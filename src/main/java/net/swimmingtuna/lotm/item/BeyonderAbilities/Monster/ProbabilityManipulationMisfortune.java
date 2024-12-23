@@ -165,9 +165,8 @@ public class ProbabilityManipulationMisfortune extends SimpleAbilityItem {
         if (luckStone == 0) {
             tag.putInt("luckStone", 10);
         }
-        if (luckDoubleDamage == 0) {
-            tag.putInt("luckDoubleDamage", 1);
-        }
+        tag.putInt("luckDoubleDamage", luckDoubleDamage + 1);
+
         if (calamityLightningStorm == 0) {
             tag.putInt("calamityLightningStorm", (int) Math.max(15, Math.random() * 50));
         }

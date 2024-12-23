@@ -114,6 +114,11 @@ public class LOTMNetworkHandler {
                 .encoder(SyncSequencePacketS2C::encode)
                 .consumerMainThread(SyncSequencePacketS2C::handle)
                 .add();
+        INSTANCE.messageBuilder(SyncShouldntRenderPacketS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncShouldntRenderPacketS2C::new)
+                .encoder(SyncShouldntRenderPacketS2C::encode)
+                .consumerMainThread(SyncShouldntRenderPacketS2C::handle)
+                .add();
         INSTANCE.messageBuilder(SendParticleS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SendParticleS2C::new)
                 .encoder(SendParticleS2C::encode)

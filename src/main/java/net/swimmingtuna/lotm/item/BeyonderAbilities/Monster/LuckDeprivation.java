@@ -80,10 +80,7 @@ public class LuckDeprivation extends SimpleAbilityItem {
             CompoundTag tag = player.getPersistentData();
             CompoundTag pTag = interactionTarget.getPersistentData();
             double luck = tag.getDouble("luck");
-            double misfortune = tag.getDouble("misfortune");
             double pLuck = pTag.getDouble("luck");
-            double pMisfortune = pTag.getDouble("misfortune");
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             tag.putDouble("luck", luck + pLuck);
             pTag.putDouble("luck", 0);
         }

@@ -3,6 +3,7 @@ package net.swimmingtuna.lotm.item;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -19,6 +20,9 @@ import net.swimmingtuna.lotm.entity.MeteorEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
+import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderPacketS2C;
+import net.swimmingtuna.lotm.util.ClientShouldntRenderData;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import net.swimmingtuna.lotm.world.worlddata.BeyonderRecipeData;
 
@@ -61,7 +65,10 @@ public class TestItem extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         if (!player.level().isClientSide()) {
-            player.getPersistentData().putInt("luckTornado", 1);
+            boolean currentValue = ClientShouldntRenderData.getShouldntRender();
+            ClientShouldntRenderData.setShouldntRender(!currentValue);
+            // Send packet to sync to clients
+            LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderPacketS2C(!currentValue), (ServerPlayer) player);
         }
         return InteractionResult.SUCCESS;
     }

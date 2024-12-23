@@ -121,8 +121,8 @@ public class ProbabilityManipulationFortune extends SimpleAbilityItem {
         tag.putInt("luckDiamonds", tag.getInt("luckDiamonds" + 10));
         tag.putInt("luckRegeneration", tag.getInt("luckRegeneration" + 10));
         tag.putInt("windMovingProjectilesCounter", tag.getInt("windMovingProjectilesCounter" + 10));
-        tag.putInt("luckHalveDamage", tag.getInt("luckIgnoreDamage" + 15));
-        tag.putInt("luckIgnoreMobs", tag.getInt("luckIgnoreDamage" + 10));
+        tag.putInt("luckHalveDamage", tag.getInt("luckHalveDamage" + 15));
+        tag.putInt("luckIgnoreMobs", tag.getInt("luckIgnoreMobs" + 10));
         tag.putInt("luckAttackerPoisoned", tag.getInt("luckIgnoreDamage" + 10));
     }
 }

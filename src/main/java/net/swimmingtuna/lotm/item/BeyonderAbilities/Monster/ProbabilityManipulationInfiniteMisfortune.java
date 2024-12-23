@@ -22,7 +22,6 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
@@ -78,6 +77,7 @@ public class ProbabilityManipulationInfiniteMisfortune extends SimpleAbilityItem
         useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
+
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
         if (!checkAll(player)) {
@@ -104,12 +104,78 @@ public class ProbabilityManipulationInfiniteMisfortune extends SimpleAbilityItem
             int y = tag.getInt("probabilityManipulationInfiniteFortune");
             if (BeyonderUtil.isBeyonderCapable(entity)) {
                 if (x >= 1) {
-                    tag.putInt("probabilityManipulationInfiniteMisfortune", x -1);
+                    tag.putInt("probabilityManipulationInfiniteMisfortune", x - 1);
                     tag.putDouble("misfortune", 777);
                 }
                 if (y >= 1) {
                     tag.putInt("probabilityManipulationInfiniteFortune", y - 1);
                     tag.putDouble("luck", 777);
+                }
+            }
+        }
+    }
+
+    public static void testEvent(LivingEvent.LivingTickEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        CompoundTag tag = livingEntity.getPersistentData();
+        int x = tag.getInt("probabilityManipulationInfiniteMisfortune");
+        int y = tag.getInt("probabilityManipulationInfiniteFortune");
+        int luckMeteor = tag.getInt("luckMeteor");
+        int luckLightningLOTM = tag.getInt("luckLightningLOTM");
+        int luckParalysis = tag.getInt("luckParalysis");
+        int luckUnequipArmor = tag.getInt("luckUnequipArmor");
+        int luckWarden = tag.getInt("luckWarden");
+        int luckLightningMC = tag.getInt("luckLightningMC");
+        int luckPoison = tag.getInt("luckPoison");
+        int luckTornado = tag.getInt("luckTornado");
+        int luckStone = tag.getInt("luckStone");
+        int luckDoubleDamage = tag.getInt("luckDoubleDamage");
+        int cantUseAbility = tag.getInt("cantUseAbility");
+        if (!livingEntity.level().isClientSide()) {
+            if (x >= 1) {
+                if (cantUseAbility == 0 && livingEntity.tickCount % 59 == 0) {
+                    tag.putInt("cantUseAbility", cantUseAbility + 1);
+                }
+                if (luckMeteor == 0 && livingEntity.tickCount % 59 == 0) {
+                    tag.putInt("luckMeteor", 40);
+                }
+                if (luckLightningLOTM == 0 && livingEntity.tickCount % 59 == 0) {
+                    tag.putInt("luckLightningLOTM", 20);
+                }
+                if (luckParalysis == 0 && livingEntity.tickCount % 59 == 0) {
+                    tag.putInt("luckParalysis", 15);
+                }
+                if (luckUnequipArmor == 0 && livingEntity.tickCount % 59 == 0) {
+                    tag.putInt("luckUnequipArmor", 25);
+                }
+                if (luckWarden == 0 && livingEntity.tickCount % 59 == 0) {
+                    tag.putInt("luckWarden", 30);
+                }
+                if (luckLightningMC == 0 && livingEntity.tickCount % 59 == 0) {
+                    tag.putInt("luckLightningMC", 1);
+                }
+                if (luckPoison == 0 && livingEntity.tickCount % 59 == 0) {
+                    tag.putInt("luckPoison", 1);
+                }
+                if (luckTornado == 0 && livingEntity.tickCount % 59 == 0) {
+                    tag.putInt("luckTornado", 35);
+                }
+                if (luckStone == 0 && livingEntity.tickCount % 59 == 0) {
+                    tag.putInt("luckStone", 10);
+                }
+                if (livingEntity.tickCount % 101 == 0) {
+                    tag.putInt("luckDoubleDamage", luckDoubleDamage + 1);
+                }
+            }
+            if (y >= 1) {
+                if (livingEntity.tickCount % 101 == 0) {
+                    tag.putInt("luckIgnoreDamage", tag.getInt("luckIgnoreDamage" + 1));
+                    tag.putInt("luckDiamonds", tag.getInt("luckDiamonds" + 2));
+                    tag.putInt("luckRegeneration", tag.getInt("luckRegeneration" + 1));
+                    tag.putInt("windMovingProjectilesCounter", tag.getInt("windMovingProjectilesCounter" + 1));
+                    tag.putInt("luckHalveDamage", tag.getInt("luckHalveDamage" + 2));
+                    tag.putInt("luckIgnoreMobs", tag.getInt("luckIgnoreMobs" + 2));
+                    tag.putInt("luckAttackerPoisoned", tag.getInt("luckAttackerPoisoned" + 2));
                 }
             }
         }

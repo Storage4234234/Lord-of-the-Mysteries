@@ -2,10 +2,13 @@ package net.swimmingtuna.lotm.events;
 
 import com.mojang.blaze3d.shaders.FogShape;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -30,6 +33,14 @@ public class KeyClientEvents {
                System.out.println("Worked");
                LOTMNetworkHandler.sendToServer(new SpiritWorldTraversalC2S());
            }
+        }
+        @SubscribeEvent
+        @OnlyIn(Dist.CLIENT)
+        public static void livingRender(RenderLivingEvent.Pre<?,?> event) {
+            LivingEntity entity = event.getEntity();
+            if (entity.getPersistentData().getBoolean("shouldntRender")) {
+                event.setCanceled(true);
+            }
         }
 
         @SubscribeEvent

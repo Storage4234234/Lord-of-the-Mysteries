@@ -42,7 +42,7 @@ public class LuckDenial extends SimpleAbilityItem {
             }
             useSpirituality(player);
             addCooldown(player);
-            giftLuck(interactionTarget, player);
+            giftLuck(player, player);
         }
         return InteractionResult.SUCCESS;
     }
@@ -88,6 +88,23 @@ public class LuckDenial extends SimpleAbilityItem {
             } else {
                 tag.putDouble("luckDenialTimer", 1800 - (holder.getCurrentSequence()) * 150);
                 tag.putDouble("luckDenialLuck", luck);
+            }
+        }
+    }
+    public static void luckDenial(LivingEntity livingEntity) {
+        CompoundTag tag = livingEntity.getPersistentData();
+        double luck = tag.getDouble("luck");
+        double misfortune = tag.getDouble("misfortune");
+        double luckDenialTimer = tag.getDouble("luckDenialTimer");
+        double luckDenialLuck = tag.getDouble("luckDenialLuck");
+        double luckDenialMisfortune = tag.getDouble("luckDenialMisfortune");
+        if (luckDenialTimer >= 1) {
+            tag.putDouble("luckDenialTimer", luckDenialTimer - 1);
+            if (luck >= luckDenialLuck) {
+                tag.putDouble("luck", luckDenialLuck);
+            }
+            if (misfortune <= luckDenialMisfortune) {
+                tag.putDouble("misfortune", luckDenialMisfortune);
             }
         }
     }

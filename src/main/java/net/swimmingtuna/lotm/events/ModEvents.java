@@ -57,6 +57,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -210,7 +211,7 @@ public class ModEvents {
             checkForProjectiles(player);
         }
         if (!player.level().isClientSide() && player.tickCount % 20 == 0) {
-
+            player.sendSystemMessage(Component.literal("value is " + player.getPersistentData().getBoolean("shouldntRender")));
         }
 
 
@@ -1173,23 +1174,7 @@ public class ModEvents {
         }
     }
 
-    private static void luckDenial(LivingEntity livingEntity) {
-        CompoundTag tag = livingEntity.getPersistentData();
-        double luck = tag.getDouble("luck");
-        double misfortune = tag.getDouble("misfortune");
-        double luckDenialTimer = tag.getDouble("luckDenialTimer");
-        double luckDenialLuck = tag.getDouble("luckDenialLuck");
-        double luckDenialMisfortune = tag.getDouble("luckDenialMisfortune");
-        if (luckDenialTimer >= 1) {
-            tag.putDouble("luckDenialTimer", luckDenialTimer - 1);
-            if (luck >= luckDenialLuck) {
-                tag.putDouble("luck", luckDenialTimer);
-            }
-            if (misfortune <= luckDenialMisfortune) {
-                tag.putDouble("misfortune", luckDenialMisfortune);
-            }
-        }
-    }
+
 
     private static void domainDrops(LivingDropsEvent event) {
         if (event.getEntity().getPersistentData().getInt("inMonsterProvidenceDomain") >= 1) {
@@ -1747,7 +1732,7 @@ public class ModEvents {
             MisfortuneRedirection.misfortuneLivingTickEvent(event);
             doubleProphecyDamageHelper(event);
             showMonsterParticles(entity);
-
+            LuckDenial.luckDenial(entity);
             MonsterCalamityIncarnation.calamityTickEvent(event);
             dreamWeaving(entity);
 
