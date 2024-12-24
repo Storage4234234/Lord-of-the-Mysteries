@@ -9,10 +9,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -79,6 +76,19 @@ public class DreamWeaving extends SimpleAbilityItem {
                 "Spirituality Used: 250\n" +
                 "Cooldown: 25 seconds").withStyle(ChatFormatting.AQUA));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
+
+    public static void dreamWeaving(LivingEntity entity) {
+        //DREAM WEAVING
+        AttributeInstance maxHp = entity.getAttribute(Attributes.MAX_HEALTH);
+        if (entity instanceof Player || maxHp.getBaseValue() != 551) {
+            return;
+        }
+        int deathTimer = entity.getPersistentData().getInt("DeathTimer");
+        entity.getPersistentData().putInt("DeathTimer", deathTimer + 1);
+        if (deathTimer >= 300) {
+            entity.remove(Entity.RemovalReason.KILLED);
+        }
     }
 
     private static void spawnMobsAroundTarget(EntityType<? extends Mob> mobEntityType, LivingEntity entity, Level level, double x, double y, double z, int numberOfMobs) {

@@ -11,13 +11,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.DomainOfDecay;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.DomainOfProvidence;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 
 public class Monster {
-    protected static void monsterDomainIntHandler(Player player) {
+    public static void monsterDomainIntHandler(Player player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
@@ -37,30 +38,9 @@ public class Monster {
         }
     }
 
-    protected static void monsterDangerSense(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
-        //WIND MANIPULATION SENSE
-        boolean monsterDangerSense = playerPersistentData.getBoolean("monsterDangerSense");
-        if (!monsterDangerSense) {
-            return;
-        }
-        if (!holder.useSpirituality(2)) return;
-        double radius = 150 - (holder.getCurrentSequence() * 15);
-        for (Player otherPlayer : player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius))) {
-            if (otherPlayer == player) {
-                continue;
-            }
-            Vec3 directionToPlayer = otherPlayer.position().subtract(player.position()).normalize();
-            Vec3 lookAngle = player.getLookAngle();
-            double horizontalAngle = Math.atan2(directionToPlayer.x, directionToPlayer.z) - Math.atan2(lookAngle.x, lookAngle.z);
 
-            String message = AbilityEventsUtil.getString(otherPlayer, horizontalAngle, directionToPlayer);
-            if (player.tickCount % 200 == 0) {
-                player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE));
-            }
-        }
-    }
 
-    protected static void monsterLuckPoisonAttacker(Player pPlayer) {
+    public static void monsterLuckPoisonAttacker(LivingEntity pPlayer) {
         if (pPlayer.tickCount % 100 == 0) {
             if (pPlayer.getPersistentData().getInt("luckAttackerPoisoned") >= 1) {
                 for (Player player : pPlayer.level().getEntitiesOfClass(Player.class, pPlayer.getBoundingBox().inflate(50))) {
@@ -74,7 +54,7 @@ public class Monster {
         }
     }
 
-    protected static void monsterLuckIgnoreMobs(Player pPlayer) {
+    public static void monsterLuckIgnoreMobs(PlayerMobEntity pPlayer) {
         if (pPlayer.tickCount % 40 == 0) {
             if (pPlayer.getPersistentData().getInt("luckIgnoreMobs") >= 1) {
                 for (Mob mob : pPlayer.level().getEntitiesOfClass(Mob.class, pPlayer.getBoundingBox().inflate(20))) {

@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -34,6 +35,58 @@ public class Tsunami extends SimpleAbilityItem {
         useSpirituality(player);
         startTsunami(player);
         return InteractionResult.SUCCESS;
+    }
+
+    public static void tsunami(CompoundTag tag, LivingEntity livingEntity) {
+        //TSUNAMI
+        int tsunami = tag.getInt("sailorTsunami");
+        if (tsunami >= 1) {
+            tag.putInt("sailorTsunami", tsunami - 5);
+            summonTsunami(livingEntity);
+        } else {
+            tag.remove("sailorTsunamiDirection");
+            tag.remove("sailorTsunamiX");
+            tag.remove("sailorTsunamiY");
+            tag.remove("sailorTsunamiZ");
+        }
+
+        //TSUNAMI SEAL
+        int tsunamiSeal = tag.getInt("sailorTsunami");
+        if (tsunamiSeal >= 1) {
+            tag.putInt("sailorTsunami", tsunamiSeal - 5);
+            summonTsunami(livingEntity);
+        } else {
+            tag.remove("sailorTsunamiDirection");
+            tag.remove("sailorTsunamiX");
+            tag.remove("sailorTsunamiY");
+            tag.remove("sailorTsunamiZ");
+        }
+    }
+
+    public static void tsunami(CompoundTag playerPersistentData, Player player) {
+        //TSUNAMI
+        int tsunami = playerPersistentData.getInt("sailorTsunami");
+        if (tsunami >= 1) {
+            playerPersistentData.putInt("sailorTsunami", tsunami - 5);
+            Tsunami.summonTsunami(player);
+        } else {
+            playerPersistentData.remove("sailorTsunamiDirection");
+            playerPersistentData.remove("sailorTsunamiX");
+            playerPersistentData.remove("sailorTsunamiY");
+            playerPersistentData.remove("sailorTsunamiZ");
+        }
+
+        //TSUNAMI SEAL
+        int tsunamiSeal = playerPersistentData.getInt("sailorTsunamiSeal");
+        if (tsunamiSeal >= 1) {
+            playerPersistentData.putInt("sailorTsunamiSeal", tsunamiSeal - 5);
+            TsunamiSeal.summonTsunami(player);
+        } else {
+            playerPersistentData.remove("sailorTsunamiSealDirection");
+            playerPersistentData.remove("sailorTsunamiSealX");
+            playerPersistentData.remove("sailorTsunamiSealY");
+            playerPersistentData.remove("sailorTsunamiSealZ");
+        }
     }
 
     public static void startTsunami(Player player) {
@@ -72,7 +125,7 @@ public class Tsunami extends SimpleAbilityItem {
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public static void summonTsunami(Player player) {
+    public static void summonTsunami(LivingEntity player) {
         CompoundTag tag = player.getPersistentData();
         int playerX = tag.getInt("sailorTsunamiX");
         int playerY = tag.getInt("sailorTsunamiY");

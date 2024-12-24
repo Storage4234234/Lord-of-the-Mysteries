@@ -3,16 +3,12 @@ package net.swimmingtuna.lotm.events.ability_events;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -31,9 +27,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.Skeleton;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
@@ -41,17 +34,12 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -80,30 +68,21 @@ import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.GameRuleInit;
 import net.swimmingtuna.lotm.init.SoundInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.DomainOfDecay;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.DomainOfProvidence;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.LuckGifting;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.DreamIntoReality;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionBarrier;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocationBlink;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ClientSequenceData;
-import net.swimmingtuna.lotm.util.CorruptionAndLuckHandler;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.worldgen.MirrorWorldChunkGenerator;
-import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.*;
 
-import static net.swimmingtuna.lotm.events.ability_events.Calamity.*;
-import static net.swimmingtuna.lotm.events.ability_events.Envision.*;
-import static net.swimmingtuna.lotm.events.ability_events.Envoirement.*;
-import static net.swimmingtuna.lotm.events.ability_events.Monster.*;
-import static net.swimmingtuna.lotm.events.ability_events.WindManipulation.*;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.DreamWeaving.dreamWeaving;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.MentalPlague.mentalPlague;
 import static net.swimmingtuna.lotm.worldgen.dimension.DimensionInit.SPIRIT_WORLD_LEVEL_KEY;
 
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID)
@@ -159,8 +138,6 @@ public class ModEvents {
     @SubscribeEvent
     public static void onPlayerTickClient(TickEvent.PlayerTickEvent event) {
         Player player = event.player;
-        Style style = BeyonderUtil.getStyle(player);
-        CompoundTag playerPersistentData = player.getPersistentData();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         int sequence = holder.getCurrentSequence();
         if (player.level().isClientSide() && holder.currentClassMatches(BeyonderClassInit.MONSTER) && sequence <= 8 && player.tickCount % 15 == 0) {
@@ -171,20 +148,13 @@ public class ModEvents {
     @SubscribeEvent
     public static void onPlayerTickServer(TickEvent.PlayerTickEvent event) {
         Player player = event.player;
-        if (!(player.level() instanceof ServerLevel serverLevel)) return;
+        if (!(player.level() instanceof ServerLevel)) return;
 
         if (player.level().isClientSide() || event.phase != TickEvent.Phase.START) return;
-
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        Style style = BeyonderUtil.getStyle(player);
-        CompoundTag playerPersistentData = player.getPersistentData();
-        int sequence = holder.getCurrentSequence();
 
         handleClientSequenceDataSync(player, holder);
         handleAttributes(player);
-
-        Map<String, Long> executionTimes = new HashMap<>();
-        executeTimedTasks(executionTimes, serverLevel, player, holder, playerPersistentData, style, sequence);
         // System.out.println(executionTimes.entrySet().stream().max(Map.Entry.comparingByValue()));
     }
 
@@ -205,162 +175,7 @@ public class ModEvents {
         }
     }
 
-    private static void executeTimedTasks(
-            Map<String, Long> times,
-            ServerLevel serverLevel,
-            Player player,
-            BeyonderHolder holder,
-            CompoundTag playerPersistentData,
-            Style style,
-            int sequence
-    ) {
-        runTimedTask(times, "decrementMonsterAttackEvent", () -> decrementMonsterAttackEvent(player));
-        runTimedTask(times, "monsterLuckIgnoreMobs", () -> monsterLuckIgnoreMobs(player));
-        runTimedTask(times, "monsterLuckPoisonAttacker", () -> monsterLuckPoisonAttacker(player));
-        runTimedTask(times, "calamityExplosion", () -> calamityExplosion(player));
-        runTimedTask(times, "calamityLightningStorm", () -> calamityLightningStorm(player));
-        runTimedTask(times, "calamityUndeadArmy", () -> calamityUndeadArmy(player));
-        runTimedTask(times, "corruptionAndLuckManagers", () -> CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel,
-                player.getAttribute(ModAttributes.MISFORTUNE.get()),
-                player.getAttribute(ModAttributes.CORRUPTION.get()),
-                player,
-                player.getAttribute(ModAttributes.LOTM_LUCK.get()),
-                holder,
-                sequence));
-        runTimedTask(times, "nightmare", () -> nightmare(player, playerPersistentData));
-        runTimedTask(times, "calamityIncarnationTornado", () -> calamityIncarnationTornado(playerPersistentData, player));
-        runTimedTask(times, "psychologicalInvisibility", () -> psychologicalInvisibility(player, playerPersistentData, holder));
-        runTimedTask(times, "monsterDomainIntHandler", () -> monsterDomainIntHandler(player));
-        runTimedTask(times, "windManipulationSense", () -> windManipulationSense(playerPersistentData, holder, player));
-        runTimedTask(times, "sailorLightningTravel", () -> sailorLightningTravel(player));
-        runTimedTask(times, "windManipulationCushion", () -> windManipulationCushion(playerPersistentData, player));
-        runTimedTask(times, "windManipulationGuide", () -> windManipulationGuide(playerPersistentData, holder, player));
-        runTimedTask(times, "dreamIntoReality", () -> dreamIntoReality(player, holder));
-        runTimedTask(times, "consciousnessStroll", () -> consciousnessStroll(playerPersistentData, player));
-        runTimedTask(times, "prophesizeTeleportation", () -> prophesizeTeleportation(playerPersistentData, player));
-        runTimedTask(times, "projectileEvent", () -> projectileEvent(player, holder));
-        runTimedTask(times, "envisionBarrier", () -> envisionBarrier(holder, player, style));
-        runTimedTask(times, "envisionLife", () -> envisionLife(player));
-        runTimedTask(times, "manipulateMovement", () -> manipulateMovement(player, serverLevel));
-        runTimedTask(times, "envisionKingdom", () -> envisionKingdom(playerPersistentData, player, holder, serverLevel));
-        runTimedTask(times, "acidicRain", () -> acidicRain(player, sequence));
-        runTimedTask(times, "calamityIncarnationTsunami", () -> calamityIncarnationTsunami(playerPersistentData, player, serverLevel));
-        runTimedTask(times, "earthquake", () -> earthquake(player, sequence));
-        runTimedTask(times, "extremeColdness", () -> extremeColdness(playerPersistentData, holder, player));
-        runTimedTask(times, "hurricane", () -> hurricane(playerPersistentData, player));
-        runTimedTask(times, "lightningStorm", () -> lightningStorm(player, playerPersistentData, style, holder));
-        runTimedTask(times, "matterAccelerationSelf", () -> matterAccelerationSelf(player, holder, style));
-        runTimedTask(times, "ragingBlows", () -> ragingBlows(playerPersistentData, holder, player));
-        runTimedTask(times, "rainEyes", () -> rainEyes(player));
-        runTimedTask(times, "sirenSongs", () -> sirenSongs(playerPersistentData, holder, player, sequence));
-        runTimedTask(times, "starOfLightning", () -> starOfLightning(player, playerPersistentData));
-        runTimedTask(times, "tsunami", () -> tsunami(playerPersistentData, player));
-        runTimedTask(times, "waterSphereCheck", () -> waterSphereCheck(player, serverLevel));
-        runTimedTask(times, "windManipulationFlight", () -> windManipulationFlight(player, playerPersistentData));
-    }
-
-    private static void runTimedTask(Map<String, Long> times, String taskName, Runnable task) {
-        long startTime = System.nanoTime();
-        task.run();
-        long endTime = System.nanoTime();
-        times.put(taskName, endTime - startTime);
-    }
-
-    private static void nightmare(Player player, CompoundTag playerPersistentData) {
-        //NIGHTMARE
-        AttributeInstance nightmareAttribute = player.getAttribute(ModAttributes.NIGHTMARE.get());
-        int nightmareTimer = playerPersistentData.getInt("NightmareTimer");
-        int matterAccelerationBlockTimer = player.getPersistentData().getInt("matterAccelerationBlockTimer");
-        if (matterAccelerationBlockTimer >= 1) {
-            player.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
-        }
-
-        if (nightmareAttribute.getValue() >= 1) {
-            nightmareTimer++;
-            if (nightmareTimer >= 600) {
-                nightmareAttribute.setBaseValue(0);
-                nightmareTimer = 0;
-            }
-        } else {
-            nightmareTimer = 0;
-        }
-        playerPersistentData.putInt("NightmareTimer", nightmareTimer);
-    }
-
-    private static void psychologicalInvisibility(Player player, CompoundTag playerPersistentData, BeyonderHolder holder) {
-        //PSYCHOLOGICAL INVISIBILITY
-
-        AttributeInstance armorInvisAttribute = player.getAttribute(ModAttributes.ARMORINVISIBLITY.get());
-        if (armorInvisAttribute.getValue() > 0 && !player.hasEffect(MobEffects.INVISIBILITY)) {
-            removeArmor(player);
-            armorInvisAttribute.setBaseValue(0);
-
-        }
-        if (playerPersistentData.getBoolean("armorStored")) {
-            player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 5, 1, false, false));
-            if (player.tickCount % 10 == 0) {
-                holder.useSpirituality((int) holder.getMaxSpirituality() / 100);
-            }
-        }
-    }
-
-    private static void sailorLightningTravel(Player player) {
-        //SAILOR LIGHTNING TRAVEL
-        if (player.getPersistentData().getInt("sailorLightningTravel") >= 1) {
-            player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 3, 1, false, false));
-            player.getPersistentData().putInt("sailorLightningTravel", player.getPersistentData().getInt("sailorLightningTravel") - 1);
-        }
-    }
-
-    private static void dreamIntoReality(Player player, BeyonderHolder holder) {
-        //DREAM INTO REALITY
-        boolean canFly = player.getPersistentData().getBoolean("CanFly");
-        if (!canFly) {
-            return;
-        }
-        if (holder.getSpirituality() >= 15) {
-            if (player.tickCount % 2 == 0) {
-                holder.useSpirituality(20);
-            }
-        }
-        if (holder.getSpirituality() <= 15) {
-            DreamIntoReality.stopFlying(player);
-        }
-        if (holder.getCurrentSequence() == 2) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 2, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
-        }
-        if (holder.getCurrentSequence() == 1) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
-        }
-        if (holder.getCurrentSequence() == 0) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 4, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 5, false, false));
-        }
-    }
-
-    private static void consciousnessStroll(CompoundTag playerPersistentData, Player player) {
-        //CONSCIOUSNESS STROLL
-        if (!(player instanceof ServerPlayer serverPlayer)) return;
-        int strollCounter = playerPersistentData.getInt("consciousnessStrollActivated");
-        int consciousnessStrollActivatedX = playerPersistentData.getInt("consciousnessStrollActivatedX");
-        int consciousnessStrollActivatedY = playerPersistentData.getInt("consciousnessStrollActivatedY");
-        int consciousnessStrollActivatedZ = playerPersistentData.getInt("consciousnessStrollActivatedZ");
-        if (strollCounter >= 1) {
-            playerPersistentData.putInt("consciousnessStrollActivated", strollCounter - 1);
-            serverPlayer.setGameMode(GameType.SPECTATOR);
-        }
-        if (strollCounter == 1) {
-            player.teleportTo(consciousnessStrollActivatedX, consciousnessStrollActivatedY, consciousnessStrollActivatedZ);
-            serverPlayer.setGameMode(GameType.SURVIVAL);
-        }
-    }
-
-    private static void prophesizeTeleportation(CompoundTag playerPersistentData, LivingEntity livingEntity) {
+    public static void prophesizeTeleportation(CompoundTag playerPersistentData, LivingEntity livingEntity) {
         //PROPHESIZE TELEPORT BLOCK/PLAYER
         if (playerPersistentData.getInt("prophesizeTeleportationCounter") >= 1) {
             playerPersistentData.putInt("prophesizeTeleportationCounter", playerPersistentData.getInt("prophesizeTeleportationCounter") - 1);
@@ -387,17 +202,7 @@ public class ModEvents {
             double movementY = Math.abs(projectile.getDeltaMovement().y());
             double movementZ = Math.abs(projectile.getDeltaMovement().z());
             if (movementX >= 6 || movementY >= 6 || movementZ >= 6) {
-                BlockPos entityPos = projectile.blockPosition();
-                for (int x = -2; x <= 2; x++) {
-                    for (int y = -2; y <= 2; y++) {
-                        for (int z = -2; z <= 2; z++) {
-                            BlockPos pos = entityPos.offset(x, y, z);
-
-                            // Remove the block (replace with air)
-                            projectile.level().setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-                        }
-                    }
-                }
+                removeBlockInRange(projectile);
                 for (LivingEntity entity1 : projectile.level().getEntitiesOfClass(LivingEntity.class, projectile.getBoundingBox().inflate(5))) {
                     if (entity1 instanceof Player playerEntity) {
                         if (!holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() == 0) {
@@ -409,7 +214,6 @@ public class ModEvents {
                 }
             }
         }
-
 
         //SAILOR PASSIVE CHECK FROM HERE
         LivingEntity target = projectileEvent.getTarget(75, 0);
@@ -430,122 +234,16 @@ public class ModEvents {
 
     }
 
-    private static void manipulateMovement(Player player, Level level) {
-        //MANIPULATE MOVEMENT
-        if (!player.getPersistentData().getBoolean("manipulateMovementBoolean")) {
-            return;
-        }
-        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
-            if (entity == player || !entity.hasEffect(ModEffects.MANIPULATION.get())) {
-                continue;
-            }
-            int targetX = player.getPersistentData().getInt("manipulateMovementX");
-            int targetY = player.getPersistentData().getInt("manipulateMovementY");
-            int targetZ = player.getPersistentData().getInt("manipulateMovementZ");
+    public static void removeBlockInRange(Projectile projectile) {
+        BlockPos entityPos = projectile.blockPosition();
+        for (int x = -2; x <= 2; x++) {
+            for (int y = -2; y <= 2; y++) {
+                for (int z = -2; z <= 2; z++) {
+                    BlockPos pos = entityPos.offset(x, y, z);
 
-            if (entity.distanceToSqr(targetX, targetY, targetZ) <= 8) {
-                entity.removeEffect(ModEffects.MANIPULATION.get());
-                continue;
-            }
-
-            if (!(entity instanceof Player)) {
-                if (entity instanceof Mob mob) {
-                    mob.getNavigation().moveTo(targetX, targetY, targetZ, 1.7);
+                    // Remove the block (replace with air)
+                    projectile.level().setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
                 }
-                continue;
-            }
-            // Existing logic for players
-            double entityX = entity.getX();
-            double entityY = entity.getY();
-            double entityZ = entity.getZ();
-
-            double dx = targetX - entityX;
-            double dy = targetY - entityY;
-            double dz = targetZ - entityZ;
-
-            double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-            if (distance > 0) {
-                dx /= distance;
-                dy /= distance;
-                dz /= distance;
-            }
-
-            double speed = 3.0 / 20;
-
-            BlockPos frontBlockPos = new BlockPos((int) (entityX + dx), (int) (entityY + dy), (int) (entityZ + dz));
-            BlockPos frontBlockPos1 = new BlockPos((int) (entityX + dx * 2), (int) (entityY + dy * 2), (int) (entityZ + dz * 2));
-            boolean pathIsClear = level.getBlockState(frontBlockPos).isAir() && level.getBlockState(frontBlockPos1).isAir();
-
-            if (pathIsClear) {
-                entity.setDeltaMovement(dx * speed, Math.min(0, dy * speed), dz * speed);
-            } else {
-                entity.setDeltaMovement(dx * speed, 0.25, dz * speed);
-            }
-        }
-    }
-
-    private static void acidicRain(Player player, int sequence) {
-        //ACIDIC RAIN
-        int acidicRain = player.getPersistentData().getInt("sailorAcidicRain");
-        if (acidicRain <= 0) {
-            return;
-        }
-        player.getPersistentData().putInt("sailorAcidicRain", acidicRain + 1);
-        AcidicRain.spawnAcidicRainParticles(player);
-        double radius1 = 50 - (sequence * 7);
-        double radius2 = 10 - sequence;
-
-
-        for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius1))) {
-            if (entity == player) {
-                continue;
-            }
-            if (entity.hasEffect(MobEffects.POISON)) {
-                int poisonAmp = entity.getEffect(MobEffects.POISON).getAmplifier();
-                if (poisonAmp == 0) {
-                    entity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 1, false, false));
-                }
-            } else {
-                entity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 1, false, false));
-            }
-        }
-
-        for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius2))) {
-            if (entity == player) {
-                continue;
-            }
-            if (entity.hasEffect(MobEffects.POISON)) {
-                int poisonAmp = entity.getEffect(MobEffects.POISON).getAmplifier();
-                if (poisonAmp <= 2) {
-                    entity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 2, false, false));
-                }
-            } else {
-                entity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 2, false, false));
-            }
-        }
-
-
-        if (acidicRain > 300) {
-            player.getPersistentData().putInt("sailorAcidicRain", 0);
-        }
-    }
-
-    private static void luckDenial(LivingEntity livingEntity) {
-        CompoundTag tag = livingEntity.getPersistentData();
-        AttributeInstance luck = livingEntity.getAttribute(ModAttributes.LOTM_LUCK.get());
-        AttributeInstance misfortune = livingEntity.getAttribute(ModAttributes.MISFORTUNE.get());
-        double luckDenialTimer = tag.getDouble("luckDenialTimer");
-        double luckDenialLuck = tag.getDouble("luckDenialLuck");
-        double luckDenialMisfortune = tag.getDouble("luckDenialMisfortune");
-        double misfortuneAmount = misfortune.getBaseValue();
-        double luckAmount = luck.getBaseValue();
-        if (luckDenialTimer >= 1) {
-            tag.putDouble("luckDenialTimer", luckDenialTimer - 1);
-            if (luckAmount >= luckDenialLuck) {
-                luck.setBaseValue(luckAmount);
-            }
-            if (misfortuneAmount <= luckDenialMisfortune) {
-                misfortune.setBaseValue(luckDenialMisfortune);
             }
         }
     }
@@ -591,57 +289,6 @@ public class ModEvents {
         if (luckGiftingAmount > 101) {
             player.displayClientMessage(Component.literal("Luck Gifting Amount is 0").withStyle(style), true);
             player.getPersistentData().putInt("monsterLuckGifting", 0);
-        }
-    }
-
-    private static void ragingBlows(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
-        //RAGING BLOWS
-        boolean sailorLightning = playerPersistentData.getBoolean("SailorLightning");
-        int ragingBlows = playerPersistentData.getInt("ragingBlows");
-        int ragingBlowsRadius = (27 - (holder.getCurrentSequence() * 3));
-        int damage = 20 - holder.getCurrentSequence() * 2;
-        if (ragingBlows >= 1) {
-            RagingBlows.spawnRagingBlowsParticles(player);
-            playerPersistentData.putInt("ragingBlows", ragingBlows + 1);
-        }
-        if (ragingBlows >= 6 && ragingBlows <= 96 && ragingBlows % 6 == 0) {
-            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.NEUTRAL, 0.5F, 0.5F);
-            Vec3 playerLookVector = player.getViewVector(1.0F);
-            Vec3 playerPos = player.position();
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, new AABB(playerPos.x - ragingBlowsRadius, playerPos.y - ragingBlowsRadius, playerPos.z - ragingBlowsRadius, playerPos.x + ragingBlowsRadius, playerPos.y + ragingBlowsRadius, playerPos.z + ragingBlowsRadius))) {
-                if (entity != player && playerLookVector.dot(entity.position().subtract(playerPos)) > 0) {
-                    entity.hurt(entity.damageSources().generic(), damage);
-                    double ragingBlowsX = player.getX() - entity.getX();
-                    double ragingBlowsZ = player.getZ() - entity.getZ();
-                    entity.knockback(0.25, ragingBlowsX, ragingBlowsZ);
-                    if (holder.getCurrentSequence() <= 7) {
-                        double chanceOfDamage = (100.0 - (holder.getCurrentSequence() * 12.5));
-                        if (Math.random() * 100 < chanceOfDamage && sailorLightning) {
-                            LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, entity.level());
-                            lightningBolt.moveTo(entity.getX(), entity.getY(), entity.getZ());
-                            entity.level().addFreshEntity(lightningBolt);
-                        }
-                    }
-                }
-            }
-        }
-        if (ragingBlows >= 100) {
-            ragingBlows = 0;
-            playerPersistentData.putInt("ragingBlows", 0);
-        }
-    }
-
-    private static void rainEyes(Player player) {
-        //RAIN EYES
-        if (!player.level().isRaining()) {
-            return;
-        }
-        if (player.getPersistentData().getBoolean("torrentialDownpour") && player.tickCount % 200 == 0) {
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(500))) {
-                if (entity != player && entity instanceof Player otherPlayer && otherPlayer.isInWaterOrRain()) {
-                    player.sendSystemMessage(Component.literal(otherPlayer.getName().getString() + "'s location is " + otherPlayer.getX() + ", " + otherPlayer.getY() + ", " + otherPlayer.getZ()).withStyle(ChatFormatting.BOLD));
-                }
-            }
         }
     }
 
@@ -817,65 +464,13 @@ public class ModEvents {
         }
     }
 
-
-    private static void starOfLightning(Player player, CompoundTag playerPersistentData) {
-        //STAR OF LIGHTNING
-        int sailorLightningStar = playerPersistentData.getInt("sailorLightningStar");
-        if (sailorLightningStar >= 2) {
-            StarOfLightning.summonLightningParticles(player);
-            player.level().playSound(player, player.getOnPos(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 10, 1);
-            playerPersistentData.putInt("sailorLightningStar", sailorLightningStar - 1);
-        }
-        if (sailorLightningStar == 1) {
-            playerPersistentData.putInt("sailorLightningStar", 0);
-            for (int i = 0; i < 500; i++) {
-                LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());
-                lightningEntity.setSpeed(50);
-                double sailorStarX = (Math.random() * 2 - 1);
-                double sailorStarY = (Math.random() * 2 - 1);
-                double sailorStarZ = (Math.random() * 2 - 1);
-                lightningEntity.setDeltaMovement(sailorStarX, sailorStarY, sailorStarZ);
-                lightningEntity.setMaxLength(10);
-                lightningEntity.setOwner(player);
-                lightningEntity.teleportTo(player.getX(), player.getY(), player.getZ());
-                player.level().addFreshEntity(lightningEntity);
-            }
-        }
-    }
-
     private static void domainDropsExperience(LivingExperienceDropEvent event) {
         //MONSTER PROVIDENCE DOMAIN
         if (!event.getEntity().level().isClientSide() && event.getEntity().getPersistentData().getInt("inMonsterProvidenceDomain") >= 1) {
-                int droppedExperience = event.getDroppedExperience();
-                event.setDroppedExperience((int) (droppedExperience * 1.5));
-            }
-
-    }
-
-    private static void tsunami(CompoundTag playerPersistentData, Player player) {
-        //TSUNAMI
-        int tsunami = playerPersistentData.getInt("sailorTsunami");
-        if (tsunami >= 1) {
-            playerPersistentData.putInt("sailorTsunami", tsunami - 5);
-            Tsunami.summonTsunami(player);
-        } else {
-            playerPersistentData.remove("sailorTsunamiDirection");
-            playerPersistentData.remove("sailorTsunamiX");
-            playerPersistentData.remove("sailorTsunamiY");
-            playerPersistentData.remove("sailorTsunamiZ");
+            int droppedExperience = event.getDroppedExperience();
+            event.setDroppedExperience((int) (droppedExperience * 1.5));
         }
 
-        //TSUNAMI SEAL
-        int tsunamiSeal = playerPersistentData.getInt("sailorTsunamiSeal");
-        if (tsunamiSeal >= 1) {
-            playerPersistentData.putInt("sailorTsunamiSeal", tsunamiSeal - 5);
-            TsunamiSeal.summonTsunami(player);
-        } else {
-            playerPersistentData.remove("sailorTsunamiSealDirection");
-            playerPersistentData.remove("sailorTsunamiSealX");
-            playerPersistentData.remove("sailorTsunamiSealY");
-            playerPersistentData.remove("sailorTsunamiSealZ");
-        }
     }
 
     private static void waterSphereCheck(Player player, ServerLevel level) {
@@ -910,7 +505,7 @@ public class ModEvents {
                 for (int sphereY = (int) -maxRemovalRadius; sphereY <= maxRemovalRadius; sphereY++) {
                     for (int sphereZ = (int) -maxRemovalRadius; sphereZ <= maxRemovalRadius; sphereZ++) {
                         double sphereDistance = Math.sqrt(sphereX * sphereX + sphereY * sphereY + sphereZ * sphereZ);
-                        if ( (sphereDistance > maxRemovalRadius) || (sphereDistance < minRemovalRadius)) {
+                        if ((sphereDistance > maxRemovalRadius) || (sphereDistance < minRemovalRadius)) {
                             continue;
                         }
                         BlockPos blockPos = playerPos.offset(sphereX, sphereY, sphereZ);
@@ -1107,22 +702,7 @@ public class ModEvents {
                 if (entity.getDeltaMovement().y <= 0.2) {
                     entity.setDeltaMovement(entity.getDeltaMovement().x, Math.min(0, entity.getDeltaMovement().y - 0.5), entity.getDeltaMovement().z);
                 }
-                tag.putInt("lightDrowning", aqueousLight + 1);
-                if (level.getBlockState(headPos).is(Blocks.AIR)) {
-                    level.setBlockAndUpdate(headPos, Blocks.WATER.defaultBlockState());
-                }
-                for (int x = -3; x <= 3; x++) {
-                    for (int y = -3; y <= 3; y++) {
-                        for (int z = -3; z <= 3; z++) {
-                            if (Math.abs(x) > 1 || Math.abs(y) > 1 || Math.abs(z) > 1) {
-                                BlockPos blockPos = headPos.offset(x, y, z);
-                                if (level.getBlockState(blockPos).is(Blocks.WATER)) {
-                                    level.setBlockAndUpdate(blockPos, Blocks.AIR.defaultBlockState());
-                                }
-                            }
-                        }
-                    }
-                }
+                waterElemination(tag, level, headPos, aqueousLight);
             }
 
 
@@ -1144,7 +724,6 @@ public class ModEvents {
                 if (affectedBySailorExtremeColdness >= 20) {
                     entity.addEffect(new MobEffectInstance(ModEffects.AWE.get(), 100, 1, false, false));
                     tag.putInt("affectedBySailorExtremeColdness", 0);
-                    affectedBySailorExtremeColdness = 0;
                     entity.hurt(entity.damageSources().freeze(), 30);
                 }
             }
@@ -1164,32 +743,7 @@ public class ModEvents {
                 double maxRemovalRadius = 11.0;
 
                 // Create a sphere of water around the player
-                for (int x = (int) -radius; x <= radius; x++) {
-                    for (int y = (int) -radius; y <= radius; y++) {
-                        for (int z = (int) -radius; z <= radius; z++) {
-                            double distance = Math.sqrt(x * x + y * y + z * z);
-                            if (distance <= radius) {
-                                BlockPos blockPos = playerPos.offset(x, y, z);
-                                if (level.getBlockState(blockPos).isAir() && !level.getBlockState(blockPos).is(Blocks.WATER)) {
-                                    level.setBlock(blockPos, Blocks.WATER.defaultBlockState(), 3);
-                                }
-                            }
-                        }
-                    }
-                }
-                for (int x = (int) -maxRemovalRadius; x <= maxRemovalRadius; x++) {
-                    for (int y = (int) -maxRemovalRadius; y <= maxRemovalRadius; y++) {
-                        for (int z = (int) -maxRemovalRadius; z <= maxRemovalRadius; z++) {
-                            double distance = Math.sqrt(x * x + y * y + z * z);
-                            if (distance <= maxRemovalRadius && distance >= minRemovalRadius) {
-                                BlockPos blockPos = playerPos.offset(x, y, z);
-                                if (level.getBlockState(blockPos).getBlock() == Blocks.WATER) {
-                                    level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
-                                }
-                            }
-                        }
-                    }
-                }
+                waterSphereOnPlayer(level, playerPos, radius, minRemovalRadius, maxRemovalRadius);
                 tag.putInt("sailorSeal", sealCounter - 1);
                 if (sealCounter % 20 == 0) {
                     entity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 40, 1, false, false));
@@ -1200,19 +754,7 @@ public class ModEvents {
                 double minRemovalRadius = 6.0;
                 double maxRemovalRadius = 11.0;
                 BlockPos playerPos = entity.blockPosition();
-                for (int x = (int) -maxRemovalRadius; x <= maxRemovalRadius; x++) {
-                    for (int y = (int) -maxRemovalRadius; y <= maxRemovalRadius; y++) {
-                        for (int z = (int) -maxRemovalRadius; z <= maxRemovalRadius; z++) {
-                            double distance = Math.sqrt(x * x + y * y + z * z);
-                            if (distance <= maxRemovalRadius && distance >= minRemovalRadius) {
-                                BlockPos blockPos = playerPos.offset(x, y, z);
-                                if (level.getBlockState(blockPos).getBlock() == Blocks.WATER) {
-                                    level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
-                                }
-                            }
-                        }
-                    }
-                }
+                sealWaterRemoval(level, minRemovalRadius, maxRemovalRadius, playerPos);
             }
 
 
@@ -1238,9 +780,9 @@ public class ModEvents {
                     entity.addEffect(new MobEffectInstance(ModEffects.STUN.get(), 20, 0, false, false));
                 }
                 if (stormSeal % 20 == 0 && entity instanceof Player player) {
-                        int sealSeconds = stormSeal / 20;
-                        player.displayClientMessage(Component.literal("You are stuck in the storm seal for " + sealSeconds + " seconds").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
-                    }
+                    int sealSeconds = stormSeal / 20;
+                    player.displayClientMessage(Component.literal("You are stuck in the storm seal for " + sealSeconds + " seconds").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
+                }
 
             }
             if (tag.getInt("inStormSeal") == 2 || tag.getInt("inStormSeal") == 1) {
@@ -1253,16 +795,68 @@ public class ModEvents {
         }
     }
 
-    private static void dreamWeaving(LivingEntity entity) {
-        //DREAM WEAVING
-        AttributeInstance maxHp = entity.getAttribute(Attributes.MAX_HEALTH);
-        if (entity instanceof Player || maxHp.getBaseValue() != 551) {
-            return;
+    private static void sealWaterRemoval(Level level, double minRemovalRadius, double maxRemovalRadius, BlockPos playerPos) {
+        for (int x = (int) -maxRemovalRadius; x <= maxRemovalRadius; x++) {
+            for (int y = (int) -maxRemovalRadius; y <= maxRemovalRadius; y++) {
+                for (int z = (int) -maxRemovalRadius; z <= maxRemovalRadius; z++) {
+                    double distance = Math.sqrt(x * x + y * y + z * z);
+                    if (distance <= maxRemovalRadius && distance >= minRemovalRadius) {
+                        BlockPos blockPos = playerPos.offset(x, y, z);
+                        if (level.getBlockState(blockPos).getBlock() == Blocks.WATER) {
+                            level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
+                        }
+                    }
+                }
+            }
         }
-        int deathTimer = entity.getPersistentData().getInt("DeathTimer");
-        entity.getPersistentData().putInt("DeathTimer", deathTimer + 1);
-        if (deathTimer >= 300) {
-            entity.remove(Entity.RemovalReason.KILLED);
+    }
+
+    public static void waterSphereOnPlayer(Level level, BlockPos playerPos, double radius, double minRemovalRadius, double maxRemovalRadius) {
+        for (int x = (int) -radius; x <= radius; x++) {
+            for (int y = (int) -radius; y <= radius; y++) {
+                for (int z = (int) -radius; z <= radius; z++) {
+                    double distance = Math.sqrt(x * x + y * y + z * z);
+                    if (distance <= radius) {
+                        BlockPos blockPos = playerPos.offset(x, y, z);
+                        if (level.getBlockState(blockPos).isAir() && !level.getBlockState(blockPos).is(Blocks.WATER)) {
+                            level.setBlock(blockPos, Blocks.WATER.defaultBlockState(), 3);
+                        }
+                    }
+                }
+            }
+        }
+        sealWaterRemoval(level, minRemovalRadius, maxRemovalRadius, playerPos);
+    }
+
+    public static void waterElemination(CompoundTag tag, Level level, BlockPos headPos, int aqueousLight) {
+        tag.putInt("lightDrowning", aqueousLight + 1);
+        if (level.getBlockState(headPos).is(Blocks.AIR)) {
+            level.setBlockAndUpdate(headPos, Blocks.WATER.defaultBlockState());
+        }
+        for (int x = -3; x <= 3; x++) {
+            for (int y = -3; y <= 3; y++) {
+                for (int z = -3; z <= 3; z++) {
+                    if (Math.abs(x) > 1 || Math.abs(y) > 1 || Math.abs(z) > 1) {
+                        BlockPos blockPos = headPos.offset(x, y, z);
+                        if (level.getBlockState(blockPos).is(Blocks.WATER)) {
+                            level.setBlockAndUpdate(blockPos, Blocks.AIR.defaultBlockState());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void waterRemovalFromMinusThreeToThree(Level level, BlockPos headPos) {
+        for (int x = -3; x <= 3; x++) {
+            for (int y = -3; y <= 3; y++) {
+                for (int z = -3; z <= 3; z++) {
+                    BlockPos blockPos = headPos.offset(x, y, z);
+                    if (level.getBlockState(blockPos).is(Blocks.WATER)) {
+                        level.setBlockAndUpdate(blockPos, Blocks.AIR.defaultBlockState());
+                    }
+                }
+            }
         }
     }
 
@@ -1303,24 +897,6 @@ public class ModEvents {
                 entity1.hurt(entity1.damageSources().lightningBolt(), 10);
             }
         }
-    }
-
-    private static void mentalPlague(LivingEntity entity) {
-        //MENTAL PLAGUE
-        int mentalPlagueTimer = entity.getPersistentData().getInt("MentalPlagueTimer");
-        if (entity.hasEffect(ModEffects.MENTALPLAGUE.get())) {
-            mentalPlagueTimer++;
-
-            if (mentalPlagueTimer >= 600) {
-                for (LivingEntity entity1 : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(50))) {
-                    applyEffectsAndDamage(entity1);
-
-                }
-                applyEffectsAndDamage(entity);
-                mentalPlagueTimer = 0;
-            }
-        }
-        entity.getPersistentData().putInt("MentalPlagueTimer", mentalPlagueTimer);
     }
 
 
@@ -1390,23 +966,13 @@ public class ModEvents {
     }
 
 
-    private static void applyEffectsAndDamage(LivingEntity entity) {
+    public static void applyEffectsAndDamage(LivingEntity entity) {
         entity.addEffect(new MobEffectInstance(MobEffects.POISON, 400, 2, false, false));
         entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 400, 1, false, false));
         entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 400, 1, false, false));
         entity.hurt(entity.damageSources().magic(), 20);
     }
 
-    private static void removeArmor(Player player) {
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
-                ItemStack armorStack = player.getItemBySlot(slot);
-                if (!armorStack.isEmpty()) {
-                    player.setItemSlot(slot, ItemStack.EMPTY);
-                }
-            }
-        }
-    }
 
     private static void decrementMonsterAttackEvent(Player pPlayer) {
         if (pPlayer.getPersistentData().getInt("attackedMonster") >= 1) {
@@ -1419,10 +985,10 @@ public class ModEvents {
         LivingEntity attacked = event.getEntity();
         Entity attacker = event.getSource().getEntity();
         if (attacker != null && !attacker.level().isClientSide() && attacked instanceof Player pPlayer) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                    if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 5 && attacker instanceof LivingEntity) {
-                            attacker.getPersistentData().putInt("attackedMonster", 100);
-                        }
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
+            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 5 && attacker instanceof LivingEntity) {
+                attacker.getPersistentData().putInt("attackedMonster", 100);
+            }
         }
     }
 
@@ -1537,16 +1103,7 @@ public class ModEvents {
             if (entity.getPersistentData().getInt("lightDrowning") >= 1) {
                 Level level = entity.level();
                 BlockPos headPos = BlockPos.containing(entity.getEyePosition());
-                for (int x = -3; x <= 3; x++) {
-                    for (int y = -3; y <= 3; y++) {
-                        for (int z = -3; z <= 3; z++) {
-                            BlockPos blockPos = headPos.offset(x, y, z);
-                            if (level.getBlockState(blockPos).is(Blocks.WATER)) {
-                                level.setBlockAndUpdate(blockPos, Blocks.AIR.defaultBlockState());
-                            }
-                        }
-                    }
-                }
+                waterRemovalFromMinusThreeToThree(level, headPos);
             }
 
             //STORM SEAL
@@ -1598,6 +1155,8 @@ public class ModEvents {
             }
         }
     }
+
+
 
     private static void dodgeProjectiles(Player pPlayer) {
         if (pPlayer.getPersistentData().getInt("windMovingProjectilesCounter") >= 1) {
@@ -1829,65 +1388,39 @@ public class ModEvents {
                     return;
                 }
                 dir.setBaseValue(1);
-                if (armorinvis == null) {
-                    return;
-                }
-                armorinvis.setBaseValue(0);
-                if (luck == null) {
-                    return;
-                }
-                luck.setBaseValue(0);
-                if (misfortune == null) {
-                    return;
-                }
-                misfortune.setBaseValue(0);
-
-                if (particle == null) {
-                    return;
-                }
-                particle.setBaseValue(0);
-                if (particle1 == null) {
-                    return;
-                }
-                particle1.setBaseValue(0);
-                if (particle2 == null) {
-                    return;
-                }
-                particle2.setBaseValue(0);
-                if (particle3 == null) {
-                    return;
-                }
-                particle3.setBaseValue(0);
-                if (particle4 == null) {
-                    return;
-                }
-                particle4.setBaseValue(0);
-                if (particle5 == null) {
-                    return;
-                }
-                particle5.setBaseValue(0);
-                if (particle6 == null) {
-                    return;
-                }
-                particle6.setBaseValue(0);
-                if (particle7 == null) {
-                    return;
-                }
-                particle7.setBaseValue(0);
-                if (particle8 == null) {
-                    return;
-                }
-                particle8.setBaseValue(0);
+                if (particleSetter(armorinvis, luck, misfortune, particle, particle1, particle2)) return;
+                if (particleSetter(particle3, particle4, particle5, particle6, particle7, particle8)) return;
                 if (particle9 == null) {
                     return;
                 }
                 particle9.setBaseValue(0);
                 if (livingEntity instanceof PlayerMobEntity playerMobEntity && !playerMobEntity.level().getLevelData().getGameRules().getBoolean(GameRuleInit.NPC_SHOULD_SPAWN)) {
-                        event.setCanceled(true);
-                    }
+                    event.setCanceled(true);
+                }
 
             }
         }
+    }
+
+    private static boolean particleSetter(AttributeInstance particle3, AttributeInstance particle4, AttributeInstance particle5, AttributeInstance particle6, AttributeInstance particle7, AttributeInstance particle8) {
+        if (particleSetterPartTwo(particle3, particle4, particle5)) return true;
+        return particleSetterPartTwo(particle6, particle7, particle8);
+    }
+
+    private static boolean particleSetterPartTwo(AttributeInstance particle1, AttributeInstance particle2, AttributeInstance particle3) {
+        if (particle1 == null) {
+            return true;
+        }
+        particle1.setBaseValue(0);
+        if (particle2 == null) {
+            return true;
+        }
+        particle2.setBaseValue(0);
+        if (particle3 == null) {
+            return true;
+        }
+        particle3.setBaseValue(0);
+        return false;
     }
 
 }

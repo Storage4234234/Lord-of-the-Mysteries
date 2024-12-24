@@ -28,27 +28,31 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.*;
 import net.swimmingtuna.lotm.events.ability_events.ModEvents;
+import net.swimmingtuna.lotm.events.ability_events.Monster;
 import net.swimmingtuna.lotm.events.custom_events.ModEventFactory;
 import net.swimmingtuna.lotm.events.custom_events.ProjectileEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.SoundInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
-import virtuoel.pehkui.api.ScaleData;
-import virtuoel.pehkui.api.ScaleTypes;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+import static net.swimmingtuna.lotm.events.ability_events.Monster.monsterLuckIgnoreMobs;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.Earthquake.earthquake;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.ExtremeColdness.extremeColdness;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.SirenSongStrengthen.isInsideSphere;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLife.envisionLife;
 
 public class TickEventUtil {
 
@@ -61,40 +65,40 @@ public class TickEventUtil {
         int sequence = playerMobEntity.getCurrentSequence();
         decrementMonsterAttackEvent(playerMobEntity);
         monsterLuckIgnoreMobs(playerMobEntity);
-        monsterLuckPoisonAttacker(playerMobEntity);
+        Monster.monsterLuckPoisonAttacker(playerMobEntity);
         calamityExplosion(playerMobEntity);
         calamityLightningStorm(playerMobEntity);
         calamityUndeadArmy(playerMobEntity);
         PlayerMobCorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, misfortune, corruption, playerMobEntity, luck, sequence);
-        nightmare(playerMobEntity, livingEntityPersistentData);
-        envisionKingdom(livingEntityPersistentData, playerMobEntity, serverLevel);
+        Nightmare.nightmare(playerMobEntity, livingEntityPersistentData);
+        EnvisionKingdom.envisionKingdom(livingEntityPersistentData, playerMobEntity, serverLevel);
         calamityIncarnationTornado(livingEntityPersistentData, playerMobEntity);
-        psychologicalInvisibility(playerMobEntity, livingEntityPersistentData);
-        windManipulationSense(livingEntityPersistentData, playerMobEntity);
-        windManipulationCushion(livingEntityPersistentData, playerMobEntity);
+        PsychologicalInvisibility.psychologicalInvisibility(playerMobEntity, livingEntityPersistentData);
+        WindManipulationSense.windManipulationSense(livingEntityPersistentData, playerMobEntity);
+        WindManipulationCushion.windManipulationCushion(livingEntityPersistentData, playerMobEntity);
         windManipulationGuide(livingEntityPersistentData, playerMobEntity);
-        sailorLightningTravel(playerMobEntity);
-        dreamIntoReality(playerMobEntity);
+        SailorLightningTravel.sailorLightningTravel(playerMobEntity);
+        DreamIntoReality.dreamIntoReality(playerMobEntity);
         //consciousnessStroll is meant to be here but no real use for entities
-        prophesizeTeleportation(livingEntityPersistentData, playerMobEntity);
+        ModEvents.prophesizeTeleportation(livingEntityPersistentData, playerMobEntity);
         projectileEvent(playerMobEntity);
-        envisionBarrier(playerMobEntity);
+        EnvisionBarrier.envisionBarrier(playerMobEntity);
         envisionLife(playerMobEntity);
-        manipulateMovement(playerMobEntity, serverLevel);
+        ManipulateMovement.manipulateMovement(playerMobEntity, serverLevel);
         acidicRain(playerMobEntity, sequence);
-        calamityIncarnationTsunami(livingEntityPersistentData, playerMobEntity, serverLevel);
+        CalamityIncarnationTsunami.calamityIncarnationTsunami(livingEntityPersistentData, playerMobEntity, serverLevel);
         earthquake(playerMobEntity, sequence);
         extremeColdness(livingEntityPersistentData, playerMobEntity);
-        hurricane(livingEntityPersistentData, playerMobEntity);
+        Hurricane.hurricane(livingEntityPersistentData, playerMobEntity);
         lightningStorm(playerMobEntity, livingEntityPersistentData);
         matterAccelerationSelf(playerMobEntity);
-        ragingBlows(livingEntityPersistentData, playerMobEntity);
+        RagingBlows.ragingBlows(livingEntityPersistentData, playerMobEntity);
         rainEyes(playerMobEntity);
         sirenSongs(livingEntityPersistentData, playerMobEntity, sequence);
         starOfLightning(playerMobEntity, livingEntityPersistentData);
-        tsunami(livingEntityPersistentData, playerMobEntity);
+        Tsunami.tsunami(livingEntityPersistentData, playerMobEntity);
         waterSphereCheck(playerMobEntity, serverLevel);
-        windManipulationFlight(playerMobEntity, livingEntityPersistentData);
+        WindManipulationFlight.windManipulationFlight(playerMobEntity, livingEntityPersistentData);
         sirenSongsParticles(playerMobEntity);
     }
 
@@ -151,7 +155,6 @@ public class TickEventUtil {
             playerPersistentData.putInt("sailorStormVec", 50);
             if (stormVec > 300) {
                 playerPersistentData.putInt("sailorStormVec", 0);
-                stormVec = 0;
             }
         }
     }
@@ -176,144 +179,6 @@ public class TickEventUtil {
         }
         if (blinkDistance > 200) {
             player.getPersistentData().putInt("BlinkDistance", 0);
-        }
-    }
-
-    private static void earthquake(PlayerMobEntity player, int sequence) {
-        //EARTHQUAKE
-        int sailorEarthquake = player.getPersistentData().getInt("sailorEarthquake");
-        if (sailorEarthquake >= 0) {
-            player.getPersistentData().putInt("sailorEarthquake", sailorEarthquake - 1);
-        }
-        if (!(sailorEarthquake % 20 == 0 && sailorEarthquake != 0 || sailorEarthquake == 1)) {
-            return;
-        }
-        int radius = 100 - (sequence * 10);
-        for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate((radius)))) {
-            if (entity != player) {
-                if (entity.onGround()) {
-                    entity.hurt(player.damageSources().fall(), 35 - (sequence * 5));
-                }
-            }
-        }
-        AABB checkArea = player.getBoundingBox().inflate(radius);
-        Random random = new Random();
-        for (BlockPos blockPos : BlockPos.betweenClosedStream(checkArea).toList()) {
-
-            if (!player.level().getBlockState(blockPos).isAir() && Earthquake.isOnSurface(player.level(), blockPos)) {
-                if (random.nextInt(200) == 1) { // 50% chance to destroy a block
-                    player.level().destroyBlock(blockPos, false);
-                } else if (random.nextInt(200) == 2) { // 10% chance to spawn a stone entity
-                    StoneEntity stoneEntity = new StoneEntity(player.level(), player);
-                    ScaleData scaleData = ScaleTypes.BASE.getScaleData(stoneEntity);
-                    stoneEntity.teleportTo(blockPos.getX(), blockPos.getY() + 3, blockPos.getZ());
-                    stoneEntity.setDeltaMovement(0, 3 + Math.random() * 3, 0);
-                    stoneEntity.setStoneYRot((int) (Math.random() * 18));
-                    stoneEntity.setStoneXRot((int) (Math.random() * 18));
-                    scaleData.setScale((float) (1 + Math.random() * 2.0f));
-                    player.level().addFreshEntity(stoneEntity);
-                }
-            }
-        }
-    }
-
-    private static void extremeColdness(CompoundTag playerPersistentData, PlayerMobEntity player) {
-        //EXTREME COLDNESS
-        int extremeColdness = playerPersistentData.getInt("sailorExtremeColdness");
-        if (extremeColdness >= 150 - (player.getCurrentSequence()) * 20) {
-            playerPersistentData.putInt("sailorExtremeColdness", 0);
-            extremeColdness = 0;
-        }
-        if (extremeColdness < 1) {
-            return;
-        }
-        playerPersistentData.putInt("sailorExtremeColdness", extremeColdness + 1);
-
-        AABB areaOfEffect = player.getBoundingBox().inflate(extremeColdness);
-        List<LivingEntity> entities = player.level().getEntitiesOfClass(LivingEntity.class, areaOfEffect);
-        for (LivingEntity entity : entities) {
-            if (entity != player) {
-                int affectedBySailorExtremeColdness = entity.getPersistentData().getInt("affectedBySailorExtremeColdness");
-                entity.getPersistentData().putInt("affectedBySailorExtremeColdness", affectedBySailorExtremeColdness + 1);
-                entity.setTicksFrozen(1);
-            }
-        }
-        List<Entity> entities1 = player.level().getEntitiesOfClass(Entity.class, areaOfEffect); //test thsi
-        for (Entity entity : entities1) {
-            if (!(entity instanceof LivingEntity)) {
-                int affectedBySailorColdness = entity.getPersistentData().getInt("affectedBySailorColdness");
-                entity.getPersistentData().putInt("affectedBySailorColdness", affectedBySailorColdness + 1);
-                if (affectedBySailorColdness == 10) {
-                    entity.setDeltaMovement(entity.getDeltaMovement().x() / 5, entity.getDeltaMovement().y() / 5, entity.getDeltaMovement().z() / 5);
-                    entity.hurtMarked = true;
-                    entity.getPersistentData().putInt("affectedBySailorColdness", 0);
-                }
-            }
-        }
-
-        // Additional part: Turn the top 3 surface blocks within radius into ice
-        BlockPos playerPos = player.blockPosition();
-        int radius = extremeColdness; // Adjust the division factor as needed
-        int blocksToProcessPerTick = 2000;  // Adjust as needed
-        int processedBlocks = 0;
-
-        // Cache for heightmap lookups
-        Map<BlockPos, Integer> heightMapCache = new HashMap<>();
-
-        for (int dx = -radius; dx <= radius && processedBlocks < blocksToProcessPerTick; dx++) {
-            for (int dz = -radius; dz <= radius && processedBlocks < blocksToProcessPerTick; dz++) {
-                BlockPos surfacePos = playerPos.offset(dx, 0, dz);
-
-                // Check cache first
-                Integer surfaceY = heightMapCache.get(surfacePos);
-                if (surfaceY == null) {
-                    // If not cached, calculate and store in cache
-                    surfaceY = player.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, surfacePos).getY();
-                    heightMapCache.put(surfacePos, surfaceY);
-                }
-
-                for (int dy = 0; dy < 3; dy++) {
-                    BlockPos targetPos = new BlockPos(surfacePos.getX(), surfaceY - dy, surfacePos.getZ());
-                    if (ExtremeColdness.canFreezeBlock(player, targetPos)) {
-                        player.level().setBlockAndUpdate(targetPos, Blocks.ICE.defaultBlockState());
-                        processedBlocks++;
-                    }
-                }
-            }
-        }
-    }
-
-    private static void hurricane(CompoundTag playerPersistentData, PlayerMobEntity player) {
-        //HURRICANE
-        boolean sailorHurricaneRain = playerPersistentData.getBoolean("sailorHurricaneRain");
-        BlockPos pos = new BlockPos((int) (player.getX() + (Math.random() * 100 - 100)), (int) (player.getY() - 100), (int) (player.getZ() + (Math.random() * 300 - 300)));
-        int hurricane = playerPersistentData.getInt("sailorHurricane");
-        if (hurricane < 1) {
-            return;
-        }
-        if (sailorHurricaneRain) {
-            playerPersistentData.putInt("sailorHurricane", hurricane - 1);
-            if (hurricane == 600 && player.level() instanceof ServerLevel serverLevel) {
-                serverLevel.setWeatherParameters(0, 700, true, true);
-            }
-            if (hurricane % 5 == 0) {
-                SailorLightning.lightningHighPlayerMob(player, player.level());
-            }
-            if (hurricane == 600 || hurricane == 300) {
-                for (int i = 0; i < 5; i++) {
-                    TornadoEntity tornado = new TornadoEntity(player.level(), player, 0, 0, 0);
-                    tornado.teleportTo(pos.getX(), pos.getY() + 100, pos.getZ());
-                    tornado.setTornadoRandom(true);
-                    tornado.setTornadoHeight(300);
-                    tornado.setTornadoRadius(30);
-                    tornado.setTornadoPickup(false);
-                    player.level().addFreshEntity(tornado);
-                }
-            }
-        }
-        if (!sailorHurricaneRain && player.level() instanceof ServerLevel serverLevel && hurricane == 600) {
-            playerPersistentData.putInt("sailorHurricane", hurricane - 1);
-            serverLevel.setWeatherParameters(0, 700, true, false);
         }
     }
 
@@ -358,146 +223,24 @@ public class TickEventUtil {
         }
     }
 
-    private static void calamityIncarnationTsunami(CompoundTag playerPersistentData, PlayerMobEntity player, ServerLevel level) {
-        //CALAMITY INCARNATION TSUNAMI
-        int calamityIncarnationTsunami = playerPersistentData.getInt("calamityIncarnationTsunami");
-        if (calamityIncarnationTsunami < 1) {
-            return;
-        }
-        playerPersistentData.putInt("calamityIncarnationTsunami", calamityIncarnationTsunami - 1);
-        BlockPos playerPos = player.blockPosition();
-        double radius = 23.0;
-        double minRemovalRadius = 25.0;
-        double maxRemovalRadius = 30.0;
+    public static @NotNull List<BlockPos> getBlockPos(BlockPos playerPos) {
+        int radius = 20;
+        List<BlockPos> blocksInRadius = new ArrayList<>();
 
-        // Create a sphere of water around the player
-        for (int sphereX = (int) -radius; sphereX <= radius; sphereX++) {
-            for (int sphereY = (int) -radius; sphereY <= radius; sphereY++) {
-                for (int sphereZ = (int) -radius; sphereZ <= radius; sphereZ++) {
-                    double distance = Math.sqrt(sphereX * sphereX + sphereY * sphereY + sphereZ * sphereZ);
-                    if (distance <= radius) {
-                        BlockPos blockPos = playerPos.offset(sphereX, sphereY, sphereZ);
-                        if (level.getBlockState(blockPos).isAir() && !level.getBlockState(blockPos).is(Blocks.WATER)) {
-                            level.setBlock(blockPos, Blocks.WATER.defaultBlockState(), 3);
-                        }
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    BlockPos newPos = playerPos.offset(x, y, z);
+                    if (playerPos.distSqr(newPos) <= radius * radius) {
+                        blocksInRadius.add(newPos);
                     }
                 }
             }
         }
-        for (int sphereX = (int) -maxRemovalRadius; sphereX <= maxRemovalRadius; sphereX++) {
-            for (int sphereY = (int) -maxRemovalRadius; sphereY <= maxRemovalRadius; sphereY++) {
-                for (int sphereZ = (int) -maxRemovalRadius; sphereZ <= maxRemovalRadius; sphereZ++) {
-                    double distance = Math.sqrt(sphereX * sphereX + sphereY * sphereY + sphereZ * sphereZ);
-                    if (distance <= maxRemovalRadius && distance >= minRemovalRadius) {
-                        BlockPos blockPos = playerPos.offset(sphereX, sphereY, sphereZ);
-                        if (level.getBlockState(blockPos).getBlock() == Blocks.WATER) {
-                            level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
-                        }
-                    }
-                }
-            }
-        }
+        return blocksInRadius;
     }
 
-    private static void envisionBarrier(PlayerMobEntity player) {
-        //ENVISION BARRIER
-        if (player.getCurrentSequence() != 0) {
-            return;
-        }
-        int barrierRadius = player.getPersistentData().getInt("BarrierRadius");
-        for (Projectile projectile : player.level().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(100))) {
-            if (projectile.distanceTo(player) <= 50) {
-                List<Vec3> trajectory = ModEvents.predictProjectileTrajectory(projectile, player);
-                BlockPos playerPos = player.blockPosition();
-                int radius = 20;
-                List<BlockPos> blocksInRadius = new ArrayList<>();
 
-                for (int x = -radius; x <= radius; x++) {
-                    for (int y = -radius; y <= radius; y++) {
-                        for (int z = -radius; z <= radius; z++) {
-                            BlockPos newPos = playerPos.offset(x, y, z);
-                            if (playerPos.distSqr(newPos) <= radius * radius) {
-                                blocksInRadius.add(newPos);
-                            }
-                        }
-                    }
-                }
-                if (trajectory.contains(blocksInRadius)) {
-                    player.getPersistentData().putInt("BarrierRadius", (int) (projectile.distanceTo(player) - 5));
-                }
-            }
-        }
-        if (barrierRadius > 100) {
-            barrierRadius = 0;
-        }
-        player.getPersistentData().putInt("BarrierRadius", barrierRadius);
-    }
-
-    private static void envisionLife(LivingEntity player) {
-        //ENVISION LIFE
-        int waitMakeLifeCounter = player.getPersistentData().getInt("waitMakeLifeTimer");
-        if (waitMakeLifeCounter >= 1) {
-            waitMakeLifeCounter++;
-        }
-        if (waitMakeLifeCounter >= 600) {
-            waitMakeLifeCounter = 0;
-        }
-        player.getPersistentData().putInt("waitMakeLifeTimer", waitMakeLifeCounter);
-    }
-
-    private static void manipulateMovement(LivingEntity player, Level level) {
-        //MANIPULATE MOVEMENT
-        if (!player.getPersistentData().getBoolean("manipulateMovementBoolean")) {
-            return;
-        }
-        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
-            if (entity == player || !entity.hasEffect(ModEffects.MANIPULATION.get())) {
-                continue;
-            }
-            int targetX = player.getPersistentData().getInt("manipulateMovementX");
-            int targetY = player.getPersistentData().getInt("manipulateMovementY");
-            int targetZ = player.getPersistentData().getInt("manipulateMovementZ");
-
-            if (entity.distanceToSqr(targetX, targetY, targetZ) <= 8) {
-                entity.removeEffect(ModEffects.MANIPULATION.get());
-                continue;
-            }
-
-            if (!(entity instanceof Player)) {
-                if (entity instanceof Mob mob) {
-                    mob.getNavigation().moveTo(targetX, targetY, targetZ, 1.7);
-                }
-                continue;
-            }
-            // Existing logic for players
-            double entityX = entity.getX();
-            double entityY = entity.getY();
-            double entityZ = entity.getZ();
-
-            double dx = targetX - entityX;
-            double dy = targetY - entityY;
-            double dz = targetZ - entityZ;
-
-            double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-            if (distance > 0) {
-                dx /= distance;
-                dy /= distance;
-                dz /= distance;
-            }
-
-            double speed = 3.0 / 20;
-
-            BlockPos frontBlockPos = new BlockPos((int) (entityX + dx), (int) (entityY + dy), (int) (entityZ + dz));
-            BlockPos frontBlockPos1 = new BlockPos((int) (entityX + dx * 2), (int) (entityY + dy * 2), (int) (entityZ + dz * 2));
-            boolean pathIsClear = level.getBlockState(frontBlockPos).isAir() && level.getBlockState(frontBlockPos1).isAir();
-
-            if (pathIsClear) {
-                entity.setDeltaMovement(dx * speed, Math.min(0, dy * speed), dz * speed);
-            } else {
-                entity.setDeltaMovement(dx * speed, 0.25, dz * speed);
-            }
-        }
-    }
 
     private static void projectileEvent(PlayerMobEntity player) {
         //PROJECTILE EVENT
@@ -512,17 +255,7 @@ public class TickEventUtil {
             double movementY = Math.abs(projectile.getDeltaMovement().y());
             double movementZ = Math.abs(projectile.getDeltaMovement().z());
             if (movementX >= 6 || movementY >= 6 || movementZ >= 6) {
-                BlockPos entityPos = projectile.blockPosition();
-                for (int x = -2; x <= 2; x++) {
-                    for (int y = -2; y <= 2; y++) {
-                        for (int z = -2; z <= 2; z++) {
-                            BlockPos pos = entityPos.offset(x, y, z);
-
-                            // Remove the block (replace with air)
-                            projectile.level().setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
-                        }
-                    }
-                }
+                ModEvents.removeBlockInRange(projectile);
                 for (LivingEntity entity1 : projectile.level().getEntitiesOfClass(LivingEntity.class, projectile.getBoundingBox().inflate(5))) {
                     if (entity1 instanceof Player playerEntity) {
                         if (player.getCurrentPathway() != BeyonderClassInit.SAILOR && player.getCurrentSequence() == 0) {
@@ -555,72 +288,6 @@ public class TickEventUtil {
 
     }
 
-    private static void prophesizeTeleportation(CompoundTag playerPersistentData, LivingEntity livingEntity) {
-        //PROPHESIZE TELEPORT BLOCK/PLAYER
-        if (playerPersistentData.getInt("prophesizeTeleportationCounter") >= 1) {
-            playerPersistentData.putInt("prophesizeTeleportationCounter", playerPersistentData.getInt("prophesizeTeleportationCounter") - 1);
-        }
-        if (playerPersistentData.getInt("prophesizeTeleportationCounter") == 1) {
-            playerPersistentData.putInt("prophesizeTeleportationCounter", playerPersistentData.getInt("prophesizeTeleportationCounter") - 1);
-            int x = playerPersistentData.getInt("prophesizeTeleportX");
-            int y = playerPersistentData.getInt("prophesizeTeleportY");
-            int z = playerPersistentData.getInt("prophesizeTeleportZ");
-            livingEntity.teleportTo(x, y, z);
-        }
-    }
-
-    private static void stopFlying(LivingEntity player) {
-        AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-        player.getPersistentData().putBoolean("CanFly", false);
-        CompoundTag compoundTag = player.getPersistentData();
-        int mindscape = compoundTag.getInt("inMindscape");
-        if (mindscape >= 1) {
-            //flying is false
-        }
-        dreamIntoReality.setBaseValue(1);
-        //set flyingspeed 0.05
-        ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
-        scaleData.setTargetScale(1);
-        scaleData.markForSync(true);
-    }
-
-    private static void dreamIntoReality(PlayerMobEntity player) {
-        //DREAM INTO REALITY
-        boolean canFly = player.getPersistentData().getBoolean("CanFly");
-        if (!canFly) {
-            return;
-        }
-        if (player.getSpirituality() >= 15) {
-            player.useSpirituality(15);
-        }
-        if (player.getSpirituality() <= 15) {
-            stopFlying(player);
-        }
-        if (player.getCurrentSequence() == 2) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 2, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
-        }
-        if (player.getCurrentSequence() == 1) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
-        }
-        if (player.getCurrentSequence() == 0) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 4, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 5, false, false));
-        }
-    }
-
-    private static void sailorLightningTravel(LivingEntity player) {
-        //SAILOR LIGHTNING TRAVEL
-        if (player.getPersistentData().getInt("sailorLightningTravel") >= 1) {
-            player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 3, 1, false, false));
-            player.getPersistentData().putInt("sailorLightningTravel", player.getPersistentData().getInt("sailorLightningTravel") - 1);
-        }
-    }
-
     private static void windManipulationGuide(CompoundTag playerPersistentData, PlayerMobEntity player) {
         //WIND MANIPULATION GLIDE
         int regularFlight = playerPersistentData.getInt("sailorFlight");
@@ -642,84 +309,7 @@ public class TickEventUtil {
         }
     }
 
-    private static void windManipulationCushion(CompoundTag playerPersistentData, LivingEntity player) {
-        //WIND MANIPULATION CUSHION
-        int cushion = playerPersistentData.getInt("windManipulationCushion");
-        if (cushion >= 1) {
-            WindManipulationCushion.summonWindCushionParticles(player);
-            playerPersistentData.putInt("windManipulationCushion", cushion - 1);
-            player.resetFallDistance();
-        }
-        if (cushion >= 20 && player.getDeltaMovement().y <= 0) {
-            player.setDeltaMovement(player.getDeltaMovement().x(), player.getDeltaMovement().y() * 0.9, player.getDeltaMovement().z());
-            player.hurtMarked = true;
-        }
-        if (cushion == 1) {
-            player.setDeltaMovement(player.getLookAngle().scale(2.0f));
-            player.hurtMarked = true;
-            player.resetFallDistance();
-        }
-    }
-
-    private static void windManipulationSense(CompoundTag playerPersistentData, PlayerMobEntity player) {
-        //WIND MANIPULATION SENSE
-        boolean windManipulationSense = playerPersistentData.getBoolean("windManipulationSense");
-        if (!windManipulationSense) {
-            return;
-        }
-        if (player.useSpirituality(2)) return;
-        double radius = 100 - (player.getCurrentSequence() * 10);
-        for (LivingEntity otherEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-            if (otherEntity == player) {
-                continue;
-            }
-            if (otherEntity.getMaxHealth() >= player.getMaxHealth()) {
-                player.setTarget(otherEntity);
-            }
-        }
-    }
-
-    private static void envisionKingdom(CompoundTag playerPersistentData, PlayerMobEntity player, ServerLevel serverLevel) {
-        //ENVISION KINGDOM
-
-        AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-        int mindScape = playerPersistentData.getInt("inMindscape");
-        if (mindScape < 1) return;
-        playerPersistentData.putInt("inMindscape", mindScape + 1);
-        if (mindScape >= 1200) {
-            playerPersistentData.putInt("inMindscape", 0);
-        }
-        int mindscapeAbilities = playerPersistentData.getInt("mindscapeAbilities");
-        if (mindscapeAbilities >= 1) { //
-            player.setSpirituality(player.getMaxSpirituality());
-            if (!playerPersistentData.getBoolean("CAN_FLY")) {
-                dreamIntoReality.setBaseValue(3);
-                //allow it to fly with a fly speed of 0.15
-                playerPersistentData.putInt("mindscapeAbilities", mindscapeAbilities - 1);
-            }
-        }
-        if (mindscapeAbilities == 1 && !playerPersistentData.getBoolean("CAN_FLY")) {
-            dreamIntoReality.setBaseValue(1);
-            //disable flight, return flight speed to 0.05
-
-        }
-
-        int partIndex = mindScape - 2;
-        if (partIndex < 0) return;
-
-        int mindScape1 = playerPersistentData.getInt("inMindscape");
-        int x = playerPersistentData.getInt("mindscapePlayerLocationX");
-        int y = playerPersistentData.getInt("mindscapePlayerLocationY");
-        int z = playerPersistentData.getInt("mindscapePlayerLocationZ");
-        if (mindScape1 < 1) return;
-        if (mindScape1 == 6) {
-            player.teleportTo(player.getX() + 77, player.getY() + 8, player.getZ() + 206);
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
-                if (entity != player) {
-                    entity.teleportTo(player.getX(), player.getY(), player.getZ() - 10);
-                }
-            }
-        }
+    public static void placeCorpseCathedral(CompoundTag playerPersistentData, ServerLevel serverLevel, int mindScape, int partIndex, int x, int y, int z) {
         StructureTemplate part = serverLevel.getStructureManager().getOrCreate(new ResourceLocation(LOTM.MOD_ID, "corpse_cathedral_" + (partIndex + 1)));
         BlockPos tagPos = new BlockPos(x, y + (partIndex * 2), z);
         StructurePlaceSettings settings = BeyonderUtil.getStructurePlaceSettings(new BlockPos(x, y, z));
@@ -727,61 +317,7 @@ public class TickEventUtil {
         playerPersistentData.putInt("inMindscape", mindScape + 1);
     }
 
-    private static void ragingBlows(CompoundTag playerPersistentData, PlayerMobEntity player) {
-        //RAGING BLOWS
-        boolean sailorLightning = playerPersistentData.getBoolean("SailorLightning");
-        int ragingBlows = playerPersistentData.getInt("ragingBlows");
-        int sequence = player.getCurrentSequence();
-        int ragingBlowsRadius = (25 - (sequence * 3));
-        int damage = 20 - sequence * 2;
-        if (ragingBlows >= 1) {
-            RagingBlows.spawnRagingBlowsParticlesPM(player);
-            playerPersistentData.putInt("ragingBlows", ragingBlows + 1);
-        }
-        if (ragingBlows >= 6 && ragingBlows <= 96 && ragingBlows % 6 == 0) {
-            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.NEUTRAL, 0.5F, 0.5F);
-            Vec3 playerLookVector = player.getViewVector(1.0F);
-            Vec3 playerPos = player.position();
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, new AABB(playerPos.x - ragingBlowsRadius, playerPos.y - ragingBlowsRadius, playerPos.z - ragingBlowsRadius, playerPos.x + ragingBlowsRadius, playerPos.y + ragingBlowsRadius, playerPos.z + ragingBlowsRadius))) {
-                if (entity != player && playerLookVector.dot(entity.position().subtract(playerPos)) > 0) {
-                    entity.hurt(entity.damageSources().generic(), damage);
-                    double ragingBlowsX = player.getX() - entity.getX();
-                    double ragingBlowsZ = player.getZ() - entity.getZ();
-                    entity.knockback(0.25, ragingBlowsX, ragingBlowsZ);
-                    if (sequence <= 7) {
-                        double chanceOfDamage = (100.0 - (sequence * 12.5));
-                        if (Math.random() * 100 < chanceOfDamage && sailorLightning) {
-                            LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, entity.level());
-                            lightningBolt.moveTo(entity.getX(), entity.getY(), entity.getZ());
-                            entity.level().addFreshEntity(lightningBolt);
-                        }
-                    }
-                }
-            }
-        }
-        if (ragingBlows >= 100) {
-            RagingBlows.spawnRagingBlowsParticlesPM(player);
-            ragingBlows = 0;
-            playerPersistentData.putInt("ragingBlows", 0);
-        }
-    }
-
-    private static void psychologicalInvisibility(PlayerMobEntity player, CompoundTag playerPersistentData) {
-        //PSYCHOLOGICAL INVISIBILITY
-
-        AttributeInstance armorInvisAttribute = player.getAttribute(ModAttributes.ARMORINVISIBLITY.get());
-        if (armorInvisAttribute.getValue() > 0 && !player.hasEffect(MobEffects.INVISIBILITY)) {
-            removeArmor(player);
-            armorInvisAttribute.setBaseValue(0);
-
-        }
-        if (playerPersistentData.getBoolean("armorStored")) {
-            player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 5, 1, false, false));
-            player.useSpirituality((int) player.getMaxSpirituality() / 100);
-        }
-    }
-
-    private static void removeArmor(LivingEntity player) {
+    public static void removeArmor(LivingEntity player) {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (slot.getType() == EquipmentSlot.Type.ARMOR) {
                 ItemStack armorStack = player.getItemBySlot(slot);
@@ -790,27 +326,6 @@ public class TickEventUtil {
                 }
             }
         }
-    }
-
-    private static void nightmare(LivingEntity player, CompoundTag playerPersistentData) {
-        //NIGHTMARE
-        AttributeInstance nightmareAttribute = player.getAttribute(ModAttributes.NIGHTMARE.get());
-        int nightmareTimer = playerPersistentData.getInt("NightmareTimer");
-        int matterAccelerationBlockTimer = player.getPersistentData().getInt("matterAccelerationBlockTimer");
-        if (matterAccelerationBlockTimer >= 1) {
-            player.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
-        }
-
-        if (nightmareAttribute.getValue() >= 1) {
-            nightmareTimer++;
-            if (nightmareTimer >= 600) {
-                nightmareAttribute.setBaseValue(0);
-                nightmareTimer = 0;
-            }
-        } else {
-            nightmareTimer = 0;
-        }
-        playerPersistentData.putInt("NightmareTimer", nightmareTimer);
     }
 
     private static void calamityIncarnationTornado(CompoundTag playerPersistentData, LivingEntity player) {
@@ -856,170 +371,110 @@ public class TickEventUtil {
             Zombie zombie = new Zombie(EntityType.ZOMBIE, pPlayer.level());
             Skeleton skeleton = new Skeleton(EntityType.SKELETON, pPlayer.level());
             int randomPos = (int) ((Math.random() * 24) - 12);
-            if (random.nextInt(10) == 10) {
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(zombie);
+            if (random.nextInt(11) == 10) {
+                setZombieTarget(pPlayer, subtractX, subtractY, subtractZ, zombie);
             }
             if (random.nextInt(10) == 9) {
-                zombie.setPos(x + randomPos, surfaceY, z + randomPos);
-                zombie.setItemSlot(EquipmentSlot.HEAD, leatherHelmet);
-                zombie.setItemSlot(EquipmentSlot.CHEST, leatherChestplate);
-                zombie.setItemSlot(EquipmentSlot.LEGS, leatherLeggings);
-                zombie.setItemSlot(EquipmentSlot.FEET, leatherBoots);
-                zombie.setItemSlot(EquipmentSlot.MAINHAND, woodSword);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(zombie);
+                giveMobItems(pPlayer, x, z, subtractX, subtractY, subtractZ, surfaceY, leatherHelmet, leatherChestplate, leatherLeggings, leatherBoots, woodSword, zombie, randomPos);
             }
             if (random.nextInt(10) == 8) {
-                zombie.setPos(x + randomPos, surfaceY, z + randomPos);
-                zombie.setItemSlot(EquipmentSlot.HEAD, ironHelmet);
-                zombie.setItemSlot(EquipmentSlot.CHEST, ironChestplate);
-                zombie.setItemSlot(EquipmentSlot.LEGS, ironLeggings);
-                zombie.setItemSlot(EquipmentSlot.FEET, ironBoots);
-                zombie.setItemSlot(EquipmentSlot.MAINHAND, ironSword);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(zombie);
+                giveMobItems(pPlayer, x, z, subtractX, subtractY, subtractZ, surfaceY, ironHelmet, ironChestplate, ironLeggings, ironBoots, ironSword, zombie, randomPos);
             }
             if (random.nextInt(10) == 7) {
-                zombie.setPos(x + randomPos, surfaceY, z + randomPos);
-                zombie.setItemSlot(EquipmentSlot.HEAD, diamondHelmet);
-                zombie.setItemSlot(EquipmentSlot.CHEST, diamondChestplate);
-                zombie.setItemSlot(EquipmentSlot.LEGS, diamondLeggings);
-                zombie.setItemSlot(EquipmentSlot.FEET, diamondBoots);
-                zombie.setItemSlot(EquipmentSlot.MAINHAND, diamondSword);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(zombie);
+                giveMobItems(pPlayer, x, z, subtractX, subtractY, subtractZ, surfaceY, diamondHelmet, diamondChestplate, diamondLeggings, diamondBoots, diamondSword, zombie, randomPos);
             }
             if (random.nextInt(10) == 6) {
-                zombie.setPos(x + randomPos, surfaceY, z + randomPos);
-                zombie.setItemSlot(EquipmentSlot.HEAD, netheriteHelmet);
-                zombie.setItemSlot(EquipmentSlot.CHEST, netheriteChestplate);
-                zombie.setItemSlot(EquipmentSlot.LEGS, netheriteLeggings);
-                zombie.setItemSlot(EquipmentSlot.FEET, netheriteBoots);
-                zombie.setItemSlot(EquipmentSlot.MAINHAND, netheriteSword);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(zombie);
+                giveMobItems(pPlayer, x, z, subtractX, subtractY, subtractZ, surfaceY, netheriteHelmet, netheriteChestplate, netheriteLeggings, netheriteBoots, netheriteSword, zombie, randomPos);
             }
             if (random.nextInt(20) == 5) {
                 skeleton.setPos(x + randomPos, surfaceY, z + randomPos);
                 skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(skeleton);
+                setTargetOfZombie(pPlayer, subtractX, subtractY, subtractZ, zombie, skeleton);
             }
             if (random.nextInt(20) == 4) {
-                skeleton.setPos(x + randomPos, surfaceY, z + randomPos);
-                skeleton.setItemSlot(EquipmentSlot.HEAD, leatherHelmet);
-                skeleton.setItemSlot(EquipmentSlot.CHEST, leatherChestplate);
-                skeleton.setItemSlot(EquipmentSlot.LEGS, leatherLeggings);
-                skeleton.setItemSlot(EquipmentSlot.FEET, leatherBoots);
-                enchantedBow.enchant(Enchantments.POWER_ARROWS, 1);
-                skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(skeleton);
+                giveSkeletonitems(x, z, surfaceY, leatherHelmet, leatherChestplate, leatherLeggings, leatherBoots, enchantedBow, skeleton, randomPos);
+                setTargetOfZombie(pPlayer, subtractX, subtractY, subtractZ, zombie, skeleton);
             }
-            if (random.nextInt(20) == 3) {
-                skeleton.setPos(x + randomPos, surfaceY, z + randomPos);
-                skeleton.setItemSlot(EquipmentSlot.HEAD, ironHelmet);
-                skeleton.setItemSlot(EquipmentSlot.CHEST, ironChestplate);
-                skeleton.setItemSlot(EquipmentSlot.LEGS, ironLeggings);
-                skeleton.setItemSlot(EquipmentSlot.FEET, ironBoots);
-                enchantedBow.enchant(Enchantments.POWER_ARROWS, 2);
-                skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(skeleton);
-            }
-            if (random.nextInt(20) == 2) {
-                skeleton.setPos(x + randomPos, surfaceY, z + randomPos);
-                skeleton.setItemSlot(EquipmentSlot.HEAD, diamondHelmet);
-                skeleton.setItemSlot(EquipmentSlot.CHEST, diamondChestplate);
-                skeleton.setItemSlot(EquipmentSlot.LEGS, diamondLeggings);
-                skeleton.setItemSlot(EquipmentSlot.FEET, diamondBoots);
-                enchantedBow.enchant(Enchantments.POWER_ARROWS, 3);
-                skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(skeleton);
-            }
-            if (random.nextInt(20) == 1) {
-                skeleton.setPos(x + randomPos, surfaceY, z + randomPos);
-                skeleton.setItemSlot(EquipmentSlot.HEAD, netheriteHelmet);
-                skeleton.setItemSlot(EquipmentSlot.CHEST, netheriteChestplate);
-                skeleton.setItemSlot(EquipmentSlot.LEGS, netheriteLeggings);
-                skeleton.setItemSlot(EquipmentSlot.FEET, netheriteBoots);
-                enchantedBow.enchant(Enchantments.POWER_ARROWS, 4);
-                skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(skeleton);
-            }
-            zombie.setDropChance(EquipmentSlot.HEAD, 0.0F);
-            zombie.setDropChance(EquipmentSlot.CHEST, 0.0F);
-            zombie.setDropChance(EquipmentSlot.LEGS, 0.0F);
-            zombie.setDropChance(EquipmentSlot.FEET, 0.0F);
-            skeleton.setDropChance(EquipmentSlot.HEAD, 0.0F);
-            skeleton.setDropChance(EquipmentSlot.CHEST, 0.0F);
-            skeleton.setDropChance(EquipmentSlot.LEGS, 0.0F);
-            skeleton.setDropChance(EquipmentSlot.FEET, 0.0F);
-            tag.putInt("calamityUndeadArmyCounter", tag.getInt("calamityUndeadArmyCounter") - 1);
+            giveSkeletonItems(pPlayer, x, z, subtractX, subtractY, subtractZ, surfaceY, random, ironHelmet, ironChestplate, ironLeggings, ironBoots, enchantedBow, zombie, skeleton, randomPos, 3, 2);
+            giveSkeletonItems(pPlayer, x, z, subtractX, subtractY, subtractZ, surfaceY, random, diamondHelmet, diamondChestplate, diamondLeggings, diamondBoots, enchantedBow, zombie, skeleton, randomPos, 2, 3);
+            giveSkeletonItems(pPlayer, x, z, subtractX, subtractY, subtractZ, surfaceY, random, netheriteHelmet, netheriteChestplate, netheriteLeggings, netheriteBoots, enchantedBow, zombie, skeleton, randomPos, 1, 4);
+            setDropchanceZombieAndSkeleton(tag, zombie, skeleton);
         }
+    }
+
+    public static void setDropchanceZombieAndSkeleton(CompoundTag tag, Zombie zombie, Skeleton skeleton) {
+        zombie.setDropChance(EquipmentSlot.HEAD, 0.0F);
+        zombie.setDropChance(EquipmentSlot.CHEST, 0.0F);
+        zombie.setDropChance(EquipmentSlot.LEGS, 0.0F);
+        zombie.setDropChance(EquipmentSlot.FEET, 0.0F);
+        skeleton.setDropChance(EquipmentSlot.HEAD, 0.0F);
+        skeleton.setDropChance(EquipmentSlot.CHEST, 0.0F);
+        skeleton.setDropChance(EquipmentSlot.LEGS, 0.0F);
+        skeleton.setDropChance(EquipmentSlot.FEET, 0.0F);
+        tag.putInt("calamityUndeadArmyCounter", tag.getInt("calamityUndeadArmyCounter") - 1);
+    }
+
+    private static void giveSkeletonItems(PlayerMobEntity pPlayer, int x, int z, int subtractX, int subtractY, int subtractZ, int surfaceY, Random random, ItemStack netheriteHelmet, ItemStack netheriteChestplate, ItemStack netheriteLeggings, ItemStack netheriteBoots, ItemStack enchantedBow, Zombie zombie, Skeleton skeleton, int randomPos, int i, int i2) {
+        if (random.nextInt(20) == i) {
+            setItemsSkeleton(x, z, surfaceY, netheriteHelmet, netheriteChestplate, netheriteLeggings, netheriteBoots, enchantedBow, skeleton, randomPos, i2);
+            setTargetOfZombie(pPlayer, subtractX, subtractY, subtractZ, zombie, skeleton);
+        }
+    }
+
+    private static void setTargetOfZombie(PlayerMobEntity pPlayer, int subtractX, int subtractY, int subtractZ, Zombie zombie, Skeleton skeleton) {
+        for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
+            if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
+                if (entity != null) {
+                    zombie.setTarget(entity);
+                }
+            }
+        }
+        pPlayer.level().addFreshEntity(skeleton);
+    }
+
+    public static void setItemsSkeleton(int x, int z, int surfaceY, ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots, ItemStack enchantedBow, Skeleton skeleton, int randomPos, int enchantLVL) {
+        skeleton.setPos(x + randomPos, surfaceY, z + randomPos);
+        skeleton.setItemSlot(EquipmentSlot.HEAD, helmet);
+        skeleton.setItemSlot(EquipmentSlot.CHEST, chestplate);
+        skeleton.setItemSlot(EquipmentSlot.LEGS, leggings);
+        skeleton.setItemSlot(EquipmentSlot.FEET, boots);
+        enchantedBow.enchant(Enchantments.POWER_ARROWS, enchantLVL);
+        skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
+    }
+
+    public static void giveSkeletonitems(int x, int z, int surfaceY, ItemStack leatherHelmet, ItemStack leatherChestplate, ItemStack leatherLeggings, ItemStack leatherBoots, ItemStack enchantedBow, Skeleton skeleton, int randomPos) {
+        skeleton.setPos(x + randomPos, surfaceY, z + randomPos);
+        skeleton.setItemSlot(EquipmentSlot.HEAD, leatherHelmet);
+        skeleton.setItemSlot(EquipmentSlot.CHEST, leatherChestplate);
+        skeleton.setItemSlot(EquipmentSlot.LEGS, leatherLeggings);
+        skeleton.setItemSlot(EquipmentSlot.FEET, leatherBoots);
+        enchantedBow.enchant(Enchantments.POWER_ARROWS, 1);
+        skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
+    }
+
+    private static void giveMobItems(PlayerMobEntity pPlayer, int x, int z, int subtractX, int subtractY, int subtractZ, int surfaceY, ItemStack leatherHelmet, ItemStack leatherChestplate, ItemStack leatherLeggings, ItemStack leatherBoots, ItemStack woodSword, Zombie zombie, int randomPos) {
+        giveZombieItems(x, z, surfaceY, leatherHelmet, leatherChestplate, leatherLeggings, leatherBoots, woodSword, zombie, randomPos);
+        setZombieTarget(pPlayer, subtractX, subtractY, subtractZ, zombie);
+    }
+
+    public static void giveZombieItems(int x, int z, int surfaceY, ItemStack leatherHelmet, ItemStack leatherChestplate, ItemStack leatherLeggings, ItemStack leatherBoots, ItemStack woodSword, Zombie zombie, int randomPos) {
+        zombie.setPos(x + randomPos, surfaceY, z + randomPos);
+        zombie.setItemSlot(EquipmentSlot.HEAD, leatherHelmet);
+        zombie.setItemSlot(EquipmentSlot.CHEST, leatherChestplate);
+        zombie.setItemSlot(EquipmentSlot.LEGS, leatherLeggings);
+        zombie.setItemSlot(EquipmentSlot.FEET, leatherBoots);
+        zombie.setItemSlot(EquipmentSlot.MAINHAND, woodSword);
+    }
+
+    private static void setZombieTarget(PlayerMobEntity pPlayer, int subtractX, int subtractY, int subtractZ, Zombie zombie) {
+        for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
+            if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && pPlayer.getCurrentSequence() <= 6) {
+                if (entity != null) {
+                    zombie.setTarget(entity);
+                }
+            }
+        }
+        pPlayer.level().addFreshEntity(zombie);
     }
 
     private static void calamityLightningStorm(LivingEntity pPlayer) {
@@ -1095,45 +550,14 @@ public class TickEventUtil {
         }
     }
 
-    private static void monsterLuckPoisonAttacker(LivingEntity pPlayer) {
-        if (pPlayer.tickCount % 100 == 0) {
-            if (pPlayer.getPersistentData().getInt("luckAttackerPoisoned") >= 1) {
-                for (Player player : pPlayer.level().getEntitiesOfClass(Player.class, pPlayer.getBoundingBox().inflate(50))) {
-                    if (player.getPersistentData().getInt("attackedMonster") >= 1) {
-                        player.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 60, 1, false, false));
-                        player.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 3, false, false));
-                        pPlayer.getPersistentData().putInt("luckAttackerPoisoned", pPlayer.getPersistentData().getInt("luckAttackerPoisoned") - 1);
-                    }
-                }
-            }
-        }
-    }
-
     private static void decrementMonsterAttackEvent(LivingEntity pPlayer) {
         if (pPlayer.getPersistentData().getInt("attackedMonster") >= 1) {
             pPlayer.getPersistentData().putInt("attackedMonster", pPlayer.getPersistentData().getInt("attackedMonster") - 1);
         }
     }
 
-    private static void monsterLuckIgnoreMobs(LivingEntity pPlayer) {
-        if (pPlayer.tickCount % 40 == 0) {
-            if (pPlayer.getPersistentData().getInt("luckIgnoreMobs") >= 1) {
-                for (Mob mob : pPlayer.level().getEntitiesOfClass(Mob.class, pPlayer.getBoundingBox().inflate(20))) {
-                    if (mob.getTarget() == pPlayer) {
-                        for (LivingEntity livingEntity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(50))) {
-                            if (livingEntity != null) {
-                                mob.setTarget(livingEntity);
-                            } else
-                                mob.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 60, 1, false, false));
-                        }
-                        pPlayer.getPersistentData().putInt("luckIgnoreMobs", pPlayer.getPersistentData().getInt("luckIgnoreMobs") - 1);
-                    }
-                }
-            }
-        }
-    }
 
-    private static void rainEyes(LivingEntity player) {
+    protected static void rainEyes(LivingEntity player) {
         //RAIN EYES
         if (!player.level().isRaining()) {
             return;
@@ -1351,84 +775,8 @@ public class TickEventUtil {
         int sirenSongStrengthen = playerPersistentData.getInt("sirenSongStrengthen");
         int sirenSongHarm = playerPersistentData.getInt("sirenSongHarm");
         int sirenSongStun = playerPersistentData.getInt("sirenSongStun");
-        if (sirenSongStrengthen >= 1|| sirenSongWeaken >= 1 || sirenSongStun >= 1 || sirenSongHarm >= 1) {
+        if (sirenSongStrengthen >= 1 || sirenSongWeaken >= 1 || sirenSongStun >= 1 || sirenSongHarm >= 1) {
             SirenSongStrengthen.spawnParticlesInSphere(player, harmCounter);
-        }
-    }
-
-    public static void summonTsunami(LivingEntity livingEntity) {
-        CompoundTag tag = livingEntity.getPersistentData();
-        int livingEntityX = tag.getInt("sailorTsunamiX");
-        int livingEntityY = tag.getInt("sailorTsunamiY");
-        int livingEntityZ = tag.getInt("sailorTsunamiZ");
-        int tsunami = tag.getInt("sailorTsunami");
-        String direction = tag.getString("sailorTsunamiDirection");
-
-        int offsetX = 0;
-        int offsetZ = 0;
-
-        switch (direction) {
-            case "N":
-                offsetZ = 1;
-                break;
-            case "E":
-                offsetX = -1;
-                break;
-            case "S":
-                offsetZ = -1;
-                break;
-            case "W":
-                offsetX = 1;
-                break;
-        }
-
-        int waveWidth = 80;
-        int waveHeight = 10;
-        int startDistance = 85;
-
-        for (int w = -waveWidth / 2; w < waveWidth / 2; w++) {
-            for (int h = 0; h < waveHeight; h++) {
-                int x = livingEntityX + (offsetX * startDistance) + (offsetX * (200 - tsunami) / 5);
-                int y = livingEntityY + h;
-                int z = livingEntityZ + (offsetZ * startDistance) + (offsetZ * (200 - tsunami) / 5);
-
-                if (offsetX == 0) {
-                    x += w;
-                } else {
-                    z += w;
-                }
-
-                BlockPos blockPos = new BlockPos(x, y, z);
-                if (livingEntity.level().getBlockState(blockPos).isAir()) {
-                    livingEntity.level().setBlock(blockPos, Blocks.WATER.defaultBlockState(), 3);
-                }
-            }
-        }
-    }
-
-    private static void tsunami(CompoundTag tag, LivingEntity livingEntity) {
-        //TSUNAMI
-        int tsunami = tag.getInt("sailorTsunami");
-        if (tsunami >= 1) {
-            tag.putInt("sailorTsunami", tsunami - 5);
-            summonTsunami(livingEntity);
-        } else {
-            tag.remove("sailorTsunamiDirection");
-            tag.remove("sailorTsunamiX");
-            tag.remove("sailorTsunamiY");
-            tag.remove("sailorTsunamiZ");
-        }
-
-        //TSUNAMI SEAL
-        int tsunamiSeal = tag.getInt("sailorTsunami");
-        if (tsunamiSeal >= 1) {
-            tag.putInt("sailorTsunami", tsunamiSeal - 5);
-            summonTsunami(livingEntity);
-        } else {
-            tag.remove("sailorTsunamiDirection");
-            tag.remove("sailorTsunamiX");
-            tag.remove("sailorTsunamiY");
-            tag.remove("sailorTsunamiZ");
         }
     }
 
@@ -1443,37 +791,13 @@ public class TickEventUtil {
                 double z = livingEntity.getZ() + (random.nextDouble() * 2 - 1) * radius;
                 if (isInsideSphere(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), x, y, z, radius)) {
                     double noteValue = random.nextInt(25) / 24.0;
-                    serverLevel.sendParticles(ParticleTypes.NOTE, x, y, z,0, noteValue, 0, 0,0);
+                    serverLevel.sendParticles(ParticleTypes.NOTE, x, y, z, 0, noteValue, 0, 0, 0);
                 }
             }
         }
     }
 
-    private static void windManipulationFlight(LivingEntity livingEntity, CompoundTag tag) {
-        //WIND MANIPULATION FLIGHT
-        Vec3 lookVector = livingEntity.getLookAngle();
-        if (!tag.getBoolean("sailorFlight1")) {
-            return;
-        }
-        int flight = tag.getInt("sailorFlight");
-        int flightCancel = tag.getInt("sailorFlightDamageCancel");
-        if (flightCancel >= 1) {
-            tag.putInt("sailorFlightDamageCancel", flightCancel + 1);
-        }
-        if (flightCancel >= 300) {
-            tag.putInt("sailorFlightDamageCancel", 0);
-        }
-        if (flight >= 1) {
-            tag.putInt("sailorFlight", flight + 1);
-        }
-        if (flight <= 60 && flight % 20 == 0) {
-            livingEntity.setDeltaMovement(lookVector.x * 2, lookVector.y * 2, lookVector.z * 2);
-            livingEntity.hurtMarked = true;
-        }
-        if (flight > 60) {
-            tag.putInt("sailorFlight", 0);
-        }
-    }
+
 
     private static void waterSphereCheck(LivingEntity livingEntity, ServerLevel level) {
         //WATER SPHERE CHECK

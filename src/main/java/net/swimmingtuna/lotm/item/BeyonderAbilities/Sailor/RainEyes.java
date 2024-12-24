@@ -40,6 +40,7 @@ public class RainEyes extends SimpleAbilityItem {
                 "Cooldown: 0.5 seconds").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
     public static void rainEyes(Player player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();

@@ -17,6 +17,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
+import net.swimmingtuna.lotm.events.ability_events.ModEvents;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
@@ -26,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+
+import static net.swimmingtuna.lotm.events.ability_events.ModEvents.applyEffectsAndDamage;
 
 public class MentalPlague extends SimpleAbilityItem {
 
@@ -60,6 +63,24 @@ public class MentalPlague extends SimpleAbilityItem {
             return this.lazyAttributeMap.get();
         }
         return super.getDefaultAttributeModifiers(slot);
+    }
+
+    public static void mentalPlague(LivingEntity entity) {
+        //MENTAL PLAGUE
+        int mentalPlagueTimer = entity.getPersistentData().getInt("MentalPlagueTimer");
+        if (entity.hasEffect(ModEffects.MENTALPLAGUE.get())) {
+            mentalPlagueTimer++;
+
+            if (mentalPlagueTimer >= 600) {
+                for (LivingEntity entity1 : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(50))) {
+                    applyEffectsAndDamage(entity1);
+
+                }
+                applyEffectsAndDamage(entity);
+                mentalPlagueTimer = 0;
+            }
+        }
+        entity.getPersistentData().putInt("MentalPlagueTimer", mentalPlagueTimer);
     }
 
     private Multimap<Attribute, AttributeModifier> createAttributeMap() {

@@ -4,6 +4,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -41,6 +44,22 @@ public class SailorLightningTravel extends SimpleAbilityItem {
                 "Spirituality Used: 400\n" +
                 "Cooldown: 5 seconds").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
+
+    public static void sailorLightningTravel(LivingEntity player) {
+        //SAILOR LIGHTNING TRAVEL
+        if (player.getPersistentData().getInt("sailorLightningTravel") >= 1) {
+            player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 3, 1, false, false));
+            player.getPersistentData().putInt("sailorLightningTravel", player.getPersistentData().getInt("sailorLightningTravel") - 1);
+        }
+    }
+
+    public static void sailorLightningTravel(Player player) {
+        //SAILOR LIGHTNING TRAVEL
+        if (player.getPersistentData().getInt("sailorLightningTravel") >= 1) {
+            player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 3, 1, false, false));
+            player.getPersistentData().putInt("sailorLightningTravel", player.getPersistentData().getInt("sailorLightningTravel") - 1);
+        }
     }
 
     private static void lightningTravel(Player player, Level level) {

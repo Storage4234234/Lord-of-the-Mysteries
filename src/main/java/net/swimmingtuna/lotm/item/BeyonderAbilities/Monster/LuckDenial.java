@@ -76,6 +76,26 @@ public class LuckDenial extends SimpleAbilityItem {
     }
 
 
+    private static void luckDenial(LivingEntity livingEntity) {
+        CompoundTag tag = livingEntity.getPersistentData();
+        AttributeInstance luck = livingEntity.getAttribute(ModAttributes.LOTM_LUCK.get());
+        AttributeInstance misfortune = livingEntity.getAttribute(ModAttributes.MISFORTUNE.get());
+        double luckDenialTimer = tag.getDouble("luckDenialTimer");
+        double luckDenialLuck = tag.getDouble("luckDenialLuck");
+        double luckDenialMisfortune = tag.getDouble("luckDenialMisfortune");
+        double misfortuneAmount = misfortune.getBaseValue();
+        double luckAmount = luck.getBaseValue();
+        if (luckDenialTimer >= 1) {
+            tag.putDouble("luckDenialTimer", luckDenialTimer - 1);
+            if (luckAmount >= luckDenialLuck) {
+                luck.setBaseValue(luckAmount);
+            }
+            if (misfortuneAmount <= luckDenialMisfortune) {
+                misfortune.setBaseValue(luckDenialMisfortune);
+            }
+        }
+    }
+
     private static void giftLuck(LivingEntity interactionTarget, Player player) {
         if (!player.level().isClientSide() && !interactionTarget.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);

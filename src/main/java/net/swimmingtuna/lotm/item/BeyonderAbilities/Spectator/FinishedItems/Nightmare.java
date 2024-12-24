@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -72,6 +73,26 @@ public class Nightmare extends SimpleAbilityItem {
         return attributeBuilder.build();
     }
 
+    public static void nightmare(LivingEntity player, CompoundTag playerPersistentData) {
+        //NIGHTMARE
+        AttributeInstance nightmareAttribute = player.getAttribute(ModAttributes.NIGHTMARE.get());
+        int nightmareTimer = playerPersistentData.getInt("NightmareTimer");
+        int matterAccelerationBlockTimer = player.getPersistentData().getInt("matterAccelerationBlockTimer");
+        if (matterAccelerationBlockTimer >= 1) {
+            player.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
+        }
+
+        if (nightmareAttribute.getValue() >= 1) {
+            nightmareTimer++;
+            if (nightmareTimer >= 600) {
+                nightmareAttribute.setBaseValue(0);
+                nightmareTimer = 0;
+            }
+        } else {
+            nightmareTimer = 0;
+        }
+        playerPersistentData.putInt("NightmareTimer", nightmareTimer);
+    }
 
     private void nightmare(Player player, Level level, BlockPos targetPos) {
         if (!player.level().isClientSide()) {

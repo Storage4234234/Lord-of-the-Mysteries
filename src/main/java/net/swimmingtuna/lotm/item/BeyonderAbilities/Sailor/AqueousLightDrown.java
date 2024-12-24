@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.entity.AqueousLightEntity;
+import net.swimmingtuna.lotm.events.ability_events.ModEvents;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import org.jetbrains.annotations.NotNull;
@@ -67,37 +68,12 @@ public class AqueousLightDrown extends SimpleAbilityItem {
                 if (entity.getDeltaMovement().y <= 0.15) {
                     entity.setDeltaMovement(entity.getDeltaMovement().x, entity.getDeltaMovement().y - 0.01, entity.getDeltaMovement().z);
                 }
-                tag.putInt("lightDrowning", aqueousLight + 1);
-                if (level.getBlockState(headPos).is(Blocks.AIR)) {
-                    level.setBlockAndUpdate(headPos, Blocks.WATER.defaultBlockState());
-                }
-                for (int x = -3; x <= 3; x++) {
-                    for (int y = -3; y <= 3; y++) {
-                        for (int z = -3; z <= 3; z++) {
-                            if (Math.abs(x) > 1 || Math.abs(y) > 1 || Math.abs(z) > 1) {
-                                BlockPos blockPos = headPos.offset(x, y, z);
-                                if (level.getBlockState(blockPos).is(Blocks.WATER)) {
-                                    level.setBlockAndUpdate(blockPos, Blocks.AIR.defaultBlockState());
-                                }
-                            }
-                        }
-                    }
-                }
+                ModEvents.waterElemination(tag, level, headPos, aqueousLight);
             }
             if (aqueousLight >= 200) {
                 aqueousLight = 0;
                 tag.putInt("lightDrowning", 0);
-                for (int x = -3; x <= 3; x++) {
-                    for (int y = -3; y <= 3; y++) {
-                        for (int z = -3; z <= 3; z++) {
-                            BlockPos blockPos = headPos.offset(x, y, z);
-                            // Check if the block is water and remove it
-                            if (level.getBlockState(blockPos).is(Blocks.WATER)) {
-                                level.setBlockAndUpdate(blockPos, Blocks.AIR.defaultBlockState());
-                            }
-                        }
-                    }
-                }
+                ModEvents.waterRemovalFromMinusThreeToThree(level, headPos);
             }
         }
     }

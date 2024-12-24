@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -33,6 +34,12 @@ public class CalamityIncarnationTornado extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
+    public static void calamityIncarnationTornado(CompoundTag playerPersistentData, Player player) {
+        //CALAMITY INCARNATION TORNADO
+        if (playerPersistentData.getInt("calamityIncarnationTornado") >= 1) {
+            playerPersistentData.putInt("calamityIncarnationTornado", player.getPersistentData().getInt("calamityIncarnationTornado") - 1);
+        }
+    }
 
     public static void calamityIncarnationTornado(Player player) {
         if (!player.level().isClientSide()) {

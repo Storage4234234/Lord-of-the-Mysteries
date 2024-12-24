@@ -5,6 +5,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -50,6 +53,52 @@ public class AcidicRain extends SimpleAbilityItem {
                 "Spirituality Used: 175\n" +
                 "Cooldown: 25 seconds").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
+
+    public static void acidicRain(Player player, int sequence) {
+        //ACIDIC RAIN
+        int acidicRain = player.getPersistentData().getInt("sailorAcidicRain");
+        if (acidicRain <= 0) {
+            return;
+        }
+        player.getPersistentData().putInt("sailorAcidicRain", acidicRain + 1);
+        AcidicRain.spawnAcidicRainParticles(player);
+        double radius1 = 50 - (sequence * 7);
+        double radius2 = 10 - sequence;
+
+
+        for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius1))) {
+            if (entity == player) {
+                continue;
+            }
+            if (entity.hasEffect(MobEffects.POISON)) {
+                int poisonAmp = entity.getEffect(MobEffects.POISON).getAmplifier();
+                if (poisonAmp == 0) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 1, false, false));
+                }
+            } else {
+                entity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 1, false, false));
+            }
+        }
+
+        for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius2))) {
+            if (entity == player) {
+                continue;
+            }
+            if (entity.hasEffect(MobEffects.POISON)) {
+                int poisonAmp = entity.getEffect(MobEffects.POISON).getAmplifier();
+                if (poisonAmp <= 2) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 2, false, false));
+                }
+            } else {
+                entity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 2, false, false));
+            }
+        }
+
+
+        if (acidicRain > 300) {
+            player.getPersistentData().putInt("sailorAcidicRain", 0);
+        }
     }
 
     public static void spawnAcidicRainParticles(Player player) {

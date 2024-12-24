@@ -9,6 +9,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.swimmingtuna.lotm.caps.BeyonderHolder;
+import net.swimmingtuna.lotm.events.ability_events.AbilityEventsUtil;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +34,30 @@ public class MonsterDangerSense extends SimpleAbilityItem {
         enableOrDisableDangerSense(player);
         return InteractionResult.SUCCESS;
     }
+
+    public static void monsterDangerSense(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
+        //WIND MANIPULATION SENSE
+        boolean monsterDangerSense = playerPersistentData.getBoolean("monsterDangerSense");
+        if (!monsterDangerSense) {
+            return;
+        }
+        if (!holder.useSpirituality(2)) return;
+        double radius = 150 - (holder.getCurrentSequence() * 15);
+        for (Player otherPlayer : player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius))) {
+            if (otherPlayer == player) {
+                continue;
+            }
+            Vec3 directionToPlayer = otherPlayer.position().subtract(player.position()).normalize();
+            Vec3 lookAngle = player.getLookAngle();
+            double horizontalAngle = Math.atan2(directionToPlayer.x, directionToPlayer.z) - Math.atan2(lookAngle.x, lookAngle.z);
+
+            String message = AbilityEventsUtil.getString(otherPlayer, horizontalAngle, directionToPlayer);
+            if (player.tickCount % 200 == 0) {
+                player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE));
+            }
+        }
+    }
+
 
     public static void enableOrDisableDangerSense(Player player) {
         if (!player.level().isClientSide()) {

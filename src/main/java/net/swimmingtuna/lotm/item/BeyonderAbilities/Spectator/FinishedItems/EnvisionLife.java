@@ -27,6 +27,34 @@ public class EnvisionLife extends SimpleAbilityItem {
     public EnvisionLife(Properties properties) {
         super(properties, BeyonderClassInit.SPECTATOR, 0, 0, 0);
     }
+
+
+    public static void envisionLife(Player player) {
+        //ENVISION LIFE
+        int waitMakeLifeCounter = player.getPersistentData().getInt("waitMakeLifeTimer");
+        if (waitMakeLifeCounter >= 1) {
+            waitMakeLifeCounter++;
+        }
+        if (waitMakeLifeCounter >= 600) {
+            waitMakeLifeCounter = 0;
+        }
+        player.getPersistentData().putInt("waitMakeLifeTimer", waitMakeLifeCounter);
+    }
+
+    public static void envisionLife(LivingEntity player) {
+        //ENVISION LIFE
+        int waitMakeLifeCounter = player.getPersistentData().getInt("waitMakeLifeTimer");
+        if (waitMakeLifeCounter >= 1) {
+            waitMakeLifeCounter++;
+        }
+        if (waitMakeLifeCounter >= 600) {
+            waitMakeLifeCounter = 0;
+        }
+        player.getPersistentData().putInt("waitMakeLifeTimer", waitMakeLifeCounter);
+    }
+
+
+
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("While holding this item, type in a mob and that mob will be spawned, targeting the nearest player within 100 blocks\n" +

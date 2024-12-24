@@ -23,61 +23,14 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.LightningEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.util.TickEventUtil;
 
 import java.util.Random;
 
 public class Calamity {
     private Calamity(){}
 
-    protected static void calamityIncarnationTornado(CompoundTag playerPersistentData, Player player) {
-        //CALAMITY INCARNATION TORNADO
-        if (playerPersistentData.getInt("calamityIncarnationTornado") >= 1) {
-            playerPersistentData.putInt("calamityIncarnationTornado", player.getPersistentData().getInt("calamityIncarnationTornado") - 1);
-        }
-    }
-
-    protected static void calamityIncarnationTsunami(CompoundTag playerPersistentData, Player player, ServerLevel level) {
-        //CALAMITY INCARNATION TSUNAMI
-        int calamityIncarnationTsunami = playerPersistentData.getInt("calamityIncarnationTsunami");
-        if (calamityIncarnationTsunami < 1) {
-            return;
-        }
-        playerPersistentData.putInt("calamityIncarnationTsunami", calamityIncarnationTsunami - 1);
-        BlockPos playerPos = player.blockPosition();
-        double radius = 23.0;
-        double minRemovalRadius = 25.0;
-        double maxRemovalRadius = 30.0;
-
-        // Create a sphere of water around the player
-        for (int sphereX = (int) -radius; sphereX <= radius; sphereX++) {
-            for (int sphereY = (int) -radius; sphereY <= radius; sphereY++) {
-                for (int sphereZ = (int) -radius; sphereZ <= radius; sphereZ++) {
-                    double distance = Math.sqrt(sphereX * sphereX + sphereY * sphereY + sphereZ * sphereZ);
-                    if (distance <= radius) {
-                        BlockPos blockPos = playerPos.offset(sphereX, sphereY, sphereZ);
-                        if (level.getBlockState(blockPos).isAir() && !level.getBlockState(blockPos).is(Blocks.WATER)) {
-                            level.setBlock(blockPos, Blocks.WATER.defaultBlockState(), 3);
-                        }
-                    }
-                }
-            }
-        }
-        for (int sphereX = (int) -maxRemovalRadius; sphereX <= maxRemovalRadius; sphereX++) {
-            for (int sphereY = (int) -maxRemovalRadius; sphereY <= maxRemovalRadius; sphereY++) {
-                for (int sphereZ = (int) -maxRemovalRadius; sphereZ <= maxRemovalRadius; sphereZ++) {
-                    double distance = Math.sqrt(sphereX * sphereX + sphereY * sphereY + sphereZ * sphereZ);
-                    if (distance <= maxRemovalRadius && distance >= minRemovalRadius) {
-                        BlockPos blockPos = playerPos.offset(sphereX, sphereY, sphereZ);
-                        if (level.getBlockState(blockPos).getBlock() == Blocks.WATER) {
-                            level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    protected static void calamityExplosion(Player pPlayer) {
+    public static void calamityExplosion(Player pPlayer) {
         CompoundTag tag = pPlayer.getPersistentData();
         int x = tag.getInt("calamityExplosionOccurrence");
         if (x >= 1 && pPlayer.tickCount % 20 == 0 && !pPlayer.level().isClientSide()) {
@@ -188,72 +141,16 @@ public class Calamity {
                 pPlayer.level().addFreshEntity(zombie);
             }
             if (random.nextInt(10) == 9) {
-                zombie.setPos(x + randomPos, surfaceY, z + randomPos);
-                zombie.setItemSlot(EquipmentSlot.HEAD, leatherHelmet);
-                zombie.setItemSlot(EquipmentSlot.CHEST, leatherChestplate);
-                zombie.setItemSlot(EquipmentSlot.LEGS, leatherLeggings);
-                zombie.setItemSlot(EquipmentSlot.FEET, leatherBoots);
-                zombie.setItemSlot(EquipmentSlot.MAINHAND, woodSword);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                    if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(zombie);
+                giveItemsAndSetTarget(pPlayer, x, z, subtractX, subtractY, subtractZ, surfaceY, leatherHelmet, leatherChestplate, leatherLeggings, leatherBoots, woodSword, zombie, randomPos);
             }
             if (random.nextInt(10) == 8) {
-                zombie.setPos(x + randomPos, surfaceY, z + randomPos);
-                zombie.setItemSlot(EquipmentSlot.HEAD, ironHelmet);
-                zombie.setItemSlot(EquipmentSlot.CHEST, ironChestplate);
-                zombie.setItemSlot(EquipmentSlot.LEGS, ironLeggings);
-                zombie.setItemSlot(EquipmentSlot.FEET, ironBoots);
-                zombie.setItemSlot(EquipmentSlot.MAINHAND, ironSword);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                    if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(zombie);
+                giveItemsAndSetTarget(pPlayer, x, z, subtractX, subtractY, subtractZ, surfaceY, ironHelmet, ironChestplate, ironLeggings, ironBoots, ironSword, zombie, randomPos);
             }
             if (random.nextInt(10) == 7) {
-                zombie.setPos(x + randomPos, surfaceY, z + randomPos);
-                zombie.setItemSlot(EquipmentSlot.HEAD, diamondHelmet);
-                zombie.setItemSlot(EquipmentSlot.CHEST, diamondChestplate);
-                zombie.setItemSlot(EquipmentSlot.LEGS, diamondLeggings);
-                zombie.setItemSlot(EquipmentSlot.FEET, diamondBoots);
-                zombie.setItemSlot(EquipmentSlot.MAINHAND, diamondSword);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                    if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(zombie);
+                giveItemsAndSetTarget(pPlayer, x, z, subtractX, subtractY, subtractZ, surfaceY, diamondHelmet, diamondChestplate, diamondLeggings, diamondBoots, diamondSword, zombie, randomPos);
             }
             if (random.nextInt(10) == 6) {
-                zombie.setPos(x + randomPos, surfaceY, z + randomPos);
-                zombie.setItemSlot(EquipmentSlot.HEAD, netheriteHelmet);
-                zombie.setItemSlot(EquipmentSlot.CHEST, netheriteChestplate);
-                zombie.setItemSlot(EquipmentSlot.LEGS, netheriteLeggings);
-                zombie.setItemSlot(EquipmentSlot.FEET, netheriteBoots);
-                zombie.setItemSlot(EquipmentSlot.MAINHAND, netheriteSword);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                    if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
-                        if (entity != null) {
-                            zombie.setTarget(entity);
-                        }
-                    }
-                }
-                pPlayer.level().addFreshEntity(zombie);
+                giveItemsAndSetTarget(pPlayer, x, z, subtractX, subtractY, subtractZ, surfaceY, netheriteHelmet, netheriteChestplate, netheriteLeggings, netheriteBoots, netheriteSword, zombie, randomPos);
             }
             if (random.nextInt(20) == 5) {
                 skeleton.setPos(x + randomPos, surfaceY, z + randomPos);
@@ -269,13 +166,7 @@ public class Calamity {
                 pPlayer.level().addFreshEntity(skeleton);
             }
             if (random.nextInt(20) == 4) {
-                skeleton.setPos(x + randomPos, surfaceY, z + randomPos);
-                skeleton.setItemSlot(EquipmentSlot.HEAD, leatherHelmet);
-                skeleton.setItemSlot(EquipmentSlot.CHEST, leatherChestplate);
-                skeleton.setItemSlot(EquipmentSlot.LEGS, leatherLeggings);
-                skeleton.setItemSlot(EquipmentSlot.FEET, leatherBoots);
-                enchantedBow.enchant(Enchantments.POWER_ARROWS, 1);
-                skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
+                TickEventUtil.giveSkeletonitems(x, z, surfaceY, leatherHelmet, leatherChestplate, leatherLeggings, leatherBoots, enchantedBow, skeleton, randomPos);
                 for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
                     BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
                     if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
@@ -287,13 +178,7 @@ public class Calamity {
                 pPlayer.level().addFreshEntity(skeleton);
             }
             if (random.nextInt(20) == 3) {
-                skeleton.setPos(x + randomPos, surfaceY, z + randomPos);
-                skeleton.setItemSlot(EquipmentSlot.HEAD, ironHelmet);
-                skeleton.setItemSlot(EquipmentSlot.CHEST, ironChestplate);
-                skeleton.setItemSlot(EquipmentSlot.LEGS, ironLeggings);
-                skeleton.setItemSlot(EquipmentSlot.FEET, ironBoots);
-                enchantedBow.enchant(Enchantments.POWER_ARROWS, 2);
-                skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
+                TickEventUtil.giveSkeletonitems(x, z, surfaceY, ironHelmet, ironChestplate, ironLeggings, ironBoots, enchantedBow, skeleton, randomPos);
                 for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
                     BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
                     if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
@@ -340,15 +225,20 @@ public class Calamity {
                 }
                 pPlayer.level().addFreshEntity(skeleton);
             }
-            zombie.setDropChance(EquipmentSlot.HEAD, 0.0F);
-            zombie.setDropChance(EquipmentSlot.CHEST, 0.0F);
-            zombie.setDropChance(EquipmentSlot.LEGS, 0.0F);
-            zombie.setDropChance(EquipmentSlot.FEET, 0.0F);
-            skeleton.setDropChance(EquipmentSlot.HEAD, 0.0F);
-            skeleton.setDropChance(EquipmentSlot.CHEST, 0.0F);
-            skeleton.setDropChance(EquipmentSlot.LEGS, 0.0F);
-            skeleton.setDropChance(EquipmentSlot.FEET, 0.0F);
-            tag.putInt("calamityUndeadArmyCounter", tag.getInt("calamityUndeadArmyCounter") - 1);
+            TickEventUtil.setDropchanceZombieAndSkeleton(tag, zombie, skeleton);
         }
+    }
+
+    private static void giveItemsAndSetTarget(Player pPlayer, int x, int z, int subtractX, int subtractY, int subtractZ, int surfaceY, ItemStack diamondHelmet, ItemStack diamondChestplate, ItemStack diamondLeggings, ItemStack diamondBoots, ItemStack diamondSword, Zombie zombie, int randomPos) {
+        TickEventUtil.giveZombieItems(x, z, surfaceY, diamondHelmet, diamondChestplate, diamondLeggings, diamondBoots, diamondSword, zombie, randomPos);
+        for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
+            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
+                if (entity != null) {
+                    zombie.setTarget(entity);
+                }
+            }
+        }
+        pPlayer.level().addFreshEntity(zombie);
     }
 }

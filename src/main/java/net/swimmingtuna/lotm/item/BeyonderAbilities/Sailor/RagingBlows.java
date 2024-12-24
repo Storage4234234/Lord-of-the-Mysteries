@@ -5,12 +5,18 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
@@ -39,12 +45,48 @@ public class RagingBlows extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
+    public static void ragingBlows(CompoundTag playerPersistentData, PlayerMobEntity player) {
+        //RAGING BLOWS
+        boolean sailorLightning = playerPersistentData.getBoolean("SailorLightning");
+        int ragingBlows = playerPersistentData.getInt("ragingBlows");
+        int sequence = player.getCurrentSequence();
+        int ragingBlowsRadius = (25 - (sequence * 3));
+        int damage = 20 - sequence * 2;
+        if (ragingBlows >= 1) {
+            RagingBlows.spawnRagingBlowsParticlesPM(player);
+            playerPersistentData.putInt("ragingBlows", ragingBlows + 1);
+        }
+        if (ragingBlows >= 6 && ragingBlows <= 96 && ragingBlows % 6 == 0) {
+            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.NEUTRAL, 0.5F, 0.5F);
+            Vec3 playerLookVector = player.getViewVector(1.0F);
+            Vec3 playerPos = player.position();
+            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, new AABB(playerPos.x - ragingBlowsRadius, playerPos.y - ragingBlowsRadius, playerPos.z - ragingBlowsRadius, playerPos.x + ragingBlowsRadius, playerPos.y + ragingBlowsRadius, playerPos.z + ragingBlowsRadius))) {
+                if (entity != player && playerLookVector.dot(entity.position().subtract(playerPos)) > 0) {
+                    entity.hurt(entity.damageSources().generic(), damage);
+                    double ragingBlowsX = player.getX() - entity.getX();
+                    double ragingBlowsZ = player.getZ() - entity.getZ();
+                    entity.knockback(0.25, ragingBlowsX, ragingBlowsZ);
+                    if (sequence <= 7) {
+                        double chanceOfDamage = (100.0 - (sequence * 12.5));
+                        if (Math.random() * 100 < chanceOfDamage && sailorLightning) {
+                            LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, entity.level());
+                            lightningBolt.moveTo(entity.getX(), entity.getY(), entity.getZ());
+                            entity.level().addFreshEntity(lightningBolt);
+                        }
+                    }
+                }
+            }
+        }
+        if (ragingBlows >= 100) {
+            RagingBlows.spawnRagingBlowsParticlesPM(player);
+            playerPersistentData.putInt("ragingBlows", 0);
+        }
+    }
+
     public static void ragingBlows(Player player) {
         if (!player.level().isClientSide()) {
             CompoundTag persistentData = player.getPersistentData();
-            int ragingBlows = persistentData.getInt("ragingBlows");
             persistentData.putInt("ragingBlows", 1);
-            ragingBlows = 1;
         }
     }
 
@@ -54,6 +96,42 @@ public class RagingBlows extends SimpleAbilityItem {
                 "Spirituality Used: 20\n" +
                 "Cooldown: 10 seconds").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
+
+    public static void ragingBlows(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
+        //RAGING BLOWS
+        boolean sailorLightning = playerPersistentData.getBoolean("SailorLightning");
+        int ragingBlows = playerPersistentData.getInt("ragingBlows");
+        int ragingBlowsRadius = (27 - (holder.getCurrentSequence() * 3));
+        int damage = 20 - holder.getCurrentSequence() * 2;
+        if (ragingBlows >= 1) {
+            RagingBlows.spawnRagingBlowsParticles(player);
+            playerPersistentData.putInt("ragingBlows", ragingBlows + 1);
+        }
+        if (ragingBlows >= 6 && ragingBlows <= 96 && ragingBlows % 6 == 0) {
+            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.NEUTRAL, 0.5F, 0.5F);
+            Vec3 playerLookVector = player.getViewVector(1.0F);
+            Vec3 playerPos = player.position();
+            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, new AABB(playerPos.x - ragingBlowsRadius, playerPos.y - ragingBlowsRadius, playerPos.z - ragingBlowsRadius, playerPos.x + ragingBlowsRadius, playerPos.y + ragingBlowsRadius, playerPos.z + ragingBlowsRadius))) {
+                if (entity != player && playerLookVector.dot(entity.position().subtract(playerPos)) > 0) {
+                    entity.hurt(entity.damageSources().generic(), damage);
+                    double ragingBlowsX = player.getX() - entity.getX();
+                    double ragingBlowsZ = player.getZ() - entity.getZ();
+                    entity.knockback(0.25, ragingBlowsX, ragingBlowsZ);
+                    if (holder.getCurrentSequence() <= 7) {
+                        double chanceOfDamage = (100.0 - (holder.getCurrentSequence() * 12.5));
+                        if (Math.random() * 100 < chanceOfDamage && sailorLightning) {
+                            LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, entity.level());
+                            lightningBolt.moveTo(entity.getX(), entity.getY(), entity.getZ());
+                            entity.level().addFreshEntity(lightningBolt);
+                        }
+                    }
+                }
+            }
+        }
+        if (ragingBlows >= 100) {
+            playerPersistentData.putInt("ragingBlows", 0);
+        }
     }
 
     public static void spawnRagingBlowsParticles(Player player) {

@@ -1,13 +1,19 @@
 package net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.swimmingtuna.lotm.entity.PlayerMobEntity;
+import net.swimmingtuna.lotm.events.ability_events.ModEvents;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +37,38 @@ public class CalamityIncarnationTsunami extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
+    public static void calamityIncarnationTsunami(CompoundTag playerPersistentData, PlayerMobEntity player, ServerLevel level) {
+        //CALAMITY INCARNATION TSUNAMI
+        int calamityIncarnationTsunami = playerPersistentData.getInt("calamityIncarnationTsunami");
+        if (calamityIncarnationTsunami < 1) {
+            return;
+        }
+        playerPersistentData.putInt("calamityIncarnationTsunami", calamityIncarnationTsunami - 1);
+        BlockPos playerPos = player.blockPosition();
+        double radius = 23.0;
+        double minRemovalRadius = 25.0;
+        double maxRemovalRadius = 30.0;
+
+        // Create a sphere of water around the player
+        ModEvents.waterSphereOnPlayer(level, playerPos, radius, minRemovalRadius, maxRemovalRadius);
+    }
+
+
+    public static void calamityIncarnationTsunami(CompoundTag playerPersistentData, Player player, ServerLevel level) {
+        //CALAMITY INCARNATION TSUNAMI
+        int calamityIncarnationTsunami = playerPersistentData.getInt("calamityIncarnationTsunami");
+        if (calamityIncarnationTsunami < 1) {
+            return;
+        }
+        playerPersistentData.putInt("calamityIncarnationTsunami", calamityIncarnationTsunami - 1);
+        BlockPos playerPos = player.blockPosition();
+        double radius = 23.0;
+        double minRemovalRadius = 25.0;
+        double maxRemovalRadius = 30.0;
+
+        // Create a sphere of water around the player
+        ModEvents.waterSphereOnPlayer(level, playerPos, radius, minRemovalRadius, maxRemovalRadius);
+    }
     public static void calamityIncarnationTsunami(Player player) {
         if (!player.level().isClientSide()) {
             int x = player.getPersistentData().getInt("calamityIncarnationTsunami");

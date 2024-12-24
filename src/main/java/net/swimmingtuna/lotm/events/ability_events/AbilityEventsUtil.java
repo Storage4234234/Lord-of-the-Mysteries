@@ -1,11 +1,13 @@
 package net.swimmingtuna.lotm.events.ability_events;
 
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public class AbilityEventsUtil {
-    protected static @NotNull String getString(Player otherPlayer, double horizontalAngle, Vec3 directionToPlayer) {
+    public static @NotNull String getString(Player otherPlayer, double horizontalAngle, Vec3 directionToPlayer) {
         String horizontalDirection;
         if (Math.abs(horizontalAngle) < Math.PI / 4) {
             horizontalDirection = "in front of";
@@ -29,4 +31,14 @@ public class AbilityEventsUtil {
         return otherPlayer.getName().getString() + " is " + horizontalDirection + " and " + verticalDirection + " you.";
     }
 
+    public static void removeArmor(Player player) {
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+                ItemStack armorStack = player.getItemBySlot(slot);
+                if (!armorStack.isEmpty()) {
+                    player.setItemSlot(slot, ItemStack.EMPTY);
+                }
+            }
+        }
+    }
 }

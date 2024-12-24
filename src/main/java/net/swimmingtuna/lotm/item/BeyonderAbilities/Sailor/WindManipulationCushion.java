@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor;
 
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -33,6 +34,46 @@ public class WindManipulationCushion extends SimpleAbilityItem {
         windManipulationCushion(player);
         return InteractionResult.SUCCESS;
     }
+
+    public static void windManipulationCushion(CompoundTag playerPersistentData, LivingEntity player) {
+        //WIND MANIPULATION CUSHION
+        int cushion = playerPersistentData.getInt("windManipulationCushion");
+        if (cushion >= 1) {
+            WindManipulationCushion.summonWindCushionParticles(player);
+            playerPersistentData.putInt("windManipulationCushion", cushion - 1);
+            player.resetFallDistance();
+        }
+        if (cushion >= 20 && player.getDeltaMovement().y <= 0) {
+            player.setDeltaMovement(player.getDeltaMovement().x(), player.getDeltaMovement().y() * 0.9, player.getDeltaMovement().z());
+            player.hurtMarked = true;
+        }
+        if (cushion == 1) {
+            player.setDeltaMovement(player.getLookAngle().scale(2.0f));
+            player.hurtMarked = true;
+            player.resetFallDistance();
+        }
+    }
+
+
+    public static void windManipulationCushion(CompoundTag playerPersistentData, Player player) {
+        //WIND MANIPULATION CUSHION
+        int cushion = playerPersistentData.getInt("windManipulationCushion");
+        if (cushion >= 1) {
+            WindManipulationCushion.summonWindCushionParticles(player);
+            playerPersistentData.putInt("windManipulationCushion", cushion - 1);
+            player.resetFallDistance();
+        }
+        if (cushion >= 20 && player.getDeltaMovement().y <= 0) {
+            player.setDeltaMovement(player.getDeltaMovement().x(), player.getDeltaMovement().y() * 0.7, player.getDeltaMovement().z());
+            player.hurtMarked = true;
+        }
+        if (cushion == 1) {
+            player.setDeltaMovement(player.getLookAngle().scale(2.0f));
+            player.hurtMarked = true;
+            player.resetFallDistance();
+        }
+    }
+
 
     public static void windManipulationCushion(Player player) {
         if (!player.level().isClientSide()) {
