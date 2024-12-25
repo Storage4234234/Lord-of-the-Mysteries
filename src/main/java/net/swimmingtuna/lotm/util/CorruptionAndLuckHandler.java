@@ -73,6 +73,11 @@ public class CorruptionAndLuckHandler {
                         livingEntity.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 40, 2, false, false));
                     }
                 }
+                boolean low = tag.getBoolean("corruptedEntityLow");
+                boolean mid = tag.getBoolean("corruptedEntityMid");
+                boolean saint = tag.getBoolean("corruptedEntitySaint");
+                boolean angel = tag.getBoolean("corruptedEntityAngel");
+                boolean deity = tag.getBoolean("corruptedEntityDeity");
                 if (corruption >= 90) {
                     if (Math.random() >= 0.15) {
                         if (livingEntity instanceof Player player) {
@@ -186,30 +191,30 @@ public class CorruptionAndLuckHandler {
                         } else {
                             int sequence = -1;
                             float maxHp = livingEntity.getMaxHealth();
-                            if (maxHp >= 20) {
+                            if (maxHp <= 20) {
                                 sequence = 9;
-                            } else if (maxHp >= 35) {
+                            } else if (maxHp <= 35) {
                                 sequence = 8;
                             }
-                            else if (maxHp >= 70) {
+                            else if (maxHp <= 70) {
                                 sequence = 7;
                             }
-                            else if (maxHp >= 120) {
+                            else if (maxHp <= 120) {
                                 sequence = 6;
                             }
-                            else if (maxHp >= 190) {
+                            else if (maxHp <= 190) {
                                 sequence = 5;
                             }
-                            else if (maxHp >= 300) {
+                            else if (maxHp <= 300) {
                                 sequence = 4;
                             }
-                            else if (maxHp >= 450) {
+                            else if (maxHp <= 450) {
                                 sequence = 3;
                             }
-                            else if (maxHp >= 700) {
+                            else if (maxHp <= 700) {
                                 sequence = 2;
                             }
-                            else if (maxHp >= 999) {
+                            else if (maxHp <= 999) {
                                 sequence = 1;
                             }
                             else {
@@ -223,6 +228,7 @@ public class CorruptionAndLuckHandler {
                                 witherSkeleton.getPersistentData().putBoolean("corruptedEntityLow", true);
                                 BeyonderUtil.setTargetToHighestHP(witherSkeleton, 30);
                                 livingEntity.level().addFreshEntity(witherSkeleton);
+                                livingEntity.remove(Entity.RemovalReason.KILLED);
 
                             } else if (sequence == 7 || sequence == 6 || sequence == 5) {
                                 SkeletonHorse skeletonHorse = new SkeletonHorse(EntityType.SKELETON_HORSE, livingEntity.level());
@@ -240,6 +246,7 @@ public class CorruptionAndLuckHandler {
                                 skeleton.startRiding(skeletonHorse, true);
                                 livingEntity.level().addFreshEntity(skeletonHorse);
                                 livingEntity.level().addFreshEntity(skeleton);
+                                livingEntity.remove(Entity.RemovalReason.KILLED);
                             } else if (sequence == 4 || sequence == 3) {
                                 Vex vex = new Vex(EntityType.VEX, livingEntity.level());
                                 vex.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
@@ -248,6 +255,7 @@ public class CorruptionAndLuckHandler {
                                 vex.getPersistentData().putBoolean("corruptedEntitySaint", true);
                                 BeyonderUtil.setTargetToHighestHP(vex, 70);
                                 livingEntity.level().addFreshEntity(vex);
+                                livingEntity.remove(Entity.RemovalReason.KILLED);
                             } else if (sequence == 2 || sequence == 1) {
                                 Phantom phantom = new Phantom(EntityType.PHANTOM, livingEntity.level());
                                 phantom.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
@@ -256,7 +264,7 @@ public class CorruptionAndLuckHandler {
                                 phantom.getPersistentData().putBoolean("corruptedEntityAngel", true);
                                 BeyonderUtil.setTargetToHighestHP(phantom, 100);
                                 livingEntity.level().addFreshEntity(phantom);
-
+                                livingEntity.remove(Entity.RemovalReason.KILLED);
                             } else if (sequence == 0) {
                                 WitherBoss wither = new WitherBoss(EntityType.WITHER, livingEntity.level());
                                 wither.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
@@ -265,6 +273,7 @@ public class CorruptionAndLuckHandler {
                                 wither.getPersistentData().putBoolean("corruptedEntityDeity", true);
                                 BeyonderUtil.setTargetToHighestHP(wither, 150);
                                 livingEntity.level().addFreshEntity(wither);
+                                livingEntity.remove(Entity.RemovalReason.KILLED);
                             }
                         }
                     }

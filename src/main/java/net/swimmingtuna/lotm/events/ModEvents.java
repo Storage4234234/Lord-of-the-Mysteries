@@ -1163,7 +1163,7 @@ public class ModEvents {
         double sailorStormVecY = playerPersistentData.getInt("sailorStormVecY");
         double sailorStormVecZ = playerPersistentData.getInt("sailorStormVecZ");
         if (sailorLightningStorm >= 1) {
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 2; i++) {
                 LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());
                 lightningEntity.setSpeed(10.0f);
                 lightningEntity.setDeltaMovement((Math.random() * 0.4) - 0.2, -4, (Math.random() * 0.4) - 0.2);
@@ -1743,7 +1743,6 @@ public class ModEvents {
             FalseProphecy.falseProphecyTick(entity);
             AuraOfChaos.auraOfChaos(event);
             NoRegenerationEffect.preventRegeneration(entity);
-            WhisperOfCorruptionEntity.decrementWhisper(tag);
             MisfortuneRedirection.misfortuneLivingTickEvent(event);
             doubleProphecyDamageHelper(event);
             showMonsterParticles(entity);

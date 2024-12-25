@@ -4,19 +4,18 @@ package net.swimmingtuna.lotm.entity;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
-import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -89,10 +88,13 @@ public class WhisperOfCorruptionEntity extends AbstractHurtingProjectile {
                     serverLevel.sendParticles(ParticleTypes.ENCHANT, particleX, particleY, particleZ, 0, random, random, random, 0);
                 }
             }
-            for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 1.5))) {
-                if (livingEntity.getPersistentData().getInt("corruptionWhisperCooldown") == 0) {
-                    livingEntity.getPersistentData().putDouble("corruption", livingEntity.getPersistentData().getDouble("corruption" + scale));
-                    livingEntity.getPersistentData().putInt("corruptionWhisperCooldown", 10);
+            if (this.tickCount % 10 == 0) {
+                for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 1.5))) {
+                    if (this.getOwner() != null) {
+                        this.getOwner().sendSystemMessage(Component.literal("Worked on " + livingEntity.getName().getString() + livingEntity.getPersistentData().getDouble("corruption")));
+                    }
+                    livingEntity.getPersistentData().putDouble("corruption", livingEntity.getPersistentData().getDouble("corruption") + scale);
+
                 }
             }
             if (this.tickCount >= getLifetime()) {
@@ -124,11 +126,5 @@ public class WhisperOfCorruptionEntity extends AbstractHurtingProjectile {
 
     public void setLifetime(int lifetime) {
         this.entityData.set(LIFETIME, lifetime);
-    }
-
-    public static void decrementWhisper(CompoundTag tag) {
-        if (tag.getInt("corruptionWhisperCooldown") >= 1) {
-            tag.putInt("corruptionWhisperCooldonw", tag.getInt("corruptionWhisperCooldown") - 1);
-        }
     }
 }

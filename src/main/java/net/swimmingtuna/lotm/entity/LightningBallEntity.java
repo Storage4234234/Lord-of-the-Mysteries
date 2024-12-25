@@ -13,14 +13,20 @@ import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
+
+import java.util.List;
+import java.util.Random;
 
 public class LightningBallEntity extends AbstractHurtingProjectile {
     private static final EntityDataAccessor<Boolean> DATA_DANGEROUS = SynchedEntityData.defineId(LightningBallEntity.class, EntityDataSerializers.BOOLEAN);
@@ -33,6 +39,7 @@ public class LightningBallEntity extends AbstractHurtingProjectile {
     public LightningBallEntity(EntityType<? extends LightningBallEntity> entityType, Level level, boolean absorb) {
         super(entityType, level);
         this.setAbsorbed(absorb);
+
     }
 
     public LightningBallEntity(EntityType<LightningBallEntity> lightningBallEntityEntityType, Level level) {
@@ -52,7 +59,11 @@ public class LightningBallEntity extends AbstractHurtingProjectile {
     public void onHitBlock(BlockHitResult result) {
         if (!this.level().isClientSide()) {
             if (this.tickCount >= 50) {
-
+                ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
+                float scale = scaleData.getScale();
+                this.setDeltaMovement(this.getDeltaMovement().x * 0.5, this.getDeltaMovement().y * 0.5f, this.getDeltaMovement().z * 0.5f);
+                this.getPersistentData().putInt("lightningRadiusCounter", (int) (scale * 2));
+                this.getPersistentData().putBoolean("isExploding", true);
             }
         }
     }
@@ -61,16 +72,23 @@ public class LightningBallEntity extends AbstractHurtingProjectile {
     public void onHitEntity(EntityHitResult result) {
         if (!this.level().isClientSide()) {
             if (this.tickCount >= 50) {
-
+                Entity hitEntity = result.getEntity();
+                ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
+                float scale = scaleData.getScale();
+                this.setDeltaMovement(this.getDeltaMovement().x * 0.2, this.getDeltaMovement().y * 0.2, this.getDeltaMovement().z * 0.2);
+                this.getPersistentData().putInt("lightningRadiusCounter", (int) (scale * 2));
+                this.getPersistentData().putBoolean("isExploding", true);
             }
         }
     }
+
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("Summoned", this.getSummoned());
         compound.putBoolean("Absorbed", this.getAbsorb());
     }
+
     @Override
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
@@ -106,7 +124,7 @@ public class LightningBallEntity extends AbstractHurtingProjectile {
 
     @Override
     public boolean canHitEntity(Entity entity) {
-        if (entity == this.getOwner()){
+        if (entity == this.getOwner()) {
             return false;
         }
         return super.canHitEntity(entity);
@@ -127,7 +145,7 @@ public class LightningBallEntity extends AbstractHurtingProjectile {
                         ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
                         this.teleportTo(owner.getX(), owner.getY() + scaleData.getScale() * 2, owner.getZ());
                     }
-                    if (this.tickCount == 41 ) {
+                    if (this.tickCount == 41) {
                         this.setDeltaMovement(owner.getLookAngle().scale(3.0f));
                         this.hurtMarked = true;
                     }
@@ -157,17 +175,18 @@ public class LightningBallEntity extends AbstractHurtingProjectile {
                         lightningEntity.discard();
                         ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
                         if (scaleData.getScale() <= 50) {
-                        scaleData.setScale(scaleData.getScale() + 1);
+                            scaleData.setScale(scaleData.getScale() + 0.2f);
                         }
                     }
                 }
                 if (entity instanceof LightningBolt lightningBolt) {
                     lightningBolt.discard();
+
                     LightningBolt lightning = new LightningBolt(EntityType.LIGHTNING_BOLT, this.level());
                     lightning.teleportTo(this.getX(), this.getY(), this.getZ());
                     ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
                     if (scaleData.getScale() <= 50) {
-                        scaleData.setScale(scaleData.getScale() + 1.5f);
+                        scaleData.setScale(scaleData.getScale() + 0.3f);
                         scaleData.markForSync(true);
                     }
                 }
@@ -175,10 +194,24 @@ public class LightningBallEntity extends AbstractHurtingProjectile {
         }
         this.xRotO = getXRot();
         this.yRotO = this.getYRot();
-        if (!this.level().isClientSide() && this.tickCount >= 200) {
-            this.discard();
+        if (!this.level().isClientSide) {
+            int lightningArea = this.getPersistentData().getInt("lightningRadiusCounter");
+            boolean isExploding = this.getPersistentData().getBoolean("isExploding");
+            float scale = ScaleTypes.BASE.getScaleData(this).getScale();
+            if (isExploding) {
+                if (lightningArea <= 1) {
+                    explodeLightningBallBlock(this.getOnPos(), Math.min(50,2 * scale), scale); // Adjust as needed for final explosion
+                    this.discard();
+                }
+                BlockPos centerPos = this.blockPosition();
+                int currentRadius = lightningArea / 5; // Base radius
+                spawnRandomLightning(centerPos, currentRadius, lightningArea);
+                this.getPersistentData().putInt("lightningRadiusCounter", lightningArea - 1);
+                System.out.println("Current lightning radius counter: " + lightningArea);
+            }
         }
     }
+
     public boolean getSummoned() {
         return this.entityData.get(SUMMONED);
     }
@@ -194,6 +227,7 @@ public class LightningBallEntity extends AbstractHurtingProjectile {
     public void setSummoned(boolean summoned) {
         this.entityData.set(SUMMONED, summoned);
     }
+
     public void setBallXRot(float xRot) {
         this.entityData.set(X_ROT, xRot);
     }
@@ -201,11 +235,89 @@ public class LightningBallEntity extends AbstractHurtingProjectile {
     public void setBallYRot(float yRot) {
         this.entityData.set(Y_ROT, yRot);
     }
+
     public boolean getAbsorb() {
         return this.entityData.get(ABSORB);
     }
 
     public void setAbsorbed(boolean absorbed) {
         this.entityData.set(ABSORB, absorbed);
+    }
+
+    public void explodeLightningBallEntity(LivingEntity hitEntity, float scale) {
+        BlockPos hitPos = hitEntity.blockPosition();
+        double radius = scale * 2;
+        for (BlockPos pos : BlockPos.betweenClosed(
+                hitPos.offset((int) -radius, (int) -radius, (int) -radius),
+                hitPos.offset((int) radius, (int) radius, (int) radius))) {
+            if (pos.distSqr(hitPos) <= radius * radius) {
+                if (this.level().getBlockState(pos).getDestroySpeed(this.level(), pos) >= 0) {
+                    this.level().setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+                }
+            }
+        }
+        List<Entity> entities = this.level().getEntities(this,
+                new AABB(hitPos.offset((int) -radius, (int) -radius, (int) -radius),
+                        hitPos.offset((int) radius, (int) radius, (int) radius)));
+        for (Entity entity : entities) {
+            if (entity instanceof LivingEntity livingEntity) {
+                livingEntity.hurt(BeyonderUtil.genericSource(this), 10 * scale);
+            }
+        }
+    }
+
+    public void explodeLightningBallBlock(BlockPos hitPos, double radius, float scale) {
+        for (BlockPos pos : BlockPos.betweenClosed(
+                hitPos.offset((int) -radius, (int) -radius, (int) -radius),
+                hitPos.offset((int) radius, (int) radius, (int) radius))) {
+            if (pos.distSqr(hitPos) <= radius * radius) {
+                if (this.level().getBlockState(pos).getDestroySpeed(this.level(), pos) >= 0) {
+                    this.level().setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+                }
+            }
+        }
+        List<Entity> entities = this.level().getEntities(this,
+                new AABB(hitPos.offset((int) -radius, (int) -radius, (int) -radius),
+                        hitPos.offset((int) radius, (int) radius, (int) radius)));
+
+        for (Entity entity : entities) {
+            if (entity instanceof LivingEntity livingEntity) {
+                livingEntity.hurt(BeyonderUtil.genericSource(this), 10 * scale);
+            }
+        }
+    }
+
+
+    private void spawnRandomLightning(BlockPos center, int radius, int lightningArea) {
+        int adjustedRadius = radius + Math.max(0, 50 - lightningArea);
+        for (int i = 0; i < 4; i++) {
+            double angle = this.random.nextDouble() * 2 * Math.PI;
+            double distance = this.random.nextDouble() * adjustedRadius;
+            int x = center.getX() + (int) (Math.cos(angle) * distance);
+            int z = center.getZ() + (int) (Math.sin(angle) * distance);
+            BlockPos lightningPos = new BlockPos(x, center.getY(), z);
+            while (this.level().isEmptyBlock(lightningPos) && lightningPos.getY() > this.level().getMinBuildHeight()) {
+                lightningPos = lightningPos.below();
+            }
+            lightningPos = lightningPos.above();
+            LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, this.level());
+            Random random = new Random();
+            if (random.nextInt(20) == 0) {
+                List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(adjustedRadius));
+                if (!entities.isEmpty() && this.random.nextInt(20) == 0) {
+                    LivingEntity randomEntity = entities.get(this.random.nextInt(entities.size()));
+                    lightningBolt.moveTo(randomEntity.getOnPos().getCenter());
+                } else {
+                    lightningBolt.moveTo(Vec3.atBottomCenterOf(lightningPos));
+                }
+            }
+            lightningBolt.moveTo(Vec3.atBottomCenterOf(lightningPos));
+            lightningBolt.setVisualOnly(false);
+            lightningBolt.setDamage(15);
+            this.level().addFreshEntity(lightningBolt);
+            if (this.level().getBlockState(lightningPos).getDestroySpeed(this.level(), lightningPos) >= 0) {
+                this.level().setBlock(lightningPos, Blocks.AIR.defaultBlockState(), 3);
+            }
+        }
     }
 }

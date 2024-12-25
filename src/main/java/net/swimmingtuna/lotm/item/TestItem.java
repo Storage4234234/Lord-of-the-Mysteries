@@ -58,9 +58,6 @@ public class TestItem extends SimpleAbilityItem {
     }
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
-        if (!checkAll(player)) {
-            return InteractionResult.FAIL;
-        };
         player.sendSystemMessage(Component.literal("Corruption value is " + interactionTarget.getPersistentData().getDouble("corruption")));
         return InteractionResult.SUCCESS;
     }
