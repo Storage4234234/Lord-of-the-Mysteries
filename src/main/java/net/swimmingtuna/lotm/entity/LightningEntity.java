@@ -12,15 +12,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
@@ -32,6 +29,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class LightningEntity extends AbstractHurtingProjectile {
+    private static final EntityDataAccessor<Integer> DAMAGE = SynchedEntityData.defineId(LightningEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> MAX_LENGTH = SynchedEntityData.defineId(LightningEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> SPEED = SynchedEntityData.defineId(LightningEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> FALL_DOWN = SynchedEntityData.defineId(LightningEntity.class, EntityDataSerializers.BOOLEAN);
@@ -69,6 +67,7 @@ public class LightningEntity extends AbstractHurtingProjectile {
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(MAX_LENGTH, 100);
+        this.entityData.define(DAMAGE, 30);
         this.entityData.define(SPEED, 1.0f);
         this.entityData.define(FALL_DOWN, false);
         this.entityData.define(BRANCH_OUT, false);
@@ -86,6 +85,9 @@ public class LightningEntity extends AbstractHurtingProjectile {
         super.readAdditionalSaveData(compound);
         if (compound.contains("MaxLength")) {
             this.setMaxLength(compound.getInt("MaxLength"));
+        }
+        if (compound.contains("Damage")) {
+            this.setDamage(compound.getInt("Damage"));
         }
         if (compound.contains("NoUp")) {
             this.setNoUp(compound.getBoolean("NoUp"));
@@ -146,6 +148,7 @@ public class LightningEntity extends AbstractHurtingProjectile {
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("MaxLength", this.getMaxLength());
+        compound.putInt("Damage", this.getDamage());
         compound.putFloat("Speed", this.getSpeed());
         ListTag posList = new ListTag();
         for (Vec3 pos : this.positions) {
@@ -243,34 +246,7 @@ public class LightningEntity extends AbstractHurtingProjectile {
                     for (BlockPos blockPos : BlockPos.betweenClosed(new BlockPos((int) checkArea.minX, (int) checkArea.minY, (int) checkArea.minZ), new BlockPos((int) checkArea.maxX, (int) checkArea.maxY, (int) checkArea.maxZ))) {
                         if (!this.level().getBlockState(blockPos).isAir() && !this.level().getBlockState(blockPos).getBlock().equals(Blocks.WATER)) {
                             Vec3 hitPos = currentPos;
-                            if (this.owner != null) {
-                                if (this.owner instanceof Player player) {
-                                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                                    int sequence = holder.getCurrentSequence();
-                                    int radius = 20 - (sequence * 2);
-                                    this.level().explode(this, hitPos.x, hitPos.y, hitPos.z, radius, Level.ExplosionInteraction.BLOCK);
-                                    AABB damageArea = new AABB(hitPos.x - radius, hitPos.y - radius, hitPos.z - radius,
-                                            hitPos.x + radius, hitPos.y + radius, hitPos.z + radius);
-                                    for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, damageArea)) {
-                                        if (entity != this.owner || entity != this.getOwner()) {
-                                            double distance1 = Math.sqrt(entity.distanceToSqr(hitPos));
-                                            float maxDamage = 50f;
-                                            float minDamage = 10f;
-                                            float damageFalloff = (float) (distance1 / radius);
-                                            float damage = Math.max(minDamage, maxDamage * (1 - damageFalloff));
-                                            damage -= (sequence * 2);
-                                            entity.hurt(BeyonderUtil.lightningSource(this), damage);
-                                        }
-                                    }
-                                }
-                            } else {
-                                level().explode(this, hitPos.x(), hitPos.y(), hitPos.z(), 10, false, Level.ExplosionInteraction.TNT);
-                                for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, new AABB(hitPos.x - 4, hitPos.y - 4, hitPos.z - 4, hitPos.x + 4, hitPos.y + 4, hitPos.z + 4))) {
-                                    if (entity != this.getOwner() || entity != this.owner) {
-                                        entity.hurt(BeyonderUtil.lightningSource(this), 10);
-                                    }
-                                }
-                            }
+                            explodeLightningBlock(BlockPos.containing(hitPos), getDamage() * 0.1);
                             hasExploded = true;
                             this.discard();
                             break;
@@ -281,8 +257,8 @@ public class LightningEntity extends AbstractHurtingProjectile {
                 double offsetY = random.nextGaussian() * 1;
                 double offsetZ = random.nextGaussian() * 1;
                 if (level() instanceof ServerLevel serverLevel) {
-                    serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,checkArea.minX + offsetX, checkArea.minY + offsetY, checkArea.minZ + offsetZ,0,0,0,0,0);
-                    serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,checkArea.minX + offsetX, checkArea.minY + offsetY, checkArea.minZ + offsetZ,0,0,0,0,0);
+                    serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, checkArea.minX + offsetX, checkArea.minY + offsetY, checkArea.minZ + offsetZ, 0, 0, 0, 0, 0);
+                    serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, checkArea.minX + offsetX, checkArea.minY + offsetY, checkArea.minZ + offsetZ, 0, 0, 0, 0, 0);
                 }
             }
             if (hasExploded) break;
@@ -305,12 +281,14 @@ public class LightningEntity extends AbstractHurtingProjectile {
             }
             if (branchOut) {
                 if (this.tickCount == getMaxLength()) {
-                    this.level().explode(this, lastPos.x(), lastPos.y(), lastPos.z(), 10, Level.ExplosionInteraction.TNT);
+                    Vec3 pos = new Vec3(lastPos.x, lastPos.y, lastPos.z);
+                    this.explodeLightningBlock(BlockPos.containing(pos), getDamage() * 0.1);
                 }
                 LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), this.level());
                 lightningEntity.setSpeed(8.0f);
                 lightningEntity.setDeltaMovement(this.getPersistentData().getDouble("sailorLightningDMX") + (Math.random() * 0.5) - 0.25, this.getPersistentData().getDouble("sailorLightningDMY") + (Math.random() * 0.5) - 0.25, this.getPersistentData().getDouble("sailorLightningDMZ") + (Math.random() * 0.5) - 0.25);
                 lightningEntity.setMaxLength(100);
+                lightningEntity.setDamage(6);
                 lightningEntity.teleportTo(lastPos.x(), lastPos.y(), lastPos.z());
                 lightningEntity.setSynchedMovement(true);
                 lightningEntity.getPersistentData().putDouble("lightningBranchDMY", this.getPersistentData().getDouble("sailorLightningDMY") + (Math.random() * 0.8) - 0.4);
@@ -457,10 +435,41 @@ public class LightningEntity extends AbstractHurtingProjectile {
     public void setSynchedMovement(boolean synchedMovement) {
         this.entityData.set(SYNCHED_MOVEMENT, synchedMovement);
     }
+
     public Vec3 getLastPos() {
         return this.lastPos;
     }
+
     public void setLastPos(Vec3 lastPos) {
         this.lastPos = lastPos;
+    }
+
+    public void setDamage(int damage) { //increase by 3x
+        this.entityData.set(DAMAGE, damage * 3);
+    }
+
+    public int getDamage() {
+        return this.entityData.get(DAMAGE);
+    }
+
+    public void explodeLightningBlock(BlockPos hitPos, double radius) {
+        for (BlockPos pos : BlockPos.betweenClosed(hitPos.offset((int) -radius, (int) -radius, (int) -radius), hitPos.offset((int) radius, (int) radius, (int) radius))) {
+            if (pos.distSqr(hitPos) <= radius * radius) {
+                if (this.level().getBlockState(pos).getDestroySpeed(this.level(), pos) >= 0) {
+                    this.level().setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+                }
+            }
+        }
+        List<Entity> entities = this.level().getEntities(this, new AABB(hitPos.offset((int) -radius, (int) -radius, (int) -radius), hitPos.offset((int) radius, (int) radius, (int) radius)));
+        for (Entity entity : entities) {
+            if (entity instanceof LivingEntity livingEntity) {
+                if (this.getOwner() == null) {
+                    livingEntity.hurt(BeyonderUtil.genericSource(this), (float) (Math.max((double) getDamage() / 5, getDamage() - (entity.distanceToSqr(hitPos.getCenter())))));
+                } else {
+                    livingEntity.hurt(BeyonderUtil.genericSource(this.getOwner()), (float) (Math.max((double) getDamage() / 3, getDamage() - (entity.distanceToSqr(hitPos.getCenter())))));
+
+                }
+            }
+        }
     }
 }

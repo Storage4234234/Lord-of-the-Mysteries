@@ -174,6 +174,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), entity.level());
             lightningEntity.setSpeed(9.0f);
             lightningEntity.setMaxLength(60);
+            lightningEntity.setDamage(7);
             lightningEntity.setNoUp(true);
             lightningEntity.setNewStartPos(startPos);
             lightningEntity.setDeltaMovement(0, -3, 0);

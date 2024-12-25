@@ -22,6 +22,7 @@ import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.LightningEntity;
+import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -113,6 +114,7 @@ public class SailorLightning extends SimpleAbilityItem {
             float speed = 15.0f;
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), level);
             lightningEntity.setSpeed(speed);
+            lightningEntity.setDamage(20 - (holder.getCurrentSequence() * 2));
             lightningEntity.setDeltaMovement(lookVec.x, lookVec.y, lookVec.z);
             lightningEntity.setMaxLength(30);
             lightningEntity.setOwner(player);
@@ -135,6 +137,7 @@ public class SailorLightning extends SimpleAbilityItem {
             lightningEntity.setSpeed(speed);
             lightningEntity.setDeltaMovement(lookVec.x, lookVec.y, lookVec.z);
             lightningEntity.setMaxLength(30);
+            lightningEntity.setDamage(20 - (holder.getCurrentSequence() * 2));
             lightningEntity.setOwner(player);
             lightningEntity.teleportTo(player.getX(), player.getEyeY(), player.getZ());
             lightningEntity.setTargetPos(targetPos);
@@ -147,22 +150,25 @@ public class SailorLightning extends SimpleAbilityItem {
             float speed = 10.0f;
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), level);
             lightningEntity.setSpeed(speed);
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             lightningEntity.setDeltaMovement(0, -2, 0);
             lightningEntity.setMaxLength(60);
             lightningEntity.setOwner(player);
+            lightningEntity.setDamage(20 - (holder.getCurrentSequence() * 2));
             lightningEntity.setOwner(player);
             lightningEntity.teleportTo(player.getX() + ((Math.random() * 150) - 75), player.getY() + 60, player.getZ() + ((Math.random() * 150) - 75));
             level.addFreshEntity(lightningEntity);
         }
     }
 
-    public static void lightningHighPlayerMob(LivingEntity player, Level level) {
+    public static void lightningHighPlayerMob(PlayerMobEntity player, Level level) {
         if (!level.isClientSide()) {
             float speed = 10.0f;
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), level);
             lightningEntity.setSpeed(speed);
             lightningEntity.setDeltaMovement(0, -2, 0);
             lightningEntity.setMaxLength(60);
+            lightningEntity.setDamage(20 - (player.getCurrentSequence() * 2));
             lightningEntity.setOwner(player);
             lightningEntity.setOwner(player);
             lightningEntity.teleportTo(player.getX() + ((Math.random() * 150) - 75), player.getY() + 60, player.getZ() + ((Math.random() * 150) - 75));
@@ -179,6 +185,8 @@ public class SailorLightning extends SimpleAbilityItem {
             Vec3 lookVec = player.getLookAngle();
             lightningEntity.setDeltaMovement(lookVec.x, lookVec.y, lookVec.z);
             lightningEntity.setMaxLength(30);
+            lightningEntity.setDamage(20 - (holder.getCurrentSequence() * 2));
+
             lightningEntity.teleportTo(player.getX(), player.getY(), player.getZ());
             lightningEntity.setTargetPos(targetEntity.position());
             lightningEntity.setOwner(player);

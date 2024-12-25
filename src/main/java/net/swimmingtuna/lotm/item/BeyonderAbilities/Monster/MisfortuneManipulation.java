@@ -105,11 +105,11 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
             if (misfortuneManipulation == 1) {
                 if (holder.getCurrentSequence() > 2) {
                     summonMeteor(interactionTarget, player);
-                }
+                } else
                 if (holder.getCurrentSequence() == 2 || holder.getCurrentSequence() == 1) {
                     summonMeteor(interactionTarget, player);
                     summonMeteor(interactionTarget, player);
-                }
+                } else
                 if (holder.getCurrentSequence() == 0) {
                     summonMeteor(interactionTarget, player);
                     summonMeteor(interactionTarget, player);
@@ -127,23 +127,24 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
                 tornadoEntity.setTornadoHeight(80 - (holder.getCurrentSequence() * 10));
                 tornadoEntity.teleportTo(interactionTarget.getX(), interactionTarget.getY(), interactionTarget.getZ());
                 player.level().addFreshEntity(tornadoEntity);
-            }
+            }  else
             if (misfortuneManipulation == 3) {
                 interactionTarget.getPersistentData().putInt("sailorLightningStorm1", 200 - (holder.getCurrentSequence() * 25));
                 interactionTarget.getPersistentData().putInt("sailorStormVecX1", (int) interactionTarget.getX());
                 interactionTarget.getPersistentData().putInt("sailorStormVecY1", (int) interactionTarget.getY());
                 interactionTarget.getPersistentData().putInt("sailorStormVecZ1", (int) interactionTarget.getZ());
-            }
+            }  else
             if (misfortuneManipulation == 4) {
                 LightningEntity lightning = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), interactionTarget.level());
                 lightning.setSpeed(5.0f);
+                lightning.setDamage(12);
                 lightning.setTargetEntity(interactionTarget);
                 lightning.setMaxLength(120);
                 lightning.setNewStartPos(new Vec3(interactionTarget.getX(), interactionTarget.getY() + 80, interactionTarget.getZ()));
                 lightning.setDeltaMovement(0, -3, 0);
                 lightning.setNoUp(true);
                 player.level().addFreshEntity(lightning);
-            }
+            }  else
             if (misfortuneManipulation == 5) {
                 for (Mob mob : interactionTarget.level().getEntitiesOfClass(Mob.class, interactionTarget.getBoundingBox().inflate(60 - (holder.getCurrentSequence() * 10)))) {
                     if (mob.getTarget() != interactionTarget) {
@@ -151,10 +152,10 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
                         mob.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 2, false, false));
                     }
                 }
-            }
+            }  else
             if (misfortuneManipulation == 6) {
                 tag.putInt("luckDoubleDamage", tag.getInt("luckDoubleDamage") + 5 - holder.getCurrentSequence());
-            }
+            } else
             if (misfortuneManipulation == 7) {
                 Random random = new Random();
                 List<EquipmentSlot> armorSlots = Arrays.asList(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
@@ -167,21 +168,21 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
                     player.spawnAtLocation(armorPiece);
                     player.setItemSlot(randomArmorSlot, ItemStack.EMPTY);
                 }
-            }
+            } else
             if (misfortuneManipulation == 8) {
                 tag.putInt("luckIgnoreAbility", tag.getInt("luckIgnoreAbility") + 1);
-            }
+            } else
             if (misfortuneManipulation == 9) {
                 BeyonderUtil.applyMobEffect(interactionTarget, MobEffects.POISON, 300 - (holder.getCurrentSequence() * 40), 4, true, true);
-            }
+            } else
             if (misfortuneManipulation == 10) {
                 tag.putInt("monsterMisfortuneManipulationGravity", 300);
-            }
+            } else
             if (misfortuneManipulation == 11) {
                 for (PlayerMobEntity playerMobEntity : interactionTarget.level().getEntitiesOfClass(PlayerMobEntity.class, interactionTarget.getBoundingBox().inflate(300))) {
                     playerMobEntity.setTarget(interactionTarget);
                 }
-            }
+            } else
             if (misfortuneManipulation == 12) {
                 tag.putInt("abilitySelfTarget", 5);
             }

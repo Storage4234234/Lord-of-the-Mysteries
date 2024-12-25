@@ -60,6 +60,7 @@ public class LightningBranch extends SimpleAbilityItem {
             lightningEntity.setOwner(player);
             lightningEntity.setOwner(player);
             lightningEntity.setBranchOut(true);
+            lightningEntity.setDamage(30 - (holder.getCurrentSequence() * 3));
             lightningEntity.teleportTo(player.getX(), player.getY(), player.getZ());
             player.level().addFreshEntity(lightningEntity);
         }

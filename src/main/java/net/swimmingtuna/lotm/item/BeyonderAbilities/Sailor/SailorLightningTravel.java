@@ -55,6 +55,7 @@ public class SailorLightningTravel extends SimpleAbilityItem {
             lightningEntity.setDeltaMovement(lookVec.x, lookVec.y, lookVec.z);
             lightningEntity.setMaxLength(400);
             lightningEntity.setOwner(player);
+            lightningEntity.setDamage(25);
             lightningEntity.setOwner(player);
             player.getPersistentData().putInt("sailorLightningTravel", 5);
             lightningEntity.teleportTo(player.getX(), player.getY(), player.getZ());

@@ -348,6 +348,7 @@ public class MisfortuneRedirection extends SimpleAbilityItem {
                 lightning.setSpeed(5.0f);
                 lightning.setTargetEntity(livingEntity);
                 lightning.setMaxLength(120);
+                lightning.setDamage(10 + (enhancement * 2));
                 lightning.setNewStartPos(new Vec3(livingEntity.getX(), livingEntity.getY() + 80, livingEntity.getZ()));
                 lightning.setDeltaMovement(0, -3, 0);
                 lightning.setNoUp(true);

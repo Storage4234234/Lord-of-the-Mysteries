@@ -24,6 +24,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
@@ -54,23 +55,26 @@ public class CorruptionAndLuckHandler {
             if (corruption >= 1 && livingEntity.tickCount % 200 == 0) {
                 tag.putDouble("corruption", corruption - 1);
             }
+            if (corruption >= 1) {
+                spawnCorruptionParticles(livingEntity, corruption);
+            }
             if (livingEntity.tickCount % 20 == 0) {
-                if (corruption >= 60) {
-                    livingEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 2, false, false));
+                if (corruption >= 60 && Math.random() <= 0.05) {
+                    livingEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 60, 2, true, true));
                 }
                 if (corruption >= 70) {
-                    if (Math.random() <= 0.10 && livingEntity.tickCount % 100 == 0) {
-                        livingEntity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 40, 2, false, false));
+                    if (Math.random() <= 0.05 && livingEntity.tickCount % 100 == 0) {
+                        livingEntity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 40, 2, true, true));
                     }
-                    if (Math.random() <= 0.40 && livingEntity.tickCount % 60 == 0) {
-                        livingEntity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 40, 2, false, false));
+                    if (Math.random() <= 0.2 && livingEntity.tickCount % 60 == 0) {
+                        livingEntity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 40, 2, true, true));
                     }
                 }
                 if (corruption >= 80 && livingEntity.tickCount % 200 == 0) {
                     if (Math.random() <= .50) {
-                        livingEntity.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), 40, 2, false, false));
+                        livingEntity.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), 40, 2, true, true));
                     } else {
-                        livingEntity.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 40, 2, false, false));
+                        livingEntity.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 40, 2, true, true));
                     }
                 }
                 boolean low = tag.getBoolean("corruptedEntityLow");
@@ -78,6 +82,94 @@ public class CorruptionAndLuckHandler {
                 boolean saint = tag.getBoolean("corruptedEntitySaint");
                 boolean angel = tag.getBoolean("corruptedEntityAngel");
                 boolean deity = tag.getBoolean("corruptedEntityDeity");
+                if (livingEntity.tickCount % 100 == 0) {
+                    if (low) {
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SPEED, 200, 1, false, false);
+                    } else if (mid) {
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SPEED, 200, 1, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DAMAGE_BOOST, 200, 2, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DAMAGE_RESISTANCE, 200, 0, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.REGENERATION, 200, 0, false, false);
+                    } else if (saint) {
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SPEED, 200, 3, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DAMAGE_BOOST, 200, 5, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DAMAGE_RESISTANCE, 200, 1, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.REGENERATION, 200, 1, false, false);
+                    } else if (angel) {
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SPEED, 200, 4, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DAMAGE_BOOST, 200, 7, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DAMAGE_RESISTANCE, 200, 2, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.REGENERATION, 200, 2, false, false);
+                    } else if (deity) {
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SPEED, 200, 5, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DAMAGE_BOOST, 200, 10, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DAMAGE_RESISTANCE, 200, 2, false, false);
+                        BeyonderUtil.applyMobEffect(livingEntity, MobEffects.REGENERATION, 200, 4, false, false);
+                    }
+                    if (livingEntity instanceof Mob mob) {
+                        if (mob.getTarget() == null) {
+                            if (low || mid || saint || angel || deity) {
+                                double searchRadius;
+                                if (deity) {
+                                    searchRadius = 300.0D;
+                                } else if (angel) {
+                                    searchRadius = 200.0D;
+                                } else if (saint) {
+                                    searchRadius = 100.0D;
+                                } else if (mid) {
+                                    searchRadius = 50.0D;
+                                } else {
+                                    searchRadius = 20.0D;
+                                }
+                                double maxYDifference = 10.0D;
+                                LivingEntity highestHealthTarget = null;
+                                double highestHealth = 0;
+                                List<LivingEntity> nearbyEntities = mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(searchRadius, searchRadius, searchRadius),
+                                        entity -> {
+                                            if (entity == mob || !entity.isAlive()) {
+                                                return false;
+                                            }
+                                            if (Math.abs(entity.getY() - mob.getY()) > maxYDifference) {
+                                                return false;
+                                            }
+                                            CompoundTag entityTag = entity.getPersistentData();
+                                            return !entityTag.getBoolean("corruptedEntityLow") && !entityTag.getBoolean("corruptedEntityMid") && !entityTag.getBoolean("corruptedEntitySaint") && !entityTag.getBoolean("corruptedEntityAngel") && !entityTag.getBoolean("corruptedEntityDeity");
+                                        }
+                                );
+                                for (LivingEntity nearby : nearbyEntities) {
+                                    if (nearby.getHealth() > highestHealth) {
+                                        highestHealth = nearby.getHealth();
+                                        highestHealthTarget = nearby;
+                                    }
+                                }
+                                if (highestHealthTarget != null) {
+                                    mob.setTarget(highestHealthTarget);
+                                }
+                            }
+                        }
+                        if (saint && livingEntity.tickCount % 500 == 0 && mob.getTarget() != null) {
+                            LivingEntity target = mob.getTarget();
+                            Vec3 lookVec = target.getLookAngle();
+                            double behindX = target.getX() - lookVec.x * 2;
+                            double behindZ = target.getZ() - lookVec.z * 2;
+                            mob.teleportTo(behindX, target.getY(), behindZ);
+                        } else
+                        if (angel && livingEntity.tickCount % 200 == 0 && mob.getTarget() != null) {
+                            LivingEntity target = mob.getTarget();
+                            Vec3 lookVec = target.getLookAngle();
+                            double behindX = target.getX() - lookVec.x * 2;
+                            double behindZ = target.getZ() - lookVec.z * 2;
+                            mob.teleportTo(behindX, target.getY(), behindZ);
+                        } else
+                        if (deity && livingEntity.tickCount % 60 == 0 && mob.getTarget() != null) {
+                            LivingEntity target = mob.getTarget();
+                            Vec3 lookVec = target.getLookAngle();
+                            double behindX = target.getX() - lookVec.x * 2;
+                            double behindZ = target.getZ() - lookVec.z * 2;
+                            mob.teleportTo(behindX, target.getY(), behindZ);
+                        }
+                    }
+                }
                 if (corruption >= 90) {
                     if (Math.random() >= 0.15) {
                         if (livingEntity instanceof Player player) {
@@ -112,6 +204,7 @@ public class CorruptionAndLuckHandler {
                                 Vex vex = new Vex(EntityType.VEX, player.level());
                                 vex.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
                                 vex.setHealth(maxHp);
+                                vex.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.8);
                                 vex.teleportTo(player.getX(), player.getY() + 1, player.getZ());
                                 vex.getPersistentData().putBoolean("corruptedEntitySaint", true);
                                 BeyonderUtil.setTargetToHighestHP(vex, 70);
@@ -120,6 +213,7 @@ public class CorruptionAndLuckHandler {
                                 Phantom phantom = new Phantom(EntityType.PHANTOM, player.level());
                                 phantom.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
                                 phantom.setHealth(maxHp);
+                                phantom.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.2);
                                 phantom.teleportTo(player.getX(), player.getY() + 1, player.getZ());
                                 phantom.getPersistentData().putBoolean("corruptedEntityAngel", true);
                                 BeyonderUtil.setTargetToHighestHP(phantom, 100);
@@ -129,6 +223,7 @@ public class CorruptionAndLuckHandler {
                                 WitherBoss wither = new WitherBoss(EntityType.WITHER, player.level());
                                 wither.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
                                 wither.setHealth(maxHp);
+                                wither.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.2);
                                 wither.teleportTo(player.getX(), player.getY() + 1, player.getZ());
                                 wither.getPersistentData().putBoolean("corruptedEntityDeity", true);
                                 BeyonderUtil.setTargetToHighestHP(wither, 150);
@@ -166,6 +261,7 @@ public class CorruptionAndLuckHandler {
                                 Vex vex = new Vex(EntityType.VEX, player.level());
                                 vex.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
                                 vex.setHealth(maxHp);
+                                vex.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.8);
                                 vex.teleportTo(player.getX(), player.getY() + 1, player.getZ());
                                 vex.getPersistentData().putBoolean("corruptedEntitySaint", true);
                                 BeyonderUtil.setTargetToHighestHP(vex, 70);
@@ -174,6 +270,7 @@ public class CorruptionAndLuckHandler {
                                 Phantom phantom = new Phantom(EntityType.PHANTOM, player.level());
                                 phantom.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
                                 phantom.setHealth(maxHp);
+                                phantom.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.2);
                                 phantom.teleportTo(player.getX(), player.getY() + 1, player.getZ());
                                 phantom.getPersistentData().putBoolean("corruptedEntityAngel", true);
                                 BeyonderUtil.setTargetToHighestHP(phantom, 100);
@@ -183,6 +280,7 @@ public class CorruptionAndLuckHandler {
                                 WitherBoss wither = new WitherBoss(EntityType.WITHER, player.level());
                                 wither.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
                                 wither.setHealth(maxHp);
+                                wither.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.2);
                                 wither.teleportTo(player.getX(), player.getY() + 1, player.getZ());
                                 wither.getPersistentData().putBoolean("corruptedEntityDeity", true);
                                 BeyonderUtil.setTargetToHighestHP(wither, 150);
@@ -251,6 +349,7 @@ public class CorruptionAndLuckHandler {
                                 Vex vex = new Vex(EntityType.VEX, livingEntity.level());
                                 vex.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
                                 vex.setHealth(maxHp);
+                                vex.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(0.8);
                                 vex.teleportTo(livingEntity.getX(), livingEntity.getY() + 1, livingEntity.getZ());
                                 vex.getPersistentData().putBoolean("corruptedEntitySaint", true);
                                 BeyonderUtil.setTargetToHighestHP(vex, 70);
@@ -260,6 +359,7 @@ public class CorruptionAndLuckHandler {
                                 Phantom phantom = new Phantom(EntityType.PHANTOM, livingEntity.level());
                                 phantom.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
                                 phantom.setHealth(maxHp);
+                                phantom.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.2);
                                 phantom.teleportTo(livingEntity.getX(), livingEntity.getY() + 1, livingEntity.getZ());
                                 phantom.getPersistentData().putBoolean("corruptedEntityAngel", true);
                                 BeyonderUtil.setTargetToHighestHP(phantom, 100);
@@ -269,6 +369,7 @@ public class CorruptionAndLuckHandler {
                                 WitherBoss wither = new WitherBoss(EntityType.WITHER, livingEntity.level());
                                 wither.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
                                 wither.setHealth(maxHp);
+                                wither.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(1.2);
                                 wither.teleportTo(livingEntity.getX(), livingEntity.getY() + 1, livingEntity.getZ());
                                 wither.getPersistentData().putBoolean("corruptedEntityDeity", true);
                                 BeyonderUtil.setTargetToHighestHP(wither, 150);
@@ -1265,6 +1366,7 @@ public class CorruptionAndLuckHandler {
                     }
                     LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), livingEntity.level());
                     lightningEntity.setSpeed(6);
+                    lightningEntity.setDamage(15);
                     lightningEntity.setNoUp(true);
                     lightningEntity.setDeltaMovement((Math.random() * 0.4) - 0.2, -4, (Math.random() * 0.4) - 0.2);
                     lightningEntity.teleportTo(lightningBoltX, lightningBoltY + 60, lightningBoltZ);
@@ -1388,6 +1490,7 @@ public class CorruptionAndLuckHandler {
             if (lotmLightning == 1) {
                 LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), serverLevel);
                 lightningEntity.setSpeed(6.0f);
+                lightningEntity.setDamage(15);
                 lightningEntity.setTargetEntity(livingEntity);
                 lightningEntity.setMaxLength(60);
                 lightningEntity.setDeltaMovement(0, -3, 0);
@@ -1425,7 +1528,7 @@ public class CorruptionAndLuckHandler {
                         livingEntity.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 5 + (calamityEnhancement), 0, false, false));
                         livingEntity.sendSystemMessage(Component.literal("How unlucky, you tripped!").withStyle(ChatFormatting.BOLD));
                     } else if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && sequence <= 3) {
-                        return;
+                        tag.putInt("luckParalysis", 0);
                     } else {
                         livingEntity.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 10 + (calamityEnhancement * 3), 0, false, false));
                         livingEntity.sendSystemMessage(Component.literal("How unlucky, you tripped!").withStyle(ChatFormatting.BOLD));
@@ -1437,7 +1540,7 @@ public class CorruptionAndLuckHandler {
                         livingEntity.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 5 + (calamityEnhancement), 0, false, false));
                         livingEntity.sendSystemMessage(Component.literal("How unlucky, you tripped!").withStyle(ChatFormatting.BOLD));
                     } else if (pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER && sequence <= 3) {
-                        return;
+                        tag.putInt("luckParalysis", 0);
                     } else {
                         livingEntity.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 10 + (calamityEnhancement * 3), 0, false, false));
                         livingEntity.sendSystemMessage(Component.literal("How unlucky, you tripped!").withStyle(ChatFormatting.BOLD));
@@ -1466,7 +1569,6 @@ public class CorruptionAndLuckHandler {
                             }
                         }
                     }
-                    tag.putInt("luckUnequipArmor", 0);
                 } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
                     int sequence = playerMobEntity.getCurrentSequence();
                     List<EquipmentSlot> armorSlots = Arrays.asList(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
@@ -1486,21 +1588,10 @@ public class CorruptionAndLuckHandler {
                             }
                         }
                     }
-                    tag.putInt("luckUnequipArmor", 0);
                 }
+                tag.putInt("luckUnequipArmor", 0);
             }
             if (wardenSpawn == 1 && livingEntity.onGround()) {
-                Warden warden = new Warden(EntityType.WARDEN, livingEntity.level());
-                warden.setLastHurtByMob(livingEntity);
-                warden.setTarget(livingEntity);
-                warden.setAggressive(true);
-                warden.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
-                warden.setNoAi(false);
-                AttributeInstance maxHP = warden.getAttribute(Attributes.MAX_HEALTH);
-                maxHP.setBaseValue(60);
-                if (calamityEnhancement >= 2) {
-                    warden.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100 * calamityEnhancement, 2, false, false));
-                }
                 if (livingEntity instanceof Player player) {
                     BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                     int sequence = holder.getCurrentSequence();
@@ -1511,10 +1602,19 @@ public class CorruptionAndLuckHandler {
                         ravager.setAggressive(true);
                         livingEntity.level().addFreshEntity(ravager);
                     } else if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && sequence <= 3) {
-                        return;
-                    } else {
-                        livingEntity.level().addFreshEntity(warden);
                         tag.putInt("luckWarden", 0);
+                    } else {
+                        Warden warden = EntityType.WARDEN.spawn(serverLevel, (ItemStack)null, null, livingEntity.blockPosition(), MobSpawnType.NATURAL, true, false);
+                        warden.setLastHurtByMob(livingEntity);
+                        warden.setTarget(livingEntity);
+                        warden.setAggressive(true);
+                        warden.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
+                        warden.setNoAi(false);
+                        AttributeInstance maxHP = warden.getAttribute(Attributes.MAX_HEALTH);
+                        maxHP.setBaseValue(60);
+                        if (calamityEnhancement >= 2) {
+                            warden.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100 * calamityEnhancement, 2, false, false));
+                        }
                     }
                 }
                 if (livingEntity instanceof PlayerMobEntity player) {
@@ -1526,12 +1626,29 @@ public class CorruptionAndLuckHandler {
                         ravager.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
                         livingEntity.level().addFreshEntity(ravager);
                     } else if (player.getCurrentPathway() == BeyonderClassInit.MONSTER && sequence <= 3) {
-                        return;
-                    } else livingEntity.level().addFreshEntity(warden);
-                    tag.putInt("luckWarden", 0);
+                        tag.putInt("luckWarden", 0);
+                    } else {
+                        Warden warden = EntityType.WARDEN.spawn(serverLevel, (ItemStack)null, null, livingEntity.blockPosition(), MobSpawnType.NATURAL, true, false);
+                        warden.setLastHurtByMob(livingEntity);
+                        warden.setTarget(livingEntity);
+                        warden.setAggressive(true);
+                        warden.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
+                        warden.setNoAi(false);
+                        AttributeInstance maxHP = warden.getAttribute(Attributes.MAX_HEALTH);
+                        maxHP.setBaseValue(60);
+                        if (calamityEnhancement >= 2) {
+                            warden.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100 * calamityEnhancement, 2, false, false));
+                        }
+                    }
+                } else if (!BeyonderUtil.isBeyonderCapable(livingEntity)){
+                    Ravager ravager = new Ravager(EntityType.RAVAGER, livingEntity.level());
+                    ravager.setTarget(livingEntity);
+                    ravager.setAggressive(true);
+                    ravager.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
+                    livingEntity.level().addFreshEntity(ravager);
                 }
+                tag.putInt("luckWarden", 0);
             }
-
             if (mcLightning >= 1 && livingEntity.getHealth() <= 15 + (calamityEnhancement * 3)) {
                 tag.putInt("luckLightningMC", mcLightning - 1);
                 LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, livingEntity.level());
@@ -1563,26 +1680,23 @@ public class CorruptionAndLuckHandler {
                     if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && sequence <= 6 && sequence >= 4) {
                         livingEntity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 2 + calamityEnhancement, false, false));
                     } else if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && sequence <= 3) {
-                        return;
+                        tag.putInt("luckPoison", 0);
                     } else {
                         livingEntity.addEffect(new MobEffectInstance(MobEffects.POISON, 100, 2 + calamityEnhancement, false, false));
-                        tag.putInt("luckPoison", 0);
                     }
                 } else if (livingEntity instanceof PlayerMobEntity player) {
                     int sequence = player.getCurrentSequence();
                     if (player.getCurrentPathway() == BeyonderClassInit.MONSTER && sequence <= 6 && sequence >= 4) {
                         livingEntity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 2 + calamityEnhancement, false, false));
                     } else if (player.getCurrentPathway() == BeyonderClassInit.MONSTER && sequence <= 3) {
-                        return;
+                        tag.putInt("luckPoison", 0);
                     } else {
                         livingEntity.addEffect(new MobEffectInstance(MobEffects.POISON, 100, 2 + calamityEnhancement, false, false));
-                        tag.putInt("luckPoison", 0);
                     }
                 }
+                tag.putInt("luckPoison", 0);
             }
-            if (tornadoInt == 1) {
-                livingEntity.sendSystemMessage(Component.literal("Tornado is CURRENTLYYYYYYYYYYY 1"));
-                TornadoEntity tornado = new TornadoEntity(EntityInit.TORNADO_ENTITY.get(), livingEntity.level());
+            if (tornadoInt == 1) {TornadoEntity tornado = new TornadoEntity(EntityInit.TORNADO_ENTITY.get(), livingEntity.level());
                 tornado.setTornadoLifecount(120 + (calamityEnhancement * 30));
                 tornado.setTornadoPickup(true);
                 tornado.setTornadoRandom(true);
@@ -1598,7 +1712,6 @@ public class CorruptionAndLuckHandler {
                         tag.putInt("luckTornadoImmunity", 6 + (calamityEnhancement * 2));
                     }
                     livingEntity.level().addFreshEntity(tornado);
-                    tag.putInt("luckTornado", 0);
                 } else if (livingEntity instanceof PlayerMobEntity player) {
                     int sequence = player.getCurrentSequence();
                     if (player.getCurrentPathway() == BeyonderClassInit.MONSTER && sequence <= 6 && sequence >= 4) {
@@ -1607,8 +1720,8 @@ public class CorruptionAndLuckHandler {
                         tag.putInt("luckTornadoImmunity", 6 + (calamityEnhancement * 2));
                     }
                     livingEntity.level().addFreshEntity(tornado);
-                    tag.putInt("luckTornado", 0);
                 }
+                tag.putInt("luckTornado", 0);
             }
             if (stone == 1) {
                 StoneEntity stoneEntity = new StoneEntity(EntityInit.STONE_ENTITY.get(), livingEntity.level());
@@ -1617,7 +1730,6 @@ public class CorruptionAndLuckHandler {
                 for (int i = 0; i < calamityEnhancement; i++) {
                     livingEntity.level().addFreshEntity(stoneEntity);
                 }
-                tag.putInt("luckStone", 0);
                 if (livingEntity instanceof Player player) {
                     BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                     int sequence = holder.getCurrentSequence();
@@ -1634,6 +1746,7 @@ public class CorruptionAndLuckHandler {
                         tag.putInt("luckStoneDamageImmunity", 5 + calamityEnhancement);
                     }
                 }
+                tag.putInt("luckStone", 0);
             }
             if (regeneration == 1 && livingEntity.getHealth() <= 15) {
                 if (livingEntity.hasEffect(MobEffects.REGENERATION)) {
@@ -1796,7 +1909,7 @@ public class CorruptionAndLuckHandler {
             }
         }
     }
-    public void spawnCorruptionParticles(LivingEntity entity, double corruption) {
+    public static void spawnCorruptionParticles(LivingEntity entity, double corruption) {
         Level level = entity.level();
         if (!(level instanceof ServerLevel serverLevel)) {
             return;

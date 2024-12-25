@@ -1140,9 +1140,10 @@ public class ModEvents {
         if (sailorMentioned >= 1) {
             playerPersistentData.putInt("tyrantMentionedInChat", sailorMentioned - 1);
             if (sailorLightningStorm1 >= 1) {
-                for (int i = 0; i < (tyrantVer >= 1 ? 8 : 4); i++) {
+                for (int i = 0; i < (tyrantVer >= 1 ? 4 : 2); i++) {
                     LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());
                     lightningEntity.setSpeed(10.0f);
+                    lightningEntity.setDamage(10);
                     lightningEntity.setDeltaMovement((Math.random() * 0.4) - 0.2, -4, (Math.random() * 0.4) - 0.2);
                     lightningEntity.setMaxLength(30);
                     lightningEntity.setOwner(player);
@@ -1497,6 +1498,7 @@ public class ModEvents {
             for (int i = 0; i < 500; i++) {
                 LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());
                 lightningEntity.setSpeed(50);
+                lightningEntity.setDamage(15);
                 double sailorStarX = (Math.random() * 2 - 1);
                 double sailorStarY = (Math.random() * 2 - 1);
                 double sailorStarZ = (Math.random() * 2 - 1);
@@ -1709,6 +1711,7 @@ public class ModEvents {
                 tag.putInt("sailorLightningStorm1", sailorLightningStorm1 - 1);
                 LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), livingEntity.level());
                 lightningEntity.setSpeed(7.0f);
+                lightningEntity.setDamage(8);
                 lightningEntity.setDeltaMovement((Math.random() * 0.4) - 0.2, -3, (Math.random() * 0.4) - 0.2);
                 lightningEntity.setMaxLength(30);
                 lightningEntity.setNoUp(true);
@@ -1735,7 +1738,7 @@ public class ModEvents {
             }
             DeathKnell.deathKnellNegativeTick(entity);
             BattleHypnotism.untargetMobs(event);
-            ProbabilityManipulationInfiniteMisfortune.infiniteFortuneMisfortuneTick(event);
+            ProbabilityManipulationInfiniteMisfortune.testEvent(event);
             probabilityManipulationWorld(entity);
             CycleOfFate.tickEvent(event);
             dodgeProjectiles(entity);
@@ -2490,6 +2493,7 @@ public class ModEvents {
                         LightningEntity lightning = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), livingEntity.level());
                         lightning.setSpeed(5.0f);
                         lightning.setTargetEntity(livingEntity);
+                        lightning.setDamage(12);
                         lightning.setMaxLength(120);
                         lightning.setNewStartPos(new Vec3(livingEntity.getX(), livingEntity.getY() + 80, livingEntity.getZ()));
                         lightning.setDeltaMovement(0, -3, 0);
@@ -3385,6 +3389,7 @@ public class ModEvents {
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), pPlayer.level());
             tag.putInt("calamityLightningStormSummon", stormCounter - 1);
             lightningEntity.setSpeed(6);
+            lightningEntity.setDamage(5);
             lightningEntity.setNoUp(true);
             lightningEntity.setDeltaMovement((Math.random() * 0.4) - 0.2, -4, (Math.random() * 0.4) - 0.2);
             int stormX = tag.getInt("calamityLightningStormX");
@@ -3783,6 +3788,7 @@ public class ModEvents {
                             int surfaceY = pPlayer.level().getHeight(Heightmap.Types.WORLD_SURFACE, farAwayX, farAwayZ) + 1;
                             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), pPlayer.level());
                             lightningEntity.setSpeed(5);
+                            lightningEntity.setDamage(15);
                             Vec3 targetPos = new Vec3(farAwayX, surfaceY, farAwayZ);
                             lightningEntity.setTargetPos(targetPos);
                             lightningEntity.setBranchOut(true);
