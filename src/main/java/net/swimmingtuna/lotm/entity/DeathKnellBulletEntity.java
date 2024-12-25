@@ -63,7 +63,7 @@ public class DeathKnellBulletEntity extends AbstractHurtingProjectile {
                 if (getWeakness()) {
                     livingEntity.addEffect(new MobEffectInstance(ModEffects.ARMOR_WEAKNESS.get(), 200, 1));
                 } else if (getSlaughter()) {
-                    if (livingEntity.getHealth() <= livingEntity.getMaxHealth() * 0.35f) {
+                    if (livingEntity.getHealth() <= livingEntity.getMaxHealth() * 0.3f) {
                         if (this.getOwner() != null) {
                             livingEntity.hurt(BeyonderUtil.genericSource(this.getOwner()), getDamage() * 2);
                         } else {
@@ -99,7 +99,7 @@ public class DeathKnellBulletEntity extends AbstractHurtingProjectile {
             } else if (getLethal()) {
                 radius = 2;
             } else if (getSlaughter()) {
-                radius = 3;
+                radius = 4;
             }
             for (int x = -radius; x <= radius; x++) {
                 for (int y = -radius; y <= radius; y++) {
@@ -138,8 +138,7 @@ public class DeathKnellBulletEntity extends AbstractHurtingProjectile {
         } else if (getLethal()) {
             return new DustParticleOptions(new Vector3f(1.0F, 0.0F, 0.0F), 1.0F);
         } else if (getSlaughter()) {
-            return new DustParticleOptions(new Vector3f(0.5F, 0.0F, 0.0F), 1.0F);
-        }
+            return new DustParticleOptions(new Vector3f(0.0F, 0.0F, 0.0F), 1.0F);        }
         return ParticleInit.NULL_PARTICLE.get();
     }
 

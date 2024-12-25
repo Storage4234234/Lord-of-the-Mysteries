@@ -18,6 +18,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -139,7 +140,7 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
                 lightning.setTargetEntity(interactionTarget);
                 lightning.setMaxLength(120);
                 lightning.setNewStartPos(new Vec3(interactionTarget.getX(), interactionTarget.getY() + 80, interactionTarget.getZ()));
-                lightning.setDeltaMovement(0, -3,0);
+                lightning.setDeltaMovement(0, -3, 0);
                 lightning.setNoUp(true);
                 player.level().addFreshEntity(lightning);
             }
@@ -155,17 +156,17 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
                 tag.putInt("luckDoubleDamage", tag.getInt("luckDoubleDamage") + 5 - holder.getCurrentSequence());
             }
             if (misfortuneManipulation == 7) {
-                    Random random = new Random();
-                    List<EquipmentSlot> armorSlots = Arrays.asList(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
-                    List<EquipmentSlot> equippedArmor = armorSlots.stream()
-                            .filter(slot -> !player.getItemBySlot(slot).isEmpty())
-                            .toList();
-                    if (!equippedArmor.isEmpty()) {
-                        EquipmentSlot randomArmorSlot = equippedArmor.get(random.nextInt(equippedArmor.size()));
-                        ItemStack armorPiece = player.getItemBySlot(randomArmorSlot);
-                        player.spawnAtLocation(armorPiece);
-                        player.setItemSlot(randomArmorSlot, ItemStack.EMPTY);
-                    }
+                Random random = new Random();
+                List<EquipmentSlot> armorSlots = Arrays.asList(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
+                List<EquipmentSlot> equippedArmor = armorSlots.stream()
+                        .filter(slot -> !player.getItemBySlot(slot).isEmpty())
+                        .toList();
+                if (!equippedArmor.isEmpty()) {
+                    EquipmentSlot randomArmorSlot = equippedArmor.get(random.nextInt(equippedArmor.size()));
+                    ItemStack armorPiece = player.getItemBySlot(randomArmorSlot);
+                    player.spawnAtLocation(armorPiece);
+                    player.setItemSlot(randomArmorSlot, ItemStack.EMPTY);
+                }
             }
             if (misfortuneManipulation == 8) {
                 tag.putInt("luckIgnoreAbility", tag.getInt("luckIgnoreAbility") + 1);
@@ -204,38 +205,27 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
         int luckManipulation = tag.getInt("misfortuneManipulationItem");
         if (luckManipulation == 1) {
             return "Meteor";
-        }
-        if (luckManipulation == 2) {
+        } else if (luckManipulation == 2) {
             return "Tornado";
-        }
-        if (luckManipulation == 3) {
+        } else if (luckManipulation == 3) {
             return "Lightning Storm";
-        }
-        if (luckManipulation == 4) {
+        } else if (luckManipulation == 4) {
             return "Lightning Bolt";
-        }
-        if (luckManipulation == 5) {
+        } else if (luckManipulation == 5) {
             return "Attract Mobs";
-        }
-        if (luckManipulation == 6) {
+        } else if (luckManipulation == 6) {
             return "Double next damage";
-        }
-        if (luckManipulation == 7) {
+        } else if (luckManipulation == 7) {
             return "Unequip Armor";
-        }
-        if (luckManipulation == 8) {
+        } else if (luckManipulation == 8) {
             return "Next Ability Use Failed";
-        }
-        if (luckManipulation == 9) {
+        } else if (luckManipulation == 9) {
             return "Poison";
-        }
-        if (luckManipulation == 10) {
+        } else if (luckManipulation == 10) {
             return "Gravity Press";
-        }
-        if (luckManipulation == 11) {
+        } else if (luckManipulation == 11) {
             return "Rogue Beyonders will target them";
-        }
-        if (luckManipulation == 12) {
+        } else if (luckManipulation == 12) {
             return "Next 5 Targeted Abilities will target the user";
         }
         return "None";
@@ -246,10 +236,10 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
             int x = (int) entity.getX();
             int y = (int) entity.getY();
             int z = (int) entity.getZ();
-            Vec3 targetPos = new Vec3(x,y,z);
+            Vec3 targetPos = new Vec3(x, y, z);
             int enhancement = CalamityEnhancementData.getInstance((ServerLevel) entity.level()).getCalamityEnhancement();
             MeteorEntity meteor = new MeteorEntity(EntityInit.METEOR_ENTITY.get(), entity.level());
-            meteor.teleportTo(x + (Math.random() * 100) - 50,y + 150 + (Math.random() * 100) - 50, z+ (Math.random() * 100) - 50);
+            meteor.teleportTo(x + (Math.random() * 100) - 50, y + 150 + (Math.random() * 100) - 50, z + (Math.random() * 100) - 50);
             meteor.noPhysics = true;
             meteor.setOwner(player);
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(meteor);
@@ -262,17 +252,19 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
             entity.level().addFreshEntity(meteor);
         }
     }
+
     public static void livingTickMisfortuneManipulation(LivingEvent.LivingTickEvent event) {
         LivingEntity livingEntity = event.getEntity();
         CompoundTag tag = livingEntity.getPersistentData();
         if (!livingEntity.level().isClientSide()) {
             int gravity = tag.getInt("monsterMisfortuneManipulationGravity");
             if (gravity >= 1) {
-                tag.putInt("monsterMisfortuneManipulationGravity", gravity -1 );
-                livingEntity.getDeltaMovement().add(0,-2,0);
+                tag.putInt("monsterMisfortuneManipulationGravity", gravity - 1);
+                livingEntity.getDeltaMovement().add(0, -2, 0);
             }
         }
     }
+
     public static void livingUseAbilityMisfortuneManipulation(LivingEntityUseItemEvent event) {
         LivingEntity livingEntity = event.getEntity();
         CompoundTag tag = livingEntity.getPersistentData();
@@ -293,5 +285,10 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
                 }
             }
         }
+    }
+
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }

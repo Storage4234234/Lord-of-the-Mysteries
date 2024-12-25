@@ -15,6 +15,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
@@ -267,17 +268,12 @@ public class FalseProphecy extends SimpleAbilityItem {
             if (x >= 60) {
                 tag.putInt("falseProphecyShiftBeneficial", 0);
                 tag.putInt("beneficialFalseProphecyShift", 0);
-                if (BeyonderUtil.isBeyonderCapable(livingEntity)) {
-                    livingEntity.getPersistentData().putDouble("luck", livingEntity.getPersistentData().getDouble("luck") + 50);
-                }
+                livingEntity.getPersistentData().putDouble("luck", livingEntity.getPersistentData().getDouble("luck") + 50);
             }
         }
 
 
         if (beneficialStand >= 1) {
-            if (livingEntity.tickCount % 20 == 0) {
-                livingEntity.sendSystemMessage(Component.literal("value is " + beneficialStand));
-            }
             if (!BeyonderUtil.isLivingEntityMoving(livingEntity)) {
                 tag.putInt("falseProphecyStandBeneficial", tag.getInt("falseProphecyStandBeneficial") + 1);
             }
@@ -338,5 +334,10 @@ public class FalseProphecy extends SimpleAbilityItem {
             tag.putInt("falseProphecyJumpBeneficial", 0);
             tag.putInt("beneficialFalseProphecyJump", 0);
         }
+    }
+
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }

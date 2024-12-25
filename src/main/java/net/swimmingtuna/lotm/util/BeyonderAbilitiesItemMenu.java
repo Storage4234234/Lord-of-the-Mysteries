@@ -56,16 +56,26 @@ public class BeyonderAbilitiesItemMenu extends AbstractContainerMenu {
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         Slot slot = this.slots.get(index);
-
         if (slot != null && slot.hasItem()) {
-            ItemStack clickedItem = slot.getItem().copy();
-            if (!player.level().isClientSide) {
-                handleItemClick(clickedItem, (ServerPlayer) player);
+            ItemStack itemStack = slot.getItem();
+            ItemStack originalStack = itemStack.copy();
+            if (index < this.container.getContainerSize()) {
+                if (!this.moveItemStackTo(itemStack, this.container.getContainerSize(), this.slots.size(), true)) {
+                    return ItemStack.EMPTY;
+                }
+            } else {
+                return ItemStack.EMPTY;
             }
+            if (itemStack.isEmpty()) {
+                slot.set(ItemStack.EMPTY);
+            } else {
+                slot.setChanged();
+            }
+            return originalStack;
         }
-
         return ItemStack.EMPTY;
     }
+
 
     private void handleItemClick(ItemStack clickedItem, ServerPlayer player) {
         if (player != null) {

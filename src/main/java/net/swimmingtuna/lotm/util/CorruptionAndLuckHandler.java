@@ -10,10 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.horse.SkeletonHorse;
@@ -881,14 +878,12 @@ public class CorruptionAndLuckHandler {
                     tag.putInt("calamityGroundTremor", calamityGroundTremor - 1);
                 }
                 if (calamityExplosion >= 1) {
-                    livingEntity.sendSystemMessage(Component.literal("explosion val is " + calamityExplosion));
                     tag.putInt("calamityExplosion", calamityExplosion - 1);
                 }
                 if (calamityBabyZombie >= 1) {
                     tag.putInt("calamityBabyZombie", calamityBabyZombie - 1);
                 }
                 if (calamityUndeadArmy >= 1) {
-                    livingEntity.sendSystemMessage(Component.literal(calamityUndeadArmy + " value"));
                     tag.putInt("calamityUndeadArmy", calamityUndeadArmy - 1);
                 }
                 if (calamityLightningBolt >= 1) {
@@ -1486,7 +1481,6 @@ public class CorruptionAndLuckHandler {
                 }
             }
             if (wardenSpawn == 1 && livingEntity.onGround()) {
-                livingEntity.sendSystemMessage(Component.literal("Warden is 1"));
                 Warden warden = new Warden(EntityType.WARDEN, livingEntity.level());
                 warden.setLastHurtByMob(livingEntity);
                 warden.setTarget(livingEntity);
@@ -1509,8 +1503,10 @@ public class CorruptionAndLuckHandler {
                         livingEntity.level().addFreshEntity(ravager);
                     } else if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && sequence <= 3) {
                         return;
-                    } else livingEntity.level().addFreshEntity(warden);
-                    tag.putInt("luckWarden", 0);
+                    } else {
+                        livingEntity.level().addFreshEntity(warden);
+                        tag.putInt("luckWarden", 0);
+                    }
                 }
                 if (livingEntity instanceof PlayerMobEntity player) {
                     int sequence = player.getCurrentSequence();

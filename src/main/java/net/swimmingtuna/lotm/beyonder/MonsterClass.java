@@ -303,7 +303,7 @@ public class MonsterClass implements BeyonderClass {
 
     @Override
     public ChatFormatting getColorFormatting() {
-        return ChatFormatting.WHITE;
+        return ChatFormatting.GRAY;
     }
 
     public void applyMobEffect(Player pPlayer, MobEffect mobEffect, int duration, int amplifier, boolean ambient, boolean visible) {

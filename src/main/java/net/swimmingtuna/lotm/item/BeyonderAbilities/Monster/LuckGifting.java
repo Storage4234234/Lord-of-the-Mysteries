@@ -14,6 +14,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
@@ -40,6 +41,10 @@ public class LuckGifting extends SimpleAbilityItem {
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             if (!checkAll(player)) {
+                return InteractionResult.FAIL;
+            }
+            if ((double) player.getPersistentData().getInt("monsterLuckGifting") / 2 <= player.getPersistentData().getDouble("luck")) {
+                player.displayClientMessage(Component.literal("Not enough luck").withStyle(ChatFormatting.RED), true);
                 return InteractionResult.FAIL;
             }
             useSpirituality(player);
@@ -88,5 +93,9 @@ public class LuckGifting extends SimpleAbilityItem {
             tag.putDouble("luck", luck - ((double) luckGiftingAmount / 2));
             pTag.putDouble("luck", pLuck + luckGiftingAmount);
         }
+    }
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }

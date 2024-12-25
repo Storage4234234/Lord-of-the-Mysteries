@@ -15,6 +15,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
@@ -40,7 +41,7 @@ public class MisfortuneBestowal extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
-        if (!player.level().isClientSide() && !interactionTarget.level().isClientSide() && BeyonderUtil.isBeyonderCapable(interactionTarget)) {
+        if (!player.level().isClientSide() && !interactionTarget.level().isClientSide()) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -85,13 +86,15 @@ public class MisfortuneBestowal extends SimpleAbilityItem {
             int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
             CompoundTag tag = player.getPersistentData();
             CompoundTag pTag = interactionTarget.getPersistentData();
-            double luck = tag.getDouble("luck");
             double misfortune = tag.getDouble("misfortune");
-            double pLuck = pTag.getDouble("luck");
             double pMisfortune = pTag.getDouble("misfortune");
             int misfortuneAddValue = 60 - (sequence * 7) + (enhancement * 10);
             pTag.putDouble("misfortune", Math.min(200, pMisfortune + misfortuneAddValue));
             tag.putDouble("misfortune", Math.min(0, misfortune - ((double) misfortuneAddValue / 2)));
         }
+    }
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }

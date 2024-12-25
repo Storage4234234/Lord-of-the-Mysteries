@@ -35,7 +35,8 @@ public class ClientEvents {
     @OnlyIn(Dist.CLIENT)
     public static void livingRender(RenderLivingEvent.Pre<?, ?> event) {
         LivingEntity entity = event.getEntity();
-        if (ClientShouldntRenderData.getShouldntRender()) {
+        if (ClientShouldntRenderData.getShouldntRender() &&
+                entity.getUUID().equals(ClientShouldntRenderData.getLivingUUID())) {
             event.setCanceled(true);
         }
     }

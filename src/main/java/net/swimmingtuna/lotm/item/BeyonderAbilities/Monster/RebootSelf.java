@@ -11,6 +11,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
@@ -60,7 +61,7 @@ public class RebootSelf extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, summons a colossal wave in the direction you're looking"));
+        tooltipComponents.add(Component.literal("Upon use if you're shifting, save your current state including health, spirituality, potion effects, luck, misfortune, sanity, and corruption. If not shifting, load your saved state"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("2000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Minute").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
@@ -81,14 +82,14 @@ public class RebootSelf extends SimpleAbilityItem {
         }
         double luck = tag.getDouble("luck");
         double misfortune = tag.getDouble("misfortune");
-        AttributeInstance sanity = player.getAttribute(ModAttributes.SANITY.get());
+        double sanity = tag.getDouble("sanity");
         double corruption = tag.getDouble("corruption");
         tag.putInt("monsterRebootLuck", (int) luck);
         tag.putInt("monsterRebootMisfortune", (int) misfortune);
-        tag.putInt("monsterRebootSanity", (int) sanity.getValue());
+        tag.putInt("monsterRebootSanity", (int) sanity);
         tag.putInt("monsterRebootCorruption", (int) corruption);
         tag.putInt("monsterRebootHealth", (int) player.getHealth());
-        tag.putInt("monsterRebootSpirituality", holder.getCurrentSequence());
+        tag.putInt("monsterRebootSpirituality",(int) holder.getSpirituality());
         List<Item> beyonderAbilities = BeyonderUtil.getAbilities(player);
         for (Item item : beyonderAbilities) {
             if (item != ItemInit.REBOOTSELF.get()) {
@@ -103,6 +104,12 @@ public class RebootSelf extends SimpleAbilityItem {
         for (MobEffectInstance activeEffect : new ArrayList<>(player.getActiveEffects())) {
             player.removeEffect(activeEffect.getEffect());
         }
+        int sanity = tag.getInt("monsterRebootSanity");
+        int luck = tag.getInt("monsterRebootLuck");
+        int misfortune = tag.getInt("monsterRebootMisfortune");
+        int corruption = tag.getInt("monsterRebootCorruption");
+        int health = tag.getInt("monsterRebootHealth");
+        int spirituality = tag.getInt("monsterRebootSpirituality");
         int effectCount = tag.getInt("monsterRebootPotionEffectsCount");
         for (int i = 0; i < effectCount; i++) {
             CompoundTag effectTag = tag.getCompound("monsterRebootPotionEffect_" + i);
@@ -111,16 +118,12 @@ public class RebootSelf extends SimpleAbilityItem {
                 player.addEffect(effect);
             }
         }
-        double luck = tag.getDouble("luck");
-        double misfortune = tag.getDouble("misfortune");
-        AttributeInstance sanity = player.getAttribute(ModAttributes.SANITY.get());
-        double corruption = tag.getDouble("corruption");
-        player.getAttribute(ModAttributes.SANITY.get()).setBaseValue(Math.max(5, tag.getInt("monsterRebootSanity")));
-        tag.putDouble("corruption", tag.getInt("monsterRebootCorruption"));
-        tag.putDouble("luck", tag.getInt("monsterRebootLuck"));
-        tag.putDouble("misfortune", tag.getInt("monsterRebootMisfortune"));
-        holder.setSpirituality(tag.getInt("monsterRebootSpirituality"));
-        player.setHealth(Math.max(1, player.getHealth()));
+        tag.putDouble("sanity", sanity);
+        tag.putDouble("corruption", corruption);
+        tag.putDouble("luck", luck);
+        tag.putDouble("misfortune", misfortune);
+        holder.setSpirituality(spirituality);
+        player.setHealth(Math.max(1, health));
         List<Item> beyonderAbilities = BeyonderUtil.getAbilities(player);
         for (Item item : beyonderAbilities) {
             if (item instanceof SimpleAbilityItem simpleAbilityItem) {
@@ -130,5 +133,9 @@ public class RebootSelf extends SimpleAbilityItem {
                 player.getCooldowns().addCooldown(item, remainingCooldownTicks);
             }
         }
+    }
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }

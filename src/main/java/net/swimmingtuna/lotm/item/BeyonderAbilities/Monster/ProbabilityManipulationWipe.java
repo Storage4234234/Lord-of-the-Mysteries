@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
@@ -142,7 +143,12 @@ public class ProbabilityManipulationWipe extends SimpleAbilityItem {
         tag.putInt("luckHalveDamage", 0);
         tag.putInt("luckIgnoreMobs", 0);
         tag.putInt("luckAttackerPoisoned", 0);
+        tag.putDouble("luck",0);
+        tag.putDouble("misfortune",0);
     }
-
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
+    }
 
 }

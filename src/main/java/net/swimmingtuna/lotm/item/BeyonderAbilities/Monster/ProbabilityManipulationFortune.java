@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
@@ -124,5 +125,9 @@ public class ProbabilityManipulationFortune extends SimpleAbilityItem {
         tag.putInt("luckHalveDamage", tag.getInt("luckHalveDamage" + 15));
         tag.putInt("luckIgnoreMobs", tag.getInt("luckIgnoreMobs" + 10));
         tag.putInt("luckAttackerPoisoned", tag.getInt("luckIgnoreDamage" + 10));
+    }
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }

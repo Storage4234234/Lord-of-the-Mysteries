@@ -33,6 +33,9 @@
   "item.lotm.nightmare": "Nightmare",
   "item.lotm.lightningredirection": "Lightning Redirection",
   "item.lotm.deathknell": "Death Knell",
+  "item.lotm.symphonyofhatred": "Syphony of Hatred",
+
+  "item.lotm.luckdeprivation": "Luck Deprivation",
 
 
   "item.lotm.applymanipulation": "Apply Manipulation",
@@ -163,8 +166,8 @@
   "item.lotm.probabilitymanipulationworldmisfortune": "Probability Manipulation: World Misfortune",
   "item.lotm.probabilitywipe": "Probability Manipulation: Wipe",
   "item.lotm.probabilityeffect": "Probability Manipulation: Instantaneous",
-  "item.lotm.probabilitymisfortune": "Probability Manipulation: Unluck Granting",
-  "item.lotm.probabilityfortune": "Probability Manipulation: Luck Granting",
+  "item.lotm.probabilitymisfortune": "Probability Manipulation: Misfortune Granting",
+  "item.lotm.probabilityfortune": "Probability Manipulation: Fortune Granting",
   "item.lotm.probabilityinfinitemisfortune": "Probability Manipulation: Infinite Unluck",
   "item.lotm.probabilityinfinitefortune": "Probability Manipulation: Infinite Luck",
 

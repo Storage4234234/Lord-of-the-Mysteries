@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -59,5 +60,9 @@ public class ExtremeColdness extends SimpleAbilityItem {
         return block != Blocks.BEDROCK && block != Blocks.AIR &&
                 block != Blocks.CAVE_AIR && block != Blocks.VOID_AIR &&
                 block != Blocks.ICE;
+    }
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
 }

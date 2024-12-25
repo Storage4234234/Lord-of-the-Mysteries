@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
@@ -327,5 +328,9 @@ public class LuckFutureTelling extends SimpleAbilityItem {
         if (windMovingProjectiles >= 2) {
             pPlayer.sendSystemMessage(Component.literal("The next " + windMovingProjectiles + " times a projectile is heading towards you, the wind will move it ").withStyle(ChatFormatting.GREEN));
         }
+    }
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }

@@ -116,7 +116,7 @@ public class LOTM {
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
+        if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ItemInit.TEST_ITEM);
             event.accept(ItemInit.LIGHTNING_STORM);
             event.accept(ItemInit.ROAR);
@@ -275,6 +275,8 @@ public class LOTM {
             event.accept(ItemInit.SIREN_SONG_WEAKEN);
             event.accept(ItemInit.SIREN_SONG_STUN);
             event.accept(ItemInit.SIREN_SONG_STRENGTHEN);
+            event.accept(ItemInit.DEATHKNELL);
+            event.accept(ItemInit.SYMPHONYOFHATRED);
         }
         if (event.getTabKey() == CreativeModeTabs.OP_BLOCKS) {
             event.accept(BlockInit.VISIONARY_BARRIER_BLOCK);
@@ -315,7 +317,6 @@ public class LOTM {
             event.accept(BlockInit.LOTM_OAK_LOG);
             event.accept(ItemInit.LUCKBOTTLEITEM);
             event.accept(ItemInit.LUCKYGOLDCOIN);
-            event.accept(ItemInit.DEATHKNELL);
 
             event.accept(BlockInit.VISIONARY_BLACK_STAINED_GLASS_PANE);
             event.accept(BlockInit.VISIONARY_WHITE_STAINED_GLASS_PANE);

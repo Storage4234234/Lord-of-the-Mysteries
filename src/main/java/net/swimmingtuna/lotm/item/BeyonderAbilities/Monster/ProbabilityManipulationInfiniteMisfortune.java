@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
@@ -22,7 +23,6 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -102,15 +102,13 @@ public class ProbabilityManipulationInfiniteMisfortune extends SimpleAbilityItem
             CompoundTag tag = entity.getPersistentData();
             int x = tag.getInt("probabilityManipulationInfiniteMisfortune");
             int y = tag.getInt("probabilityManipulationInfiniteFortune");
-            if (BeyonderUtil.isBeyonderCapable(entity)) {
-                if (x >= 1) {
-                    tag.putInt("probabilityManipulationInfiniteMisfortune", x - 1);
-                    tag.putDouble("misfortune", 777);
-                }
-                if (y >= 1) {
-                    tag.putInt("probabilityManipulationInfiniteFortune", y - 1);
-                    tag.putDouble("luck", 777);
-                }
+            if (x >= 1) {
+                tag.putInt("probabilityManipulationInfiniteMisfortune", x - 1);
+                tag.putDouble("misfortune", 777);
+            }
+            if (y >= 1) {
+                tag.putInt("probabilityManipulationInfiniteFortune", y - 1);
+                tag.putDouble("luck", 777);
             }
         }
     }
@@ -179,5 +177,10 @@ public class ProbabilityManipulationInfiniteMisfortune extends SimpleAbilityItem
                 }
             }
         }
+    }
+
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }

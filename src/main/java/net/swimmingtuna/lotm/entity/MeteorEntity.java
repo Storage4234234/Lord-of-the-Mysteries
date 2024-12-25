@@ -292,7 +292,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
                 float scale = ScaleTypes.BASE.getScaleData(this).getScale();
                 Vec3 lookVec = livingEntity.getLookAngle();
                 if (tag.getInt("calamityIncarnationInMeteor") >= 1 && !livingEntity.onGround()) {
-                    this.teleportTo(livingEntity.getX(), livingEntity.getY() + 3 * scale, livingEntity.getZ());
+                    this.teleportTo(livingEntity.getX(), livingEntity.getY() + 1 * scale, livingEntity.getZ());
                     this.setDeltaMovement(lookVec.x, -1, lookVec.z);
                     this.hurtMarked = true;
                 }

@@ -5,17 +5,22 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
+import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderPacketS2C;
+import net.swimmingtuna.lotm.util.ClientShouldntRenderData;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -33,7 +38,7 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         storeAndReleaseArmor(player);
-        if (!player.getPersistentData().getBoolean("armorStored")) {
+        if (ClientShouldntRenderData.getShouldntRender()) {
             addCooldown(player);
         }
         return InteractionResult.SUCCESS;
@@ -42,41 +47,20 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
     private static void storeAndReleaseArmor(Player player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
-            boolean armorStored = tag.getBoolean("armorStored");
-
-            if (!armorStored) {
+            boolean shouldntRender = ClientShouldntRenderData.getShouldntRender();
+            if (!shouldntRender) {
                 for (Mob mob : player.level().getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(50))) {
                     if (mob.getTarget() == player) {
                         mob.setTarget(null);
                     }
                 }
-                for (EquipmentSlot slot : EquipmentSlot.values()) {
-                    if (slot.getType() == EquipmentSlot.Type.ARMOR) {
-                        ItemStack armorPiece = player.getItemBySlot(slot);
-                        if (!armorPiece.isEmpty()) {
-                            ResourceLocation armorIdentifier = ForgeRegistries.ITEMS.getKey(armorPiece.getItem());
-                            if (armorIdentifier != null) {
-                                tag.putString(slot.getName() + "_armor", armorIdentifier.toString());
-                                player.setItemSlot(slot, ItemStack.EMPTY);
-                            }
-                        }
-                    }
-                }
-                player.displayClientMessage(Component.literal("Armor stored."), true);
-                tag.putBoolean("armorStored", true);
+                LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderPacketS2C(true, player.getUUID()), (ServerPlayer) player);
+                tag.putBoolean("psychologicalInvisibility", true);
+                player.displayClientMessage(Component.literal("You are now invisible"), true);
             } else {
-                for (EquipmentSlot slot : EquipmentSlot.values()) {
-                    if (slot.getType() == EquipmentSlot.Type.ARMOR) {
-                        String storedArmor = tag.getString(slot.getName() + "_armor");
-                        if (!storedArmor.isEmpty()) {
-                            ItemStack armorPiece = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(storedArmor)));
-                            player.setItemSlot(slot, armorPiece);
-                            tag.remove(slot.getName() + "_armor");
-                        }
-                    }
-                }
-                player.displayClientMessage(Component.literal("Armor restored."), true);
-                tag.putBoolean("armorStored", false);
+                player.displayClientMessage(Component.literal("You are now visible"), true);
+                tag.putBoolean("psychologicalInvisibility", false);
+                LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderPacketS2C(false, player.getUUID()), (ServerPlayer) player);
             }
         }
     }
@@ -90,5 +74,10 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
+
+    @Override
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
 }

@@ -44,7 +44,7 @@ public class LightningBallEntity extends AbstractHurtingProjectile {
     }
 
     protected float getInertia() {
-        return this.isDangerous() ? 1.0F : super.getInertia();
+        return 0.99F;
     }
 
 

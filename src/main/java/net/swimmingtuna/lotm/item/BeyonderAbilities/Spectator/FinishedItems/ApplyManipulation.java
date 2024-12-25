@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
@@ -80,5 +81,9 @@ public class ApplyManipulation extends SimpleAbilityItem {
                 player.sendSystemMessage(Component.literal("Manipulating " + interactionTarget.getName().getString()).withStyle(BeyonderUtil.getStyle(player)));
             }
         }
+    }
+    @Override
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
 }

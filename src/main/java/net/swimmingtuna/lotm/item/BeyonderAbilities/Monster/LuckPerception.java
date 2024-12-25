@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
@@ -76,8 +77,8 @@ public class LuckPerception extends SimpleAbilityItem {
             CompoundTag tag = interactionTarget.getPersistentData();
             double luck = tag.getDouble("luck");
             double misfortune = tag.getDouble("misfortune");
-            player.sendSystemMessage(Component.literal(interactionTarget.getName().getString() + "'s luck value is " + luck).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.WHITE));
-            player.sendSystemMessage(Component.literal(interactionTarget.getName().getString() + "'s misfortune value is " + misfortune).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.WHITE));
+            player.sendSystemMessage(Component.literal(interactionTarget.getName().getString() + "'s luck value is " + luck).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN));
+            player.sendSystemMessage(Component.literal(interactionTarget.getName().getString() + "'s misfortune value is " + misfortune).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED));
         }
         return InteractionResult.SUCCESS;
     }
@@ -96,5 +97,9 @@ public class LuckPerception extends SimpleAbilityItem {
             player.sendSystemMessage(Component.literal("Your misfortune value is " + misfortune).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED));
         }
         return InteractionResult.SUCCESS;
+    }
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }

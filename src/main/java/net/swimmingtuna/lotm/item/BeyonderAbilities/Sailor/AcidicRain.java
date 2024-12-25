@@ -7,6 +7,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
@@ -75,5 +76,10 @@ public class AcidicRain extends SimpleAbilityItem {
             int maxParticles = 250 - (sequence * 30);
             BeyonderUtil.spawnParticlesInSphere(serverLevel, x, y, z, maxRadius, maxParticles, 0, -3, 0, ParticleInit.ACIDRAIN_PARTICLE.get());
         }
+    }
+
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
 }

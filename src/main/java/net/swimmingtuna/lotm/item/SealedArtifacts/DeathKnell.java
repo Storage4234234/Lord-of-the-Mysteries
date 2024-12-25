@@ -19,6 +19,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.providers.score.ScoreboardNameProvider;
@@ -27,7 +29,11 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.DeathKnellBulletEntity;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Random;
 
 public class DeathKnell extends Item {
@@ -52,20 +58,31 @@ public class DeathKnell extends Item {
         if (entity instanceof Player player) {
             if (player.tickCount % 2 == 0 && !level.isClientSide()) {
                 if (player.getMainHandItem().getItem() instanceof DeathKnell) {
-                    player.displayClientMessage(Component.literal("Death Knell Selection is: " + player.getPersistentData().getInt("deathKnell")).withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
+                    player.displayClientMessage(Component.literal("Death Knell Selection is: " + deathKnellString(player)).withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
                 }
             }
         }
         super.inventoryTick(stack, level, entity, itemSlot, isSelected);
+    }
+    public static String deathKnellString(Player pPlayer) {
+        CompoundTag tag = pPlayer.getPersistentData();
+        int x = tag.getInt("deathKnell");
+        if (x == 1) {
+            return "Weakness Attack";
+        } else if (x == 2) {
+            return "Lethal Attack";
+        } else if (x == 3) {
+            return "Slaughtering";
+        }
+        return "None";
     }
 
     public static void summonDeathKnellBullet(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             CompoundTag tag = livingEntity.getPersistentData();
             int x = tag.getInt("deathKnell");
-
             DeathKnellBulletEntity deathKnellBulletEntity = new DeathKnellBulletEntity(EntityInit.DEATH_KNELL_BULLET_ENTITY.get(), livingEntity.level());
-            deathKnellBulletEntity.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
+            deathKnellBulletEntity.teleportTo(livingEntity.getX(), livingEntity.getEyeY(), livingEntity.getZ());
 
             // Particle and sound effects based on x
             Level level = livingEntity.level();
@@ -261,5 +278,19 @@ public class DeathKnell extends Item {
         }
         livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 2, false, false));
         livingEntity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 2, false, false));
+    }
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.literal("A special gun that allows you to pour in spirituality into it by left clicking in order to change it's function").withStyle(ChatFormatting.DARK_RED).withStyle(ChatFormatting.BOLD));
+        tooltipComponents.add(Component.literal("Weakness Attack: Use to lower a target's defenses by decreasing their armor value for a short time").withStyle(ChatFormatting.RED));
+        tooltipComponents.add(Component.literal("Lethal Attack: Use to deal extra damage").withStyle(ChatFormatting.DARK_RED));
+        tooltipComponents.add(Component.literal("Slaughtering: Use to deal a bit extra damage than lethal attack, but if a target's HP is lower than 30%, then it deals double damage").withStyle(ChatFormatting.DARK_GRAY));
+        tooltipComponents.add(Component.literal("Drawback: On use, gain either a fear of water, fire, monsters, peaceful mobs, players, the night, or water for a while. If you encounter any of these, you will become significantly weaker and slower").withStyle(ChatFormatting.GRAY));
+
+        super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
+    @Override
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
 }

@@ -88,11 +88,14 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.Batt
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.DreamIntoReality;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionBarrier;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocationBlink;
+import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
+import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderPacketS2C;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ClientSequenceData;
+import net.swimmingtuna.lotm.util.ClientShouldntRenderData;
 import net.swimmingtuna.lotm.util.CorruptionAndLuckHandler;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.util.effect.NoRegenerationEffect;
@@ -211,7 +214,7 @@ public class ModEvents {
             checkForProjectiles(player);
         }
         if (!player.level().isClientSide() && player.tickCount % 20 == 0) {
-            player.sendSystemMessage(Component.literal("value is " + player.getPersistentData().getBoolean("shouldntRender")));
+            //debug stuff
         }
 
 
@@ -493,18 +496,18 @@ public class ModEvents {
 
     private static void psychologicalInvisibility(Player player, CompoundTag playerPersistentData, BeyonderHolder holder) {
         //PSYCHOLOGICAL INVISIBILITY
-
-        if (playerPersistentData.getBoolean("armorStored")) {
-            player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 5, 1, false, false));
-            if (player.tickCount % 10 == 0) {
-                holder.useSpirituality((int) holder.getMaxSpirituality() / 100);
+        if (playerPersistentData.getBoolean("psychologicalInvisibility")) {
+            if (ClientShouldntRenderData.getShouldntRender()) {
+                if (player.tickCount % 10 == 0) {
+                    holder.useSpirituality((int) holder.getMaxSpirituality() / 100);
+                }
             }
         }
     }
 
-    private static void psychologicalInvisibilityHurt(LivingEntity entity) {
-        if (entity.getPersistentData().getBoolean("armorStored")) {
-            entity.getPersistentData().putBoolean("armorStored", false);
+    private static void psychologicalInvisibilityHurt(Player entity) {
+        if (ClientShouldntRenderData.getShouldntRender()) {
+            LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderPacketS2C(false, entity.getUUID()), (ServerPlayer) entity);
         }
     }
 
@@ -549,6 +552,17 @@ public class ModEvents {
                 if (player.tickCount % 200 == 0) {
                     player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE));
                 }
+            }
+        }
+    }
+    @SubscribeEvent
+    public static void sealItemCanceler(PlayerInteractEvent.RightClickItem event) {
+        Player player = event.getEntity();
+        if (!player.level().isClientSide()) {
+            CompoundTag tag = player.getPersistentData();
+            int sealCounter = tag.getInt("sailorSeal");
+            if (sealCounter >= 1) {
+                event.setCanceled(true);
             }
         }
     }
@@ -1719,6 +1733,7 @@ public class ModEvents {
             if (entity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
             }
+            DeathKnell.deathKnellNegativeTick(entity);
             BattleHypnotism.untargetMobs(event);
             ProbabilityManipulationInfiniteMisfortune.infiniteFortuneMisfortuneTick(event);
             probabilityManipulationWorld(entity);
@@ -2703,9 +2718,6 @@ public class ModEvents {
         Entity entitySource = source.getEntity();
         if (!event.getEntity().level().isClientSide()) {
             if (entity instanceof LivingEntity living) {
-                if (BeyonderUtil.isBeyonderCapable(living)) {
-                    psychologicalInvisibilityHurt(living);
-                }
                 monsterDodgeAttack(event);
                 int stoneImmunity = tag.getInt("luckStoneDamageImmunity");
                 int stoneDamage = tag.getInt("luckStoneDamage");
@@ -2761,6 +2773,7 @@ public class ModEvents {
             }
             //SAILOR FLIGHT
             if (entity instanceof Player player) {
+                psychologicalInvisibilityHurt(player);
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                 int flightCancel = tag.getInt("sailorFlightDamageCancel");
                 if (!player.level().isClientSide()) {
@@ -2783,7 +2796,6 @@ public class ModEvents {
                 if (ignoreDamage >= 1) {
                     event.setCanceled(true);
                     entity.getPersistentData().putInt("luckIgnoreDamage", entity.getPersistentData().getInt("luckIgnoreDamage") - 1);
-                    player.sendSystemMessage(Component.literal("Ignore Damage value is " + player.getPersistentData().getInt("luckIgnoreDamage")));
                 } else if (doubleDamage >= 1) {
                     event.setAmount(event.getAmount() * 2);
                     entity.getPersistentData().putInt("luckDoubleDamage", entity.getPersistentData().getInt("luckDoubleDamage") - 1);
@@ -3700,7 +3712,6 @@ public class ModEvents {
     @SubscribeEvent
     public static void addAttributes(EntityAttributeCreationEvent event) {
         event.put(EntityInit.PLAYER_MOB_ENTITY.get(), AttributeSupplier.builder().add(ModAttributes.DIR.get()).build());
-        event.put(EntityInit.PLAYER_MOB_ENTITY.get(), AttributeSupplier.builder().add(ModAttributes.SANITY.get()).build());
         event.put(EntityInit.PLAYER_MOB_ENTITY.get(), AttributeSupplier.builder().add(ModAttributes.NIGHTMARE.get()).build());
     }
 

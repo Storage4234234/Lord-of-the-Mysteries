@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -148,16 +149,8 @@ public class TsunamiSeal extends SimpleAbilityItem {
             }
         });
     }
-
-    @SubscribeEvent
-    public static void sealItemCanceler(PlayerInteractEvent.RightClickItem event) {
-        Player player = event.getEntity();
-        if (!player.level().isClientSide()) {
-            CompoundTag tag = player.getPersistentData();
-            int sealCounter = tag.getInt("sailorSeal");
-            if (sealCounter >= 1) {
-                event.setCanceled(true);
-            }
-        }
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
 }

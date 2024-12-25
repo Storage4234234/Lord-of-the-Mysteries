@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
@@ -102,10 +103,18 @@ public class LuckDenial extends SimpleAbilityItem {
             tag.putDouble("luckDenialTimer", luckDenialTimer - 1);
             if (luck >= luckDenialLuck) {
                 tag.putDouble("luck", luckDenialLuck);
+            } else if (luck < luckDenialLuck) {
+                tag.putDouble("luckDenialLuck", luck);
             }
             if (misfortune <= luckDenialMisfortune) {
                 tag.putDouble("misfortune", luckDenialMisfortune);
+            } else if (misfortune > luckDenialMisfortune) {
+                tag.putDouble("luckDenialMisfortune", misfortune);
             }
         }
+    }
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }

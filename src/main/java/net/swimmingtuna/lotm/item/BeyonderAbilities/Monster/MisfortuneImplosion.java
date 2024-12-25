@@ -12,6 +12,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
@@ -30,7 +31,7 @@ import java.util.Random;
 public class MisfortuneImplosion extends SimpleAbilityItem {
 
     public MisfortuneImplosion(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 2, 1000, 200);
+        super(properties, BeyonderClassInit.MONSTER, 2, 1000, 200);
     }
 
     @Override
@@ -62,14 +63,13 @@ public class MisfortuneImplosion extends SimpleAbilityItem {
                         entity.hurt(BeyonderUtil.explosionSource(player), damage);
                         entity.level().explode(entity, entity.getX(), entity.getY(), entity.getZ(), explosionRadius, false, Level.ExplosionInteraction.TNT);
                         tag.putDouble("misfortune", 0);
-                    }
+                    } else
                     if (randomInt == 1) {
                         float duration = (float) (100 + (misfortune * 5) * enhancement);
                         entity.addEffect(new MobEffectInstance(MobEffects.WITHER, (int) duration, 4, false, false));
                         entity.addEffect(new MobEffectInstance(ModEffects.NOREGENERATION.get(), (int) (duration * 0.75), 1, false, false));
                         entity.hurt(BeyonderUtil.genericSource(player), (float) misfortune / 2);
-                    }
-                    if (randomInt == 2) {
+                    } else {
                         int duration = (int) ((5) + (misfortune / 10) + (enhancement * 3));
                         entity.getPersistentData().putInt("monsterImplosionLightning", duration);
                         tag.putDouble("misfortune", 0);
@@ -106,5 +106,9 @@ public class MisfortuneImplosion extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }

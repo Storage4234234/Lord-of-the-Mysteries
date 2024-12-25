@@ -587,6 +587,8 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new CalamityEnhancementLeftClickC2S());
             } else if (heldItem.getItem() instanceof DeathKnell) {
                 LOTMNetworkHandler.sendToServer(new DeathKnellLeftClickC2S());
+            } else if (heldItem.getItem() instanceof DomainOfProvidence || heldItem.getItem() instanceof DomainOfDecay || heldItem.getItem() instanceof MonsterDomainTeleporation) {
+                LOTMNetworkHandler.sendToServer(new MonsterDomainLeftClickC2S());
             }
         }
     }
@@ -712,6 +714,23 @@ public class BeyonderUtil {
             } else if (heldItem.getItem() instanceof DeathKnell) {
                 LOTMNetworkHandler.sendToServer(new DeathKnellLeftClickC2S());
             }
+            else if (heldItem.getItem() instanceof ProbabilityManipulationFortune) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYMISFORTUNE.get())));
+            } else if (heldItem.getItem() instanceof ProbabilityManipulationMisfortune) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYINFINITEFORTUNE.get())));
+            } else if (heldItem.getItem() instanceof ProbabilityManipulationInfiniteFortune) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYINFINITEMISFORTUNE.get())));
+            } else if (heldItem.getItem() instanceof ProbabilityManipulationInfiniteMisfortune) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYFORTUNEINCREASE.get())));
+            } else if (heldItem.getItem() instanceof ProbabilityManipulationWorldFortune) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYMISFORTUNEINCREASE.get())));
+            } else if (heldItem.getItem() instanceof ProbabilityManipulationWorldMisfortune) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYWIPE.get())));
+            } else if (heldItem.getItem() instanceof ProbabilityManipulationWipe) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYEFFECT.get())));
+            } else if (heldItem.getItem() instanceof ProbabilityManipulationImpulse) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYFORTUNE.get())));
+            }
         }
     }
 
@@ -801,6 +820,7 @@ public class BeyonderUtil {
             tag.putInt("tickCounter", 0);
         }
     }
+
     public static void setTargetToHighestHP(Mob mob, int searchRange) {
         List<LivingEntity> nearbyEntities = mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(searchRange), entity -> entity != mob && entity.isAlive() && mob.canAttack(entity));
         if (nearbyEntities.isEmpty()) {

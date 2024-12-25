@@ -14,8 +14,6 @@ public class ModAttributes {
 
     public static final RegistryObject<Attribute> SOUL_BODY = ATTRIBUTES.register("soul_body",
             ()-> new RangedAttribute("attribute.lotm.soul_body",100.0D,0.0D,10000000).setSyncable(true));
-    public static final RegistryObject<Attribute> SANITY = ATTRIBUTES.register("sanity",
-            ()-> new RangedAttribute("attribute.lotm.sanity",100.0D,0.0D,100).setSyncable(true));
     public static final RegistryObject<Attribute> NIGHTMARE = ATTRIBUTES.register("nightmare",
             ()-> new RangedAttribute("attribute.lotm.nightmare",0.0D,0.0D,10).setSyncable(true));
     public static final RegistryObject<Attribute> ARMORINVISIBLITY = ATTRIBUTES.register("armorinvisibility",

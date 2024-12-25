@@ -17,8 +17,6 @@ public class AttributeAdder {
         addToPlayer(event, ModAttributes.NIGHTMARE);
         addToPlayer(event, ModAttributes.ARMORINVISIBLITY);
         addToPlayer(event, ModAttributes.DIR);
-
-        addToPlayer(event, ModAttributes.SANITY);
     }
 
     @SafeVarargs

@@ -13,6 +13,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -223,37 +224,41 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             tag.putInt("monsterCalamityImmunity", 5);
             if (entity instanceof Player player) {
                 int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
-                for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(150 - (sequence * 20) + (enhancement * 40)))) {
+                for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate((150 - (sequence * 20)) + (enhancement * 40)))) {
                     if (livingEntity != entity) {
                         if (sequence >= 4) {
-                            entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 2 + enhancement, false, false));
-                            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, enhancement, false, false));
-                            entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 1 + enhancement, false, false));
-                            entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 40, 1 + enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 2 + enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 1 + enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 40, 1 + enhancement, false, false));
                         } else if (sequence >= 1) {
-                            entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 3 + enhancement, false, false));
-                            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1 + enhancement, false, false));
-                            entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 2 + enhancement, false, false));
-                            entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 40, 2 + enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 3 + enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1 + enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 2 + enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 40, 2 + enhancement, false, false));
                         } else {
-                            entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 4 + enhancement, false, false));
-                            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2 + enhancement, false, false));
-                            entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 3 + enhancement, false, false));
-                            entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 40, 2 + enhancement, false, false));
-                            entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 40, enhancement,false,false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 4 + enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2 + enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 3 + enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 40, 2 + enhancement, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 40, enhancement,false,false));
                         }
                     }
                 }
             } else {
                 for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(80))) {
                     if (livingEntity != entity) {
-                        entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 2 + enhancement, false, false));
-                        entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, enhancement, false, false));
-                        entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 1 + enhancement, false, false));
-                        entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 40, 1 + enhancement, false, false));
+                        livingEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 2 + enhancement, false, false));
+                        livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, enhancement, false, false));
+                        livingEntity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 1 + enhancement, false, false));
+                        livingEntity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 40, 1 + enhancement, false, false));
                     }
                 }
             }
         }
+    }
+    @Override
+    public Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 }
