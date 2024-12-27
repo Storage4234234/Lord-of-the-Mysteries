@@ -1,6 +1,8 @@
 package net.swimmingtuna.lotm.init;
 
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tiers;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -16,6 +18,7 @@ import net.swimmingtuna.lotm.item.OtherItems.LuckBottleItem;
 import net.swimmingtuna.lotm.item.OtherItems.LuckyGoldCoin;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.SymphonyOfHatred;
+import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
 import net.swimmingtuna.lotm.item.TestItem;
 
 public class ItemInit {
@@ -372,6 +375,8 @@ public class ItemInit {
             () -> new DeathKnell(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> SYMPHONYOFHATRED = ITEMS.register("symphonyofhatred",
             () -> new SymphonyOfHatred(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> WINTRYBLADE = ITEMS.register("wintryblade",
+            () -> new WintryBlade(Tiers.NETHERITE, 4,-2,new Item.Properties()));
 
 
     public static void register(IEventBus eventBus) {

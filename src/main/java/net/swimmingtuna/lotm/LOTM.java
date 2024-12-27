@@ -277,6 +277,7 @@ public class LOTM {
             event.accept(ItemInit.SIREN_SONG_STRENGTHEN);
             event.accept(ItemInit.DEATHKNELL);
             event.accept(ItemInit.SYMPHONYOFHATRED);
+            event.accept(ItemInit.WINTRYBLADE);
         }
         if (event.getTabKey() == CreativeModeTabs.OP_BLOCKS) {
             event.accept(BlockInit.VISIONARY_BARRIER_BLOCK);

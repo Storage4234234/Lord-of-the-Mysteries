@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.util;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
@@ -2787,17 +2788,22 @@ public class SpamClass {
     private static final Random RANDOM = new Random();
     public static void sendMonsterMessage(Player pPlayer) {
         Random random = new Random();
+        CompoundTag tag = pPlayer.getPersistentData();
+        double corruption = tag.getDouble("corruption");
         int randomNumber = random.nextInt(25) + 1;
         if (randomNumber <= 1) {
             int index = RANDOM.nextInt(monsterCorruptedWhispers().size());
             pPlayer.displayClientMessage(Component.literal(monsterCorruptedWhispers().get(index)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.DARK_RED),true);
-        } else if (randomNumber >= 2 && randomNumber <= 5) {
+        } else if (randomNumber <= 5) {
+            tag.putDouble("corruption", corruption + 4);
             int index = RANDOM.nextInt(monsterSemiCorruptedWhispers().size());
             pPlayer.displayClientMessage(Component.literal(monsterSemiCorruptedWhispers().get(index)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED),true);
-        } else if (randomNumber >= 6 && randomNumber <= 12) {
+        } else if (randomNumber <= 12) {
+            tag.putDouble("corruption", corruption + 15);
             int index = RANDOM.nextInt(monsterSlightyCorruptedWhispers().size());
             pPlayer.displayClientMessage(Component.literal(monsterSlightyCorruptedWhispers().get(index)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GRAY),true);
-        } else if (randomNumber >= 13 && randomNumber <= 25) {
+        } else {
+            tag.putDouble("corruption", corruption + 40);
             int index = RANDOM.nextInt(monsterNonCorruptedWhispers().size());
             pPlayer.displayClientMessage(Component.literal(monsterNonCorruptedWhispers().get(index)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.WHITE),true);
         }

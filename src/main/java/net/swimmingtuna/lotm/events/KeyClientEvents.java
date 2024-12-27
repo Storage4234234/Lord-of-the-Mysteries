@@ -29,10 +29,10 @@ public class KeyClientEvents {
            if (KeyBinding.SPIRIT_VISION.consumeClick()) {
                LOTMNetworkHandler.sendToServer(new SpiritVisionC2S());
            }
-           if (KeyBinding.SPIRIT_WORLD_TRAVERSAL.consumeClick()) {
-               System.out.println("Worked");
-               LOTMNetworkHandler.sendToServer(new SpiritWorldTraversalC2S());
-           }
+           //if (KeyBinding.SPIRIT_WORLD_TRAVERSAL.consumeClick()) {
+           //    System.out.println("Worked");
+           //    LOTMNetworkHandler.sendToServer(new SpiritWorldTraversalC2S());
+           //}
         }
         @SubscribeEvent
         @OnlyIn(Dist.CLIENT)

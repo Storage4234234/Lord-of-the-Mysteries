@@ -119,10 +119,20 @@ public class LOTMNetworkHandler {
                 .encoder(SyncSequencePacketS2C::encode)
                 .consumerMainThread(SyncSequencePacketS2C::handle)
                 .add();
+        INSTANCE.messageBuilder(SyncLeftClickCooldownS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncLeftClickCooldownS2C::new)
+                .encoder(SyncLeftClickCooldownS2C::encode)
+                .consumerMainThread(SyncLeftClickCooldownS2C::handle)
+                .add();
         INSTANCE.messageBuilder(SyncShouldntRenderPacketS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SyncShouldntRenderPacketS2C::new)
                 .encoder(SyncShouldntRenderPacketS2C::encode)
                 .consumerMainThread(SyncShouldntRenderPacketS2C::handle)
+                .add();
+        INSTANCE.messageBuilder(RequestCooldownSetC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(RequestCooldownSetC2S::new)
+                .encoder(RequestCooldownSetC2S::toByte)
+                .consumerMainThread(RequestCooldownSetC2S::handle)
                 .add();
         INSTANCE.messageBuilder(SendParticleS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SendParticleS2C::new)

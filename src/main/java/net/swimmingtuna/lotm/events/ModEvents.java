@@ -89,14 +89,13 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.Drea
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionBarrier;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocationBlink;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
+import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
+import net.swimmingtuna.lotm.networking.packet.SyncLeftClickCooldownS2C;
 import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderPacketS2C;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
-import net.swimmingtuna.lotm.util.BeyonderUtil;
-import net.swimmingtuna.lotm.util.ClientSequenceData;
-import net.swimmingtuna.lotm.util.ClientShouldntRenderData;
-import net.swimmingtuna.lotm.util.CorruptionAndLuckHandler;
+import net.swimmingtuna.lotm.util.*;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.util.effect.NoRegenerationEffect;
 import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
@@ -214,14 +213,22 @@ public class ModEvents {
             checkForProjectiles(player);
         }
         if (!player.level().isClientSide() && player.tickCount % 20 == 0) {
-            //debug stuff
+            //player.sendSystemMessage(Component.literal("value is " + playerPersistentData.getInt("wintryBladeSelf")));
         }
 
+        if (player instanceof ServerPlayer serverPlayer) {
+            if (player.tickCount % 20 == 0) {
+                AbilityRegisterCommand.tickEvent(serverPlayer);
+                if (holder.getCurrentSequence() != 0 && ClientSequenceData.getCurrentSequence() == 0) {
+                    ClientSequenceData.setCurrentSequence(-1);
+                }
+            }
 
-        if (player.tickCount % 20 == 0 && player instanceof ServerPlayer serverPlayer) {
-            AbilityRegisterCommand.tickEvent(serverPlayer);
-            if (holder.getCurrentSequence() != 0 && ClientSequenceData.getCurrentSequence() == 0) {
-                ClientSequenceData.setCurrentSequence(-1);
+
+            int currentCooldown = getCooldown(serverPlayer);
+            if (currentCooldown >= 1) {
+                currentCooldown--;
+                setCooldown(serverPlayer, currentCooldown);
             }
         }
 
@@ -1736,6 +1743,7 @@ public class ModEvents {
             if (entity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
             }
+            WintryBlade.wintryBladeTick(event);
             DeathKnell.deathKnellNegativeTick(entity);
             BattleHypnotism.untargetMobs(event);
             ProbabilityManipulationInfiniteMisfortune.testEvent(event);
@@ -3886,5 +3894,12 @@ public class ModEvents {
         Random random = new Random();
         int offset = random.nextInt(maxDistance - minDistance + 1) + minDistance;
         return random.nextBoolean() ? centerCoord + offset : centerCoord - offset;
+    }
+    public static void setCooldown(ServerPlayer player, int cooldown) {
+        player.getPersistentData().putInt("leftClickCooldown", cooldown);
+        LOTMNetworkHandler.sendToPlayer(new SyncLeftClickCooldownS2C(cooldown), player);
+    }
+    public static int getCooldown(ServerPlayer player) {
+        return player.getPersistentData().getInt("leftClickCooldown");
     }
 }

@@ -2,6 +2,8 @@ package net.swimmingtuna.lotm.util;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.commands.CommandSource;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleOptions;
@@ -458,6 +460,10 @@ public class BeyonderUtil {
         Style style = BeyonderUtil.getStyle(pPlayer);
         ItemStack heldItem = pPlayer.getMainHandItem();
         int activeSlot = pPlayer.getInventory().selected;
+        if (ClientLeftclickCooldownData.getCooldown() > 0) {
+            return;
+        }
+        LOTMNetworkHandler.sendToServer(new RequestCooldownSetC2S());
         if (!heldItem.isEmpty()) {
             if (heldItem.getItem() instanceof MonsterDomainTeleporation) {
                 LOTMNetworkHandler.sendToServer(new MonsterLeftClickC2S());
@@ -600,6 +606,10 @@ public class BeyonderUtil {
         Style style = BeyonderUtil.getStyle(pPlayer);
         ItemStack heldItem = pPlayer.getMainHandItem();
         int activeSlot = pPlayer.getInventory().selected;
+        if (ClientLeftclickCooldownData.getCooldown() > 0) {
+            return;
+        }
+        LOTMNetworkHandler.sendToServer(new RequestCooldownSetC2S());
         if (!heldItem.isEmpty()) {
             if (heldItem.getItem() instanceof MonsterDomainTeleporation) {
                 LOTMNetworkHandler.sendToServer(new MonsterLeftClickC2S());
@@ -835,13 +845,57 @@ public class BeyonderUtil {
         // Get the Minecraft server instance
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) {
-            // Iterate through all loaded dimensions (worlds)
             for (ServerLevel level : server.getAllLevels()) {
-                // Save the chunks and data
                 level.save(null, true, false);
             }
             PlayerList playerList = server.getPlayerList();
             playerList.saveAll();
         }
+    }
+    public static void executeCommand(ServerLevel world, BlockPos pos, String command) {
+        CommandSourceStack source = new CommandSourceStack(
+                CommandSource.NULL,
+                Vec3.atCenterOf(pos),
+                Vec2.ZERO,
+                world,
+                4, // Permission level
+                "", // Name
+                Component.literal(""), // Display name
+                world.getServer(),
+                null // Entity
+        );
+
+        world.getServer().getCommands().performPrefixedCommand(source, command);
+    }
+
+    public static void executeCommand(MinecraftServer server, String command) {
+        CommandSourceStack source = server.createCommandSourceStack();
+        server.getCommands().performPrefixedCommand(source, command);
+    }
+    public static void registerAllRecipes(MinecraftServer server) {
+        executeCommand(server, "/beyonderrecipe add lotm:monster_9_potion bossominium:flower_of_genesis bossominium:redstone_hard_drive minecraft:rotten_flesh alexscaves:charred_remnant samurai_dynasty:jorogumo_eye");
+        executeCommand(server, "/beyonderrecipe add lotm:monster_8_potion legendary_monsters:crystal_of_sandstorm alexscaves:sweet_tooth minecraft:netherite_scrap mutantmonsters:hulk_hammer legendary_monsters:primal_ice_shard");
+        executeCommand(server, "/beyonderrecipe add lotm:monster_7_potion alexscaves:pure_darkness bossominium:soul_eye born_in_chaos_v1:spiritual_dust bossominium:possesed_metal bossominium:dead_charm");
+        executeCommand(server, "/beyonderrecipe add lotm:monster_6_potion nether_star alexsmobs:void_worm_eye kom:nectra_egg cataclysm:monstrous_horn illageandspillage:bag_of_horrors");
+        executeCommand(server, "/beyonderrecipe add lotm:monster_5_potion soulsweapons:chaos_crown cataclysm:witherite_ingot alexscaves:uranium kom:anglospike");
+        executeCommand(server, "/beyonderrecipe add lotm:monster_4_potion iceandfire:dragon_skull_fire eeeabsmobs:guardian_core cataclysm:ignitium_ingot");
+        executeCommand(server, "/beyonderrecipe add lotm:monster_3_potion minecraft:nether_star iceandfire:dragon_skull_ice");
+        executeCommand(server, "/beyonderrecipe add lotm:monster_2_potion terramity:giant_sniffers_hoof soulsweapons:lord_soul_day_stalker soulsweapons:lord_soul_night_prowler");
+        executeCommand(server, "/beyonderrecipe add lotm:sailor_9_potion bossominium:rusted_trident mowziesmobs:sol_visage aquamirae:fin aether:victory_medal samurai_dynasty:oni_horn");
+        executeCommand(server, "/beyonderrecipe add lotm:sailor_8_potion bossominium:mossy_stone_tablet iceandfire:sea_serpent_fang alexsmobs:warped_muscle prismarine_shard mutantmonsters:endersoul_hand");
+        executeCommand(server, "/beyonderrecipe add lotm:sailor_7_potion eeeabsmobs:heart_of_pagan aquamirae:abyssal_amethyst bossominium:decayed_mushroom mowziesmobs:ice_crystal faded_conquest_2:eye_of_the_storm");
+        executeCommand(server, "/beyonderrecipe add lotm:sailor_6_potion nether_star illageandspillage:spellbound_book minecraft:dragon_egg kom:caligan_saw minecraft:white_banner");
+        executeCommand(server, "/beyonderrecipe add lotm:sailor_5_potion cataclysm:gauntlet_of_guard aquamirae:frozen_key soulsweapons:essence_of_eventide alexscaves:immortal_embryo");
+        executeCommand(server, "/beyonderrecipe add lotm:sailor_4_potion iceandfire:dragon_skull_ice alexscaves:tectonic_shard cataclysm:abyssal_egg");
+        executeCommand(server, "/beyonderrecipe add lotm:sailor_3_potion soulsweapons:essence_of_luminescence iceandfire:dragon_skull_lightning");
+        executeCommand(server, "/beyonderrecipe add lotm:sailor_2_potion terramity:angel_feather soulsweapons:lord_soul_day_stalker soulsweapons:lord_soul_night_prowler");
+        executeCommand(server, "/beyonderrecipe add lotm:spectator_9_potion bossominium:golden_shard bossominium:forest_core minecraft:ender_pearl iceandfire:witherbone born_in_chaos_v1:nightmare_claw");
+        executeCommand(server, "/beyonderrecipe add lotm:spectator_8_potion minecraft:sandstone bossominium:the_golden_eye born_in_chaos_v1:seedof_chaos born_in_chaos_v1:spider_mandible alexscaves:heavy_bone");
+        executeCommand(server, "/beyonderrecipe add lotm:spectator_7_potion bossominium:pure_pearl deeperdarker:soul_crystal mutantmonsters:endersoul_hand legendary_monsters:withered_bone aether:gold_dungeon_key");
+        executeCommand(server, "/beyonderrecipe add lotm:spectator_6_potion illageandspillage:spellbound_book bossominium:ancient_scrap born_in_chaos_v1:lifestealer_bone born_in_chaos_v1:soul_cutlass");
+        executeCommand(server, "/beyonderrecipe add lotm:spectator_5_potion cataclysm:witherite_ingot soulsweapons:lord_soul_rose kom:sigil_of_revival soulsweapons:darkin_blade");
+        executeCommand(server, "/beyonderrecipe add lotm:spectator_4_potion iceandfire:dragon_skull_lightning sleepy_hollows:spectral_essence terramity:belt_of_the_gnome_king");
+        executeCommand(server, "/beyonderrecipe add lotm:spectator_3_potion iceandfire:dragon_skull_fire born_in_chaos_v1:lord_pumpkinheads_lamp");
+        executeCommand(server, "/beyonderrecipe add lotm:spectator_2_potion terramity:fortunes_favor soulsweapons:lord_soul_day_stalker soulsweapons:lord_soul_night_prowler");
     }
 }

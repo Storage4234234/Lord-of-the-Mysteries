@@ -54,6 +54,7 @@ public class TestItem extends SimpleAbilityItem {
     public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
         Player player = pContext.getPlayer();
         player.setHealth(10);
+        player.getPersistentData().putInt("wintryBladeSelf", 1000);
         return InteractionResult.SUCCESS;
     }
     @Override
