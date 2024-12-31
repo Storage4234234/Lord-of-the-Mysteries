@@ -62,8 +62,8 @@ public class MeteorNoLevelEntity extends AbstractHurtingProjectile {
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
             float scale = scaleData.getScale();
             if (hitEntity instanceof LivingEntity pEntity) {
-                if (this.getOwner() != null && this.getOwner().getPersistentData().getInt("inMindscape") >= 1) {
-                    if (hitEntity.getX() > this.getOwner().getX()) {
+                if (this.getOwner() != null && this.getOwner().getPersistentData().getInt("inMindscape") == 1) {
+                    if (hitEntity.getY() > this.getOwner().getY()) {
                         return;
                     } else {
                         this.explodeMeteor(pEntity, scale);
@@ -103,8 +103,8 @@ public class MeteorNoLevelEntity extends AbstractHurtingProjectile {
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
             float scale = scaleData.getScale();
             double radius = scale * 4;
-            if (this.getOwner() != null && this.getOwner().getPersistentData().getInt("inMindscape") >= 1) {
-                if (hitPos.getX() > this.getOwner().getX()) {
+            if (this.getOwner() != null && this.getOwner().getPersistentData().getInt("inMindscape") == 1) {
+                if (hitPos.getY() > this.getOwner().getY()) {
                     return;
                 } else {
                     this.level().playSound(null, this.getOnPos(), SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 30.0f, 1.0f);

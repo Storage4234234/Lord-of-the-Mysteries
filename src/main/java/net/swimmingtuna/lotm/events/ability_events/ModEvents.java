@@ -156,7 +156,13 @@ public class ModEvents {
         handleClientSequenceDataSync(player, holder);
         handleAttributes(player);
         // System.out.println(executionTimes.entrySet().stream().max(Map.Entry.comparingByValue()));
+
+        if (player.getPersistentData().getInt("inMindscape") > 0 && EnvisionKingdom.isPlayerInCathedral(player, player.getPersistentData())){
+            player.getPersistentData().putInt("inMindscape", 0);
+        }
+
     }
+
 
     private static void handleClientSequenceDataSync(Player player, BeyonderHolder holder) {
         if (player.tickCount % 20 == 0) {

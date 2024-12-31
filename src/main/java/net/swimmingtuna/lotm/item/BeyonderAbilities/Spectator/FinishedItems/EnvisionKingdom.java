@@ -44,13 +44,9 @@ public class EnvisionKingdom extends SimpleAbilityItem {
         //ENVISION KINGDOM
 
         AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-        int mindScape = playerPersistentData.getInt("inMindscape");
-        if (mindScape < 1) return;
-        playerPersistentData.putInt("inMindscape", mindScape + 1);
-        if (mindScape >= 1200) {
-            playerPersistentData.putInt("inMindscape", 0);
-        }
+
         int mindscapeAbilities = playerPersistentData.getInt("mindscapeAbilities");
+
         if (mindscapeAbilities >= 1) { //
             player.setSpirituality(player.getMaxSpirituality());
             if (!playerPersistentData.getBoolean("CAN_FLY")) {
@@ -65,37 +61,25 @@ public class EnvisionKingdom extends SimpleAbilityItem {
 
         }
 
-        int partIndex = mindScape - 2;
-        if (partIndex < 0) return;
-
-        int mindScape1 = playerPersistentData.getInt("inMindscape");
         int x = playerPersistentData.getInt("mindscapePlayerLocationX");
         int y = playerPersistentData.getInt("mindscapePlayerLocationY");
         int z = playerPersistentData.getInt("mindscapePlayerLocationZ");
-        if (mindScape1 < 1) return;
-        if (mindScape1 == 6) {
-            player.teleportTo(player.getX() + 77, player.getY() + 8, player.getZ() + 206);
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
-                if (entity != player) {
-                    entity.teleportTo(player.getX(), player.getY(), player.getZ() - 10);
-                }
+
+        player.teleportTo(player.getX() + 77, player.getY() + 8, player.getZ() + 206);
+        for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
+            if (entity != player) {
+                entity.teleportTo(player.getX(), player.getY(), player.getZ() - 10);
             }
         }
-        TickEventUtil.placeCorpseCathedral(playerPersistentData, serverLevel, mindScape, partIndex, x, y, z);
-        player.sendSystemMessage(Component.literal("ENVISIONEd"));
+
+        TickEventUtil.placeCorpseCathedral(serverLevel, x, y, z);
     }
 
     public static void envisionKingdom(CompoundTag playerPersistentData, Player player, BeyonderHolder holder, ServerLevel serverLevel) {
         //ENVISION KINGDOM
 
         AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-        int mindScape = playerPersistentData.getInt("inMindscape");
-        if (mindScape < 1) return;
         Abilities playerAbilities = player.getAbilities();
-        playerPersistentData.putInt("inMindscape", mindScape + 1);
-        if (mindScape >= 1200) {
-            playerPersistentData.putInt("inMindscape", 0);
-        }
         int mindscapeAbilities = playerPersistentData.getInt("mindscapeAbilities");
         if (mindscapeAbilities >= 1) {
             holder.setSpirituality(holder.getMaxSpirituality());
@@ -119,30 +103,20 @@ public class EnvisionKingdom extends SimpleAbilityItem {
                 serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
             }
         }
-
-        int partIndex = mindScape - 2;
-        if (partIndex < 0) return;
-
-        int mindScape1 = playerPersistentData.getInt("inMindscape");
         int x = playerPersistentData.getInt("mindscapePlayerLocationX");
         int y = playerPersistentData.getInt("mindscapePlayerLocationY");
         int z = playerPersistentData.getInt("mindscapePlayerLocationZ");
-        if (mindScape1 < 1) return;
-        if (mindScape1 == 11) {
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
-                if (entity != player) {
-                    if (entity instanceof Player) {
-                        entity.teleportTo(player.getX(), player.getY() + 1, player.getZ() - 10);
-                    } else if (entity.getMaxHealth() >= 50) {
-                        entity.teleportTo(player.getX(), player.getY() + 1, player.getZ() - 10);
-                    }
+        for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
+            if (entity != player) {
+                if (entity instanceof Player) {
+                    entity.teleportTo(player.getX(), player.getY() + 1, player.getZ() - 10);
+                } else if (entity.getMaxHealth() >= 50) {
+                    entity.teleportTo(player.getX(), player.getY() + 1, player.getZ() - 10);
                 }
             }
         }
-        if (mindScape == 2 || mindScape == 4 || mindScape == 6 || mindScape == 8 || mindScape == 10) {
-            player.teleportTo(player.getX(), player.getY() + 4.5, player.getZ());
-        }
-        TickEventUtil.placeCorpseCathedral(playerPersistentData, serverLevel, mindScape, partIndex, x, y, z);
+        player.teleportTo(player.getX(), player.getY() + 4.5, player.getZ());
+        TickEventUtil.placeCorpseCathedral(serverLevel, x, y, z);
     }
 
     @Override
@@ -159,6 +133,23 @@ public class EnvisionKingdom extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
+    public static boolean isPlayerInCathedral(Player player, CompoundTag playerPersistentData) {
+        int x = (int) player.getX();
+        int y = (int) player.getY();
+        int z = (int) player.getZ();
+
+        int minX = playerPersistentData.getInt("cathedralMinX");
+        int minY = playerPersistentData.getInt("cathedralMinY");
+        int minZ = playerPersistentData.getInt("cathedralMinZ");
+        int maxX = playerPersistentData.getInt("cathedralMaxX");
+        int maxY = playerPersistentData.getInt("cathedralMaxY");
+        int maxZ = playerPersistentData.getInt("cathedralMaxZ");
+
+        return x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ;
+    }
+
+
+
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use, summons your Divine Kingdom, the Corpse Cathedral\n" +
@@ -168,7 +159,7 @@ public class EnvisionKingdom extends SimpleAbilityItem {
     }
 
     private void generateCathedral(Player player) {
-        if (!player.level().isClientSide) {
+        if (!player.level().isClientSide && player.getPersistentData().getInt("inMindscape") == 0 ) {
             int x = (int) player.getX();
             int y = (int) player.getY();
             int z = (int) player.getZ();
@@ -178,6 +169,13 @@ public class EnvisionKingdom extends SimpleAbilityItem {
             compoundTag.putInt("mindscapePlayerLocationX", x - 77); //check if this works
             compoundTag.putInt("mindscapePlayerLocationY", y - 8);
             compoundTag.putInt("mindscapePlayerLocationZ", z - 207);
+
+            compoundTag.putInt("cathedralMinX", x - 77);
+            compoundTag.putInt("cathedralMinY", y - 8);
+            compoundTag.putInt("cathedralMinZ", z - 207);
+            compoundTag.putInt("cathedralMaxX", x + 77);
+            compoundTag.putInt("cathedralMaxY", y + 20);
+            compoundTag.putInt("cathedralMaxZ", z + 207);
         }
     }
 }

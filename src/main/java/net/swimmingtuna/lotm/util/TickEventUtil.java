@@ -44,7 +44,6 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -223,7 +222,7 @@ public class TickEventUtil {
         }
     }
 
-    public static @NotNull List<BlockPos> getBlockPos(BlockPos playerPos) {
+    public static List<BlockPos> getBlockPos(BlockPos playerPos) {
         int radius = 20;
         List<BlockPos> blocksInRadius = new ArrayList<>();
 
@@ -239,7 +238,6 @@ public class TickEventUtil {
         }
         return blocksInRadius;
     }
-
 
 
     private static void projectileEvent(PlayerMobEntity player) {
@@ -309,12 +307,20 @@ public class TickEventUtil {
         }
     }
 
-    public static void placeCorpseCathedral(CompoundTag playerPersistentData, ServerLevel serverLevel, int mindScape, int partIndex, int x, int y, int z) {
-        StructureTemplate part = serverLevel.getStructureManager().getOrCreate(new ResourceLocation(LOTM.MOD_ID, "corpse_cathedral_" + (partIndex + 1)));
-        BlockPos tagPos = new BlockPos(x, y + (partIndex * 2), z);
-        StructurePlaceSettings settings = BeyonderUtil.getStructurePlaceSettings(new BlockPos(x, y, z));
-        part.placeInWorld(serverLevel, tagPos, tagPos, settings, null, Block.UPDATE_ALL);
-        playerPersistentData.putInt("inMindscape", mindScape + 1);
+    public static void placeCorpseCathedral(ServerLevel serverLevel, int x, int y, int z) {
+
+        for (int partIndex = 0; partIndex < 48; partIndex++) {
+            String structureName = "corpse_cathedral_" + partIndex;
+            ResourceLocation structureLocation = new ResourceLocation(LOTM.MOD_ID, structureName);
+            StructureTemplate part = serverLevel.getStructureManager().getOrCreate(structureLocation);
+            BlockPos tagPos = new BlockPos(x, y + ((partIndex - 1) * 2), z);
+            StructurePlaceSettings settings = BeyonderUtil.getStructurePlaceSettings(new BlockPos(x, y, z));
+            part.placeInWorld(serverLevel, tagPos, tagPos, settings, null, Block.UPDATE_ALL);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ignored) {
+            }
+        }
     }
 
     public static void removeArmor(LivingEntity player) {
@@ -796,7 +802,6 @@ public class TickEventUtil {
             }
         }
     }
-
 
 
     private static void waterSphereCheck(LivingEntity livingEntity, ServerLevel level) {
