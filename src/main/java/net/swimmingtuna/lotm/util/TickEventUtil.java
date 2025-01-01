@@ -307,22 +307,6 @@ public class TickEventUtil {
         }
     }
 
-    public static void placeCorpseCathedral(ServerLevel serverLevel, int x, int y, int z) {
-
-        for (int partIndex = 0; partIndex < 48; partIndex++) {
-            String structureName = "corpse_cathedral_" + partIndex;
-            ResourceLocation structureLocation = new ResourceLocation(LOTM.MOD_ID, structureName);
-            StructureTemplate part = serverLevel.getStructureManager().getOrCreate(structureLocation);
-            BlockPos tagPos = new BlockPos(x, y + ((partIndex - 1) * 2), z);
-            StructurePlaceSettings settings = BeyonderUtil.getStructurePlaceSettings(new BlockPos(x, y, z));
-            part.placeInWorld(serverLevel, tagPos, tagPos, settings, null, Block.UPDATE_ALL);
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ignored) {
-            }
-        }
-    }
-
     public static void removeArmor(LivingEntity player) {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (slot.getType() == EquipmentSlot.Type.ARMOR) {

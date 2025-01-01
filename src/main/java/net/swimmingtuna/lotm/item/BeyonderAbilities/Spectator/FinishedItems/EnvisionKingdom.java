@@ -28,6 +28,7 @@ import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
+import net.swimmingtuna.lotm.util.CathedralBuilderUtil;
 import net.swimmingtuna.lotm.util.TickEventUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,9 +62,9 @@ public class EnvisionKingdom extends SimpleAbilityItem {
 
         }
 
-        int x = playerPersistentData.getInt("mindscapePlayerLocationX");
-        int y = playerPersistentData.getInt("mindscapePlayerLocationY");
-        int z = playerPersistentData.getInt("mindscapePlayerLocationZ");
+        int x = playerPersistentData.getInt("playerCathedralX");
+        int y = playerPersistentData.getInt("playerCathedralY");
+        int z = playerPersistentData.getInt("playerCathedralZ");
 
         player.teleportTo(player.getX() + 77, player.getY() + 8, player.getZ() + 206);
         for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
@@ -72,7 +73,7 @@ public class EnvisionKingdom extends SimpleAbilityItem {
             }
         }
 
-        TickEventUtil.placeCorpseCathedral(serverLevel, x, y, z);
+        CathedralBuilderUtil.placeCorpseCathedral(serverLevel, x, y, z);
     }
 
     public static void envisionKingdom(CompoundTag playerPersistentData, Player player, BeyonderHolder holder, ServerLevel serverLevel) {
@@ -103,9 +104,9 @@ public class EnvisionKingdom extends SimpleAbilityItem {
                 serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
             }
         }
-        int x = playerPersistentData.getInt("mindscapePlayerLocationX");
-        int y = playerPersistentData.getInt("mindscapePlayerLocationY");
-        int z = playerPersistentData.getInt("mindscapePlayerLocationZ");
+        int x = playerPersistentData.getInt("playerCathedralX");
+        int y = playerPersistentData.getInt("playerCathedralY");
+        int z = playerPersistentData.getInt("playerCathedralZ");
         for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
             if (entity != player) {
                 if (entity instanceof Player) {
@@ -116,7 +117,7 @@ public class EnvisionKingdom extends SimpleAbilityItem {
             }
         }
         player.teleportTo(player.getX(), player.getY() + 4.5, player.getZ());
-        TickEventUtil.placeCorpseCathedral(serverLevel, x, y, z);
+        CathedralBuilderUtil.placeCorpseCathedral(serverLevel, x, y, z);
     }
 
     @Override
@@ -159,23 +160,24 @@ public class EnvisionKingdom extends SimpleAbilityItem {
     }
 
     private void generateCathedral(Player player) {
-        if (!player.level().isClientSide && player.getPersistentData().getInt("inMindscape") == 0 ) {
-            int x = (int) player.getX();
+        if (!player.level().isClientSide) {
+            int x = (int) player.getX() ;
             int y = (int) player.getY();
             int z = (int) player.getZ();
             CompoundTag compoundTag = player.getPersistentData();
             compoundTag.putInt("mindscapeAbilities", 50);
             compoundTag.putInt("inMindscape", 1);
-            compoundTag.putInt("mindscapePlayerLocationX", x - 77); //check if this works
-            compoundTag.putInt("mindscapePlayerLocationY", y - 8);
-            compoundTag.putInt("mindscapePlayerLocationZ", z - 207);
 
-            compoundTag.putInt("cathedralMinX", x - 77);
-            compoundTag.putInt("cathedralMinY", y - 8);
-            compoundTag.putInt("cathedralMinZ", z - 207);
-            compoundTag.putInt("cathedralMaxX", x + 77);
-            compoundTag.putInt("cathedralMaxY", y + 20);
-            compoundTag.putInt("cathedralMaxZ", z + 207);
+            compoundTag.putInt("playerCathedralX", x- 77);
+            compoundTag.putInt("playerCathedralY", y - 8);
+            compoundTag.putInt("playerCathedralZ", z -207);
+
+            compoundTag.putInt("cathedralMinX", x - 65);
+            compoundTag.putInt("cathedralMinY", y - 4);
+            compoundTag.putInt("cathedralMinZ", z - 220);
+            compoundTag.putInt("cathedralMaxX", x + 65);
+            compoundTag.putInt("cathedralMaxY", y + 250);
+            compoundTag.putInt("cathedralMaxZ", z + 50);
         }
     }
 }

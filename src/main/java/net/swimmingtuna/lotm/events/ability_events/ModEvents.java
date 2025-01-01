@@ -143,6 +143,9 @@ public class ModEvents {
         if (player.level().isClientSide() && holder.currentClassMatches(BeyonderClassInit.MONSTER) && sequence <= 8 && player.tickCount % 15 == 0) {
             checkForProjectiles(player);
         }
+        if (player.getPersistentData().getInt("inMindscape") == 1 && !EnvisionKingdom.isPlayerInCathedral(player, player.getPersistentData())){
+            player.getPersistentData().putInt("inMindscape", 0);
+        }
     }
 
     @SubscribeEvent
@@ -156,11 +159,6 @@ public class ModEvents {
         handleClientSequenceDataSync(player, holder);
         handleAttributes(player);
         // System.out.println(executionTimes.entrySet().stream().max(Map.Entry.comparingByValue()));
-
-        if (player.getPersistentData().getInt("inMindscape") > 0 && EnvisionKingdom.isPlayerInCathedral(player, player.getPersistentData())){
-            player.getPersistentData().putInt("inMindscape", 0);
-        }
-
     }
 
 
