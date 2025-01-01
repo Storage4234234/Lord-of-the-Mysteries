@@ -159,6 +159,7 @@ public class ModEvents {
         handleClientSequenceDataSync(player, holder);
         handleAttributes(player);
         // System.out.println(executionTimes.entrySet().stream().max(Map.Entry.comparingByValue()));
+        ExtremeColdness.extremeColdness(player.getPersistentData(), BeyonderHolderAttacher.getHolderUnwrap(player) , player);
     }
 
 
