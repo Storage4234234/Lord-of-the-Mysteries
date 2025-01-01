@@ -91,15 +91,14 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.Envi
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
+import net.swimmingtuna.lotm.networking.packet.BatchedSpiritWorldUpdatePacketS2C;
 import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
 import net.swimmingtuna.lotm.networking.packet.SyncLeftClickCooldownS2C;
 import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderInvisibilityPacketS2C;
-import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderSpiritWorldPacketS2C;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ClientData.ClientSequenceData;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
-import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderSpiritWorldData;
 import net.swimmingtuna.lotm.util.CorruptionAndLuckHandler;
 import net.swimmingtuna.lotm.util.SpiritWorldVisibilityTracker;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
@@ -3344,15 +3343,18 @@ public class ModEvents {
     public static void checkForProjectiles(Player player) {
         Level level = player.level();
         for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(100))) {
-            List<Vec3> trajectory = predictProjectileTrajectory(projectile, player);
-            float scale = ScaleTypes.BASE.getScaleData(projectile).getScale();
-            double maxDistance = 20 * scale;
-            double deltaX = Math.abs(projectile.getX() - player.getX());
-            double deltaY = Math.abs(projectile.getY() - player.getY());
-            double deltaZ = Math.abs(projectile.getZ() - player.getZ());
-            if (deltaX <= maxDistance || deltaY <= maxDistance || deltaZ <= maxDistance) {
-                if (player.level() instanceof ServerLevel serverLevel) {
-                    drawParticleLine(serverLevel, (ServerPlayer) player, trajectory);
+            boolean bothInSameDimension = projectile.getPersistentData().getBoolean("inSpiritWorld") == player.getPersistentData().getBoolean("inSpiritWorld");
+            if (bothInSameDimension) {
+                List<Vec3> trajectory = predictProjectileTrajectory(projectile, player);
+                float scale = ScaleTypes.BASE.getScaleData(projectile).getScale();
+                double maxDistance = 20 * scale;
+                double deltaX = Math.abs(projectile.getX() - player.getX());
+                double deltaY = Math.abs(projectile.getY() - player.getY());
+                double deltaZ = Math.abs(projectile.getZ() - player.getZ());
+                if (deltaX <= maxDistance || deltaY <= maxDistance || deltaZ <= maxDistance) {
+                    if (player.level() instanceof ServerLevel serverLevel) {
+                        drawParticleLine(serverLevel, (ServerPlayer) player, trajectory);
+                    }
                 }
             }
         }
@@ -3728,12 +3730,17 @@ public class ModEvents {
     @SubscribeEvent
     public static void onLivingJoinWorld(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
-        if (entity instanceof LivingEntity livingEntity) {
-            if (!livingEntity.level().isClientSide()) {
+        if (!entity.level().isClientSide()) {
+            if (entity instanceof LivingEntity livingEntity) {
                 if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
                     if (!playerMobEntity.level().getLevelData().getGameRules().getBoolean(GameRuleInit.NPC_SHOULD_SPAWN)) {
                         event.setCanceled(true);
                     }
+                }
+            } else if (entity instanceof Projectile projectile) {
+                Entity owner = projectile.getOwner();
+                if (owner != null) {
+                    projectile.getPersistentData().putBoolean("inSpiritWorld", owner.getPersistentData().getBoolean("inSpiritWorld"));
                 }
             }
         }
@@ -3925,17 +3932,21 @@ public class ModEvents {
     public static void sendSpiritWorldPackets(LivingEntity livingEntity) {
         CompoundTag tag = livingEntity.getPersistentData();
         boolean isInSpiritWorld = tag.getBoolean("inSpiritWorld");
+        Map<UUID, Boolean> updates = new HashMap<>();
+
         for (Player player : livingEntity.level().players()) {
             if (player instanceof ServerPlayer serverPlayer) {
                 boolean playerInSpiritWorld = serverPlayer.getPersistentData().getBoolean("inSpiritWorld");
                 boolean shouldBeVisible = isInSpiritWorld == playerInSpiritWorld;
-                LOTMNetworkHandler.sendToPlayer(
-                        new SyncShouldntRenderSpiritWorldPacketS2C(!shouldBeVisible, livingEntity.getUUID()),
-                        serverPlayer
-                );
+                updates.put(livingEntity.getUUID(), !shouldBeVisible);
             }
         }
+
+        if (!updates.isEmpty()) {
+            LOTMNetworkHandler.sendToAllPlayers(new BatchedSpiritWorldUpdatePacketS2C(updates));
+        }
     }
+
     @SubscribeEvent
     public static void onEntityRemoved(EntityLeaveLevelEvent event) {
         if (event.getEntity() instanceof LivingEntity) {
@@ -3947,4 +3958,6 @@ public class ModEvents {
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         SpiritWorldVisibilityTracker.removePlayer(event.getEntity().getUUID());
     }
+
+
 }

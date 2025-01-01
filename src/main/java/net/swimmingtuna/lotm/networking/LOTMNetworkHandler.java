@@ -134,6 +134,11 @@ public class LOTMNetworkHandler {
                 .encoder(SyncShouldntRenderSpiritWorldPacketS2C::encode)
                 .consumerMainThread(SyncShouldntRenderSpiritWorldPacketS2C::handle)
                 .add();
+        INSTANCE.messageBuilder(BatchedSpiritWorldUpdatePacketS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(BatchedSpiritWorldUpdatePacketS2C::new)
+                .encoder(BatchedSpiritWorldUpdatePacketS2C::encode)
+                .consumerMainThread(BatchedSpiritWorldUpdatePacketS2C::handle)
+                .add();
         INSTANCE.messageBuilder(RequestCooldownSetC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(RequestCooldownSetC2S::new)
                 .encoder(RequestCooldownSetC2S::toByte)
@@ -160,6 +165,10 @@ public class LOTMNetworkHandler {
 
     public static <MSG> void sendToServer(MSG message) {
         INSTANCE.sendToServer(message);
+    }
+
+    public static <MSG> void sendToAllPlayers(MSG message) {
+        INSTANCE.send(PacketDistributor.ALL.noArg(), message);
     }
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
