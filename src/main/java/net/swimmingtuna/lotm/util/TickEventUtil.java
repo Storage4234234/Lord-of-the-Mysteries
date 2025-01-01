@@ -260,6 +260,8 @@ public class TickEventUtil {
         }
     }
 
+
+
     private static void calamityIncarnationTornado(CompoundTag playerPersistentData, LivingEntity player) {
         //CALAMITY INCARNATION TORNADO
         if (playerPersistentData.getInt("calamityIncarnationTornado") >= 1) {

@@ -332,6 +332,7 @@ public class TornadoEntity extends AbstractHurtingProjectile {
             if (this.getOwner() != null) {
                 if (this.getOwner().getPersistentData().getInt("calamityIncarnationTornado") >= 1) {
                     this.teleportTo(this.getOwner().getX(),this.getOwner().getY() - 30,this.getOwner().getZ());
+                    this.getOwner().getPersistentData().putInt("calamityIncarnationTornado", this.getOwner().getPersistentData().getInt("calamityIncarnationTornado") - 1);
                 }
             }
         }

@@ -75,6 +75,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ClientSequenceData;
+import net.swimmingtuna.lotm.util.CorruptionAndLuckHandler;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.worldgen.MirrorWorldChunkGenerator;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -151,15 +152,57 @@ public class ModEvents {
     @SubscribeEvent
     public static void onPlayerTickServer(TickEvent.PlayerTickEvent event) {
         Player player = event.player;
-        if (!(player.level() instanceof ServerLevel)) return;
+        if (!(player.level() instanceof ServerLevel serverLevel)) return;
 
         if (player.level().isClientSide() || event.phase != TickEvent.Phase.START) return;
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
 
+        AttributeInstance corruption = player.getAttribute(ModAttributes.CORRUPTION.get());
+        AttributeInstance luck = player.getAttribute(ModAttributes.LOTM_LUCK.get());
+        AttributeInstance misfortune = player.getAttribute(ModAttributes.MISFORTUNE.get());
+        CompoundTag playerPersist = player.getPersistentData();
+        Style style = BeyonderUtil.getStyle(player);
+
         handleClientSequenceDataSync(player, holder);
         handleAttributes(player);
         // System.out.println(executionTimes.entrySet().stream().max(Map.Entry.comparingByValue()));
+
+        MatterAccelerationSelf.matterAccelerationSelf(player, holder, style);
         ExtremeColdness.extremeColdness(player.getPersistentData(), BeyonderHolderAttacher.getHolderUnwrap(player) , player);
+        Earthquake.earthquake(player, holder.getCurrentSequence());
+        Hurricane.hurricane(playerPersist, player);
+        LightningStorm.lightningStorm(player, playerPersist, style, holder);
+        decrementMonsterAttackEvent(player);
+        Monster.monsterLuckIgnoreMobs(player);
+        Monster.monsterLuckPoisonAttacker(player);
+        Monster.monsterDomainIntHandler(player);
+        Calamity.calamityLightningStorm(player);
+        Calamity.calamityUndeadArmy(player);
+        Calamity.calamityExplosion(player);
+        CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, misfortune, corruption, player, luck, holder, holder.getCurrentSequence() );
+        Nightmare.nightmare(player, playerPersist);
+        PsychologicalInvisibility.psychologicalInvisibility(player, playerPersist, holder);
+        WindManipulationSense.windManipulationSense(playerPersist,holder,player);
+        SailorLightningTravel.sailorLightningTravel(player);
+        WindManipulationCushion.windManipulationCushion(playerPersist, player);
+        DreamIntoReality.dreamIntoReality(player, holder);
+        ConsciousnessStroll.consciousnessStroll(playerPersist, player);
+        prophesizeTeleportation(playerPersist, player);
+        projectileEvent(player, holder);
+        EnvisionBarrier.envisionBarrier(holder, player, style);
+        EnvisionLife.envisionLife(player);
+        ManipulateMovement.manipulateMovement(player, serverLevel);
+        AcidicRain.acidicRain(player, holder.getCurrentSequence());
+        CalamityIncarnationTornado.calamityIncarnationTornado(playerPersist, player);
+        CalamityIncarnationTsunami.calamityIncarnationTsunami(playerPersist, player, serverLevel);
+        RagingBlows.ragingBlows(playerPersist, holder, player);
+        RainEyes.rainEyes(player);
+        sirenSongs(playerPersist, holder, player, holder.getCurrentSequence());
+        sirenSongs(player);
+        StarOfLightning.starOfLightning(player, playerPersist);
+        Tsunami.tsunami(playerPersist, player);
+        waterSphereCheck(player, serverLevel);
+        WindManipulationFlight.windManipulationFlight(player, playerPersist);
     }
 
 
@@ -259,41 +302,6 @@ public class ModEvents {
             if (random.nextInt(3) == 1) {
                 event.getDrops().add((ItemEntity) event.getEntity().captureDrops());
             }
-        }
-    }
-
-    private static void matterAccelerationSelf(Player player, BeyonderHolder holder, Style style) {
-        //MATTER ACCELERATION SELF
-        if (player.isSpectator()) return;
-        int matterAccelerationDistance = player.getPersistentData().getInt("tyrantSelfAcceleration");
-        int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
-        int luckGiftingAmount = player.getPersistentData().getInt("monsterLuckGifting");
-        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof MatterAccelerationSelf && holder.currentClassMatches(BeyonderClassInit.SAILOR)) {
-            matterAccelerationDistance += 50;
-            player.getPersistentData().putInt("tyrantSelfAcceleration", matterAccelerationDistance);
-            player.displayClientMessage(Component.literal("Matter Acceleration Distance is " + matterAccelerationDistance).withStyle(style), true);
-        }
-        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof EnvisionLocationBlink && holder.currentClassMatches(BeyonderClassInit.SPECTATOR)) {
-            blinkDistance += 5;
-            player.getPersistentData().putInt("BlinkDistance", blinkDistance);
-            player.displayClientMessage(Component.literal("Blink Distance is " + blinkDistance).withStyle(style), true);
-        }
-        if (matterAccelerationDistance >= 1001) {
-            player.displayClientMessage(Component.literal("Matter Acceleration Distance is 0").withStyle(style), true);
-            player.getPersistentData().putInt("tyrantSelfAcceleration", 0);
-        }
-        if (blinkDistance > 201) {
-            player.displayClientMessage(Component.literal("Blink Distance is 0").withStyle(style), true);
-            player.getPersistentData().putInt("BlinkDistance", 0);
-        }
-        //LUCK GIFTING
-        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof LuckGifting && holder.currentClassMatches(BeyonderClassInit.MONSTER)) {
-            player.getPersistentData().putInt("monsterLuckGifting", luckGiftingAmount + 1);
-            player.displayClientMessage(Component.literal("Luck Gifting Amount is " + luckGiftingAmount).withStyle(style), true);
-        }
-        if (luckGiftingAmount > 101) {
-            player.displayClientMessage(Component.literal("Luck Gifting Amount is 0").withStyle(style), true);
-            player.getPersistentData().putInt("monsterLuckGifting", 0);
         }
     }
 

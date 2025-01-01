@@ -50,7 +50,7 @@ public class Earthquake extends SimpleAbilityItem {
         if (sailorEarthquake >= 0) {
             player.getPersistentData().putInt("sailorEarthquake", sailorEarthquake - 1);
         }
-        if (!(sailorEarthquake % 20 == 0 && sailorEarthquake != 0 || sailorEarthquake == 1)) {
+        if (!(sailorEarthquake != 0 && sailorEarthquake % 20 == 0 || sailorEarthquake == 1)) {
             return;
         }
         int radius = 100 - (sequence * 10);

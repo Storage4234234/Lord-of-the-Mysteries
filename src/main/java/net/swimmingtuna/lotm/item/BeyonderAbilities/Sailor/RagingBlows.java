@@ -92,9 +92,10 @@ public class RagingBlows extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, causes the user to shoot punches powerfully all around the user, damaging everything around them\n" +
-                "Spirituality Used: 20\n" +
-                "Cooldown: 10 seconds").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
+        tooltipComponents.add(Component.literal("""
+                Upon use, causes the user to shoot punches powerfully all around the user, damaging everything around them
+                Spirituality Used: 20
+                Cooldown: 10 seconds""").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
@@ -119,18 +120,22 @@ public class RagingBlows extends SimpleAbilityItem {
                     double ragingBlowsZ = player.getZ() - entity.getZ();
                     entity.knockback(0.25, ragingBlowsX, ragingBlowsZ);
                     if (holder.getCurrentSequence() <= 7) {
-                        double chanceOfDamage = (100.0 - (holder.getCurrentSequence() * 12.5));
-                        if (Math.random() * 100 < chanceOfDamage && sailorLightning) {
-                            LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, entity.level());
-                            lightningBolt.moveTo(entity.getX(), entity.getY(), entity.getZ());
-                            entity.level().addFreshEntity(lightningBolt);
-                        }
+                        addLightningBolt(holder, sailorLightning, entity);
                     }
                 }
             }
         }
         if (ragingBlows >= 100) {
             playerPersistentData.putInt("ragingBlows", 0);
+        }
+    }
+
+    public static void addLightningBolt(BeyonderHolder holder, boolean sailorLightning, LivingEntity entity) {
+        double chanceOfDamage = (100.0 - (holder.getCurrentSequence() * 12.5));
+        if (Math.random() * 100 < chanceOfDamage && sailorLightning) {
+            LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, entity.level());
+            lightningBolt.moveTo(entity.getX(), entity.getY(), entity.getZ());
+            entity.level().addFreshEntity(lightningBolt);
         }
     }
 

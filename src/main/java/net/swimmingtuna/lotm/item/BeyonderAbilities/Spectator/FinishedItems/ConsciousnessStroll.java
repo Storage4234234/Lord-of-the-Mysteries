@@ -26,14 +26,15 @@ public class ConsciousnessStroll extends SimpleAbilityItem {
         //CONSCIOUSNESS STROLL
         if (!(player instanceof ServerPlayer serverPlayer)) return;
         int strollCounter = playerPersistentData.getInt("consciousnessStrollActivated");
-        int consciousnessStrollActivatedX = playerPersistentData.getInt("consciousnessStrollActivatedX");
-        int consciousnessStrollActivatedY = playerPersistentData.getInt("consciousnessStrollActivatedY");
-        int consciousnessStrollActivatedZ = playerPersistentData.getInt("consciousnessStrollActivatedZ");
+
         if (strollCounter >= 1) {
             playerPersistentData.putInt("consciousnessStrollActivated", strollCounter - 1);
             serverPlayer.setGameMode(GameType.SPECTATOR);
         }
         if (strollCounter == 1) {
+            int consciousnessStrollActivatedX = playerPersistentData.getInt("consciousnessStrollActivatedX");
+            int consciousnessStrollActivatedY = playerPersistentData.getInt("consciousnessStrollActivatedY");
+            int consciousnessStrollActivatedZ = playerPersistentData.getInt("consciousnessStrollActivatedZ");
             player.teleportTo(consciousnessStrollActivatedX, consciousnessStrollActivatedY, consciousnessStrollActivatedZ);
             serverPlayer.setGameMode(GameType.SURVIVAL);
         }

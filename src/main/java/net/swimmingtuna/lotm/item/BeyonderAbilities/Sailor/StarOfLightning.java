@@ -55,7 +55,7 @@ public class StarOfLightning extends SimpleAbilityItem {
     }
 
 
-    private static void starOfLightning(Player player, CompoundTag playerPersistentData) {
+    public static void starOfLightning(Player player, CompoundTag playerPersistentData) {
         //STAR OF LIGHTNING
         int sailorLightningStar = playerPersistentData.getInt("sailorLightningStar");
         if (sailorLightningStar >= 2) {

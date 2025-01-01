@@ -18,6 +18,7 @@ import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 
 public class Monster {
+
     public static void monsterDomainIntHandler(Player player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
@@ -55,6 +56,24 @@ public class Monster {
     }
 
     public static void monsterLuckIgnoreMobs(PlayerMobEntity pPlayer) {
+        if (pPlayer.tickCount % 40 == 0) {
+            if (pPlayer.getPersistentData().getInt("luckIgnoreMobs") >= 1) {
+                for (Mob mob : pPlayer.level().getEntitiesOfClass(Mob.class, pPlayer.getBoundingBox().inflate(20))) {
+                    if (mob.getTarget() == pPlayer) {
+                        for (LivingEntity livingEntity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(50))) {
+                            if (livingEntity != null) {
+                                mob.setTarget(livingEntity);
+                            } else
+                                mob.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 60, 1, false, false));
+                        }
+                        pPlayer.getPersistentData().putInt("luckIgnoreMobs", pPlayer.getPersistentData().getInt("luckIgnoreMobs") - 1);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void monsterLuckIgnoreMobs(Player pPlayer) {
         if (pPlayer.tickCount % 40 == 0) {
             if (pPlayer.getPersistentData().getInt("luckIgnoreMobs") >= 1) {
                 for (Mob mob : pPlayer.level().getEntitiesOfClass(Mob.class, pPlayer.getBoundingBox().inflate(20))) {
