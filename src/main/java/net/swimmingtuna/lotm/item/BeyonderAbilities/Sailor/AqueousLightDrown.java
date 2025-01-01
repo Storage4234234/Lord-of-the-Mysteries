@@ -71,7 +71,6 @@ public class AqueousLightDrown extends SimpleAbilityItem {
                 ModEvents.waterElemination(tag, level, headPos, aqueousLight);
             }
             if (aqueousLight >= 200) {
-                aqueousLight = 0;
                 tag.putInt("lightDrowning", 0);
                 ModEvents.waterRemovalFromMinusThreeToThree(level, headPos);
             }

@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -13,7 +12,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
@@ -23,83 +21,27 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.phys.Vec3;
-import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.*;
 import net.swimmingtuna.lotm.events.ability_events.ModEvents;
-import net.swimmingtuna.lotm.events.ability_events.Monster;
 import net.swimmingtuna.lotm.events.custom_events.ModEventFactory;
 import net.swimmingtuna.lotm.events.custom_events.ProjectileEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.SoundInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
-import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 
 import java.util.*;
 
-import static net.swimmingtuna.lotm.events.ability_events.Monster.monsterLuckIgnoreMobs;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.Earthquake.earthquake;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.ExtremeColdness.extremeColdness;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.SirenSongStrengthen.isInsideSphere;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLife.envisionLife;
 
 public class TickEventUtil {
 
-    public static void tickEventUtil(PlayerMobEntity playerMobEntity) {
-        CompoundTag livingEntityPersistentData = playerMobEntity.getPersistentData();
-        ServerLevel serverLevel = (ServerLevel) playerMobEntity.level();
-        AttributeInstance corruption = playerMobEntity.getAttribute(ModAttributes.CORRUPTION.get());
-        AttributeInstance luck = playerMobEntity.getAttribute(ModAttributes.LOTM_LUCK.get());
-        AttributeInstance misfortune = playerMobEntity.getAttribute(ModAttributes.MISFORTUNE.get());
-        int sequence = playerMobEntity.getCurrentSequence();
-        decrementMonsterAttackEvent(playerMobEntity);
-        monsterLuckIgnoreMobs(playerMobEntity);
-        Monster.monsterLuckPoisonAttacker(playerMobEntity);
-        calamityExplosion(playerMobEntity);
-        calamityLightningStorm(playerMobEntity);
-        calamityUndeadArmy(playerMobEntity);
-        PlayerMobCorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, misfortune, corruption, playerMobEntity, luck, sequence);
-        Nightmare.nightmare(playerMobEntity, livingEntityPersistentData);
-        EnvisionKingdom.envisionKingdom(livingEntityPersistentData, playerMobEntity, serverLevel);
-        calamityIncarnationTornado(livingEntityPersistentData, playerMobEntity);
-        PsychologicalInvisibility.psychologicalInvisibility(playerMobEntity, livingEntityPersistentData);
-        WindManipulationSense.windManipulationSense(livingEntityPersistentData, playerMobEntity);
-        WindManipulationCushion.windManipulationCushion(livingEntityPersistentData, playerMobEntity);
-        windManipulationGuide(livingEntityPersistentData, playerMobEntity);
-        SailorLightningTravel.sailorLightningTravel(playerMobEntity);
-        DreamIntoReality.dreamIntoReality(playerMobEntity);
-        //consciousnessStroll is meant to be here but no real use for entities
-        ModEvents.prophesizeTeleportation(livingEntityPersistentData, playerMobEntity);
-        projectileEvent(playerMobEntity);
-        EnvisionBarrier.envisionBarrier(playerMobEntity);
-        envisionLife(playerMobEntity);
-        ManipulateMovement.manipulateMovement(playerMobEntity, serverLevel);
-        acidicRain(playerMobEntity, sequence);
-        CalamityIncarnationTsunami.calamityIncarnationTsunami(livingEntityPersistentData, playerMobEntity, serverLevel);
-        earthquake(playerMobEntity, sequence);
-        extremeColdness(livingEntityPersistentData, playerMobEntity);
-        Hurricane.hurricane(livingEntityPersistentData, playerMobEntity);
-        lightningStorm(playerMobEntity, livingEntityPersistentData);
-        matterAccelerationSelf(playerMobEntity);
-        RagingBlows.ragingBlows(livingEntityPersistentData, playerMobEntity);
-        rainEyes(playerMobEntity);
-        sirenSongs(livingEntityPersistentData, playerMobEntity, sequence);
-        starOfLightning(playerMobEntity, livingEntityPersistentData);
-        Tsunami.tsunami(livingEntityPersistentData, playerMobEntity);
-        waterSphereCheck(playerMobEntity, serverLevel);
-        WindManipulationFlight.windManipulationFlight(playerMobEntity, livingEntityPersistentData);
-        sirenSongsParticles(playerMobEntity);
-    }
 
     private static void lightningStorm(PlayerMobEntity player, CompoundTag playerPersistentData) {
         //LIGHTNING STORM
