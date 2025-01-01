@@ -57,10 +57,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
@@ -93,9 +93,15 @@ import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
 import net.swimmingtuna.lotm.networking.packet.SyncLeftClickCooldownS2C;
-import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderPacketS2C;
+import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderInvisibilityPacketS2C;
+import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderSpiritWorldPacketS2C;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
-import net.swimmingtuna.lotm.util.*;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
+import net.swimmingtuna.lotm.util.ClientData.ClientSequenceData;
+import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
+import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderSpiritWorldData;
+import net.swimmingtuna.lotm.util.CorruptionAndLuckHandler;
+import net.swimmingtuna.lotm.util.SpiritWorldVisibilityTracker;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.util.effect.NoRegenerationEffect;
 import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
@@ -120,8 +126,10 @@ public class ModEvents {
         if (!livingEntity.level().isClientSide()) {
             MisfortuneManipulation.livingUseAbilityMisfortuneManipulation(event);
             CompoundTag tag = livingEntity.getPersistentData();
-            if (tag.getInt("cantUseAbility") >= 1 && livingEntity.getMainHandItem().getItem() instanceof SimpleAbilityItem) {
-                event.setCanceled(true);
+            if (livingEntity.getMainHandItem().getItem() instanceof SimpleAbilityItem simpleAbilityItem) {
+                if (tag.getInt("cantUseAbility") >= 1) {
+                    event.setCanceled(true);
+                }
             }
         }
     }
@@ -504,7 +512,7 @@ public class ModEvents {
     private static void psychologicalInvisibility(Player player, CompoundTag playerPersistentData, BeyonderHolder holder) {
         //PSYCHOLOGICAL INVISIBILITY
         if (playerPersistentData.getBoolean("psychologicalInvisibility")) {
-            if (ClientShouldntRenderData.getShouldntRender()) {
+            if (ClientShouldntRenderInvisibilityData.getShouldntRender()) {
                 if (player.tickCount % 10 == 0) {
                     holder.useSpirituality((int) holder.getMaxSpirituality() / 100);
                 }
@@ -513,8 +521,8 @@ public class ModEvents {
     }
 
     private static void psychologicalInvisibilityHurt(Player entity) {
-        if (ClientShouldntRenderData.getShouldntRender()) {
-            LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderPacketS2C(false, entity.getUUID()), (ServerPlayer) entity);
+        if (ClientShouldntRenderInvisibilityData.getShouldntRender()) {
+            LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderInvisibilityPacketS2C(false, entity.getUUID()), (ServerPlayer) entity);
         }
     }
 
@@ -562,6 +570,7 @@ public class ModEvents {
             }
         }
     }
+
     @SubscribeEvent
     public static void sealItemCanceler(PlayerInteractEvent.RightClickItem event) {
         Player player = event.getEntity();
@@ -1197,7 +1206,6 @@ public class ModEvents {
     }
 
 
-
     private static void domainDrops(LivingDropsEvent event) {
         if (event.getEntity().getPersistentData().getInt("inMonsterProvidenceDomain") >= 1) {
             Random random = new Random();
@@ -1743,6 +1751,7 @@ public class ModEvents {
             if (entity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
             }
+            sendSpiritWorldPackets(entity);
             WintryBlade.wintryBladeTick(event);
             DeathKnell.deathKnellNegativeTick(entity);
             BattleHypnotism.untargetMobs(event);
@@ -2728,6 +2737,15 @@ public class ModEvents {
         DamageSource source = event.getSource();
         Entity entitySource = source.getEntity();
         if (!event.getEntity().level().isClientSide()) {
+            boolean entityInSpiritWorld = tag.getBoolean("inSpiritWorld");
+            if (entitySource != null) {
+                CompoundTag sourceTag = entitySource.getPersistentData();
+                boolean sourceInSpiritWorld = sourceTag.getBoolean("inSpiritWorld");
+                if (entityInSpiritWorld != sourceInSpiritWorld) {
+                    event.setCanceled(true);
+                    System.out.println("worked!!");
+                }
+            }
             if (entity instanceof LivingEntity living) {
                 monsterDodgeAttack(event);
                 int stoneImmunity = tag.getInt("luckStoneDamageImmunity");
@@ -3770,7 +3788,6 @@ public class ModEvents {
                         Random random = new Random();
                         int randomInt = random.nextInt(100);
                         if (randomInt >= 85) {
-                            pPlayer.sendSystemMessage(Component.literal("Meteor Summoned"));
                             int farAwayX = getCoordinateAtLeastAway(chaosWalkerSafeX, 60, radius);
                             int farAwayZ = getCoordinateAtLeastAway(chaosWalkerSafeZ, 60, radius);
                             int randomInt2 = (int) ((Math.random() * radius) - (double) radius / 2);
@@ -3895,11 +3912,39 @@ public class ModEvents {
         int offset = random.nextInt(maxDistance - minDistance + 1) + minDistance;
         return random.nextBoolean() ? centerCoord + offset : centerCoord - offset;
     }
+
     public static void setCooldown(ServerPlayer player, int cooldown) {
         player.getPersistentData().putInt("leftClickCooldown", cooldown);
         LOTMNetworkHandler.sendToPlayer(new SyncLeftClickCooldownS2C(cooldown), player);
     }
+
     public static int getCooldown(ServerPlayer player) {
         return player.getPersistentData().getInt("leftClickCooldown");
+    }
+
+    public static void sendSpiritWorldPackets(LivingEntity livingEntity) {
+        CompoundTag tag = livingEntity.getPersistentData();
+        boolean isInSpiritWorld = tag.getBoolean("inSpiritWorld");
+        for (Player player : livingEntity.level().players()) {
+            if (player instanceof ServerPlayer serverPlayer) {
+                boolean playerInSpiritWorld = serverPlayer.getPersistentData().getBoolean("inSpiritWorld");
+                boolean shouldBeVisible = isInSpiritWorld == playerInSpiritWorld;
+                LOTMNetworkHandler.sendToPlayer(
+                        new SyncShouldntRenderSpiritWorldPacketS2C(!shouldBeVisible, livingEntity.getUUID()),
+                        serverPlayer
+                );
+            }
+        }
+    }
+    @SubscribeEvent
+    public static void onEntityRemoved(EntityLeaveLevelEvent event) {
+        if (event.getEntity() instanceof LivingEntity) {
+            SpiritWorldVisibilityTracker.removeEntity(event.getEntity().getUUID());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        SpiritWorldVisibilityTracker.removePlayer(event.getEntity().getUUID());
     }
 }

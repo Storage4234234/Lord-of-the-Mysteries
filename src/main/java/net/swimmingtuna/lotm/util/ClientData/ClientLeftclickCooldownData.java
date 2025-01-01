@@ -1,4 +1,4 @@
-package net.swimmingtuna.lotm.util;
+package net.swimmingtuna.lotm.util.ClientData;
 
 public class ClientLeftclickCooldownData {
     private static int cooldown;

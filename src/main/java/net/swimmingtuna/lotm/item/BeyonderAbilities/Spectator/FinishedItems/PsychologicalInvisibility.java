@@ -4,23 +4,20 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
-import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderPacketS2C;
-import net.swimmingtuna.lotm.util.ClientShouldntRenderData;
+import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderInvisibilityPacketS2C;
+import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -38,7 +35,7 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         storeAndReleaseArmor(player);
-        if (ClientShouldntRenderData.getShouldntRender()) {
+        if (ClientShouldntRenderInvisibilityData.getShouldntRender()) {
             addCooldown(player);
         }
         return InteractionResult.SUCCESS;
@@ -47,20 +44,20 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
     private static void storeAndReleaseArmor(Player player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
-            boolean shouldntRender = ClientShouldntRenderData.getShouldntRender();
+            boolean shouldntRender = ClientShouldntRenderInvisibilityData.getShouldntRender();
             if (!shouldntRender) {
                 for (Mob mob : player.level().getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(50))) {
                     if (mob.getTarget() == player) {
                         mob.setTarget(null);
                     }
                 }
-                LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderPacketS2C(true, player.getUUID()), (ServerPlayer) player);
+                LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderInvisibilityPacketS2C(true, player.getUUID()), (ServerPlayer) player);
                 tag.putBoolean("psychologicalInvisibility", true);
                 player.displayClientMessage(Component.literal("You are now invisible"), true);
             } else {
                 player.displayClientMessage(Component.literal("You are now visible"), true);
                 tag.putBoolean("psychologicalInvisibility", false);
-                LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderPacketS2C(false, player.getUUID()), (ServerPlayer) player);
+                LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderInvisibilityPacketS2C(false, player.getUUID()), (ServerPlayer) player);
             }
         }
     }

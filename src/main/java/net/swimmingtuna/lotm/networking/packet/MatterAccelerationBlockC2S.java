@@ -35,7 +35,6 @@ public class MatterAccelerationBlockC2S {
         context.enqueueWork(() -> {
             int x = player.getPersistentData().getInt("matterAccelerationBlockTimer");
             if (x >= 1) {
-                player.sendSystemMessage(Component.literal("working"));
                 Vec3 lookDirection = player.getLookAngle().normalize().scale(20);
                 if (player.level().dimension() == Level.OVERWORLD) {
                     StoneEntity stoneEntity = player.level().getEntitiesOfClass(StoneEntity.class, player.getBoundingBox().inflate(10))

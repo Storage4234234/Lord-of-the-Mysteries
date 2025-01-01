@@ -1,4 +1,4 @@
-package net.swimmingtuna.lotm.util;
+package net.swimmingtuna.lotm.util.ClientData;
 
 import java.util.HashMap;
 import java.util.Map;

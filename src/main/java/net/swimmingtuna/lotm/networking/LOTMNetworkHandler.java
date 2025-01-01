@@ -124,16 +124,22 @@ public class LOTMNetworkHandler {
                 .encoder(SyncLeftClickCooldownS2C::encode)
                 .consumerMainThread(SyncLeftClickCooldownS2C::handle)
                 .add();
-        INSTANCE.messageBuilder(SyncShouldntRenderPacketS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(SyncShouldntRenderPacketS2C::new)
-                .encoder(SyncShouldntRenderPacketS2C::encode)
-                .consumerMainThread(SyncShouldntRenderPacketS2C::handle)
+        INSTANCE.messageBuilder(SyncShouldntRenderInvisibilityPacketS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncShouldntRenderInvisibilityPacketS2C::new)
+                .encoder(SyncShouldntRenderInvisibilityPacketS2C::encode)
+                .consumerMainThread(SyncShouldntRenderInvisibilityPacketS2C::handle)
+                .add();
+        INSTANCE.messageBuilder(SyncShouldntRenderSpiritWorldPacketS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncShouldntRenderSpiritWorldPacketS2C::new)
+                .encoder(SyncShouldntRenderSpiritWorldPacketS2C::encode)
+                .consumerMainThread(SyncShouldntRenderSpiritWorldPacketS2C::handle)
                 .add();
         INSTANCE.messageBuilder(RequestCooldownSetC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(RequestCooldownSetC2S::new)
                 .encoder(RequestCooldownSetC2S::toByte)
                 .consumerMainThread(RequestCooldownSetC2S::handle)
                 .add();
+
         INSTANCE.messageBuilder(SendParticleS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SendParticleS2C::new)
                 .encoder(SendParticleS2C::encode)

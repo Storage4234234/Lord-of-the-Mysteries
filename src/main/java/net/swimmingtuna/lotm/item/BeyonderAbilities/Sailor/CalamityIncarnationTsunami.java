@@ -14,7 +14,9 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -36,8 +38,9 @@ public class CalamityIncarnationTsunami extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void calamityIncarnationTsunami(Player player) {
+    public void calamityIncarnationTsunami(Player player) {
         if (!player.level().isClientSide()) {
+            float damage = BeyonderUtil.getDamage(player).get(this);
             int x = player.getPersistentData().getInt("calamityIncarnationTsunami");
             if (x == 0) {
                 player.getPersistentData().putInt("calamityIncarnationTsunami", 200);

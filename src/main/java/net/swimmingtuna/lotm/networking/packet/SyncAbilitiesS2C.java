@@ -2,7 +2,7 @@ package net.swimmingtuna.lotm.networking.packet;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-import net.swimmingtuna.lotm.util.ClientAbilitiesData;
+import net.swimmingtuna.lotm.util.ClientData.ClientAbilitiesData;
 
 import java.util.HashMap;
 import java.util.Map;

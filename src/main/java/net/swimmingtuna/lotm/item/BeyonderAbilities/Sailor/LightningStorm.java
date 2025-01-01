@@ -15,6 +15,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -39,8 +40,9 @@ public class LightningStorm extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void lightningStorm(Player player) { //add logic to add persitatent data of targetX,
+    public void lightningStorm(Player player) { //add logic to add persitatent data of targetX,
         if (!player.level().isClientSide()) {
+            float damage = BeyonderUtil.getDamage(player).get(this);
             int sailorStormVec = player.getPersistentData().getInt("sailorStormVec");
             Vec3 lookVec = player.getLookAngle();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);

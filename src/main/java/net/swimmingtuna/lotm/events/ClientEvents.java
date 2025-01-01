@@ -11,7 +11,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.client.AbilityOverlay;
 import net.swimmingtuna.lotm.client.SpiritualityBarOverlay;
-import net.swimmingtuna.lotm.util.ClientShouldntRenderData;
+import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
+import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderSpiritWorldData;
 
 
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -35,8 +36,10 @@ public class ClientEvents {
     @OnlyIn(Dist.CLIENT)
     public static void livingRender(RenderLivingEvent.Pre<?, ?> event) {
         LivingEntity entity = event.getEntity();
-        if (ClientShouldntRenderData.getShouldntRender() &&
-                entity.getUUID().equals(ClientShouldntRenderData.getLivingUUID())) {
+        if (ClientShouldntRenderInvisibilityData.getShouldntRender() && entity.getUUID().equals(ClientShouldntRenderInvisibilityData.getLivingUUID())) {
+            event.setCanceled(true);
+        }
+        if (ClientShouldntRenderSpiritWorldData.getShouldntRender(entity.getUUID())) {
             event.setCanceled(true);
         }
     }

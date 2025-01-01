@@ -3,6 +3,7 @@ package net.swimmingtuna.lotm.entity;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -123,28 +124,16 @@ public class AqueousLightEntityPush extends AbstractHurtingProjectile {
         return false;
     }
 
-    public static void summonEntityWithSpeed(Vec3 direction, Vec3 initialVelocity, Vec3 eyePosition, double x, double y, double z, Player player) {
+    public static void summonEntityWithSpeed(Vec3 direction, Vec3 initialVelocity, Vec3 eyePosition, double x, double y, double z, Player player, float scale) {
         if (!player.level().isClientSide()) {
             AqueousLightEntityPush aqueousLightEntity = new AqueousLightEntityPush(player.level(), player, initialVelocity.x, initialVelocity.y, initialVelocity.z);
             aqueousLightEntity.setDeltaMovement(initialVelocity);
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(aqueousLightEntity);
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
-            scaleData.setScale(8.0f - sequence);
+            scaleData.setScale(scale);
             Vec3 lightPosition = eyePosition.add(direction.scale(2.0));
             aqueousLightEntity.setPos(lightPosition);
             aqueousLightEntity.setOwner(player);
             player.level().addFreshEntity(aqueousLightEntity);
-        }
-    }
-
-    public static void summonEntityWhip(Player player, LivingEntity entity) {
-        if (!player.level().isClientSide()) {
-            Vec3 direction = player.getViewVector(1.0f);
-            Vec3 initialVelocity = direction.scale(2.0);
-            AqueousLightEntityPush aqueousLightEntity = new AqueousLightEntityPush(player.level(), player, initialVelocity.x, initialVelocity.y, initialVelocity.z);
-            Vec3 eyePosition = player.getEyePosition(1.0f);
-            summonEntityWithSpeed(direction, initialVelocity, eyePosition, player.getX(), player.getY(), player.getZ(), player);
         }
     }
 
@@ -156,5 +145,8 @@ public class AqueousLightEntityPush extends AbstractHurtingProjectile {
                 this.discard();
             }
         }
+        ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
+        System.out.println("scale is " + scaleData.getScale());
+
     }
 }

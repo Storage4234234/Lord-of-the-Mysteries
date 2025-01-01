@@ -39,8 +39,9 @@ public class AquaticLifeManipulation extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void aquaticLifeManipulation(Player player) {
+    public void aquaticLifeManipulation(Player player) {
         if (!player.level().isClientSide()) {
+            float damage = BeyonderUtil.getDamage(player).get(this);
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int sequence = holder.getCurrentSequence();
             if (player.level().isClientSide()) {

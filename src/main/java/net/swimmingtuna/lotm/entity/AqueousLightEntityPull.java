@@ -122,30 +122,16 @@ public class AqueousLightEntityPull extends AbstractHurtingProjectile {
         return false;
     }
 
-    public static void summonEntityWithSpeed(Vec3 direction, Vec3 initialVelocity, Vec3 eyePosition, double x, double y, double z, Player player) {
+    public static void summonEntityWithSpeed(Vec3 direction, Vec3 initialVelocity, Vec3 eyePosition, double x, double y, double z, LivingEntity player, float scale) {
         if (!player.level().isClientSide()) {
             AqueousLightEntityPull aqueousLightEntity = new AqueousLightEntityPull(player.level(), player, initialVelocity.x, initialVelocity.y, initialVelocity.z);
             aqueousLightEntity.setDeltaMovement(initialVelocity);
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(aqueousLightEntity);
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
-            scaleData.setScale(8.0f - sequence);
+            scaleData.setScale(scale);
             Vec3 lightPosition = eyePosition.add(direction.scale(2.0));
             aqueousLightEntity.setPos(lightPosition);
             aqueousLightEntity.setOwner(player);
             player.level().addFreshEntity(aqueousLightEntity);
-        }
-    }
-
-    public static void summonEntityWhip(Player player, LivingEntity entity, boolean x) {
-        if (!player.level().isClientSide()) {
-            Vec3 direction = player.getViewVector(1.0f);
-            Vec3 initialVelocity = direction.scale(2.0);
-            AqueousLightEntityPull aqueousLightEntity = new AqueousLightEntityPull(player.level(), player, initialVelocity.x, initialVelocity.y, initialVelocity.z);
-            CompoundTag tag = aqueousLightEntity.getPersistentData();
-            x = tag.getBoolean("waterManipulationPull");
-            Vec3 eyePosition = player.getEyePosition(1.0f);
-            summonEntityWithSpeed(direction, initialVelocity, eyePosition, player.getX(), player.getY(), player.getZ(), player);
         }
     }
 

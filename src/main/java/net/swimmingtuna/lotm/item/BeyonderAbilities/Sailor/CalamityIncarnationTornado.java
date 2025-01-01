@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.entity.TornadoEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -36,9 +37,10 @@ public class CalamityIncarnationTornado extends SimpleAbilityItem {
     }
 
 
-    public static void calamityIncarnationTornado(Player player) {
+    public void calamityIncarnationTornado(Player player) {
         if (!player.level().isClientSide()) {
             TornadoEntity.summonCalamityTornado(player);
+            float damage = BeyonderUtil.getDamage(player).get(this);
             player.getPersistentData().putInt("calamityIncarnationTornado", 300);
         }
     }

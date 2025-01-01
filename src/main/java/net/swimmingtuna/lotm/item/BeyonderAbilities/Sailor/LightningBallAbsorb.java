@@ -15,6 +15,7 @@ import net.swimmingtuna.lotm.entity.LightningBallEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -48,11 +49,12 @@ public class LightningBallAbsorb extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
-    public static void lightningBallAbsorb(Player player) {
+    public void lightningBallAbsorb(Player player) {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             LightningBallEntity lightningBall = new LightningBallEntity(EntityInit.LIGHTNING_BALL.get(), player.level(), true);
             lightningBall.setSummoned(true);
+            float damage = BeyonderUtil.getDamage(player).get(this);
             lightningBall.setBallXRot((float) ((Math.random() * 20) - 10));
             lightningBall.setBallYRot((float) ((Math.random() * 20) - 10));
             lightningBall.setPos(player.getX(), player.getY() + 1.5, player.getZ());

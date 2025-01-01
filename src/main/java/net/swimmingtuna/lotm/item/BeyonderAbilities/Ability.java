@@ -30,4 +30,7 @@ public interface Ability {
     default double getEntityReach() {
         return 3.0f;
     }
+    default float getDamage() {
+        return 0.0f;
+    }
 }

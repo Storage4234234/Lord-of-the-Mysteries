@@ -11,6 +11,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -33,8 +34,9 @@ public class Hurricane extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private static void hurricane(Player pPlayer) {
+    private void hurricane(Player pPlayer) {
         if (!pPlayer.level().isClientSide()) {
+            float damage = BeyonderUtil.getDamage(pPlayer).get(this);
             pPlayer.getPersistentData().putInt("sailorHurricane", 600);
         }
     }

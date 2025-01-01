@@ -55,12 +55,11 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.*;
+import net.swimmingtuna.lotm.util.ClientData.ClientLeftclickCooldownData;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class BeyonderUtil {
 
@@ -796,6 +795,17 @@ public class BeyonderUtil {
             return playerMobEntity.getCurrentSequence();
         }
         return -1;
+    }
+    public static Map<Item, Float> getDamage(LivingEntity livingEntity) {
+        Map<Item, Float> damageMap = new HashMap<>();
+        int sequence = 0;
+        if (livingEntity instanceof Player player) {
+            sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
+        } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
+            sequence = playerMobEntity.getCurrentSequence();
+        }
+        damageMap.put(ItemInit.AQUEOUS_LIGHT_PUSH.get(), 8.0f - sequence);
+        return damageMap;
     }
 
 

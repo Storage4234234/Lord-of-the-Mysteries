@@ -2,7 +2,11 @@ package net.swimmingtuna.lotm.item;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -10,7 +14,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -18,7 +21,9 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.util.BeyonderUtil;
+import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
+import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderSpiritWorldPacketS2C;
+import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderSpiritWorldData;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 
 public class TestItem extends SimpleAbilityItem {
@@ -52,14 +57,15 @@ public class TestItem extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
-        Player player = pContext.getPlayer();
-        player.setHealth(10);
-        player.getPersistentData().putInt("wintryBladeSelf", 1000);
         return InteractionResult.SUCCESS;
     }
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
-        player.sendSystemMessage(Component.literal("Corruption value is " + interactionTarget.getPersistentData().getDouble("corruption")));
+        if (!player.level().isClientSide()) {
+            CompoundTag tag = player.getPersistentData();
+            interactionTarget.getPersistentData().putBoolean("inSpiritWorld", !interactionTarget.getPersistentData().getBoolean("inSpiritWorld"));
+            player.sendSystemMessage(Component.literal("tag put as " + interactionTarget.getPersistentData().getBoolean("inSpiritWorld")));
+        }
         return InteractionResult.SUCCESS;
     }
 
@@ -73,6 +79,10 @@ public class TestItem extends SimpleAbilityItem {
                     player.getCooldowns().removeCooldown(stack.getItem());
                 }
             }
+            boolean x = player.getPersistentData().getBoolean("inSpiritWorld");
+            player.getPersistentData().putBoolean("inSpiritWorld", !x);
+            player.sendSystemMessage(Component.literal("value is now " + x));
+
         }
 
         return InteractionResult.SUCCESS;

@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
-import net.swimmingtuna.lotm.util.ClientAbilitiesData;
+import net.swimmingtuna.lotm.util.ClientData.ClientAbilitiesData;
 
 import java.util.ArrayList;
 import java.util.List;

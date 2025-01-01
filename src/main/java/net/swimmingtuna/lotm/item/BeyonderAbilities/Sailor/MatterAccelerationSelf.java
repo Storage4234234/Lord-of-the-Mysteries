@@ -21,6 +21,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -49,6 +50,7 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
 
     public void matterAccelerationSelf(Player player) {
         Level level = player.level();
+        float damage = BeyonderUtil.getDamage(player).get(this);
         int blinkDistance = player.getPersistentData().getInt("tyrantSelfAcceleration");
         Vec3 lookVector = player.getLookAngle();
         BlockPos startPos = player.blockPosition();

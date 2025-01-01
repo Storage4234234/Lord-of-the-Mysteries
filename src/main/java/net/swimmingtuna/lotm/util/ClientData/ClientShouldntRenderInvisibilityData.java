@@ -1,8 +1,8 @@
-package net.swimmingtuna.lotm.util;
+package net.swimmingtuna.lotm.util.ClientData;
 
 import java.util.UUID;
 
-public class ClientShouldntRenderData {
+public class ClientShouldntRenderInvisibilityData {
     private static boolean shouldntRender;
     private static UUID livingUUID;  // Add this to store player ID
 

@@ -18,6 +18,7 @@ import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -54,6 +55,7 @@ public class MatterAccelerationBlocks extends SimpleAbilityItem {
 
     public static void matterAccelerationBlocks(Player player) {
         if (!player.level().isClientSide()) {
+
             player.getPersistentData().putInt("matterAccelerationBlockTimer", 480);
             Level level = player.level();
             BlockPos playerPos = player.blockPosition();
@@ -176,6 +178,7 @@ public class MatterAccelerationBlocks extends SimpleAbilityItem {
         return level.canSeeSky(pos.above()) || !level.getBlockState(pos.above()).isSolid();
     }
     public static void leftClick(Player player) {
+        float damage = BeyonderUtil.getDamage(player).get(ItemInit.MATTER_ACCELERATION_BLOCKS.get());
         int x = player.getPersistentData().getInt("matterAccelerationBlockTimer");
         if (x >= 1) {
             Vec3 lookDirection = player.getLookAngle().normalize().scale(20);

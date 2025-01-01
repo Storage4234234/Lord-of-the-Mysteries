@@ -63,7 +63,7 @@ public class CircleEntity extends AbstractHurtingProjectile {
     protected void onHitEntity(EntityHitResult result) {
         if (!this.level().isClientSide()) {
             if (result.getEntity() instanceof Player player) {
-                player.sendSystemMessage(Component.literal("working"));
+
             }
         }
     }

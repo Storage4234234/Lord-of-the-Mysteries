@@ -218,7 +218,6 @@ public class FalseProphecy extends SimpleAbilityItem {
             if (x >= 60) {
                 tag.putInt("falseProphecyShiftHarmful", 0);
                 tag.putInt("harmfulFalseProphecyShift", 0);
-                livingEntity.sendSystemMessage(Component.literal("Shift Harmful Activated"));
                 livingEntity.getPersistentData().putDouble("misfortune", livingEntity.getPersistentData().getDouble("misfortune") + 50);
             }
         }
@@ -247,7 +246,6 @@ public class FalseProphecy extends SimpleAbilityItem {
                 tag.putInt("falseProphecySprintHarmful", 0);
                 tag.putInt("harmfulFalseProphecySprint", 0);
                 livingEntity.hurt(BeyonderUtil.magicSource(livingEntity), 40);
-                livingEntity.sendSystemMessage(Component.literal("Sprint hurt"));
             }
         }
         if (harmfulJump >= 1) {
@@ -279,7 +277,6 @@ public class FalseProphecy extends SimpleAbilityItem {
             }
 
             if (tag.getInt("falseProphecyStandBeneficial") >= 100) {
-                livingEntity.sendSystemMessage(Component.literal("Worked"));
                 tag.putInt("falseProphecyStandBeneficial", 0);
                 tag.putInt("beneficialFalseProphecyStand", 0);
                 BeyonderUtil.applyMobEffect(livingEntity, MobEffects.ABSORPTION, 1200, 20, false, false);
