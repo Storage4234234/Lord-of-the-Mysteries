@@ -36,6 +36,8 @@ public class CathedralBuilderUtil {
     // Tick event listener
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (tickTasks.isEmpty()) return;
+
         if (event.phase == TickEvent.Phase.END) {
             tickCounter++;
 
