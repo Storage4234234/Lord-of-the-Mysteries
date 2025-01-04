@@ -52,7 +52,6 @@ public class MatterAccelerationEntities extends SimpleAbilityItem {
 
     public void matterAccelerationEntities(Player player) {
         if (!player.level().isClientSide()) {
-            float damage = BeyonderUtil.getDamage(player).get(this);
             AABB searchBox = player.getBoundingBox().inflate(300);
             for (Entity entity : player.level().getEntitiesOfClass(Entity.class, searchBox)) {
                 if (entity != player && (entity instanceof LivingEntity || entity instanceof Projectile)) {

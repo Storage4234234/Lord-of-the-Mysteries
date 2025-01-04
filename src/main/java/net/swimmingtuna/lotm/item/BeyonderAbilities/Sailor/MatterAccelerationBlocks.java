@@ -178,7 +178,6 @@ public class MatterAccelerationBlocks extends SimpleAbilityItem {
         return level.canSeeSky(pos.above()) || !level.getBlockState(pos.above()).isSolid();
     }
     public static void leftClick(Player player) {
-        float damage = BeyonderUtil.getDamage(player).get(ItemInit.MATTER_ACCELERATION_BLOCKS.get());
         int x = player.getPersistentData().getInt("matterAccelerationBlockTimer");
         if (x >= 1) {
             Vec3 lookDirection = player.getLookAngle().normalize().scale(20);

@@ -84,6 +84,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         return InteractionResult.PASS;
     }
 
+
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand usedHand) {
         if (!player.level().isClientSide()) {
@@ -206,4 +207,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         return useSpirituality(player, this.requiredSpirituality);
     }
 
+    public int getRequiredSequence() {
+        return this.requiredSequence;
+    }
 }

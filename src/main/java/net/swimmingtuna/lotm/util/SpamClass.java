@@ -2795,15 +2795,15 @@ public class SpamClass {
             int index = RANDOM.nextInt(monsterCorruptedWhispers().size());
             pPlayer.displayClientMessage(Component.literal(monsterCorruptedWhispers().get(index)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.DARK_RED),true);
         } else if (randomNumber <= 5) {
-            tag.putDouble("corruption", corruption + 4);
+            //tag.putDouble("corruption", corruption + 4);
             int index = RANDOM.nextInt(monsterSemiCorruptedWhispers().size());
             pPlayer.displayClientMessage(Component.literal(monsterSemiCorruptedWhispers().get(index)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED),true);
         } else if (randomNumber <= 12) {
-            tag.putDouble("corruption", corruption + 15);
+            //tag.putDouble("corruption", corruption + 15);
             int index = RANDOM.nextInt(monsterSlightyCorruptedWhispers().size());
             pPlayer.displayClientMessage(Component.literal(monsterSlightyCorruptedWhispers().get(index)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GRAY),true);
         } else {
-            tag.putDouble("corruption", corruption + 40);
+            //tag.putDouble("corruption", corruption + 40);
             int index = RANDOM.nextInt(monsterNonCorruptedWhispers().size());
             pPlayer.displayClientMessage(Component.literal(monsterNonCorruptedWhispers().get(index)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.WHITE),true);
         }

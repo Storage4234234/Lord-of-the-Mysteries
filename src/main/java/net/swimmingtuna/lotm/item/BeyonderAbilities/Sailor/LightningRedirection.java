@@ -78,7 +78,6 @@ public class LightningRedirection extends SimpleAbilityItem {
 
     private void lightningRedirection(Player player, BlockPos pos) {
         if (!player.level().isClientSide()) {
-            float damage = BeyonderUtil.getDamage(player).get(this);
             Level level = player.level();
             for (Entity entity : level.getEntitiesOfClass(Entity.class, player.getBoundingBox().inflate(200))) {
                 if (entity instanceof LightningEntity lightning) {
@@ -90,7 +89,6 @@ public class LightningRedirection extends SimpleAbilityItem {
     }
     private void lightningRedirectionEntity(Player player,LivingEntity interactionTarget) {
         if (!player.level().isClientSide()) {
-            float damage = BeyonderUtil.getDamage(player).get(this);
             Level level = player.level();
             for (Entity entity : level.getEntitiesOfClass(Entity.class, player.getBoundingBox().inflate(200))) {
                 if (entity instanceof LightningEntity lightning) {

@@ -8,6 +8,7 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
@@ -110,6 +111,7 @@ import virtuoel.pehkui.api.ScaleTypes;
 
 import java.lang.reflect.Method;
 import java.util.*;
+
 
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.ProbabilityManipulationWorldFortune.probabilityManipulationWorld;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.CalamityIncarnationTsunami.calamityIncarnationTsunamiTick;
@@ -1750,7 +1752,7 @@ public class ModEvents {
             if (entity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
             }
-            sendSpiritWorldPackets(entity);
+            //sendSpiritWorldPackets(entity);
             WintryBlade.wintryBladeTick(event);
             DeathKnell.deathKnellNegativeTick(entity);
             BattleHypnotism.untargetMobs(event);
@@ -2742,7 +2744,6 @@ public class ModEvents {
                 boolean sourceInSpiritWorld = sourceTag.getBoolean("inSpiritWorld");
                 if (entityInSpiritWorld != sourceInSpiritWorld) {
                     event.setCanceled(true);
-                    System.out.println("worked!!");
                 }
             }
             if (entity instanceof LivingEntity living) {
@@ -2839,6 +2840,13 @@ public class ModEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (event.isWasDeath() && event.getOriginal().getPersistentData().contains(AbilityRegisterCommand.REGISTERED_ABILITIES_KEY)) {
+            CompoundTag originalAbilities = event.getOriginal().getPersistentData().getCompound(AbilityRegisterCommand.REGISTERED_ABILITIES_KEY);
+            event.getEntity().getPersistentData().put(AbilityRegisterCommand.REGISTERED_ABILITIES_KEY, originalAbilities.copy());
+        }
+    }
 
     @SubscribeEvent
     public static void deathEvent(LivingDeathEvent event) {
@@ -3039,299 +3047,301 @@ public class ModEvents {
 
     public static void showMonsterParticles(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide() && livingEntity.tickCount % 100 == 0) {
-            for (LivingEntity entities : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(50))) {
-                if ((entities instanceof Player pPlayer && entities != livingEntity)) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                    if (holder.getCurrentSequence() <= 2 && holder.currentClassMatches(BeyonderClassInit.MONSTER)) {
-                        CompoundTag tag = livingEntity.getPersistentData();
-                        int cantUseAbility = tag.getInt("cantUseAbility");
-                        int meteor = tag.getInt("luckMeteor");
-                        int lotmLightning = tag.getInt("luckLightningLOTM");
-                        int paralysis = tag.getInt("luckParalysis");
-                        int unequipArmor = tag.getInt("luckUnequipArmor");
-                        int wardenSpawn = tag.getInt("luckWarden");
-                        int mcLightning = tag.getInt("luckLightningMC");
-                        int poison = tag.getInt("luckPoison");
-                        int tornadoInt = tag.getInt("luckTornado");
-                        int stone = tag.getInt("luckStone");
-                        int doubleDamage = tag.getInt("luckDoubleDamage");
-                        int calamityMeteor = tag.getInt("calamityMeteor");
-                        int calamityLightningStorm = tag.getInt("calamityLightningStorm");
-                        int calamityLightningBolt = tag.getInt("calamityLightningBolt");
-                        int calamityGroundTremor = tag.getInt("calamityGroundTremor");
-                        int calamityGaze = tag.getInt("calamityGaze");
-                        int calamityUndeadArmy = tag.getInt("calamityUndeadArmy");
-                        int calamityBabyZombie = tag.getInt("calamityBabyZombie");
-                        int calamityWindArmorRemoval = tag.getInt("calamityWindArmorRemoval");
-                        int calamityBreeze = tag.getInt("calamityBreeze");
-                        int calamityWave = tag.getInt("calamityWave");
-                        int calamityExplosion = tag.getInt("calamityExplosion");
-                        int calamityTornado = tag.getInt("calamityTornado");
-                        int ignoreDamage = tag.getInt("luckIgnoreDamage");
-                        int diamonds = tag.getInt("luckDiamonds");
-                        int regeneration = tag.getInt("luckRegeneration");
-                        int moveProjectiles = tag.getInt("windMovingProjectilesCounter");
-                        int halveDamage = tag.getInt("luckHalveDamage");
-                        int ignoreMobs = tag.getInt("luckIgnoreMobs");
-                        int luckAttackerPoisoned = tag.getInt("luckAttackerPoisoned");
-                        if (cantUseAbility >= 1) {
-                            for (int i = 0; i < cantUseAbility; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.CANT_USE_ABILITY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+            if (livingEntity instanceof ServerPlayer serverPlayer) {
+                for (LivingEntity entities : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(50))) {
+                    if (entities instanceof Player pPlayer && entities != livingEntity) {
+                        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
+                        if (holder.getCurrentSequence() <= 2 && holder.currentClassMatches(BeyonderClassInit.MONSTER)) {
+                            CompoundTag tag = livingEntity.getPersistentData();
+                            int cantUseAbility = tag.getInt("cantUseAbility");
+                            int meteor = tag.getInt("luckMeteor");
+                            int lotmLightning = tag.getInt("luckLightningLOTM");
+                            int paralysis = tag.getInt("luckParalysis");
+                            int unequipArmor = tag.getInt("luckUnequipArmor");
+                            int wardenSpawn = tag.getInt("luckWarden");
+                            int mcLightning = tag.getInt("luckLightningMC");
+                            int poison = tag.getInt("luckPoison");
+                            int tornadoInt = tag.getInt("luckTornado");
+                            int stone = tag.getInt("luckStone");
+                            int doubleDamage = tag.getInt("luckDoubleDamage");
+                            int calamityMeteor = tag.getInt("calamityMeteor");
+                            int calamityLightningStorm = tag.getInt("calamityLightningStorm");
+                            int calamityLightningBolt = tag.getInt("calamityLightningBolt");
+                            int calamityGroundTremor = tag.getInt("calamityGroundTremor");
+                            int calamityGaze = tag.getInt("calamityGaze");
+                            int calamityUndeadArmy = tag.getInt("calamityUndeadArmy");
+                            int calamityBabyZombie = tag.getInt("calamityBabyZombie");
+                            int calamityWindArmorRemoval = tag.getInt("calamityWindArmorRemoval");
+                            int calamityBreeze = tag.getInt("calamityBreeze");
+                            int calamityWave = tag.getInt("calamityWave");
+                            int calamityExplosion = tag.getInt("calamityExplosion");
+                            int calamityTornado = tag.getInt("calamityTornado");
+                            int ignoreDamage = tag.getInt("luckIgnoreDamage");
+                            int diamonds = tag.getInt("luckDiamonds");
+                            int regeneration = tag.getInt("luckRegeneration");
+                            int moveProjectiles = tag.getInt("windMovingProjectilesCounter");
+                            int halveDamage = tag.getInt("luckHalveDamage");
+                            int ignoreMobs = tag.getInt("luckIgnoreMobs");
+                            int luckAttackerPoisoned = tag.getInt("luckAttackerPoisoned");
+                            if (cantUseAbility >= 1) {
+                                for (int i = 0; i < cantUseAbility; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.CANT_USE_ABILITY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (meteor >= 1) {
-                            int particleCount = Math.max(1, (int) 20 - (meteor / 2));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.METEOR_CALAMITY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (meteor >= 1) {
+                                int particleCount = Math.max(1, (int) 20 - (meteor / 2));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.METEOR_CALAMITY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (lotmLightning >= 1) {
-                            int particleCount = Math.max(1, (int) 15 - (lotmLightning));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.LOTM_LIGHTNING_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (lotmLightning >= 1) {
+                                int particleCount = Math.max(1, (int) 15 - (lotmLightning));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.LOTM_LIGHTNING_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (paralysis >= 1) {
-                            int particleCount = Math.max(1, (int) 15 - (paralysis));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.TRIP_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (paralysis >= 1) {
+                                int particleCount = Math.max(1, (int) 15 - (paralysis));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.TRIP_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (unequipArmor >= 1) {
-                            int particleCount = (int) Math.max(1, (int) 20 - (unequipArmor));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.WIND_UNEQUIP_ARMOR_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (unequipArmor >= 1) {
+                                int particleCount = (int) Math.max(1, (int) 20 - (unequipArmor));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.WIND_UNEQUIP_ARMOR_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (wardenSpawn >= 1) {
-                            int particleCount = (int) Math.max(1, (int) 20 - (wardenSpawn / 1.5));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.WARDEN_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (wardenSpawn >= 1) {
+                                int particleCount = (int) Math.max(1, (int) 20 - (wardenSpawn / 1.5));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.WARDEN_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (mcLightning >= 1) {
-                            for (int i = 0; i < mcLightning; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.MC_LIGHTNING_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (mcLightning >= 1) {
+                                for (int i = 0; i < mcLightning; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.MC_LIGHTNING_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (poison >= 1) {
-                            int particleCount = (int) Math.max(1, (int) 20 - (poison / 0.75));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.POISON_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (poison >= 1) {
+                                int particleCount = (int) Math.max(1, (int) 20 - (poison / 0.75));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.POISON_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (tornadoInt >= 1) {
-                            int particleCount = (int) Math.max(1, (int) 20 - (tornadoInt * 0.75));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.TORNADO_CALAMITY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (tornadoInt >= 1) {
+                                int particleCount = (int) Math.max(1, (int) 20 - (tornadoInt * 0.75));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.TORNADO_CALAMITY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (stone >= 1) {
-                            int particleCount = (int) Math.max(1, (int) 20 - (tornadoInt / 0.5));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.FALLING_STONE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (stone >= 1) {
+                                int particleCount = (int) Math.max(1, (int) 20 - (tornadoInt / 0.5));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.FALLING_STONE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (doubleDamage >= 1) {
-                            for (int i = 0; i < doubleDamage; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.DOUBLE_DAMAGE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (doubleDamage >= 1) {
+                                for (int i = 0; i < doubleDamage; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.DOUBLE_DAMAGE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityMeteor >= 1) {
-                            int particleCount = (int) Math.max(1, (int) 20 - (calamityMeteor / 3.5));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.METEOR_CALAMITY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityMeteor >= 1) {
+                                int particleCount = (int) Math.max(1, (int) 20 - (calamityMeteor / 3.5));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.METEOR_CALAMITY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityLightningStorm >= 1) {
-                            int particleCount = (int) Math.max(1, (int) 20 - (calamityLightningStorm / 2.5));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.LIGHTNING_STORM_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityLightningStorm >= 1) {
+                                int particleCount = (int) Math.max(1, (int) 20 - (calamityLightningStorm / 2.5));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.LIGHTNING_STORM_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityLightningBolt >= 1) {
-                            int particleCount = Math.max(1, (int) 20 - (calamityLightningBolt * 2));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.LOTM_LIGHTNING_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityLightningBolt >= 1) {
+                                int particleCount = Math.max(1, (int) 20 - (calamityLightningBolt * 2));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.LOTM_LIGHTNING_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityGroundTremor >= 1) {
-                            int particleCount = Math.max(1, (int) 20 - (calamityGroundTremor / 2));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.GROUND_TREMOR_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityGroundTremor >= 1) {
+                                int particleCount = Math.max(1, (int) 20 - (calamityGroundTremor / 2));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.GROUND_TREMOR_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityGaze >= 1) {
-                            int particleCount = (int) Math.max(1, (int) 20 - (calamityGaze / 2.5));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.GOO_GAZE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityGaze >= 1) {
+                                int particleCount = (int) Math.max(1, (int) 20 - (calamityGaze / 2.5));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.GOO_GAZE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityUndeadArmy >= 1) {
-                            int particleCount = Math.max(1, (int) 20 - (calamityUndeadArmy));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.UNDEAD_ARMY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityUndeadArmy >= 1) {
+                                int particleCount = Math.max(1, (int) 20 - (calamityUndeadArmy));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.UNDEAD_ARMY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityBabyZombie >= 1) {
-                            int particleCount = Math.max(1, (int) 20 - (calamityBabyZombie));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.BABY_ZOMBIE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityBabyZombie >= 1) {
+                                int particleCount = Math.max(1, (int) 20 - (calamityBabyZombie));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.BABY_ZOMBIE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityWindArmorRemoval >= 1) {
-                            int particleCount = Math.max(1, (int) 20 - (calamityWindArmorRemoval / 2));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.WIND_UNEQUIP_ARMOR_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityWindArmorRemoval >= 1) {
+                                int particleCount = Math.max(1, (int) 20 - (calamityWindArmorRemoval / 2));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.WIND_UNEQUIP_ARMOR_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityBreeze >= 1) {
-                            int particleCount = (int) Math.max(1, (int) 20 - (calamityBreeze / 1.25));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.BREEZE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityBreeze >= 1) {
+                                int particleCount = (int) Math.max(1, (int) 20 - (calamityBreeze / 1.25));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.BREEZE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityWave >= 1) {
-                            int particleCount = (int) Math.max(1, (int) 20 - (calamityWave / 1.25));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.HEAT_WAVE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityWave >= 1) {
+                                int particleCount = (int) Math.max(1, (int) 20 - (calamityWave / 1.25));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.HEAT_WAVE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityExplosion >= 1) {
-                            int particleCount = Math.max(1, (int) 20 - (calamityExplosion / 3));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.EXPLOSION_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityExplosion >= 1) {
+                                int particleCount = Math.max(1, (int) 20 - (calamityExplosion / 3));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.EXPLOSION_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (calamityTornado >= 1) {
-                            int particleCount = (int) Math.max(1, (int) 20 - (calamityTornado / 3.5));
-                            for (int i = 0; i < particleCount; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.TORNADO_CALAMITY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (calamityTornado >= 1) {
+                                int particleCount = (int) Math.max(1, (int) 20 - (calamityTornado / 3.5));
+                                for (int i = 0; i < particleCount; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.TORNADO_CALAMITY_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (ignoreDamage >= 1) {
-                            for (int i = 0; i < ignoreDamage; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.IGNORE_DAMAGE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (ignoreDamage >= 1) {
+                                for (int i = 0; i < ignoreDamage; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.IGNORE_DAMAGE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (diamonds >= 1) {
-                            for (int i = 0; i < diamonds; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.DIAMOND_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (diamonds >= 1) {
+                                for (int i = 0; i < diamonds; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.DIAMOND_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (regeneration >= 1) {
-                            for (int i = 0; i < regeneration; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.REGENERATION_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (regeneration >= 1) {
+                                for (int i = 0; i < regeneration; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.REGENERATION_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (moveProjectiles >= 1) {
-                            for (int i = 0; i < moveProjectiles; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.WIND_MOVE_PROJECTILES_PARTICLES.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (moveProjectiles >= 1) {
+                                for (int i = 0; i < moveProjectiles; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.WIND_MOVE_PROJECTILES_PARTICLES.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (halveDamage >= 1) {
-                            for (int i = 0; i < halveDamage; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.HALF_DAMAGE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (halveDamage >= 1) {
+                                for (int i = 0; i < halveDamage; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.HALF_DAMAGE_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (ignoreMobs >= 1) {
-                            for (int i = 0; i < ignoreMobs; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.IGNORE_MOBS_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (ignoreMobs >= 1) {
+                                for (int i = 0; i < ignoreMobs; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.IGNORE_MOBS_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
-                        }
-                        if (luckAttackerPoisoned >= 1) {
-                            for (int i = 0; i < luckAttackerPoisoned; i++) {
-                                double offsetX = (Math.random() - 0.5) * 2;
-                                double offsetY = Math.random();
-                                double offsetZ = (Math.random() - 0.5) * 2;
-                                LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.ATTACKER_POISONED_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), (ServerPlayer) livingEntity);
+                            if (luckAttackerPoisoned >= 1) {
+                                for (int i = 0; i < luckAttackerPoisoned; i++) {
+                                    double offsetX = (Math.random() - 0.5) * 2;
+                                    double offsetY = Math.random();
+                                    double offsetZ = (Math.random() - 0.5) * 2;
+                                    LOTMNetworkHandler.sendToPlayer(new SendParticleS2C(ParticleInit.ATTACKER_POISONED_PARTICLE.get(), offsetX, offsetY, offsetZ, 0, 0, 0), serverPlayer);
+                                }
                             }
                         }
                     }
@@ -3944,6 +3954,42 @@ public class ModEvents {
 
         if (!updates.isEmpty()) {
             LOTMNetworkHandler.sendToAllPlayers(new BatchedSpiritWorldUpdatePacketS2C(updates));
+        }
+    }
+
+    public static void spiritWorldNoTarget(LivingEntity entity) {
+        if (!entity.level().isClientSide()) {
+
+            if (entity.tickCount % 20 == 0) {
+                for (Mob mob : entity.level().getEntitiesOfClass(Mob.class, entity.getBoundingBox().inflate(50))) {
+                    boolean inSpiritWorld = entity.getPersistentData().getBoolean("inSpiritWorld") == mob.getPersistentData().getBoolean("inSpiritWorld");
+                    if (inSpiritWorld) {
+                        if (mob.getTarget() == entity) {
+                            mob.setTarget(null);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void spiritWorldChangeTargetEvent(LivingChangeTargetEvent event) {
+        LivingEntity originalEntity = event.getEntity();
+        LivingEntity targetEntity = event.getNewTarget();
+        if (targetEntity != null) {
+            boolean inSpiritWorld = originalEntity.getPersistentData().getBoolean("inSpiritWorld") == targetEntity.getPersistentData().getBoolean("inSpiritWorld");
+            if (!inSpiritWorld) {
+                event.setCanceled(true);
+            }
+        }
+    }
+
+
+    @SubscribeEvent
+    public static void onEntityChangeTarget(LivingChangeTargetEvent event) {
+        LivingEntity originalEntity = event.getEntity();
+        if (!originalEntity.level().isClientSide()) {
+            //spiritWorldChangeTargetEvent(event);
         }
     }
 

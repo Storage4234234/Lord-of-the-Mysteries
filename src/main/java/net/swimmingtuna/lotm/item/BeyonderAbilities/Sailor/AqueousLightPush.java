@@ -44,9 +44,8 @@ public class AqueousLightPush extends SimpleAbilityItem {
             Vec3 eyePosition = player.getEyePosition(1.0f);
             Vec3 direction = player.getViewVector(1.0f);
             Vec3 initialVelocity = direction.scale(2.0);
-            float damage = BeyonderUtil.getDamage(player).get(this);
-            AqueousLightEntityPush.summonEntityWithSpeed(direction, initialVelocity, eyePosition, player.getX(), player.getY(), player.getZ(), player, BeyonderUtil.getDamage(player).get(this));
-            player.sendSystemMessage(Component.literal("damage is " + getDamage()));
+            float damage = 8.0f - BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
+            AqueousLightEntityPush.summonEntityWithSpeed(direction, initialVelocity, eyePosition, player.getX(), player.getY(), player.getZ(), player,damage);
         }
     }
 

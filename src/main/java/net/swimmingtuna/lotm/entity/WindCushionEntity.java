@@ -91,7 +91,6 @@ public class WindCushionEntity extends AbstractHurtingProjectile {
             scaleData.setTargetScale(2);
             scaleData.markForSync(true);
             player.level().addFreshEntity(windCushion);
-            player.sendSystemMessage(Component.literal("rotation is" + windCushion.getXRot() + "and" + windCushion.getYRot()));
         }
     }
 

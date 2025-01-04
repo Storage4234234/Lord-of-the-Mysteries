@@ -50,7 +50,6 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
 
     public void matterAccelerationSelf(Player player) {
         Level level = player.level();
-        float damage = BeyonderUtil.getDamage(player).get(this);
         int blinkDistance = player.getPersistentData().getInt("tyrantSelfAcceleration");
         Vec3 lookVector = player.getLookAngle();
         BlockPos startPos = player.blockPosition();

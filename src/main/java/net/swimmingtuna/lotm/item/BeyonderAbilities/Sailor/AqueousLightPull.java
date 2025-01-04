@@ -43,7 +43,7 @@ public class AqueousLightPull extends SimpleAbilityItem {
             Vec3 eyePosition = player.getEyePosition(1.0f);
             Vec3 direction = player.getViewVector(1.0f);
             Vec3 initialVelocity = direction.scale(2.0);
-            float damage = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
+            float damage = 8.0f - BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
             AqueousLightEntityPull.summonEntityWithSpeed(direction, initialVelocity, eyePosition, player.getX(), player.getY(), player.getZ(), player, damage);
         }
     }

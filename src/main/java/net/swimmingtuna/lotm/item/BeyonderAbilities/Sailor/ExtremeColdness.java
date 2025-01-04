@@ -40,7 +40,6 @@ public class ExtremeColdness extends SimpleAbilityItem {
 
     public void extremeColdness(Player player) {
         if (!player.level().isClientSide()) {
-            float damage = BeyonderUtil.getDamage(player).get(this);
             player.getPersistentData().putInt("sailorExtremeColdness", 1);
         }
     }

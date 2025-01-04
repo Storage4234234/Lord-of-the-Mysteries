@@ -42,7 +42,6 @@ public class LightningStorm extends SimpleAbilityItem {
 
     public void lightningStorm(Player player) { //add logic to add persitatent data of targetX,
         if (!player.level().isClientSide()) {
-            float damage = BeyonderUtil.getDamage(player).get(this);
             int sailorStormVec = player.getPersistentData().getInt("sailorStormVec");
             Vec3 lookVec = player.getLookAngle();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);

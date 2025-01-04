@@ -172,7 +172,7 @@ public class CorruptionAndLuckHandler {
                 }
                 if (corruption >= 90) {
                     if (Math.random() >= 0.15) {
-                        if (livingEntity instanceof Player player) {
+                        if (livingEntity instanceof Player player && !player.isCreative() ) {
                             int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
                             float maxHp = player.getMaxHealth();
                             if (sequence == 9 || sequence == 8) {
@@ -183,6 +183,8 @@ public class CorruptionAndLuckHandler {
                                 witherSkeleton.getPersistentData().putBoolean("corruptedEntityLow", true);
                                 BeyonderUtil.setTargetToHighestHP(witherSkeleton, 30);
                                 player.level().addFreshEntity(witherSkeleton);
+                                player.kill();
+                                player.sendSystemMessage(Component.literal("Your corruption value was too high, and you got turned into a corrupted entity"));
 
                             } else if (sequence == 7 || sequence == 6 || sequence == 5) {
                                 SkeletonHorse skeletonHorse = new SkeletonHorse(EntityType.SKELETON_HORSE, player.level());
@@ -200,6 +202,9 @@ public class CorruptionAndLuckHandler {
                                 skeleton.startRiding(skeletonHorse, true);
                                 player.level().addFreshEntity(skeletonHorse);
                                 player.level().addFreshEntity(skeleton);
+                                player.kill();
+                                player.sendSystemMessage(Component.literal("Your corruption value was too high, and you got turned into a corrupted entity"));
+
                             } else if (sequence == 4 || sequence == 3) {
                                 Vex vex = new Vex(EntityType.VEX, player.level());
                                 vex.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
@@ -209,6 +214,8 @@ public class CorruptionAndLuckHandler {
                                 vex.getPersistentData().putBoolean("corruptedEntitySaint", true);
                                 BeyonderUtil.setTargetToHighestHP(vex, 70);
                                 player.level().addFreshEntity(vex);
+                                player.kill();
+                                player.sendSystemMessage(Component.literal("Your corruption value was too high, and you got turned into a corrupted entity"));
                             } else if (sequence == 2 || sequence == 1) {
                                 Phantom phantom = new Phantom(EntityType.PHANTOM, player.level());
                                 phantom.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
@@ -218,7 +225,8 @@ public class CorruptionAndLuckHandler {
                                 phantom.getPersistentData().putBoolean("corruptedEntityAngel", true);
                                 BeyonderUtil.setTargetToHighestHP(phantom, 100);
                                 player.level().addFreshEntity(phantom);
-
+                                player.kill();
+                                player.sendSystemMessage(Component.literal("Your corruption value was too high, and you got turned into a corrupted entity"));
                             } else if (sequence == 0) {
                                 WitherBoss wither = new WitherBoss(EntityType.WITHER, player.level());
                                 wither.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
@@ -228,6 +236,8 @@ public class CorruptionAndLuckHandler {
                                 wither.getPersistentData().putBoolean("corruptedEntityDeity", true);
                                 BeyonderUtil.setTargetToHighestHP(wither, 150);
                                 player.level().addFreshEntity(wither);
+                                player.kill();
+                                player.sendSystemMessage(Component.literal("Your corruption value was too high, and you got turned into a corrupted entity"));
                             }
                         } else if (livingEntity instanceof PlayerMobEntity player) {
                             int sequence = player.getCurrentSequence();
@@ -240,7 +250,7 @@ public class CorruptionAndLuckHandler {
                                 witherSkeleton.getPersistentData().putBoolean("corruptedEntityLow", true);
                                 BeyonderUtil.setTargetToHighestHP(witherSkeleton, 30);
                                 player.level().addFreshEntity(witherSkeleton);
-
+                                player.kill();
                             } else if (sequence == 7 || sequence == 6 || sequence == 5) {
                                 SkeletonHorse skeletonHorse = new SkeletonHorse(EntityType.SKELETON_HORSE, player.level());
                                 skeletonHorse.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
@@ -257,6 +267,7 @@ public class CorruptionAndLuckHandler {
                                 skeleton.startRiding(skeletonHorse, true);
                                 player.level().addFreshEntity(skeletonHorse);
                                 player.level().addFreshEntity(skeleton);
+                                player.kill();
                             } else if (sequence == 4 || sequence == 3) {
                                 Vex vex = new Vex(EntityType.VEX, player.level());
                                 vex.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
@@ -266,6 +277,7 @@ public class CorruptionAndLuckHandler {
                                 vex.getPersistentData().putBoolean("corruptedEntitySaint", true);
                                 BeyonderUtil.setTargetToHighestHP(vex, 70);
                                 player.level().addFreshEntity(vex);
+                                player.kill();
                             } else if (sequence == 2 || sequence == 1) {
                                 Phantom phantom = new Phantom(EntityType.PHANTOM, player.level());
                                 phantom.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
@@ -275,7 +287,7 @@ public class CorruptionAndLuckHandler {
                                 phantom.getPersistentData().putBoolean("corruptedEntityAngel", true);
                                 BeyonderUtil.setTargetToHighestHP(phantom, 100);
                                 player.level().addFreshEntity(phantom);
-
+                                player.kill();
                             } else if (sequence == 0) {
                                 WitherBoss wither = new WitherBoss(EntityType.WITHER, player.level());
                                 wither.getAttribute(Attributes.MAX_HEALTH).setBaseValue(maxHp);
@@ -285,6 +297,7 @@ public class CorruptionAndLuckHandler {
                                 wither.getPersistentData().putBoolean("corruptedEntityDeity", true);
                                 BeyonderUtil.setTargetToHighestHP(wither, 150);
                                 player.level().addFreshEntity(wither);
+                                player.kill();
                             }
                         } else {
                             int sequence = -1;

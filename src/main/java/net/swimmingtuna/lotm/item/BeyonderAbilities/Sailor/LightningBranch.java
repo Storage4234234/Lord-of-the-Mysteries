@@ -53,7 +53,6 @@ public class LightningBranch extends SimpleAbilityItem {
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         int sequence = holder.getCurrentSequence();
         if (!player.level().isClientSide()) {
-            float damage = BeyonderUtil.getDamage(player).get(this);
             Vec3 lookVec = player.getLookAngle();
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());
             lightningEntity.setSpeed(5.0f);

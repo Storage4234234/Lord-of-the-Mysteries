@@ -29,7 +29,7 @@ import java.util.Map;
 
 public class AbilityRegisterCommand {
 
-    private static final String REGISTERED_ABILITIES_KEY = "RegisteredAbilities";
+    public static final String REGISTERED_ABILITIES_KEY = "RegisteredAbilities";
     private static final Map<String, Integer> COMBINATION_MAP = new HashMap<>();
     private static final Map<String, String> abilitiesToSync = new HashMap<>();
 

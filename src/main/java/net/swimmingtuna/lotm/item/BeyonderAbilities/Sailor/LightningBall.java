@@ -53,7 +53,6 @@ public class LightningBall extends SimpleAbilityItem {
 
     public void lightningBall(Player player) {
         if (!player.level().isClientSide()) {
-            float damage = BeyonderUtil.getDamage(player).get(this);
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             LightningBallEntity lightningBall = new LightningBallEntity(EntityInit.LIGHTNING_BALL.get(), player.level(), true);
             lightningBall.setSummoned(true);

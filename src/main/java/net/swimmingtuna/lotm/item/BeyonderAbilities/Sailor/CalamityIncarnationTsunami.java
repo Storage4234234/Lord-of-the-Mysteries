@@ -40,7 +40,6 @@ public class CalamityIncarnationTsunami extends SimpleAbilityItem {
 
     public void calamityIncarnationTsunami(Player player) {
         if (!player.level().isClientSide()) {
-            float damage = BeyonderUtil.getDamage(player).get(this);
             int x = player.getPersistentData().getInt("calamityIncarnationTsunami");
             if (x == 0) {
                 player.getPersistentData().putInt("calamityIncarnationTsunami", 200);

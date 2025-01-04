@@ -41,7 +41,6 @@ public class AcidicRain extends SimpleAbilityItem {
 
     private void acidicRain(Player player) {
         if (!player.level().isClientSide()) {
-            float damage = BeyonderUtil.getDamage(player).get(this);
             player.getPersistentData().putInt("sailorAcidicRain", 1);
         }
     }

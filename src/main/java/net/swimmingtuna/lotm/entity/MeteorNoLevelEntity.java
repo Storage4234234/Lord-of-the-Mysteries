@@ -149,12 +149,8 @@ public class MeteorNoLevelEntity extends AbstractHurtingProjectile {
         if (!player.level().isClientSide()) {
             double scatterRadius = 100.0;
             double randomX, randomY, randomZ;
-
-            // Calculate the target position based on the player's look angle
             Vec3 lookVec = player.getLookAngle().normalize().scale(100);
             Vec3 targetPos = player.getEyePosition().add(lookVec);
-
-            // Randomize the position within the scatter radius
             randomX = Math.random() * scatterRadius * 2 - scatterRadius;
             randomY = Math.random() * scatterRadius * 2 - scatterRadius;
             randomZ = Math.random() * scatterRadius * 2 - scatterRadius;
@@ -162,40 +158,33 @@ public class MeteorNoLevelEntity extends AbstractHurtingProjectile {
             // Set the meteor spawn position
             BlockPos meteorSpawnPos = new BlockPos(
                     (int) (player.getX() + randomX),
-                    (int) (player.getY() + (Math.random() * 300) - 150),
+                    (int) (player.getY() + (Math.max(150,(Math.random() * 500) - 150))),
                     (int) (player.getZ() + randomZ)
             );
-
-            // Create and configure the meteor entity
             MeteorNoLevelEntity meteorEntity = new MeteorNoLevelEntity(EntityInit.METEOR_NO_LEVEL_ENTITY.get(), player.level());
             meteorEntity.teleportTo(meteorSpawnPos.getX(), meteorSpawnPos.getY(), meteorSpawnPos.getZ());
             meteorEntity.setOwner(player);
             meteorEntity.noPhysics = true;
 
-            // Set the scale of the meteor based on the player's sequence
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int scalecheck = 10 - holder.getCurrentSequence() * 4;
+            int scalecheck = 10 - holder.getCurrentSequence() * 2;
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(meteorEntity);
             scaleData.setScale(scalecheck);
             scaleData.markForSync(true);
 
-            // Adjust the target position by adding some randomness within a 70-block radius
             Vec3 randomizedTargetPos = targetPos.add(
-                    (Math.random() * 140 - 70),  // Random X offset within -70 to +70
-                    (Math.random() * 140 - 70),  // Random Y offset within -70 to +70
-                    (Math.random() * 140 - 70)   // Random Z offset within -70 to +70
+                    (Math.random() * 140 - 70),
+                    (Math.random() * 140 - 70),
+                    (Math.random() * 140 - 70)
             );
-
-            // Calculate the direction and set the meteor's movement speed
             Vec3 meteorPos = meteorEntity.position();
             Vec3 directionToTarget = randomizedTargetPos.subtract(meteorPos).normalize();
             double speed = 4.0;
             meteorEntity.setDeltaMovement(directionToTarget.scale(speed));
-
-            // Spawn the meteor entity in the world
             player.level().addFreshEntity(meteorEntity);
         }
     }
+
     @Override
     public void tick() {
         super.tick();

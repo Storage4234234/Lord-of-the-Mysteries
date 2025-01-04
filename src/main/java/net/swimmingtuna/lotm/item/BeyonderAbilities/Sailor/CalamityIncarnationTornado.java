@@ -40,7 +40,6 @@ public class CalamityIncarnationTornado extends SimpleAbilityItem {
     public void calamityIncarnationTornado(Player player) {
         if (!player.level().isClientSide()) {
             TornadoEntity.summonCalamityTornado(player);
-            float damage = BeyonderUtil.getDamage(player).get(this);
             player.getPersistentData().putInt("calamityIncarnationTornado", 300);
         }
     }

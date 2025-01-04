@@ -36,7 +36,6 @@ public class Hurricane extends SimpleAbilityItem {
 
     private void hurricane(Player pPlayer) {
         if (!pPlayer.level().isClientSide()) {
-            float damage = BeyonderUtil.getDamage(pPlayer).get(this);
             pPlayer.getPersistentData().putInt("sailorHurricane", 600);
         }
     }

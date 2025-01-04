@@ -54,7 +54,6 @@ public class LightningBallAbsorb extends SimpleAbilityItem {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             LightningBallEntity lightningBall = new LightningBallEntity(EntityInit.LIGHTNING_BALL.get(), player.level(), true);
             lightningBall.setSummoned(true);
-            float damage = BeyonderUtil.getDamage(player).get(this);
             lightningBall.setBallXRot((float) ((Math.random() * 20) - 10));
             lightningBall.setBallYRot((float) ((Math.random() * 20) - 10));
             lightningBall.setPos(player.getX(), player.getY() + 1.5, player.getZ());

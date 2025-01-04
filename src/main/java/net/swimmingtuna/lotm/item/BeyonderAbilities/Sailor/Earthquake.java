@@ -37,7 +37,6 @@ public class Earthquake extends SimpleAbilityItem {
 
     public void earthquake(Player player) {
         if (!player.level().isClientSide()) {
-            float damage = BeyonderUtil.getDamage(player).get(this);
             player.getPersistentData().putInt("sailorEarthquake", 200);
         }
     }
