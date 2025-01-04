@@ -664,6 +664,11 @@ public class CorruptionAndLuckHandler {
                             tag.putInt("calamityLightningStorm", (int) Math.max(15, Math.random() * 50));
                         }
                     }
+                    if (sequence <= 6 && sequence >= 5 && pPlayer.tickCount % 500 == 0) {
+                        if (!tag.getBoolean("monsterCalamityAttraction")) {
+                            tag.putBoolean("monsterCalamityAttraction", true);
+                        }
+                    }
 
                     if (sequence <= 6 && livingEntity.tickCount % 20 == 0 && !livingEntity.level().isClientSide()) {
                         int calamityMeteor = tag.getInt("calamityMeteor");
