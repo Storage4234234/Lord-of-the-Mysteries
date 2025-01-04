@@ -246,6 +246,7 @@ public class ModEvents {
         {
             FateReincarnation.monsterReincarnationChecker(player);
         }
+            monsterDangerSense(playerPersistentData, holder, player);
         {
             decrementMonsterAttackEvent(player);
         }
@@ -893,7 +894,9 @@ public class ModEvents {
         if (mindscapeAbilities >= 1) {
             holder.setSpirituality(holder.getMaxSpirituality());
             if (!playerPersistentData.getBoolean("CAN_FLY")) {
-                dreamIntoReality.setBaseValue(3);
+                if (dreamIntoReality != null) {
+                    dreamIntoReality.setBaseValue(3);
+                }
                 playerAbilities.setFlyingSpeed(0.1F);
                 playerAbilities.mayfly = true;
                 player.onUpdateAbilities();
@@ -904,7 +907,9 @@ public class ModEvents {
             }
         }
         if (mindscapeAbilities == 1 && !playerPersistentData.getBoolean("CAN_FLY")) {
-            dreamIntoReality.setBaseValue(1);
+            if (dreamIntoReality != null) {
+                dreamIntoReality.setBaseValue(1);
+            }
             playerAbilities.setFlyingSpeed(0.05F);
             playerAbilities.mayfly = false;
             player.onUpdateAbilities();
@@ -1035,7 +1040,7 @@ public class ModEvents {
                     }
                 }
             }
-            if (sailorEarthquake >= 0) {
+            if (sailorEarthquake >= 1) {
                 player.getPersistentData().putInt("sailorEarthquake", sailorEarthquake - 1);
             }
         }
