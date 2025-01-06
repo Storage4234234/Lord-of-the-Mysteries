@@ -3359,7 +3359,7 @@ public class ModEvents {
         Level level = player.level();
         for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(100))) {
             boolean bothInSameDimension = projectile.getPersistentData().getBoolean("inSpiritWorld") == player.getPersistentData().getBoolean("inSpiritWorld");
-            if (bothInSameDimension) {
+            //if (bothInSameDimension) {
                 List<Vec3> trajectory = predictProjectileTrajectory(projectile, player);
                 float scale = ScaleTypes.BASE.getScaleData(projectile).getScale();
                 double maxDistance = 20 * scale;
@@ -3372,7 +3372,7 @@ public class ModEvents {
                     }
                 }
             }
-        }
+        //}
     }
 
     public static void drawParticleLine(ServerLevel level, ServerPlayer player, List<Vec3> points) {
@@ -4005,10 +4005,10 @@ public class ModEvents {
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        SpiritWorldVisibilityTracker.removePlayer(event.getEntity().getUUID());
-    }
+    //@SubscribeEvent
+    //public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+    //    SpiritWorldVisibilityTracker.removePlayer(event.getEntity().getUUID());
+    //}
 
 
 }

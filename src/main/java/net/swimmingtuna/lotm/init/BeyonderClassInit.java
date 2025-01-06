@@ -8,7 +8,6 @@ import net.minecraftforge.registries.RegistryObject;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.beyonder.*;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
-
 import java.util.function.Supplier;
 
 public class BeyonderClassInit {

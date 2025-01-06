@@ -39,6 +39,8 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.*;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
@@ -67,7 +69,7 @@ public class BeyonderUtil {
         if (player.level().isClientSide()) {
             return null;
         }
-        List<Projectile> projectiles = player.level().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(30));
+        List<Projectile> projectiles = player.level().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(50));
         for (Projectile projectile : projectiles) {
             if (projectile.getOwner() == player && projectile.tickCount > 8 && projectile.tickCount < 50) {
                 return projectile;
@@ -608,7 +610,9 @@ public class BeyonderUtil {
         if (ClientLeftclickCooldownData.getCooldown() > 0) {
             return;
         }
-        LOTMNetworkHandler.sendToServer(new RequestCooldownSetC2S());
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            LOTMNetworkHandler.sendToServer(new RequestCooldownSetC2S());
+        }
         if (!heldItem.isEmpty()) {
             if (heldItem.getItem() instanceof MonsterDomainTeleporation) {
                 LOTMNetworkHandler.sendToServer(new MonsterLeftClickC2S());
@@ -622,26 +626,6 @@ public class BeyonderUtil {
             } else if (heldItem.getItem() instanceof AqueousLightDrown) {
                 pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.AQUEOUS_LIGHT_PUSH.get())));
                 heldItem.shrink(1);
-            } else if (heldItem.getItem() instanceof Hurricane) {
-                CompoundTag tag = pPlayer.getPersistentData();
-                boolean sailorHurricaneRain = tag.getBoolean("sailorHurricaneRain");
-                if (sailorHurricaneRain) {
-                    pPlayer.displayClientMessage(Component.literal("Hurricane will only cause rain").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
-                    tag.putBoolean("sailorHurricaneRain", false);
-                } else {
-                    pPlayer.displayClientMessage(Component.literal("Hurricane cause lightning, tornadoes, and rain").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
-                    tag.putBoolean("sailorHurricaneRain", true);
-                }
-            } else if (heldItem.getItem() instanceof LightningStorm) {
-                CompoundTag tag = pPlayer.getPersistentData();
-                double distance = tag.getDouble("sailorLightningStormDistance");
-                tag.putDouble("sailorLightningStormDistance", (int) (distance + 30));
-                pPlayer.sendSystemMessage(Component.literal("Storm Radius Is" + distance).withStyle(style));
-                if (distance > 300) {
-                    tag.putDouble("sailorLightningStormDistance", 0);
-                }
-
-
             } else if (heldItem.getItem() instanceof MatterAccelerationBlocks) {
                 MatterAccelerationBlocks.leftClick(pPlayer);
             } else if (heldItem.getItem() instanceof MatterAccelerationEntities) {

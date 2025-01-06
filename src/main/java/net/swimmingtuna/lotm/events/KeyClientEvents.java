@@ -42,6 +42,7 @@ public class KeyClientEvents {
             }
         }
 
+        @OnlyIn(Dist.CLIENT)
         @SubscribeEvent
         public static void onFogDensityEvent(ViewportEvent.RenderFog event) {
             Player player = Minecraft.getInstance().player;

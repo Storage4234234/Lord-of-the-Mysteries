@@ -144,7 +144,6 @@ public class LOTMNetworkHandler {
                 .encoder(RequestCooldownSetC2S::toByte)
                 .consumerMainThread(RequestCooldownSetC2S::handle)
                 .add();
-
         INSTANCE.messageBuilder(SendParticleS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SendParticleS2C::new)
                 .encoder(SendParticleS2C::encode)

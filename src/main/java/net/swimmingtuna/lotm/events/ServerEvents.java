@@ -10,6 +10,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -234,13 +236,6 @@ public class ServerEvents {
                 }
                 event.setCanceled(true);
             }
-        }
-    }
-    @SubscribeEvent
-    public static void zoomEvent(ViewportEvent.ComputeFov event) {
-        Player player = event.getRenderer().getMinecraft().player;
-        if (player != null && player.getMainHandItem().getItem() instanceof DeathKnell && player.isShiftKeyDown()) {
-            event.setFOV(event.getFOV() * (1 - 0.5f));
         }
     }
 }
