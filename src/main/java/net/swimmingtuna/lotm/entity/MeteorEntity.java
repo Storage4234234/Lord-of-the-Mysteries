@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -82,7 +81,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
                 if (hitPos.getX() > this.getOwner().getX()) {
                     return;
                 } else {
-                    this.explodeMeteorBlock(hitPos,radius,scale);
+                    this.explodeMeteorBlock(hitPos, radius, scale);
                 }
             }
             explodeMeteorBlock(hitPos, radius, scale);
@@ -145,7 +144,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
             // Set the meteor spawn position
             BlockPos meteorSpawnPos = new BlockPos(
                     (int) (player.getX() + randomX),
-                    (int) (player.getY() + (Math.max(150,(Math.random() * 500) - 150))),
+                    (int) (player.getY() + (Math.max(150, (Math.random() * 500) - 150))),
                     (int) (player.getZ() + randomZ)
             );
             MeteorEntity meteorEntity = new MeteorEntity(EntityInit.METEOR_ENTITY.get(), player.level());
@@ -226,6 +225,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
             }
         }
     }
+
     public void explodeMeteorBlock(BlockPos hitPos, double radius, float scale) {
         for (BlockPos pos : BlockPos.betweenClosed(
                 hitPos.offset((int) -radius, (int) -radius, (int) -radius),
@@ -273,7 +273,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
                         this.getX() + offsetX,
                         this.getY() + offsetY,
                         this.getZ() + offsetZ,
-                        0, 0.0, 0.0,0,0);
+                        0, 0.0, 0.0, 0, 0);
             }
 
             // Spawn 20 fire particles randomly spread within a 10-block radius
@@ -295,9 +295,9 @@ public class MeteorEntity extends AbstractHurtingProjectile {
                     this.teleportTo(livingEntity.getX(), livingEntity.getY() + 1 * scale, livingEntity.getZ());
                     this.setDeltaMovement(lookVec.x, -1, lookVec.z);
                     this.hurtMarked = true;
-                }
-                if (livingEntity.onGround()) {
-                    tag.putInt("calamityIncarnationInMeteor", 1);
+                    if (livingEntity.onGround()) {
+                        tag.putInt("calamityIncarnationInMeteor", 1);
+                    }
                 }
             }
             if (this.tickCount >= 400) {

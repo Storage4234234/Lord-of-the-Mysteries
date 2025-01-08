@@ -19,8 +19,10 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +43,7 @@ public class MentalPlague extends SimpleAbilityItem {
         }
         useSpirituality(player);
         mentalPlauge(interactionTarget);
-        addCooldown(player, this, 200 / (int) player.getAttribute(ModAttributes.DIR.get()).getValue());
+        addCooldown(player, this,  (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MENTAL_PLAGUE.get()));
         return InteractionResult.SUCCESS;
     }
 

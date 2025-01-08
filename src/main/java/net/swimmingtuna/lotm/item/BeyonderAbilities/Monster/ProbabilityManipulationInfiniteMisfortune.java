@@ -22,7 +22,9 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -92,26 +94,10 @@ public class ProbabilityManipulationInfiniteMisfortune extends SimpleAbilityItem
 
     public static void giveInfiniteMisfortune(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
-            livingEntity.getPersistentData().putInt("probabilityManipulationInfiniteMisfortune", 3600);
+            livingEntity.getPersistentData().putInt("probabilityManipulationInfiniteMisfortune", (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.PROBABILITYINFINITEMISFORTUNE.get()));
         }
     }
 
-    public static void infiniteFortuneMisfortuneTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity entity = event.getEntity();
-        if (!entity.level().isClientSide()) {
-            CompoundTag tag = entity.getPersistentData();
-            int x = tag.getInt("probabilityManipulationInfiniteMisfortune");
-            int y = tag.getInt("probabilityManipulationInfiniteFortune");
-            if (x >= 1) {
-                tag.putInt("probabilityManipulationInfiniteMisfortune", x - 1);
-                tag.putDouble("misfortune", 777);
-            }
-            if (y >= 1) {
-                tag.putInt("probabilityManipulationInfiniteFortune", y - 1);
-                tag.putDouble("luck", 777);
-            }
-        }
-    }
 
     public static void testEvent(LivingEvent.LivingTickEvent event) {
         LivingEntity livingEntity = event.getEntity();

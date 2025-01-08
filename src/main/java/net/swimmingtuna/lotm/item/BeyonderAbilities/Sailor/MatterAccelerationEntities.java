@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +53,7 @@ public class MatterAccelerationEntities extends SimpleAbilityItem {
 
     public void matterAccelerationEntities(Player player) {
         if (!player.level().isClientSide()) {
-            AABB searchBox = player.getBoundingBox().inflate(300);
+            AABB searchBox = player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.MATTER_ACCELERATION_ENTITIES.get()));
             for (Entity entity : player.level().getEntitiesOfClass(Entity.class, searchBox)) {
                 if (entity != player && (entity instanceof LivingEntity || entity instanceof Projectile)) {
                     Vec3 currentMovement = entity.getDeltaMovement();

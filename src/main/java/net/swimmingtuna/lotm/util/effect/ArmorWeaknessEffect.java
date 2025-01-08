@@ -26,5 +26,10 @@ public class ArmorWeaknessEffect extends MobEffect {
     public boolean isDurationEffectTick(int duration, int amplifier) {
         return duration > 0;
     }
+
+    @Override
+    public boolean isBeneficial() {
+        return false;
+    }
 }
 

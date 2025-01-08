@@ -34,6 +34,7 @@ import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.entity.TornadoEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
@@ -123,13 +124,13 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
                 tornadoEntity.setTornadoLifecount(400 - (holder.getCurrentSequence() * 60));
                 tornadoEntity.setOwner(player);
                 tornadoEntity.setTornadoPickup(true);
-                tornadoEntity.setTornadoRadius(50 - (holder.getCurrentSequence() * 8));
-                tornadoEntity.setTornadoHeight(80 - (holder.getCurrentSequence() * 10));
+                tornadoEntity.setTornadoRadius((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) * 4);
+                tornadoEntity.setTornadoHeight((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) * 8);
                 tornadoEntity.teleportTo(interactionTarget.getX(), interactionTarget.getY(), interactionTarget.getZ());
                 player.level().addFreshEntity(tornadoEntity);
             }  else
             if (misfortuneManipulation == 3) {
-                interactionTarget.getPersistentData().putInt("sailorLightningStorm1", 200 - (holder.getCurrentSequence() * 25));
+                interactionTarget.getPersistentData().putInt("sailorLightningStorm1", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) * 15);
                 interactionTarget.getPersistentData().putInt("sailorStormVecX1", (int) interactionTarget.getX());
                 interactionTarget.getPersistentData().putInt("sailorStormVecY1", (int) interactionTarget.getY());
                 interactionTarget.getPersistentData().putInt("sailorStormVecZ1", (int) interactionTarget.getZ());
@@ -137,7 +138,7 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
             if (misfortuneManipulation == 4) {
                 LightningEntity lightning = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), interactionTarget.level());
                 lightning.setSpeed(5.0f);
-                lightning.setDamage(12);
+                lightning.setDamage((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()));
                 lightning.setTargetEntity(interactionTarget);
                 lightning.setMaxLength(120);
                 lightning.setNewStartPos(new Vec3(interactionTarget.getX(), interactionTarget.getY() + 80, interactionTarget.getZ()));
@@ -146,7 +147,7 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
                 player.level().addFreshEntity(lightning);
             }  else
             if (misfortuneManipulation == 5) {
-                for (Mob mob : interactionTarget.level().getEntitiesOfClass(Mob.class, interactionTarget.getBoundingBox().inflate(60 - (holder.getCurrentSequence() * 10)))) {
+                for (Mob mob : interactionTarget.level().getEntitiesOfClass(Mob.class, interactionTarget.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) * 4))) {
                     if (mob.getTarget() != interactionTarget) {
                         mob.setTarget(interactionTarget);
                         mob.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 2, false, false));
@@ -154,37 +155,37 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
                 }
             }  else
             if (misfortuneManipulation == 6) {
-                tag.putInt("luckDoubleDamage", tag.getInt("luckDoubleDamage") + 5 - holder.getCurrentSequence());
+                tag.putInt("luckDoubleDamage", tag.getInt("luckDoubleDamage") + (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) / 3);
             } else
             if (misfortuneManipulation == 7) {
                 Random random = new Random();
                 List<EquipmentSlot> armorSlots = Arrays.asList(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET);
                 List<EquipmentSlot> equippedArmor = armorSlots.stream()
-                        .filter(slot -> !player.getItemBySlot(slot).isEmpty())
+                        .filter(slot -> !interactionTarget.getItemBySlot(slot).isEmpty())
                         .toList();
                 if (!equippedArmor.isEmpty()) {
                     EquipmentSlot randomArmorSlot = equippedArmor.get(random.nextInt(equippedArmor.size()));
-                    ItemStack armorPiece = player.getItemBySlot(randomArmorSlot);
-                    player.spawnAtLocation(armorPiece);
-                    player.setItemSlot(randomArmorSlot, ItemStack.EMPTY);
+                    ItemStack armorPiece = interactionTarget.getItemBySlot(randomArmorSlot);
+                    interactionTarget.spawnAtLocation(armorPiece);
+                    interactionTarget.setItemSlot(randomArmorSlot, ItemStack.EMPTY);
                 }
             } else
             if (misfortuneManipulation == 8) {
                 tag.putInt("luckIgnoreAbility", tag.getInt("luckIgnoreAbility") + 1);
             } else
             if (misfortuneManipulation == 9) {
-                BeyonderUtil.applyMobEffect(interactionTarget, MobEffects.POISON, 300 - (holder.getCurrentSequence() * 40), 4, true, true);
+                BeyonderUtil.applyMobEffect(interactionTarget, MobEffects.POISON, (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) * 20, 4, true, true);
             } else
             if (misfortuneManipulation == 10) {
-                tag.putInt("monsterMisfortuneManipulationGravity", 300);
+                tag.putInt("monsterMisfortuneManipulationGravity", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) * 20);
             } else
             if (misfortuneManipulation == 11) {
-                for (PlayerMobEntity playerMobEntity : interactionTarget.level().getEntitiesOfClass(PlayerMobEntity.class, interactionTarget.getBoundingBox().inflate(300))) {
+                for (PlayerMobEntity playerMobEntity : interactionTarget.level().getEntitiesOfClass(PlayerMobEntity.class, interactionTarget.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) * 20))) {
                     playerMobEntity.setTarget(interactionTarget);
                 }
             } else
             if (misfortuneManipulation == 12) {
-                tag.putInt("abilitySelfTarget", 5);
+                tag.putInt("abilitySelfTarget", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) / 3);
             }
         }
 

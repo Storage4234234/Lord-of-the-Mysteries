@@ -13,7 +13,9 @@ import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.entity.StormSealEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -44,7 +46,7 @@ public class StormSeal extends SimpleAbilityItem {
             Vec3 lookVec = player.getLookAngle().normalize().scale(3.0f);
             stormSealEntity.setOwner(player);
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(stormSealEntity);
-            scaleData.setTargetScale(3.0f);
+            scaleData.setTargetScale(BeyonderUtil.getDamage(player).get(ItemInit.STORM_SEAL.get()));
             stormSealEntity.teleportTo(player.getX(), player.getY(), player.getZ());
             stormSealEntity.setDeltaMovement(lookVec.x, lookVec.y, lookVec.z);
             player.level().addFreshEntity(stormSealEntity);

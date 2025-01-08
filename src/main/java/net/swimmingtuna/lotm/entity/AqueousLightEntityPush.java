@@ -91,6 +91,7 @@ public class AqueousLightEntityPush extends AbstractHurtingProjectile {
         if (Math.random() * 100 < chanceOfDamage && sailorLightning) {
             LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, entity.level());
             lightningBolt.moveTo(entity.getX(), entity.getY(), entity.getZ());
+            lightningBolt.setDamage(3);
             entity.level().addFreshEntity(lightningBolt);
         }
         this.discard();

@@ -13,7 +13,9 @@ import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.entity.LightningEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -49,11 +51,11 @@ public class SailorLightningTravel extends SimpleAbilityItem {
     private static void lightningTravel(Player player, Level level) {
         if (!level.isClientSide()) {
             Vec3 lookVec = player.getLookAngle();
-            float speed = 10.0f;
+            float speed = 8.0f;
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), level);
             lightningEntity.setSpeed(speed);
             lightningEntity.setDeltaMovement(lookVec.x, lookVec.y, lookVec.z);
-            lightningEntity.setMaxLength(400);
+            lightningEntity.setMaxLength((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.SAILOR_LIGHTNING_TRAVEL.get()));
             lightningEntity.setOwner(player);
             lightningEntity.setDamage(25);
             lightningEntity.setOwner(player);

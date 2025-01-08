@@ -22,6 +22,7 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
@@ -88,7 +89,7 @@ public class MisfortuneBestowal extends SimpleAbilityItem {
             CompoundTag pTag = interactionTarget.getPersistentData();
             double misfortune = tag.getDouble("misfortune");
             double pMisfortune = pTag.getDouble("misfortune");
-            int misfortuneAddValue = 60 - (sequence * 7) + (enhancement * 10);
+            int misfortuneAddValue = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEBESTOWAL.get());
             pTag.putDouble("misfortune", Math.min(200, pMisfortune + misfortuneAddValue));
             tag.putDouble("misfortune", Math.min(0, misfortune - ((double) misfortuneAddValue / 2)));
         }

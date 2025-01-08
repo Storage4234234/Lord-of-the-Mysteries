@@ -15,7 +15,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.swimmingtuna.lotm.entity.WaterColumnEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -46,7 +48,7 @@ public class WaterColumn extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             Level level = player.level();
             BlockPos playerPos = player.blockPosition();
-            int radius = 200;
+            int radius = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.WATER_COLUMN.get());
             Random random = new Random();
             List<BlockPos> validWaterPositions = new ArrayList<>();
             for (int x = -radius; x <= radius; x++) {

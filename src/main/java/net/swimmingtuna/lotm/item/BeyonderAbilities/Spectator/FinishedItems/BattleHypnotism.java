@@ -25,8 +25,10 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +58,7 @@ public class BattleHypnotism extends SimpleAbilityItem {
     private void makesEntitiesAttackEachOther(Player player, Level level, BlockPos targetPos, int sequence, int dir) {
         if (!player.level().isClientSide()) {
             double radius = 20.0 - sequence * dir;
-            int duration = 400 - (sequence * 10);
+            int duration = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.BATTLE_HYPNOTISM.get());
             AABB boundingBox = new AABB(targetPos).inflate(radius);
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, LivingEntity::isAlive).forEach(livingEntity -> {
                 if (livingEntity != player) {

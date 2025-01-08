@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.SMath;
@@ -75,7 +76,7 @@ public class WindBladeEntity extends AbstractHurtingProjectile {
         windBladeEntity.setXRot((float) direction.x);
         windBladeEntity.setYRot((float) direction.y);
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int x = 7 - holder.getCurrentSequence();
+        int x = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.WIND_MANIPULATION_BLADE.get());
         if (!windBladeEntity.level().isClientSide()) {
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(windBladeEntity);
             scaleData.setScale(x);

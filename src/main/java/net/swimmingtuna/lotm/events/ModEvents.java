@@ -8,7 +8,6 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
@@ -78,8 +77,6 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.client.Configs;
 import net.swimmingtuna.lotm.commands.AbilityRegisterCommand;
 import net.swimmingtuna.lotm.entity.*;
-import net.swimmingtuna.lotm.events.custom_events.ModEventFactory;
-import net.swimmingtuna.lotm.events.custom_events.ProjectileEvent;
 import net.swimmingtuna.lotm.init.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
@@ -112,7 +109,6 @@ import virtuoel.pehkui.api.ScaleTypes;
 import java.lang.reflect.Method;
 import java.util.*;
 
-
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.ProbabilityManipulationWorldFortune.probabilityManipulationWorld;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.CalamityIncarnationTsunami.calamityIncarnationTsunamiTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.Earthquake.isOnSurface;
@@ -124,11 +120,18 @@ public class ModEvents {
     @SubscribeEvent
     public static void onUseItemEvent(LivingEntityUseItemEvent event) {
         LivingEntity livingEntity = event.getEntity();
+        System.out.println("living used " + event.getItem().getDisplayName());
         if (!livingEntity.level().isClientSide()) {
             MisfortuneManipulation.livingUseAbilityMisfortuneManipulation(event);
             CompoundTag tag = livingEntity.getPersistentData();
             if (livingEntity.getMainHandItem().getItem() instanceof SimpleAbilityItem simpleAbilityItem) {
-                if (tag.getInt("cantUseAbility") >= 1) {
+                if (livingEntity.hasEffect(ModEffects.STUN.get())) {
+                    event.setCanceled(true);
+                    if (livingEntity instanceof Player) {
+                        livingEntity.sendSystemMessage(Component.literal("You are stunned and unable to use abilities for another " + (int) Objects.requireNonNull(livingEntity.getEffect(ModEffects.STUN.get())).getDuration() / 20).withStyle(ChatFormatting.RED));
+                    }
+                } else if (tag.getInt("cantUseAbility") >= 1) {
+                    tag.putInt("cantUseAbility", tag.getInt("cantUseAbility") - 1);
                     event.setCanceled(true);
                 }
             }
@@ -246,7 +249,7 @@ public class ModEvents {
         {
             FateReincarnation.monsterReincarnationChecker(player);
         }
-            monsterDangerSense(playerPersistentData, holder, player);
+        monsterDangerSense(playerPersistentData, holder, player);
         {
             decrementMonsterAttackEvent(player);
         }
@@ -524,6 +527,7 @@ public class ModEvents {
 
     private static void psychologicalInvisibilityHurt(Player entity) {
         if (ClientShouldntRenderInvisibilityData.getShouldntRender()) {
+            entity.getPersistentData().putBoolean("psychologicalInvisibility", false);
             LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderInvisibilityPacketS2C(false, entity.getUUID()), (ServerPlayer) entity);
         }
     }
@@ -686,7 +690,7 @@ public class ModEvents {
         }
         if (holder.getSpirituality() >= 15) {
             if (player.tickCount % 2 == 0) {
-                holder.useSpirituality(20);
+                holder.useSpirituality(10);
             }
         }
         if (holder.getSpirituality() <= 15) {
@@ -744,8 +748,6 @@ public class ModEvents {
         //PROJECTILE EVENT
         Projectile projectile = BeyonderUtil.getProjectiles(player);
         if (projectile == null) return;
-        ProjectileEvent.ProjectileControlEvent projectileEvent = new ProjectileEvent.ProjectileControlEvent(projectile);
-        ModEventFactory.onSailorShootProjectile(projectile);
 
         //MATTER ACCELERATION ENTITIES
         if (projectile.getPersistentData().getInt("matterAccelerationEntities") >= 10) {
@@ -778,10 +780,15 @@ public class ModEvents {
 
 
         //SAILOR PASSIVE CHECK FROM HERE
-        LivingEntity target = projectileEvent.getTarget(75, 0);
+        LivingEntity target = BeyonderUtil.getTarget(projectile, 75, 0);
         if (target != null) {
             if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 7 && player.getPersistentData().getBoolean("sailorProjectileMovement")) {
-                projectileEvent.addMovement(projectile, (target.getX() - projectile.getX()) * 0.1, (target.getY() - projectile.getY()) * 0.1, (target.getZ() - projectile.getZ()) * 0.1);
+                double dx = target.getX() - projectile.getX();
+                double dy = target.getY() - projectile.getY();
+                double dz = target.getZ() - projectile.getZ();
+                double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                double speed = 1.2;
+                projectile.setDeltaMovement((dx / length) * speed, (dy / length) * speed, (dz / length) * speed);
                 projectile.hurtMarked = true;
             }
         }
@@ -789,11 +796,15 @@ public class ModEvents {
         //MONSTER CALCULATION PASSIVE
         if (target != null) {
             if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 8 && player.getPersistentData().getBoolean("monsterProjectileControl")) {
-                projectileEvent.addMovement(projectile, (target.getX() - projectile.getX()) * 0.1, (target.getY() - projectile.getY()) * 0.1, (target.getZ() - projectile.getZ()) * 0.1);
+                double dx = target.getX() - projectile.getX();
+                double dy = target.getY() - projectile.getY();
+                double dz = target.getZ() - projectile.getZ();
+                double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                double speed = 1.2;
+                projectile.setDeltaMovement((dx / length) * speed, (dy / length) * speed, (dz / length) * speed);
                 projectile.hurtMarked = true;
             }
         }
-
     }
 
     private static void envisionBarrier(BeyonderHolder holder, Player player, Style style) {
@@ -806,7 +817,7 @@ public class ModEvents {
             barrierRadius++;
             player.displayClientMessage(Component.literal("Barrier Radius: " + barrierRadius).withStyle(style), true);
         }
-        if (barrierRadius > 101) {
+        if (barrierRadius > BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_BARRIER.get())) {
             barrierRadius = 0;
             player.displayClientMessage(Component.literal("Barrier Radius: 0").withStyle(style), true);
         }
@@ -955,8 +966,8 @@ public class ModEvents {
         }
         player.getPersistentData().putInt("sailorAcidicRain", acidicRain + 1);
         AcidicRain.spawnAcidicRainParticles(player);
-        double radius1 = 50 - (sequence * 7);
-        double radius2 = 10 - sequence;
+        double radius1 = BeyonderUtil.getDamage(player).get(ItemInit.ACIDIC_RAIN.get());
+        double radius2 = radius1 / 5;
 
 
         for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius1))) {
@@ -997,7 +1008,7 @@ public class ModEvents {
     private static void earthquake(Player player, int sequence) {
         int sailorEarthquake = player.getPersistentData().getInt("sailorEarthquake");
         if (sailorEarthquake >= 1) {
-            int radius = 75 - (sequence * 6);
+            int radius = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.EARTHQUAKE.get());
             if (sailorEarthquake % 20 == 0) {
                 for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate((radius)))) {
                     if (entity != player) {
@@ -1049,7 +1060,7 @@ public class ModEvents {
     private static void extremeColdness(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
         //EXTREME COLDNESS
         int extremeColdness = playerPersistentData.getInt("sailorExtremeColdness");
-        if (extremeColdness >= 150 - (holder.getCurrentSequence()) * 20) {
+        if (extremeColdness >= BeyonderUtil.getDamage(player).get(ItemInit.EXTREME_COLDNESS.get())) {
             playerPersistentData.putInt("sailorExtremeColdness", 0);
             extremeColdness = 0;
         }
@@ -1256,7 +1267,7 @@ public class ModEvents {
             player.getPersistentData().putInt("monsterLuckGifting", luckGiftingAmount + 1);
             player.displayClientMessage(Component.literal("Luck Gifting Amount is " + luckGiftingAmount).withStyle(style), true);
         }
-        if (luckGiftingAmount > 101) {
+        if (luckGiftingAmount > BeyonderUtil.getDamage(player).get(ItemInit.LUCKGIFTING.get())) {
             player.displayClientMessage(Component.literal("Luck Gifting Amount is 0").withStyle(style), true);
             player.getPersistentData().putInt("monsterLuckGifting", 0);
         }
@@ -1267,7 +1278,7 @@ public class ModEvents {
         boolean sailorLightning = playerPersistentData.getBoolean("SailorLightning");
         int ragingBlows = playerPersistentData.getInt("ragingBlows");
         int ragingBlowsRadius = (27 - (holder.getCurrentSequence() * 3));
-        int damage = 20 - holder.getCurrentSequence() * 2;
+        float damage = BeyonderUtil.getDamage(player).get(ItemInit.RAGING_BLOWS.get());
         if (ragingBlows >= 1) {
             RagingBlows.spawnRagingBlowsParticles(player);
             playerPersistentData.putInt("ragingBlows", ragingBlows + 1);
@@ -1305,7 +1316,7 @@ public class ModEvents {
             return;
         }
         if (player.getPersistentData().getBoolean("torrentialDownpour") && player.tickCount % 200 == 0) {
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(500))) {
+            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.RAIN_EYES.get())))) {
                 if (entity != player && entity instanceof Player otherPlayer && otherPlayer.isInWaterOrRain()) {
                     player.sendSystemMessage(Component.literal(otherPlayer.getName().getString() + "'s location is " + otherPlayer.getX() + ", " + otherPlayer.getY() + ", " + otherPlayer.getZ()).withStyle(ChatFormatting.BOLD));
                 }
@@ -1323,7 +1334,7 @@ public class ModEvents {
             return;
         }
         if (sirenSongHarm % 20 == 0 && sirenSongHarm != 0) {
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50 - (sequence * 6)))) {
+            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.SIREN_SONG_HARM.get())))) {
                 if (entity != player) {
                     entity.hurt(entity.damageSources().magic(), 10 - sequence);
                 }
@@ -1361,7 +1372,7 @@ public class ModEvents {
         }
 
         if (sirenSongWeaken % 20 == 0 && sirenSongWeaken != 0) { //make it for 380,360,430 etc.
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50 - (sequence * 6)))) {
+            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.SIREN_SONG_WEAKEN.get())))) {
                 if (entity != player) {
                     entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 19, 2, false, false));
                     entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 19, 2, false, false));
@@ -1401,7 +1412,7 @@ public class ModEvents {
         }
 
         if (sirenSongStun % 20 == 0 && sirenSongStun != 0) {
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50 - (sequence * 6)))) {
+            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.SIREN_SONG_STUN.get())))) {
                 if (entity != player) {
                     entity.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 19 - (sequence * 2), 2, false, false));
                 }
@@ -1441,15 +1452,15 @@ public class ModEvents {
         if (sirenSongStrengthen % 20 == 0 && sirenSongStrengthen != 0) {
             if (player.hasEffect(MobEffects.DAMAGE_BOOST)) {
                 int strengthAmp = player.getEffect(MobEffects.DAMAGE_BOOST).getAmplifier();
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 19, strengthAmp + 2));
+                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.SIREN_SONG_STRENGTHEN.get()), strengthAmp + 2));
             } else if (!player.hasEffect(MobEffects.DAMAGE_BOOST)) {
-                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 19, 2));
+                player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.SIREN_SONG_STRENGTHEN.get()), 2));
             }
             if (player.hasEffect(MobEffects.REGENERATION)) {
                 int regenAmp = player.getEffect(MobEffects.REGENERATION).getAmplifier();
-                player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 19, regenAmp + 2));
+                player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.SIREN_SONG_STRENGTHEN.get()), regenAmp + 2));
             } else if (!player.hasEffect(MobEffects.REGENERATION)) {
-                player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 19, 2));
+                player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.SIREN_SONG_STRENGTHEN.get()), 2));
             }
         }
         SoundEvent strengthenSoundEvent = switch (sirenSongStrengthen) {
@@ -1490,7 +1501,7 @@ public class ModEvents {
             CompoundTag tag = player.getPersistentData();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int sequence = holder.getCurrentSequence();
-            int maxRadius = 250 - (holder.getCurrentSequence() * 45);
+            int maxRadius = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.DECAYDOMAIN.get());
             int radius = tag.getInt("monsterDomainRadius");
             if (player.tickCount % 500 == 0) {
                 tag.putInt("monsterDomainMaxRadius", maxRadius);
@@ -1516,7 +1527,7 @@ public class ModEvents {
         }
         if (sailorLightningStar == 1) {
             playerPersistentData.putInt("sailorLightningStar", 0);
-            for (int i = 0; i < 500; i++) {
+            for (int i = 0; i < BeyonderUtil.getDamage(player).get(ItemInit.STAR_OF_LIGHTNING.get()); i++) {
                 LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());
                 lightningEntity.setSpeed(50);
                 lightningEntity.setDamage(15);
@@ -2240,6 +2251,7 @@ public class ModEvents {
             if (Math.random() * 100 < chanceOfDamage) {
                 LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, livingTarget.level());
                 lightningBolt.moveTo(livingTarget.getX(), livingTarget.getY(), livingTarget.getZ());
+                lightningBolt.setDamage(3);
                 livingTarget.level().addFreshEntity(lightningBolt);
             }
         }
@@ -2342,7 +2354,7 @@ public class ModEvents {
             int enhancement = CalamityEnhancementData.getInstance((ServerLevel) player.level()).getCalamityEnhancement();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             holder.useSpirituality(200);
-            for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(150 - (holder.getCurrentSequence()) * 20))) {
+            for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENABLEDISABLERIPPLE.get())))) {
                 Random random = new Random();
                 if (livingEntity != player) {
                     int randomInt = random.nextInt(14);
@@ -2735,6 +2747,37 @@ public class ModEvents {
         }
     }
 
+    public static void warriorNegateDamage(LivingHurtEvent event) {
+        LivingEntity entity = event.getEntity();
+        DamageSource source = event.getSource();
+        Entity entitySource = source.getEntity();
+        if (!entity.level().isClientSide() && BeyonderUtil.isBeyonderCapable(entity)) {
+            if (entity instanceof Player pPlayer && (entitySource != null && entitySource != entity) && !source.is(DamageTypes.CRAMMING) && !source.is(DamageTypes.STARVE) && !source.is(DamageTypes.FALL) && !source.is(DamageTypes.DROWN) && !source.is(DamageTypes.FELL_OUT_OF_WORLD) && !source.is(DamageTypes.ON_FIRE)) {
+                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
+                if (holder.currentClassMatches(BeyonderClassInit.MONSTER)) {
+                    int randomChance = (int) ((Math.random() * 20) - holder.getCurrentSequence());
+                    if (randomChance >= 13) {
+                        double amount = event.getAmount();
+                        double x = 0;
+                        double z = 0;
+                        Random random = new Random();
+                        if (random.nextInt(2) == 0) {
+                            x = amount * -0.15;
+                            z = amount * -0.15;
+                        } else {
+                            x = amount * 0.15;
+                            z = amount * 0.15;
+                        }
+                        entity.setDeltaMovement(x, 1, z);
+                        entity.hurtMarked = true;
+                        event.setAmount(0);
+                        entity.sendSystemMessage(Component.literal("A breeze of wind moved you out of the way of damage").withStyle(ChatFormatting.GREEN));
+                    }
+                }
+            }
+        }
+    }
+
 
     @SubscribeEvent
     public static void hurtEvent(LivingHurtEvent event) {
@@ -2858,9 +2901,10 @@ public class ModEvents {
         LivingEntity entity = event.getEntity();
         CompoundTag tag = entity.getPersistentData();
         if (!entity.level().isClientSide()) {
+
             if (entity instanceof Player pPlayer) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-
+                ProbabilityManipulationWipe.wipeProbablility(tag);
             }
             CycleOfFate.cycleOfFateDeath(event);
 
@@ -3360,18 +3404,18 @@ public class ModEvents {
         for (Projectile projectile : level.getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(100))) {
             boolean bothInSameDimension = projectile.getPersistentData().getBoolean("inSpiritWorld") == player.getPersistentData().getBoolean("inSpiritWorld");
             //if (bothInSameDimension) {
-                List<Vec3> trajectory = predictProjectileTrajectory(projectile, player);
-                float scale = ScaleTypes.BASE.getScaleData(projectile).getScale();
-                double maxDistance = 20 * scale;
-                double deltaX = Math.abs(projectile.getX() - player.getX());
-                double deltaY = Math.abs(projectile.getY() - player.getY());
-                double deltaZ = Math.abs(projectile.getZ() - player.getZ());
-                if (deltaX <= maxDistance || deltaY <= maxDistance || deltaZ <= maxDistance) {
-                    if (player.level() instanceof ServerLevel serverLevel) {
-                        drawParticleLine(serverLevel, (ServerPlayer) player, trajectory);
-                    }
+            List<Vec3> trajectory = predictProjectileTrajectory(projectile, player);
+            float scale = ScaleTypes.BASE.getScaleData(projectile).getScale();
+            double maxDistance = 20 * scale;
+            double deltaX = Math.abs(projectile.getX() - player.getX());
+            double deltaY = Math.abs(projectile.getY() - player.getY());
+            double deltaZ = Math.abs(projectile.getZ() - player.getZ());
+            if (deltaX <= maxDistance || deltaY <= maxDistance || deltaZ <= maxDistance) {
+                if (player.level() instanceof ServerLevel serverLevel) {
+                    drawParticleLine(serverLevel, (ServerPlayer) player, trajectory);
                 }
             }
+        }
         //}
     }
 
@@ -3777,7 +3821,7 @@ public class ModEvents {
                 if (pPlayer.getHealth() <= pPlayer.getMaxHealth() * 0.75 && pPlayer.tickCount % 500 == 0 && tag.getInt("chaosWalkerCombat") == 0 && tag.getBoolean("monsterChaosWalkerCombat")) {
                     tag.putInt("chaosWalkerCombat", 300);
                     Random random = new Random();
-                    int radius = Math.max(50, 200 - (sequence * 35));
+                    int radius = (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.CHAOSWALKERCOMBAT.get());
                     tag.putInt("chaosWalkerSafeX", (int) (pPlayer.getX() + (random.nextInt(radius) - (radius * 0.5))));
                     tag.putInt("chaosWalkerSafeZ", (int) (pPlayer.getZ() + (random.nextInt(radius) - (radius * 0.5))));
                     tag.putInt("chaosWalkerRadius", radius);

@@ -11,8 +11,11 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.entity.MeteorEntity;
+import net.swimmingtuna.lotm.entity.MeteorNoLevelEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -29,6 +32,7 @@ public class MeteorShower extends SimpleAbilityItem {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
+        addCooldown(player, ItemInit.METEOR_NO_LEVEL_SHOWER.get(), 900);
         addCooldown(player);
         useSpirituality(player);
         meteorShower(player);
@@ -37,13 +41,9 @@ public class MeteorShower extends SimpleAbilityItem {
 
     public static void meteorShower(Player player) {
         if (!player.level().isClientSide()) {
-            MeteorEntity.summonMultipleMeteors(player);
-            MeteorEntity.summonMultipleMeteors(player);
-            MeteorEntity.summonMultipleMeteors(player);
-            MeteorEntity.summonMultipleMeteors(player);
-            MeteorEntity.summonMultipleMeteors(player);
-            MeteorEntity.summonMultipleMeteors(player);
-            MeteorEntity.summonMultipleMeteors(player);
+            for (int i = 0; i < BeyonderUtil.getDamage(player).get(ItemInit.METEOR_SHOWER.get()); i++) {
+                MeteorEntity.summonMultipleMeteors(player);
+            }
         }
     }
 

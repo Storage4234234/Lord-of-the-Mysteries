@@ -86,17 +86,15 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
         int luckManipulation = tag.getInt("monsterCalamityIncarnationItem");
         if (luckManipulation == 1) {
             return "Meteor";
-        }
-        if (luckManipulation == 2) {
+        } else if (luckManipulation == 2) {
             return "Tornado";
-        }
-        if (luckManipulation == 3) {
+        } else if (luckManipulation == 3) {
             return "Lightning Storm";
-        }
-        if (luckManipulation == 4) {
+        } else if (luckManipulation == 4) {
             return "Plague";
+        } else {
+            return "None";
         }
-        return "None";
     }
 
     @Override
@@ -143,7 +141,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
                 MeteorEntity meteorEntity = new MeteorEntity(EntityInit.METEOR_ENTITY.get(), entity.level());
                 ScaleData scaleData = ScaleTypes.BASE.getScaleData(meteorEntity);
                 if (entity instanceof Player player) {
-                    scaleData.setScale((enhancement + 11 - BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence() * 2));
+                    scaleData.setScale((enhancement + 11 - (BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence() * 2)));
                 } else {
                     scaleData.setScale(8);
                 }

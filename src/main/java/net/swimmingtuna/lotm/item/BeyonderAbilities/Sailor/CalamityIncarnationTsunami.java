@@ -42,7 +42,7 @@ public class CalamityIncarnationTsunami extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             int x = player.getPersistentData().getInt("calamityIncarnationTsunami");
             if (x == 0) {
-                player.getPersistentData().putInt("calamityIncarnationTsunami", 200);
+                player.getPersistentData().putInt("calamityIncarnationTsunami", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.CALAMITY_INCARNATION_TSUNAMI.get()));
             } else {
                 player.getPersistentData().putInt("calamityIncarnationTsunami", 0);
                 player.displayClientMessage(Component.literal("Tsunami Incarnation Cancelled").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);

@@ -2,6 +2,7 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Monster;
 
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -11,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.block.state.BlockState;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
@@ -45,8 +46,8 @@ public class FateReincarnation extends SimpleAbilityItem {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int x = (int) (player.getX() + (Math.random() * 5000) - 2500);
             int z = (int) (player.getZ() + (Math.random() * 5000) - 2500);
-            int surfaceY = player.level().getHeight(Heightmap.Types.WORLD_SURFACE, x, z) + 4;
-            player.teleportTo(x, surfaceY, z);
+            int surfaceY = getNonAirSurfaceBlock(player.level(),x,z);
+            player.teleportTo(x, surfaceY + 4, z);
             player.getPersistentData().putInt("monsterReincarnationCounter", 7200);
             if (holder.getCurrentSequence() == 0) {
                 player.getPersistentData().putBoolean("monsterReincarnation", true);
@@ -161,5 +162,16 @@ public class FateReincarnation extends SimpleAbilityItem {
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
+    }
+    public static int getNonAirSurfaceBlock(Level level, int x, int z) {
+        int y = level.getMaxBuildHeight() - 1;
+        boolean foundGround = false;
+        while (!foundGround && y >= level.getMinBuildHeight()) {
+            BlockPos pos = new BlockPos(x, y, z);
+            BlockState blockState = level.getBlockState(pos);
+            foundGround = !blockState.isAir();
+            y--;
+        }
+        return y;
     }
 }

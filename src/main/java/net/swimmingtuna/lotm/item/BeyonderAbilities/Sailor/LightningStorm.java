@@ -14,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -53,9 +54,9 @@ public class LightningStorm extends SimpleAbilityItem {
             player.getPersistentData().putDouble("sailorStormVecY", targetY);
             player.getPersistentData().putDouble("sailorStormVecZ", targetZ);
             CompoundTag persistentData = player.getPersistentData();
-            persistentData.putInt("sailorLightningStorm", 500 - (sequence * 80));
+            persistentData.putInt("sailorLightningStorm", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.LIGHTNING_STORM.get()));
             if (sequence <= 0) {
-                persistentData.putInt("sailorLightningStormTyrant", 500);
+                persistentData.putInt("sailorLightningStormTyrant", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.LIGHTNING_STORM.get()));
             }
         }
     }

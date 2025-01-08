@@ -25,7 +25,9 @@ import net.swimmingtuna.lotm.entity.LightningEntity;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -111,10 +113,10 @@ public class SailorLightning extends SimpleAbilityItem {
             Vec3 lookVec = player.getLookAngle();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             holder.useSpirituality(100);
-            float speed = 15.0f;
+            float speed = 10.0f;
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), level);
             lightningEntity.setSpeed(speed);
-            lightningEntity.setDamage(20 - (holder.getCurrentSequence() * 2));
+            lightningEntity.setDamage((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.SAILOR_LIGHTNING.get()));
             lightningEntity.setDeltaMovement(lookVec.x, lookVec.y, lookVec.z);
             lightningEntity.setMaxLength(30);
             lightningEntity.setOwner(player);
@@ -128,7 +130,7 @@ public class SailorLightning extends SimpleAbilityItem {
             Vec3 lookVec = player.getLookAngle();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             holder.useSpirituality(200);
-            float speed = 15.0f;
+            float speed = 10.0f;
             if (!player.isCreative()) {
                 ItemStack itemStack = player.getUseItem();
                 player.getCooldowns().addCooldown(itemStack.getItem(), 10 + (holder.getCurrentSequence() * 2));
@@ -137,7 +139,7 @@ public class SailorLightning extends SimpleAbilityItem {
             lightningEntity.setSpeed(speed);
             lightningEntity.setDeltaMovement(lookVec.x, lookVec.y, lookVec.z);
             lightningEntity.setMaxLength(30);
-            lightningEntity.setDamage(20 - (holder.getCurrentSequence() * 2));
+            lightningEntity.setDamage((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.SAILOR_LIGHTNING.get()));
             lightningEntity.setOwner(player);
             lightningEntity.teleportTo(player.getX(), player.getEyeY(), player.getZ());
             lightningEntity.setTargetPos(targetPos);
@@ -154,7 +156,7 @@ public class SailorLightning extends SimpleAbilityItem {
             lightningEntity.setDeltaMovement(0, -2, 0);
             lightningEntity.setMaxLength(60);
             lightningEntity.setOwner(player);
-            lightningEntity.setDamage(20 - (holder.getCurrentSequence() * 2));
+            lightningEntity.setDamage((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.SAILOR_LIGHTNING.get()));
             lightningEntity.setOwner(player);
             lightningEntity.teleportTo(player.getX() + ((Math.random() * 150) - 75), player.getY() + 60, player.getZ() + ((Math.random() * 150) - 75));
             level.addFreshEntity(lightningEntity);
@@ -185,9 +187,7 @@ public class SailorLightning extends SimpleAbilityItem {
             Vec3 lookVec = player.getLookAngle();
             lightningEntity.setDeltaMovement(lookVec.x, lookVec.y, lookVec.z);
             lightningEntity.setMaxLength(30);
-            lightningEntity.setDamage(20 - (holder.getCurrentSequence() * 2));
-
-            lightningEntity.teleportTo(player.getX(), player.getY(), player.getZ());
+            lightningEntity.setDamage((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.SAILOR_LIGHTNING.get()));            lightningEntity.teleportTo(player.getX(), player.getY(), player.getZ());
             lightningEntity.setTargetPos(targetEntity.position());
             lightningEntity.setOwner(player);
             lightningEntity.setOwner(player);

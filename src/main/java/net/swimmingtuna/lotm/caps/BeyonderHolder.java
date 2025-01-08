@@ -70,7 +70,6 @@ public class BeyonderHolder extends PlayerCapability {
             persistentData.remove(REGISTERED_ABILITIES_KEY);
         }
         LOTMNetworkHandler.sendToPlayer(new ClearAbilitiesS2C(), (ServerPlayer) player);
-
         updateTracking();
 
         LOTMNetworkHandler.sendToPlayer(new SyncSequencePacketS2C(this.currentSequence), (ServerPlayer) player);

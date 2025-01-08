@@ -16,8 +16,10 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,7 +51,7 @@ public class Awe extends SimpleAbilityItem {
             int dir = (int) dreamIntoReality.getValue();
             double radius = (18.0 - sequence) * dir;
             float damage = (float) ((27.0 - (sequence * 1.5)) * (Math.max(1, dir * 0.75)));
-            int duration = (190 - (sequence * 15));
+            int duration = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.AWE.get());
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
                 if (entity != player) {
                     entity.addEffect((new MobEffectInstance(ModEffects.AWE.get(), duration, 1, false, false)));

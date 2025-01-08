@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,7 @@ public class AquaticLifeManipulation extends SimpleAbilityItem {
             if (player.level().isClientSide()) {
                 return;
             }
-            List<LivingEntity> aquaticEntities = player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50), entity -> entity instanceof WaterAnimal);
+            List<LivingEntity> aquaticEntities = player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.AQUATIC_LIFE_MANIPULATION.get())), entity -> entity instanceof WaterAnimal);
             if (aquaticEntities.isEmpty()) {
                 return;
             }

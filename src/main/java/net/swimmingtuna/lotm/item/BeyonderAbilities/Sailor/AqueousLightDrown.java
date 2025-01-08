@@ -19,7 +19,9 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.AqueousLightEntity;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -47,8 +49,8 @@ public class AqueousLightDrown extends SimpleAbilityItem {
             Vec3 eyePosition = player.getEyePosition(1.0f);
             Vec3 direction = player.getViewVector(1.0f);
             Vec3 initialVelocity = direction.scale(2.0);
-            float damage = 8.0f - BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
-            AqueousLightEntity.summonEntityWithSpeed(direction, initialVelocity, eyePosition, player.getX(), player.getY(), player.getZ(), player, damage);
+
+            AqueousLightEntity.summonEntityWithSpeed(direction, initialVelocity, eyePosition, player.getX(), player.getY(), player.getZ(), player, BeyonderUtil.getDamage(player).get(ItemInit.AQUEOUS_LIGHT_DROWN.get()));
         }
     }
     @Override

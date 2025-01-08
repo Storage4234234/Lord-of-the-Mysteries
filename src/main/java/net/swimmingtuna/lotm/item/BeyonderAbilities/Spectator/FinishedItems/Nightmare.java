@@ -25,6 +25,7 @@ import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
@@ -80,12 +81,10 @@ public class Nightmare extends SimpleAbilityItem {
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
             int sequence = holder.getCurrentSequence();
             int dir = (int) dreamIntoReality.getValue();
-            double radius = 25.0 - sequence;
-            float damagePlayer = ((float) 120.0 - (sequence * 10)) * dir;
-            float damageMob = ((float) (60.0 - (sequence * 3)) / 2) * dir;
-
+            double radius = BeyonderUtil.getDamage(player).get(ItemInit.NIGHTMARE.get());
+            float damagePlayer = ((float) (60.0 * dir) - (sequence * 5));
+            float damageMob = ((float) (40.0 * dir) - (sequence * 3));
             int duration = 200 - (sequence * 20);
-
             AABB boundingBox = new AABB(targetPos).inflate(radius);
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, entity -> entity.isAlive()).forEach(livingEntity -> {
                 AttributeInstance nightmareAttribute = livingEntity.getAttribute(ModAttributes.NIGHTMARE.get());
@@ -100,7 +99,7 @@ public class Nightmare extends SimpleAbilityItem {
                                 nightmareAttribute.setBaseValue(nightmareAttribute.getValue() + 1);
                             }
                         }
-                        if (nightmareAttribute.getValue() == 3) {
+                        if (nightmareAttribute.getValue() >= 3) {
                             livingEntity.hurt(livingEntity.damageSources().magic(), damagePlayer);
                             nightmareAttribute.setBaseValue(0);
                         }

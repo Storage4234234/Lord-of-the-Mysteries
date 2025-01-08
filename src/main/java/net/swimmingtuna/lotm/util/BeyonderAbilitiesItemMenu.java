@@ -1,5 +1,7 @@
 package net.swimmingtuna.lotm.util;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -79,11 +81,27 @@ public class BeyonderAbilitiesItemMenu extends AbstractContainerMenu {
 
     private void handleItemClick(ItemStack clickedItem, ServerPlayer player) {
         if (player != null) {
-            // Find a suitable hotbar slot and set the item
-            int hotbarSlot = player.getInventory().getSuitableHotbarSlot();
-            player.getInventory().setItem(hotbarSlot, clickedItem);
-
-            // Optional: You might want to sync the inventory to the client
+            Inventory inventory = player.getInventory();
+            boolean placed = false;
+            for (int i = 0; i < Inventory.getSelectionSize(); i++) {
+                if (inventory.getItem(i).isEmpty()) {
+                    inventory.setItem(i, clickedItem);
+                    placed = true;
+                    break;
+                }
+            }
+            if (!placed) {
+                for (int i = Inventory.getSelectionSize(); i < inventory.getContainerSize(); i++) {
+                    if (inventory.getItem(i).isEmpty()) {
+                        inventory.setItem(i, clickedItem);
+                        placed = true;
+                        break;
+                    }
+                }
+            }
+            if (!placed) {
+                player.sendSystemMessage(Component.literal("No space in inventory!").withStyle(ChatFormatting.RED));
+            }
             player.containerMenu.broadcastChanges();
         }
     }

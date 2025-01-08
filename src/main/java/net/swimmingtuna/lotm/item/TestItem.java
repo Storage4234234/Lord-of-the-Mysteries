@@ -73,15 +73,14 @@ public class TestItem extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         if (!player.level().isClientSide()) {
+            CompoundTag tag = player.getPersistentData();
             for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
                 ItemStack stack = player.getInventory().getItem(i);
                 if (!stack.isEmpty()) {
                     player.getCooldowns().removeCooldown(stack.getItem());
                 }
             }
-            boolean x = player.getPersistentData().getBoolean("inSpiritWorld");
-            player.getPersistentData().putBoolean("inSpiritWorld", !x);
-            player.sendSystemMessage(Component.literal("value is now " + x));
+            tag.putInt("cantUseAbility", 5);
 
         }
 

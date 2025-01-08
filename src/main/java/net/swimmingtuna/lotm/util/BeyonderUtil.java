@@ -1,6 +1,5 @@
 package net.swimmingtuna.lotm.util;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
@@ -26,6 +25,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -57,7 +57,10 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.*;
+import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.ClientData.ClientLeftclickCooldownData;
+import net.swimmingtuna.lotm.util.effect.ModEffects;
+import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
@@ -71,11 +74,34 @@ public class BeyonderUtil {
         }
         List<Projectile> projectiles = player.level().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(50));
         for (Projectile projectile : projectiles) {
-            if (projectile.getOwner() == player && projectile.tickCount > 8 && projectile.tickCount < 50) {
+            if (projectile.getOwner() == player && projectile.tickCount > 6 && projectile.tickCount < 100) {
                 return projectile;
             }
         }
         return null;
+    }
+
+    public static LivingEntity getTarget(Projectile projectile, double maxValue, double minValue) {
+        Entity owner = null;
+        if (projectile.getOwner() != null) {
+            if (projectile.getOwner() instanceof LivingEntity) {
+                owner = projectile.getOwner();
+            }
+        }
+        LivingEntity closestEntity = null;
+        double closestDistance = Double.MAX_VALUE;
+        Vec3 projectilePos = projectile.position();
+        List<LivingEntity> nearbyEntities = projectile.level().getEntitiesOfClass(LivingEntity.class, projectile.getBoundingBox().inflate(maxValue));
+        for (LivingEntity entity : nearbyEntities) {
+            if (entity != owner && !entity.level().isClientSide()) {
+                double distance = entity.distanceToSqr(projectilePos);
+                if (distance < maxValue && distance > minValue && distance < closestDistance) {
+                    closestDistance = distance;
+                    closestEntity = entity;
+                }
+            }
+        }
+        return closestEntity;
     }
 
     public static Projectile getLivingEntitiesProjectile(LivingEntity player) {
@@ -165,6 +191,7 @@ public class BeyonderUtil {
                 abilityNames.add(ItemInit.NIGHTMARE.get());
             }
             if (sequence <= 4) {
+                abilityNames.remove(ItemInit.FRENZY.get());
                 abilityNames.add(ItemInit.APPLY_MANIPULATION.get());
                 abilityNames.add(ItemInit.MANIPULATE_MOVEMENT.get());
                 abilityNames.add(ItemInit.MANIPULATE_FONDNESS.get());
@@ -709,8 +736,7 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new CalamityEnhancementLeftClickC2S());
             } else if (heldItem.getItem() instanceof DeathKnell) {
                 LOTMNetworkHandler.sendToServer(new DeathKnellLeftClickC2S());
-            }
-            else if (heldItem.getItem() instanceof ProbabilityManipulationFortune) {
+            } else if (heldItem.getItem() instanceof ProbabilityManipulationFortune) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYMISFORTUNE.get())));
             } else if (heldItem.getItem() instanceof ProbabilityManipulationMisfortune) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYINFINITEFORTUNE.get())));
@@ -780,15 +806,143 @@ public class BeyonderUtil {
         }
         return -1;
     }
+
     public static Map<Item, Float> getDamage(LivingEntity livingEntity) {
         Map<Item, Float> damageMap = new HashMap<>();
+        int enhancement = CalamityEnhancementData.getInstance((ServerLevel) livingEntity.level()).getCalamityEnhancement();
+        double dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
         int sequence = 0;
+        int abilityWeakness = 1;
+        if (livingEntity.hasEffect(ModEffects.TWILIGHT.get())) {
+            abilityWeakness = Math.max(1,Objects.requireNonNull(livingEntity.getEffect(ModEffects.TWILIGHT.get())).getAmplifier());
+        }
         if (livingEntity instanceof Player player) {
             sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
         } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
             sequence = playerMobEntity.getCurrentSequence();
         }
+        //SAILOR
+        damageMap.put(ItemInit.ACIDIC_RAIN.get(), 50.0f - (sequence * 7));
+        damageMap.put(ItemInit.AQUATIC_LIFE_MANIPULATION.get(), 50.0f - (sequence * 5));
         damageMap.put(ItemInit.AQUEOUS_LIGHT_PUSH.get(), 8.0f - sequence);
+        damageMap.put(ItemInit.AQUEOUS_LIGHT_PULL.get(), 8.0f - sequence);
+        damageMap.put(ItemInit.AQUEOUS_LIGHT_DROWN.get(), 8.0f - sequence);
+        damageMap.put(ItemInit.CALAMITY_INCARNATION_TORNADO.get(), 300.0f - (50 * sequence));
+        damageMap.put(ItemInit.CALAMITY_INCARNATION_TSUNAMI.get(), 200.0f - (30 * sequence));
+        damageMap.put(ItemInit.EARTHQUAKE.get(), 75.0f - (sequence * 6));
+        damageMap.put(ItemInit.ENABLE_OR_DISABLE_LIGHTNING.get(), 0.0f);
+        damageMap.put(ItemInit.EXTREME_COLDNESS.get(), 150.0f - (sequence * 20));
+        damageMap.put(ItemInit.HURRICANE.get(), 600.0f - (sequence * 100));
+        damageMap.put(ItemInit.LIGHTNING_BALL.get(), 10.0f + (10 - sequence * 3));
+        damageMap.put(ItemInit.LIGHTNING_BALL_ABSORB.get(), 10.0f + (10 - sequence * 3));
+        damageMap.put(ItemInit.LIGHTNING_BRANCH.get(), 30.0f - (sequence * 3));
+        damageMap.put(ItemInit.LIGHTNING_REDIRECTION.get(), 200.0f - (sequence * 25));
+        damageMap.put(ItemInit.LIGHTNING_STORM.get(), 500.0f - (sequence * 80));
+        damageMap.put(ItemInit.MATTER_ACCELERATION_BLOCKS.get(), 10.0f - sequence);
+        damageMap.put(ItemInit.MATTER_ACCELERATION_ENTITIES.get(), 300.0f - (sequence * 80));
+        damageMap.put(ItemInit.MATTER_ACCELERATION_SELF.get(), 120.0f - (sequence * 30));
+        damageMap.put(ItemInit.RAGING_BLOWS.get(), 10.0f - (sequence));
+        damageMap.put(ItemInit.RAIN_EYES.get(), 500.0f - (sequence * 50));
+        damageMap.put(ItemInit.ROAR.get(), 10.0f - sequence);
+        damageMap.put(ItemInit.SAILOR_LIGHTNING.get(), 20.0f - ( 2 * sequence));
+        damageMap.put(ItemInit.SAILOR_LIGHTNING_TRAVEL.get(), 400.0f - (sequence * 150));
+        damageMap.put(ItemInit.SAILORPROJECTILECTONROL.get(), 0.0f);
+        damageMap.put(ItemInit.SIREN_SONG_HARM.get(), 50.0f - (sequence * 6));
+        damageMap.put(ItemInit.SIREN_SONG_WEAKEN.get(), 50.0f - (sequence * 6));
+        damageMap.put(ItemInit.SIREN_SONG_STRENGTHEN.get(), 21.0f - sequence);
+        damageMap.put(ItemInit.SIREN_SONG_STUN.get(), 50.0f - (sequence * 6));
+        damageMap.put(ItemInit.SONIC_BOOM.get(), 40.0f - (sequence * 5));
+        damageMap.put(ItemInit.STAR_OF_LIGHTNING.get(), 125.0f - sequence * 20);
+        damageMap.put(ItemInit.STORM_SEAL.get(), 3.0f - sequence);
+        damageMap.put(ItemInit.THUNDER_CLAP.get(), 300.0f - (sequence * 50));
+        damageMap.put(ItemInit.TORNADO.get(), 150.0f - (sequence * 30));
+        damageMap.put(ItemInit.TSUNAMI.get(), 600.0f - (sequence * 80));
+        damageMap.put(ItemInit.TSUNAMI_SEAL.get(), 600.0f - (sequence * 80));
+        damageMap.put(ItemInit.TYRANNY.get(), 250.0f - (sequence * 80));
+        damageMap.put(ItemInit.VOLCANIC_ERUPTION.get(), 120.0f - (sequence * 10));
+        damageMap.put(ItemInit.WATER_COLUMN.get(), 200.0f - (sequence * 60));
+        damageMap.put(ItemInit.WATER_SPHERE.get(), 200.0f - (sequence * 20));
+        damageMap.put(ItemInit.WIND_MANIPULATION_BLADE.get(), 7.0f - sequence);
+        damageMap.put(ItemInit.WIND_MANIPULATION_CUSHION.get(), 0.0f);
+        damageMap.put(ItemInit.WIND_MANIPULATION_FLIGHT.get(), 0.0f);
+        damageMap.put(ItemInit.WIND_MANIPULATION_SENSE.get(), 0.0f);
+
+        //SPECTATOR
+        damageMap.put(ItemInit.APPLY_MANIPULATION.get(), 0.0f);
+        damageMap.put(ItemInit.AWE.get(), 190.0f - (sequence * 15));
+        damageMap.put(ItemInit.BATTLE_HYPNOTISM.get(), 400.0f - (sequence * 20));
+        damageMap.put(ItemInit.CONSCIOUSNESS_STROLL.get(), 0.0f);
+        damageMap.put(ItemInit.DISCERN.get(),  0.0f);
+        damageMap.put(ItemInit.DRAGON_BREATH.get(), (float) (60.0f - (sequence * 4) * dreamIntoReality));
+        damageMap.put(ItemInit.DREAM_INTO_REALITY.get(), 0.0f);
+        damageMap.put(ItemInit.DREAM_WALKING.get(), 0.0f);
+        damageMap.put(ItemInit.DREAM_WEAVING.get(), 20.0f - (sequence * 3));
+        damageMap.put(ItemInit.ENVISION_BARRIER.get(), 101.0f - (sequence * 20));
+        damageMap.put(ItemInit.ENVISION_DEATH.get(), (float) (40.0f - (sequence * 10) + (dreamIntoReality * 5)));
+        damageMap.put(ItemInit.ENVISION_HEALTH.get(), (float) (0.66f - (sequence * 0.05) + (dreamIntoReality * 0.05f)));
+        damageMap.put(ItemInit.ENVISION_KINGDOM.get(), 0.0f);
+        damageMap.put(ItemInit.ENVISION_LIFE.get(), (3.0f + (sequence)));
+        damageMap.put(ItemInit.ENVISION_LOCATION.get(), (float) (500.0f / dreamIntoReality));
+        damageMap.put(ItemInit.ENVISION_LOCATION_BLINK.get(), (float) (1000.0f - dreamIntoReality));
+        damageMap.put(ItemInit.ENVISION_WEATHER.get(), (float) (500.0f / dreamIntoReality));
+        damageMap.put(ItemInit.FRENZY.get(), (float) ((15.0f - sequence) * dreamIntoReality));
+        damageMap.put(ItemInit.MANIPULATE_MOVEMENT.get(), 0.0f);
+        damageMap.put(ItemInit.MANIPULATE_EMOTION.get(), 100.0f - (sequence * 10));
+        damageMap.put(ItemInit.MANIPULATE_FONDNESS.get(), (float) (600.0f * dreamIntoReality));
+        damageMap.put(ItemInit.MENTAL_PLAGUE.get(), (float) (200.0f / dreamIntoReality));
+        damageMap.put(ItemInit.METEOR_NO_LEVEL_SHOWER.get(), 10.0f - (4 * sequence));
+        damageMap.put(ItemInit.METEOR_SHOWER.get(),  10.0f - (4 * sequence));
+        damageMap.put(ItemInit.MIND_READING.get(), 0.0f);
+        damageMap.put(ItemInit.MIND_STORM.get(), 50.0f - (sequence * 3));
+        damageMap.put(ItemInit.NIGHTMARE.get(), 40.0f - (sequence * 2));
+        damageMap.put(ItemInit.PLACATE.get(), 0.0f);
+        damageMap.put(ItemInit.PLAGUE_STORM.get(), (float) (20.0f - (sequence * 3) * dreamIntoReality));
+        damageMap.put(ItemInit.PROPHESIZE_DEMISE.get(), 0.0f);
+        damageMap.put(ItemInit.PROPHESIZE_TELEPORT_BLOCK.get(), (float) ((500.0f * dreamIntoReality) - (sequence * 100)));
+        damageMap.put(ItemInit.PROPHESIZE_TELEPORT_PLAYER.get(), (float) ((500.0f * dreamIntoReality) - (sequence * 100)));
+        damageMap.put(ItemInit.PSYCHOLOGICAL_INVISIBILITY.get(), 0.0f);
+
+        //MONSTER
+        damageMap.put(ItemInit.AURAOFCHAOS.get(), 200.0f - (sequence * 50) + (enhancement * 50));
+        damageMap.put(ItemInit.CHAOSAMPLIFICATION.get(), 0.0f);
+        damageMap.put(ItemInit.CHAOSWALKERCOMBAT.get(), (float) Math.max(50, 200 - (sequence * 35)));
+        damageMap.put(ItemInit.CYCLEOFFATE.get(), 0.0f);
+        damageMap.put(ItemInit.DECAYDOMAIN.get(),  250.0f - (sequence * 45));
+        damageMap.put(ItemInit.PROVIDENCEDOMAIN.get(), 250.0f - (sequence * 45));
+        damageMap.put(ItemInit.ENABLEDISABLERIPPLE.get(), 150.0f - (sequence * 20));
+        damageMap.put(ItemInit.FALSEPROPHECY.get(), 0.0f);
+        damageMap.put(ItemInit.FATEDCONNECTION.get(), 0.0f);
+        damageMap.put(ItemInit.FATEREINCARNATION.get(), 0.0f);
+        damageMap.put(ItemInit.FORTUNEAPPROPIATION.get(), 200.0f - (sequence * 40));
+        damageMap.put(ItemInit.LUCKCHANNELING.get(), 100.0f - (sequence * 25));
+        damageMap.put(ItemInit.LUCKDENIAL.get(), 1800.0f - (sequence * 150));
+        damageMap.put(ItemInit.LUCKDEPRIVATION.get(), 0.0f);
+        damageMap.put(ItemInit.LUCKFUTURETELLING.get(), 0.0f);
+        damageMap.put(ItemInit.LUCKGIFTING.get(),  101.0f - (sequence * 5));
+        damageMap.put(ItemInit.LUCK_MANIPULATION.get(), 0.0f);
+        damageMap.put(ItemInit.LUCKPERCEPTION.get(), 0.0f);
+        damageMap.put(ItemInit.MISFORTUNEBESTOWAL.get(),  60.0f - (sequence * 7) + (enhancement * 10));
+        damageMap.put(ItemInit.MISFORTUNEIMPLOSION.get(),  250.0f - (sequence * 100) + (enhancement * 50));
+        damageMap.put(ItemInit.MISFORTUNEMANIPULATION.get(), 15.0f - sequence * 2);
+        damageMap.put(ItemInit.MISFORTUNEREDIRECTION.get(), 300.0f - (sequence * 50));
+        damageMap.put(ItemInit.CALAMITYINCARNATION.get(), 8.0f - sequence);
+        damageMap.put(ItemInit.MONSTERDANGERSENSE.get(), 0.0f);
+        damageMap.put(ItemInit.MONSTERCALAMITYATTRACTION.get(),  0.0f);
+        damageMap.put(ItemInit.MONSTERDOMAINTELEPORATION.get(), 0.0f);
+        damageMap.put(ItemInit.MONSTERPROJECTILECONTROL.get(), 0.0f);
+        damageMap.put(ItemInit.MONSTERREBOOT.get(), 30.0f - (sequence * 5));
+        damageMap.put(ItemInit.PROBABILITYFORTUNE.get(), 200.0f);
+        damageMap.put(ItemInit.PROBABILITYEFFECT.get(), 200.0f);
+        damageMap.put(ItemInit.PROBABILITYINFINITEFORTUNE.get(), 2000.0f);
+        damageMap.put(ItemInit.PROBABILITYINFINITEMISFORTUNE.get(),2000.0f);
+        damageMap.put(ItemInit.PROBABILITYMISFORTUNE.get(), 200.0f);
+        damageMap.put(ItemInit.PROBABILITYWIPE.get(), 200.0f);
+        damageMap.put(ItemInit.PROBABILITYFORTUNEINCREASE.get(), 0.0f);
+        damageMap.put(ItemInit.PROBABILITYMISFORTUNEINCREASE.get(), 0.0f);
+        damageMap.put(ItemInit.PSYCHESTORM.get(), 30.0f - (sequence * 3));
+        damageMap.put(ItemInit.REBOOTSELF.get(), 0.0f);
+        damageMap.put(ItemInit.SPIRITVISION.get(), 0.0f);
+        damageMap.put(ItemInit.WHISPEROFCORRUPTION.get(), (float) sequence);
         return damageMap;
     }
 
@@ -835,6 +989,7 @@ public class BeyonderUtil {
         }
         nearbyEntities.stream().max(Comparator.comparingDouble(LivingEntity::getMaxHealth)).ifPresent(mob::setTarget);
     }
+
     public static void saveWorld() {
         // Get the Minecraft server instance
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
@@ -846,6 +1001,7 @@ public class BeyonderUtil {
             playerList.saveAll();
         }
     }
+
     public static void executeCommand(ServerLevel world, BlockPos pos, String command) {
         CommandSourceStack source = new CommandSourceStack(
                 CommandSource.NULL,
@@ -866,6 +1022,7 @@ public class BeyonderUtil {
         CommandSourceStack source = server.createCommandSourceStack();
         server.getCommands().performPrefixedCommand(source, command);
     }
+
     public static void registerAllRecipes(MinecraftServer server) {
         executeCommand(server, "/beyonderrecipe add lotm:monster_9_potion bossominium:flower_of_genesis bossominium:redstone_hard_drive minecraft:rotten_flesh alexscaves:charred_remnant samurai_dynasty:jorogumo_eye");
         executeCommand(server, "/beyonderrecipe add lotm:monster_8_potion legendary_monsters:crystal_of_sandstorm alexscaves:sweet_tooth minecraft:netherite_scrap mutantmonsters:hulk_hammer legendary_monsters:primal_ice_shard");

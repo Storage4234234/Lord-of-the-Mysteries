@@ -13,7 +13,9 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.TornadoEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -39,14 +41,8 @@ public class Tornado extends SimpleAbilityItem {
     private static void tornado(Player pPlayer) {
         if (!pPlayer.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-        if (holder.getCurrentSequence() <= 4 && holder.getCurrentSequence() != 0) {
-            TornadoEntity.summonTornado(pPlayer);
+            summonTornado(pPlayer, holder.getCurrentSequence());
             holder.useSpirituality(500);
-        }
-        if (holder.getCurrentSequence() <= 0) {
-            TornadoEntity.summonTyrantTornado(pPlayer);
-            holder.useSpirituality(1000);
-        }
         }
     }
 
@@ -59,8 +55,25 @@ public class Tornado extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
+    }
+
+    public static void summonTornado(Player player, int sequence) {
+        if (!player.level().isClientSide()) {
+            TornadoEntity tornado = new TornadoEntity(player.level(), player, 0, 0, 0);
+            tornado.setTornadoHeight((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.TORNADO.get()));
+            tornado.setTornadoRadius((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.TORNADO.get()) / 4);
+            if (sequence <= 0) {
+                tornado.setTornadoLightning(true);
+                tornado.setTornadoLifecount(400);
+            } else {
+                tornado.setTornadoLifecount(200);
+            }
+            tornado.setTornadoMov(player.getLookAngle().scale(0.5f).toVector3f());
+            player.level().addFreshEntity(tornado);
+        }
     }
 }

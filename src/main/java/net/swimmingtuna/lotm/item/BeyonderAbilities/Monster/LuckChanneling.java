@@ -19,6 +19,7 @@ import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.OtherItems.LuckBottleItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -50,7 +51,7 @@ public class LuckChanneling extends SimpleAbilityItem {
                 int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
                 if (sequence <= 2) {
                     double luckBottleAmount = 0;
-                    for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(100 - (sequence * 25)))) {
+                    for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.LUCKCHANNELING.get())))) {
                         double newLuck = livingEntity.getPersistentData().getDouble("luck");
                         if (livingEntity == player) {
                             livingEntity.getPersistentData().putDouble("luck", newLuck / 2);

@@ -20,7 +20,9 @@ import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -89,7 +91,7 @@ public class ProbabilityManipulationInfiniteFortune extends SimpleAbilityItem {
 
     public static void giveInfiniteFortune(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
-            livingEntity.getPersistentData().putInt("probabilityManipulationInfiniteFortune", 3600);
+            livingEntity.getPersistentData().putInt("probabilityManipulationInfiniteFortune", (int) (float)BeyonderUtil.getDamage(livingEntity).get(ItemInit.PROBABILITYINFINITEFORTUNE.get()));
         }
 
     }

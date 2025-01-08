@@ -17,7 +17,9 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.RoarEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -46,7 +48,8 @@ public class Roar extends SimpleAbilityItem {
             RoarEntity roarEntity = new RoarEntity(EntityInit.ROAR_ENTITY.get(), player.level());
             roarEntity.teleportTo(player.getX(), player.getY(), player.getZ());
             Vec3 lookVec = player.getLookAngle();
-            roarEntity.setDeltaMovement(lookVec.scale(10 - holder.getCurrentSequence()).x, lookVec.scale(10 - holder.getCurrentSequence()).y, lookVec.scale(10 - holder.getCurrentSequence()).z);
+            float speed = BeyonderUtil.getDamage(player).get(ItemInit.ROAR.get());
+            roarEntity.setDeltaMovement(lookVec.scale(speed).x, lookVec.scale(speed).y, lookVec.scale(speed).z);
             roarEntity.hurtMarked = true;
             player.level().addFreshEntity(roarEntity);
             Vec3 startPos = player.getEyePosition();

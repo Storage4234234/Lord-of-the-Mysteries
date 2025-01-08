@@ -15,6 +15,8 @@ import net.minecraft.world.entity.player.Player;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import virtuoel.pehkui.api.ScaleData;
+import virtuoel.pehkui.api.ScaleTypes;
 
 
 public class BeyonderCommand {
@@ -45,7 +47,10 @@ public class BeyonderCommand {
                         .executes(context -> {
                             Player player = context.getSource().getPlayerOrException();
                             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                            ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
                             holder.removeClass();
+                            player.getPersistentData().putInt("monsterReincarnationCounter", 0);
+                            scaleData.setScale(1);
                             Abilities playerAbilities = player.getAbilities();
                             playerAbilities.setFlyingSpeed(0.05F);
                             playerAbilities.setWalkingSpeed(0.1F);

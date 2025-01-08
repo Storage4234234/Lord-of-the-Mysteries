@@ -14,6 +14,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.LightningBallEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +61,7 @@ public class LightningBallAbsorb extends SimpleAbilityItem {
             lightningBall.setOwner(player);
             lightningBall.setAbsorbed(true);
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(lightningBall);
-            scaleData.setScale(10 + (10 - holder.getCurrentSequence() * 3));
+            scaleData.setScale(BeyonderUtil.getDamage(player).get(ItemInit.LIGHTNING_BALL_ABSORB.get()));
             scaleData.markForSync(true);
             player.level().addFreshEntity(lightningBall);
         }

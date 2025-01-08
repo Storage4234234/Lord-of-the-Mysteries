@@ -35,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class TornadoEntity extends AbstractHurtingProjectile {
@@ -234,7 +235,12 @@ public class TornadoEntity extends AbstractHurtingProjectile {
             Vec3 pos = this.position();
             Random random = new Random();
             List<Entity> entities = this.level().getEntities(this, boundingBox);
+            entities.removeIf(Objects::isNull);
+
             for (Entity entity : entities) {
+                if (entity == null || entity.isRemoved()) {
+                    continue;
+                }
                 if (entity instanceof TornadoEntity || entity == this.getOwner() || !(entity instanceof LivingEntity)) {
                     continue;
                 }

@@ -21,7 +21,9 @@ import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -98,7 +100,7 @@ public class ProbabilityManipulationWipe extends SimpleAbilityItem {
         Level level = player.level();
         if (!level.isClientSide()) {
             for (Player pPlayer : level.players()) {
-                for (LivingEntity livingEntity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(200))) {
+                for (LivingEntity livingEntity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.PROBABILITYWIPE.get())))) {
                     CompoundTag tag = livingEntity.getPersistentData();
                     if (player.isShiftKeyDown()) {
                         if (livingEntity != player) {
@@ -145,6 +147,8 @@ public class ProbabilityManipulationWipe extends SimpleAbilityItem {
         tag.putInt("luckAttackerPoisoned", 0);
         tag.putDouble("luck",0);
         tag.putDouble("misfortune",0);
+        tag.putInt("probabilityManipulationInfiniteFortune", 0);
+        tag.putInt("probabilityManipulationInfiniteMisfortune", 0);
     }
     @Override
     public Rarity getRarity(ItemStack pStack) {

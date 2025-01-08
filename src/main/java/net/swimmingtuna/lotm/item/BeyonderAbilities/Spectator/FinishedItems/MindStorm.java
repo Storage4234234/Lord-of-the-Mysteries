@@ -23,8 +23,10 @@ import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.NotNull;
@@ -85,11 +87,11 @@ public class MindStorm extends SimpleAbilityItem {
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
             int sequence = holder.getCurrentSequence();
             int duration = 300 - (sequence * 25);
-            int damage = 50 - (sequence * 3);
+            int damage =  (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MIND_STORM.get());
             if (dreamIntoReality.getValue() == 2) {
                 damage = 50 - (sequence * 2);
             }
-            interactionTarget.addEffect(new MobEffectInstance(ModEffects.AWE.get(), duration, 1, false, false));
+            interactionTarget.addEffect(new MobEffectInstance(ModEffects.AWE.get(), (int) (duration * 0.5), 1, false, false));
             interactionTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, duration, 1, false, false));
             interactionTarget.addEffect(new MobEffectInstance(MobEffects.CONFUSION, duration, 1, false, false));
             interactionTarget.hurt(interactionTarget.damageSources().magic(), damage);

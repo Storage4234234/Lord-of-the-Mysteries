@@ -62,7 +62,7 @@ public class MatterAccelerationBlocks extends SimpleAbilityItem {
             BlockPos surfacePos = findSurfaceBelow(level, playerPos);
 
             if (surfacePos != null) {
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < BeyonderUtil.getDamage(player).get(ItemInit.MATTER_ACCELERATION_BLOCKS.get()); i++) {
                     BlockPos posToRemove = surfacePos.below(i);
                     level.destroyBlock(posToRemove, false);
                     if (level.dimension() == Level.OVERWORLD) {

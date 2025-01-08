@@ -27,8 +27,10 @@ import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -119,7 +121,7 @@ public class DreamWeaving extends SimpleAbilityItem {
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
             interactionTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 150, 1, false, false));
             RandomSource random = player.getRandom();
-            int times = 20 - (holder.getCurrentSequence() * 3);
+            int times = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.DREAM_WEAVING.get());
             for (int i = 0; i < times; i++) {
                 int randomNumber = random.nextInt(10);
                 EntityType<? extends Mob> entityType = MOB_TYPES.get(randomNumber);

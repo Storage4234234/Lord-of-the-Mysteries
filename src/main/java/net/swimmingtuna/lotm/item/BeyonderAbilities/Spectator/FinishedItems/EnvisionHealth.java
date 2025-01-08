@@ -13,8 +13,10 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -43,7 +45,7 @@ public class EnvisionHealth extends SimpleAbilityItem {
             AttributeInstance maxHP = player.getAttribute(Attributes.MAX_HEALTH);
             double maxHealth = maxHP.getValue();
             double health = player.getHealth();
-            double x = (health + ((maxHealth - health) * 0.66));
+            double x = (health + ((maxHealth - health) * (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_HEALTH.get())));
             player.setHealth((float) x);
         }
     }

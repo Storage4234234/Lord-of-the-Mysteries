@@ -2,6 +2,7 @@ package net.swimmingtuna.lotm.blocks;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -45,4 +46,12 @@ public class MonsterDomainBlock extends HorizontalDirectionalBlock implements En
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
         return TickableBlockEntity.getTickerHelper(level);
     }
+
+    @Override
+    public boolean isOcclusionShapeFullBlock(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+        return false;
+    }
+
+    
+
 }

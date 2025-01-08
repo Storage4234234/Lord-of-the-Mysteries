@@ -14,7 +14,9 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.WhisperOfCorruptionEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -40,7 +42,7 @@ public class WhisperOfCorruption extends SimpleAbilityItem {
 
     private void whisper(Player player) {
         if (!player.level().isClientSide()) {
-            WhisperOfCorruptionEntity.summonWhispersInLookVec(player, BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence());
+            WhisperOfCorruptionEntity.summonWhispersInLookVec(player, (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.WHISPEROFCORRUPTION.get()));
         }
     }
 

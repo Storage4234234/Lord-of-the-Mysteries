@@ -15,6 +15,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.LightningEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +62,7 @@ public class LightningBranch extends SimpleAbilityItem {
             lightningEntity.setOwner(player);
             lightningEntity.setOwner(player);
             lightningEntity.setBranchOut(true);
-            lightningEntity.setDamage(30 - (holder.getCurrentSequence() * 3));
+            lightningEntity.setDamage((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.LIGHTNING_BRANCH.get()));
             lightningEntity.teleportTo(player.getX(), player.getY(), player.getZ());
             player.level().addFreshEntity(lightningEntity);
         }

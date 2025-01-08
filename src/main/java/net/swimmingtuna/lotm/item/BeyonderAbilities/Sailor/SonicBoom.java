@@ -20,7 +20,9 @@ import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ExplosionUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.NotNull;
@@ -55,13 +57,13 @@ public class SonicBoom extends SimpleAbilityItem {
         player.hurtMarked = true;
         player.setDeltaMovement(lookVec.x(), lookVec.y(), lookVec.z());
         serverLevel.playSound(null, player.getOnPos(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 30.0f, 5.0f);
-        ExplosionUtil.createNoKnockbackExplosion(player.level(), player, 40 - (sequence * 5), false);
+        ExplosionUtil.createNoKnockbackExplosion(player.level(), player,BeyonderUtil.getDamage(player).get(ItemInit.SONIC_BOOM.get()), false);
         for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(30 - (sequence * 5)))) {
             if (entity == player) {
                 continue;
             }
             int duration = 100 - (sequence * 20);
-            int damage = 25 - (sequence * 5);
+            int damage = (int) (BeyonderUtil.getDamage(player).get(ItemInit.SONIC_BOOM.get()) * 0.75);
             if (!(entity instanceof Player)) {
                 entity.addEffect(new MobEffectInstance(ModEffects.AWE.get(), duration, 1, false, false));
                 entity.hurt(entity.damageSources().generic(), damage);

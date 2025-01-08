@@ -34,7 +34,16 @@ public class EnvisionLocation extends SimpleAbilityItem {
     public static boolean isThreeIntegers(String message) {
         message = message.replace(",", " ").trim();
         message = message.replaceAll("\\s+", " ");
-        return message.matches("\\d+ \\d+ \\d+");
+        try {
+            String[] parts = message.split(" ");
+            if (parts.length != 3) return false;
+            for (String part : parts) {
+                Integer.parseInt(part);
+            }
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     @Override

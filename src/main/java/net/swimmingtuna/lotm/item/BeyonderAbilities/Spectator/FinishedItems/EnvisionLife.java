@@ -16,7 +16,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,8 +81,8 @@ public class EnvisionLife extends SimpleAbilityItem {
                     }
 
                     BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                    if (holder.getSpirituality() >= mob.getMaxHealth() * 3) {
-                        holder.useSpirituality((int) (mob.getMaxHealth() * 3));
+                    if (holder.getSpirituality() >= mob.getMaxHealth() * BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LIFE.get())) {
+                        holder.useSpirituality((int) (mob.getMaxHealth() * BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LIFE.get())));
                         level.addFreshEntity(entity);
 
                         // Get the translated name of the entity
@@ -89,7 +91,7 @@ public class EnvisionLife extends SimpleAbilityItem {
                     } else {
                         // Get the translated name for the error message too
                         String entityName = entity.getType().getDescription().getString();
-                        player.sendSystemMessage(Component.literal("You need " + (mob.getMaxHealth() * 3 - holder.getSpirituality()) + " more spirituality in order to envision " + entityName));
+                        player.sendSystemMessage(Component.literal("You need " + (mob.getMaxHealth() * BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LIFE.get()) - holder.getSpirituality()) + " more spirituality in order to envision " + entityName));
                     }
                 }
             } else {

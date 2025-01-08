@@ -23,8 +23,10 @@ import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -89,9 +91,9 @@ public class PlagueStorm extends SimpleAbilityItem {
                     continue;
                 }
                 if (entityInRange != interactionTarget) {
-                    entityInRange.hurt(entityInRange.damageSources().magic(), (float) ((20 - (holder.getCurrentSequence() * 3)) * dreamIntoReality.getValue()));
+                    entityInRange.hurt(entityInRange.damageSources().magic(),  BeyonderUtil.getDamage(player).get(ItemInit.PLAGUE_STORM.get()));
                 } else {
-                    entityInRange.hurt(entityInRange.damageSources().magic(), (float) ((40 - (holder.getCurrentSequence() * 6)) * dreamIntoReality.getValue()));
+                    entityInRange.hurt(entityInRange.damageSources().magic() , BeyonderUtil.getDamage(player).get(ItemInit.PLAGUE_STORM.get()) * 2);
                 }
                 entityInRange.addEffect(new MobEffectInstance(MobEffects.WITHER, 80, 2, false, false));
                 entityInRange.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 1, false, false));

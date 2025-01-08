@@ -18,8 +18,10 @@ import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -39,7 +41,7 @@ public class EnvisionLocationBlink extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         addCooldown(player, this, 20 / dreamIntoReality);
-        useSpirituality(player, 1000 / dreamIntoReality);
+        useSpirituality(player, (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LOCATION_BLINK.get()));
         envisionLocationBlink(player);
         return InteractionResult.SUCCESS;
     }

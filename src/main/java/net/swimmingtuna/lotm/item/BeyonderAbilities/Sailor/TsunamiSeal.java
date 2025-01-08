@@ -17,7 +17,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -34,6 +36,7 @@ public class TsunamiSeal extends SimpleAbilityItem {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
+        player.getCooldowns().addCooldown(ItemInit.TSUNAMI.get(), 2400);
         addCooldown(player);
         useSpirituality(player);
         startTsunami(player);
@@ -42,7 +45,7 @@ public class TsunamiSeal extends SimpleAbilityItem {
 
     public static void startTsunami(Player player) {
         if (!player.level().isClientSide()) {
-            player.getPersistentData().putInt("sailorTsunamiSeal", 600);
+            player.getPersistentData().putInt("sailorTsunamiSeal", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.TSUNAMI_SEAL.get()));
             float yaw = player.getYRot();
             String direction = getDirectionFromYaw(yaw);
             player.getPersistentData().putString("sailorTsunamiSealDirection", direction);

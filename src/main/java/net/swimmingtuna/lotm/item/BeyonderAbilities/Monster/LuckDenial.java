@@ -21,7 +21,9 @@ import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -83,11 +85,11 @@ public class LuckDenial extends SimpleAbilityItem {
             double luck = tag.getDouble("luck");
             double misfortune = tag.getDouble("misfortune");
             if (holder.getCurrentSequence() <= 2) {
-                tag.putDouble("luckDenialTimer", 1800 - (holder.getCurrentSequence()) * 150);
+                tag.putDouble("luckDenialTimer", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.LUCKDENIAL.get()));
                 tag.putDouble("luckDenialLuck", luck);
                 tag.putDouble("luckDenialMisfortune", misfortune);
             } else {
-                tag.putDouble("luckDenialTimer", 1800 - (holder.getCurrentSequence()) * 150);
+                tag.putDouble("luckDenialTimer", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.LUCKDENIAL.get()));
                 tag.putDouble("luckDenialLuck", luck);
             }
         }

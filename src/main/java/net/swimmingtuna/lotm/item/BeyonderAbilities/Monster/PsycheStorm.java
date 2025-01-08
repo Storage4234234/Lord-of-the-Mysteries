@@ -25,6 +25,7 @@ import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
@@ -88,8 +89,8 @@ public class PsycheStorm extends SimpleAbilityItem {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int sequence = holder.getCurrentSequence();
             double radius = (15.0 - sequence);
-            float damage = (float) (25.0 - (sequence / 2));
-            int corruptionAddition = 30 - (sequence / 3);
+            float damage = (float) (25.0 - (sequence * 2));
+            int corruptionAddition = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.PSYCHESTORM.get());
             int duration = 200 - (sequence * 20);
             AABB boundingBox = new AABB(targetPos).inflate(radius);
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, LivingEntity::isAlive).forEach(livingEntity -> {

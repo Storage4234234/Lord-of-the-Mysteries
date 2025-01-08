@@ -6,16 +6,14 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.EntityInit;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -102,6 +100,15 @@ public class StormSealEntity extends AbstractHurtingProjectile {
         ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
         float radius = 3 * scaleData.getScale();
         if (!this.level().isClientSide()) {
+            for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius * 0.75))) {
+                if (livingEntity != null && livingEntity.getMaxHealth() >= 50) {
+                    livingEntity.getPersistentData().putInt("inStormSeal", 3600);
+                    livingEntity.getPersistentData().putInt("stormSealX", (int) livingEntity.getX());
+                    livingEntity.getPersistentData().putInt("stormSealY", (int) livingEntity.getY());
+                    livingEntity.getPersistentData().putInt("stormSealZ", (int) livingEntity.getZ());
+                    this.discard();
+                }
+            }
             for (int i = 0; i < 36; i++) {
                 double angle = i * 10 * Math.PI / 180;
                 double x = this.getX() + radius * Math.cos(angle);
@@ -111,14 +118,18 @@ public class StormSealEntity extends AbstractHurtingProjectile {
                 }
             }
 
-            // Spawn 4 lightning bolts around the entity
             for (int i = 0; i < 4; i++) {
                 double angle = i * 90 * Math.PI / 180;
                 double x = this.getX() + radius * Math.cos(angle);
                 double z = this.getZ() + radius * Math.sin(angle);
                 BlockPos strikePos = new BlockPos((int) x, (int) this.getY(), (int) z);
-                EntityType.LIGHTNING_BOLT.spawn((ServerLevel) this.level(), (ItemStack) null, null, strikePos,
-                        MobSpawnType.TRIGGERED, true, true);
+                LightningBolt lightningBolt = EntityType.LIGHTNING_BOLT.create(this.level());
+                if (lightningBolt != null) {
+                    lightningBolt.moveTo(Vec3.atBottomCenterOf(strikePos));
+                    lightningBolt.setVisualOnly(false);
+                    lightningBolt.setCause(null);
+                    this.level().addFreshEntity(lightningBolt);
+                }
             }
             if (this.tickCount >= 300) {
                 this.discard();

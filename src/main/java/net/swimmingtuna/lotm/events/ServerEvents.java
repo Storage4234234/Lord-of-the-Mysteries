@@ -39,6 +39,7 @@ import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedIte
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ServerEvents {
 
+
     @SubscribeEvent
     public static void onChatMessage(ServerChatEvent event) {
         Level level = event.getPlayer().serverLevel();
@@ -50,18 +51,18 @@ public class ServerEvents {
             if (!holder.currentClassMatches(BeyonderClassInit.SPECTATOR)) {
                 player.displayClientMessage(Component.literal("You are not of the Spectator pathway").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
             }
-            if (holder.getSpirituality() < (int) 500 / dreamIntoReality.getValue()) {
+            if (holder.getSpirituality() < (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_WEATHER.get())) {
                 player.displayClientMessage(Component.literal("You need " + ((int) 500 / dreamIntoReality.getValue()) + " spirituality in order to use this").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
             }
             String message = event.getMessage().getString().toLowerCase();
             if (holder.currentClassMatches(BeyonderClassInit.SPECTATOR) && player.getMainHandItem().getItem() instanceof EnvisionWeather && holder.getCurrentSequence() == 0) {
-                if (message.equals("clear") && holder.useSpirituality((int) (500 / dreamIntoReality.getValue()))) {
+                if (message.equals("clear") && holder.useSpirituality( (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_WEATHER.get()))) {
                     setWeatherClear(level);
                     event.getPlayer().displayClientMessage(Component.literal("Set Weather to Clear").withStyle(style), true);
-                    holder.useSpirituality((int) (500 / dreamIntoReality.getValue()));
+                    holder.useSpirituality( (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_WEATHER.get()));
                     event.setCanceled(true);
                 }
-                if (message.equals("rain") && holder.useSpirituality((int) (500 / dreamIntoReality.getValue()))) {
+                if (message.equals("rain") && holder.useSpirituality( (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_WEATHER.get()))) {
                     event.getPlayer().displayClientMessage(Component.literal("Set Weather to Rain").withStyle(style), true);
                     setWeatherRain(level);
                     event.setCanceled(true);
@@ -192,50 +193,48 @@ public class ServerEvents {
         }
         String message = event.getMessage().getString();
         if (holder.currentClassMatches(BeyonderClassInit.SPECTATOR) && !player.level().isClientSide() && player.getMainHandItem().getItem() instanceof EnvisionLocation && holder.getCurrentSequence() == 0) {
-            if (isThreeIntegers(message)) {
-                if (!holder.currentClassMatches(BeyonderClassInit.SPECTATOR)) {
-                    player.displayClientMessage(Component.literal("You are not of the Spectator pathway").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
-                } else if (holder.getSpirituality() < (int) (500 / dreamIntoReality.getValue())) {
-                    player.displayClientMessage(Component.literal("You need " + (int) (500 / dreamIntoReality.getValue()) + " spirituality in order to use this").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
-                } else {
-                    String[] coordinates = message.replace(",", " ").trim().split("\\s+");
-
-                    if (coordinates.length == 3) {
-                        int x = Integer.parseInt(coordinates[0]);
-                        int y = Integer.parseInt(coordinates[1]);
-                        int z = Integer.parseInt(coordinates[2]);
-                        player.teleportTo(x, y, z);
-                        event.getPlayer().displayClientMessage(Component.literal("Teleported to " + x + ", " + y + ", " + z).withStyle(BeyonderUtil.getStyle(player)), true);
-                        holder.useSpirituality((int) (500 / dreamIntoReality.getValue()));
-                        event.setCanceled(true);
-                    }
-                }
-            } else {
-                Player targetPlayer = null;
-                for (Player serverPlayer : level.players()) {
-                    if (serverPlayer.getUUID().toString().equals(message)) {
-                        targetPlayer = serverPlayer;
-                        break;
-                    }
-                }
-                if (targetPlayer != null) {
-                    if (!holder.currentClassMatches(BeyonderClassInit.SPECTATOR)) {
-                        player.displayClientMessage(Component.literal("You are not of the Spectator pathway").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
-                    }
-                    if (holder.getSpirituality() < (int) (500 / dreamIntoReality.getValue())) {
-                        player.displayClientMessage(Component.literal("You need " + (int) (500 / dreamIntoReality.getValue()) + " spirituality in order to use this").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
-                    } else {
-                        int x = (int) targetPlayer.getX();
-                        int y = (int) targetPlayer.getY();
-                        int z = (int) targetPlayer.getZ();
-                        player.teleportTo(x, y, z);
-                        holder.useSpirituality(500);
-                    }
-                } else {
-                    event.getPlayer().displayClientMessage(Component.literal("Player:" + message + " not found").withStyle(BeyonderUtil.getStyle(player)), true);
-                }
+            if (!holder.currentClassMatches(BeyonderClassInit.SPECTATOR)) {
+                player.displayClientMessage(Component.literal("You are not of the Spectator pathway")
+                        .withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
                 event.setCanceled(true);
+                return;
             }
+            if (holder.getSpirituality() < BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LOCATION.get())) {
+                player.displayClientMessage(Component.literal("You need " + (int)(500 / dreamIntoReality.getValue()) + " spirituality in order to use this").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
+                event.setCanceled(true);
+                return;
+            }
+            if (isThreeIntegers(message)) {
+                String[] coordinates = message.replace(",", " ").trim().split("\\s+");
+                int x = Integer.parseInt(coordinates[0]);
+                int y = Integer.parseInt(coordinates[1]);
+                int z = Integer.parseInt(coordinates[2]);
+
+                player.teleportTo(x, y, z);
+                event.getPlayer().displayClientMessage(Component.literal("Teleported to " + x + ", " + y + ", " + z).withStyle(BeyonderUtil.getStyle(player)), true);
+                holder.useSpirituality((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LOCATION.get()));
+                event.setCanceled(true);
+                return;
+            }
+            Player targetPlayer = null;
+            for (Player serverPlayer : level.players()) {
+                if (serverPlayer.getName().getString().toLowerCase().equals(message.toLowerCase())) {
+                    targetPlayer = serverPlayer;
+                    break;
+                }
+            }
+            if (targetPlayer != null) {
+                int x = (int)targetPlayer.getX();
+                int y = (int)targetPlayer.getY();
+                int z = (int)targetPlayer.getZ();
+                player.teleportTo(x, y, z);
+                holder.useSpirituality((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LOCATION.get()));
+                event.getPlayer().displayClientMessage(Component.literal("Teleported to " + targetPlayer.getName().getString()).withStyle(BeyonderUtil.getStyle(player)), true);
+            } else {
+                event.getPlayer().displayClientMessage(Component.literal("Invalid coordinates or player name: " + message)
+                        .withStyle(BeyonderUtil.getStyle(player)), true);
+            }
+            event.setCanceled(true);
         }
     }
 }

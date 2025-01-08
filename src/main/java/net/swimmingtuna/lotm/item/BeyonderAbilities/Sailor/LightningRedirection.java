@@ -22,6 +22,7 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.entity.LightningEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
@@ -79,7 +80,7 @@ public class LightningRedirection extends SimpleAbilityItem {
     private void lightningRedirection(Player player, BlockPos pos) {
         if (!player.level().isClientSide()) {
             Level level = player.level();
-            for (Entity entity : level.getEntitiesOfClass(Entity.class, player.getBoundingBox().inflate(200))) {
+            for (Entity entity : level.getEntitiesOfClass(Entity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.LIGHTNING_REDIRECTION.get())))) {
                 if (entity instanceof LightningEntity lightning) {
                     lightning.setTargetPos(pos.getCenter());
                     lightning.setTargetEntity(null);
@@ -90,7 +91,7 @@ public class LightningRedirection extends SimpleAbilityItem {
     private void lightningRedirectionEntity(Player player,LivingEntity interactionTarget) {
         if (!player.level().isClientSide()) {
             Level level = player.level();
-            for (Entity entity : level.getEntitiesOfClass(Entity.class, player.getBoundingBox().inflate(200))) {
+            for (Entity entity : level.getEntitiesOfClass(Entity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.LIGHTNING_REDIRECTION.get())))) {
                 if (entity instanceof LightningEntity lightning) {
                     lightning.setTargetEntity(interactionTarget);
                     lightning.setTargetPos(null);

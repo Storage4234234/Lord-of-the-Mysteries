@@ -5,9 +5,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -20,6 +22,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.RotationUtil;
+import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -46,7 +49,9 @@ public abstract class BeamEntity extends LOTMProjectile {
 
     public @Nullable Direction side = null;
 
+    private static final EntityDataAccessor<Boolean> DRAGON_BREATH = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> FRENZY_TIME = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_YAW = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DATA_PITCH = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.FLOAT);
 
@@ -83,6 +88,22 @@ public abstract class BeamEntity extends LOTMProjectile {
 
     public void setDamage(float damage) {
         this.entityData.set(DAMAGE, damage);
+    }
+
+    public int getFrenzyTime() {
+        return this.entityData.get(FRENZY_TIME);
+    }
+
+    public void setFrenzyTime(int frenzyTime) {
+        this.entityData.set(FRENZY_TIME, frenzyTime);
+    }
+
+    public boolean getIsDragonBreath() {
+        return this.entityData.get(DRAGON_BREATH);
+    }
+
+    public void setIsDragonbreath(boolean isDragonBreath) {
+        this.entityData.set(DRAGON_BREATH, isDragonBreath);
     }
 
     protected abstract int getDuration();
@@ -158,10 +179,17 @@ public abstract class BeamEntity extends LOTMProjectile {
                         new Vec3(this.endPosX, this.endPosY, this.endPosZ));
 
                 for (Entity entity : entities) {
-                    if (entity == owner) continue;
-
-                    entity.hurt(BeyonderUtil.lightningSource(this), this.getDamage());
-
+                    if (entity == owner) {
+                        continue;
+                    }
+                    if (!(entity instanceof Player)) {
+                        entity.hurt(BeyonderUtil.genericSource(this), this.getDamage());
+                    } else {
+                        entity.hurt(BeyonderUtil.genericSource(this), this.getDamage() * 2);
+                    }
+                    if (entity instanceof LivingEntity livingEntity && getIsDragonBreath()) {
+                        livingEntity.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), getFrenzyTime(), 1, false,false));
+                    }
                     if (this.causesFire()) {
                         entity.setSecondsOnFire(5);
                     }
@@ -214,6 +242,8 @@ public abstract class BeamEntity extends LOTMProjectile {
         this.entityData.define(DAMAGE,20.0F);
         this.entityData.define(DATA_YAW, 0.0F);
         this.entityData.define(DATA_PITCH, 0.0F);
+        this.entityData.define(DRAGON_BREATH, false);
+        this.entityData.define(FRENZY_TIME, 1);
     }
 
     public float getYaw() {

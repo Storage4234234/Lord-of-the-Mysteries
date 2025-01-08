@@ -15,7 +15,9 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.LavaEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -47,7 +49,7 @@ public class VolcanicEruption extends SimpleAbilityItem {
             Level level = player.level();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int sequence = holder.getCurrentSequence();
-            int spawnCount = 120 - (sequence * 10);
+            int spawnCount =(int) (float) BeyonderUtil.getDamage(player).get(ItemInit.VOLCANIC_ERUPTION.get());
             double randomX = (Math.random() * 1) - 0.5;
             double randomZ = (Math.random() * 1) - 0.5;
             Random random = new Random();

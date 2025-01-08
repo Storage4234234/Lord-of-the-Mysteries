@@ -14,8 +14,10 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.DragonBreathEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -42,7 +44,7 @@ public class DragonBreath extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-            int sequence = (int) ((60 - holder.getCurrentSequence() * 4) * dreamIntoReality.getValue());
+            int sequence = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.DRAGON_BREATH.get());
             DragonBreathEntity.shootDragonBreath(player, sequence, player.getX(), player.getY(), player.getZ());
         }
     }

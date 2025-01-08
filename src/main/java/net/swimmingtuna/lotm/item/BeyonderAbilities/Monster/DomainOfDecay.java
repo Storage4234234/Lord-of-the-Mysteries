@@ -4,20 +4,23 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Monster;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.blocks.MonsterDomainBlockEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.BlockInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -29,6 +32,7 @@ public class DomainOfDecay extends SimpleAbilityItem {
     public DomainOfDecay(Properties properties) {
         super(properties, BeyonderClassInit.MONSTER, 4, 400, 600);
     }
+
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         if (!checkAll(player)) {
@@ -40,18 +44,44 @@ public class DomainOfDecay extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
+    @Override
+    public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
+        Player player = pContext.getPlayer();
+        if (!checkAll(player)) {
+            return InteractionResult.FAIL;
+        }
+        removeDomainOfProvidence(pContext);
+        return InteractionResult.SUCCESS;
+    }
+
     private void makeDomainOfProvidence(Player player) {
         if (!player.level().isClientSide()) {
-            Level level = player.level();
-            BlockPos pos = player.getOnPos();
-            int enhancement = CalamityEnhancementData.getInstance((ServerLevel) player.level()).getCalamityEnhancement();
-            level.setBlock(pos, BlockInit.MONSTER_DOMAIN_BLOCK.get().defaultBlockState().setValue(LIT, false), 3);
-            if (level.getBlockEntity(pos) instanceof MonsterDomainBlockEntity domainEntity) {
-                domainEntity.setOwner(player);
-                int radius = player.getPersistentData().getInt("monsterDomainRadius");
-                domainEntity.setRadius(radius);
-                domainEntity.setBad(true);
-                domainEntity.setChanged();
+            Vec3 eyePosition = player.getEyePosition();
+            Vec3 lookVector = player.getLookAngle();
+            Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
+            ClipContext clipContext = new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player);
+            BlockHitResult blockHit = player.level().clip(clipContext);
+            if (blockHit.getType() != HitResult.Type.BLOCK) {
+                Level level = player.level();
+                BlockPos pos = player.getOnPos();
+                level.setBlock(pos, BlockInit.MONSTER_DOMAIN_BLOCK.get().defaultBlockState().setValue(LIT, false), 3);
+                if (level.getBlockEntity(pos) instanceof MonsterDomainBlockEntity domainEntity) {
+                    domainEntity.setOwner(player);
+                    int radius = player.getPersistentData().getInt("monsterDomainRadius");
+                    domainEntity.setRadius(radius);
+                    domainEntity.setBad(true);
+                    domainEntity.setChanged();
+                }
+            }
+        }
+    }
+
+    private void removeDomainOfProvidence(UseOnContext pContext) {
+        Level level = pContext.getLevel();
+        BlockPos pos = pContext.getClickedPos();
+        if (!level.isClientSide()) {
+            if (level.getBlockState(pos).is(BlockInit.MONSTER_DOMAIN_BLOCK.get())) {
+                level.removeBlock(pos, false);
             }
         }
     }
@@ -66,6 +96,7 @@ public class DomainOfDecay extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);

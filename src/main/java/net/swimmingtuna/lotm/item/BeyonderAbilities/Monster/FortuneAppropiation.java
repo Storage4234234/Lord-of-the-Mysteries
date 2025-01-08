@@ -13,6 +13,7 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +39,7 @@ public class FortuneAppropiation extends SimpleAbilityItem {
 
     private void appropiateFortune(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
-            for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(100 - (BeyonderUtil.getSequence(livingEntity) * 20)))) {
+            for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(BeyonderUtil.getDamage(livingEntity).get(ItemInit.FORTUNEAPPROPIATION.get())))) {
                 if (entity != livingEntity) {
                     CompoundTag tag = entity.getPersistentData();
                     CompoundTag livingTag = livingEntity.getPersistentData();

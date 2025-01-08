@@ -88,6 +88,7 @@ public class AqueousLightEntityPull extends AbstractHurtingProjectile {
         double chanceOfDamage = (100.0 - (holder.getCurrentSequence() * 12.5)); // Decrease chance by 12.5% for each level below 9
         if (Math.random() * 100 < chanceOfDamage && sailorLightning) {
             LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, entity.level());
+            lightningBolt.setDamage(3);
             lightningBolt.moveTo(entity.getX(), entity.getY(), entity.getZ());
             entity.level().addFreshEntity(lightningBolt);
         }

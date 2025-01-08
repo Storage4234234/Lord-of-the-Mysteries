@@ -53,7 +53,7 @@ public class Placate extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (holder.getCurrentSequence() >= 4) {
+        if (holder.getCurrentSequence() <= 4) {
             removeHarmfulEffects(player);
             addCooldown(player);
             useSpirituality(player);
