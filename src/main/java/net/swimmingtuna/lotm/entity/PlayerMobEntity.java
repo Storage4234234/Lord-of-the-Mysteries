@@ -90,6 +90,7 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
     private static final UUID BABY_SPEED_BOOST_ID = UUID.fromString("B9766B59-9566-4402-BC1F-2EE2A276D836");
     private static final AttributeModifier BABY_SPEED_BOOST = new AttributeModifier(BABY_SPEED_BOOST_ID, "Baby speed boost", 0.5D, AttributeModifier.Operation.MULTIPLY_BASE);
 
+    private static final EntityDataAccessor<Integer> MENTAL_STRENGTH = SynchedEntityData.defineId(PlayerMobEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> IS_CHILD = SynchedEntityData.defineId(PlayerMobEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<String> NAME = SynchedEntityData.defineId(PlayerMobEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> SEQUENCE = SynchedEntityData.defineId(PlayerMobEntity.class, EntityDataSerializers.INT);
@@ -161,8 +162,12 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
         getEntityData().define(IS_CHILD, false);
         getEntityData().define(IS_CHARGING_CROSSBOW, false);
         getEntityData().define(SEQUENCE, -1);
-
+        getEntityData().define(MENTAL_STRENGTH, 10);
+        getEntityData().define(MAXSPIRITUALITY, 100);
+        getEntityData().define(SPIRITUALITY, 0);
     }
+
+
 
     @Override
     public void rideTick() {
@@ -452,17 +457,22 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
-        if (getCustomName() != null && getCustomName().getString().isEmpty())
+        if (getCustomName() != null && getCustomName().getString().isEmpty()) {
             compound.remove("CustomName");
-
+        }
         String username = getUsername().getCombinedNames();
-        if (!StringUtil.isNullOrEmpty(username))
+        if (!StringUtil.isNullOrEmpty(username)) {
             compound.putString("Username", username);
-
+        }
         compound.putBoolean("CanBreakDoors", canBreakDoors);
         compound.putBoolean("IsBaby", isBaby());
-        if (profile != null && profile.isComplete())
+        if (profile != null && profile.isComplete()) {
             compound.put("Profile", NbtUtils.writeGameProfile(new CompoundTag(), profile));
+        }
+        compound.putInt("MentalStrength", this.getMentalStrength());
+        compound.putInt("Sequence", this.getCurrentSequence());
+        compound.putInt("Spirituality", this.getSpirituality());
+        compound.putInt("MaxSpirituality", this.getMaxSpirituality());
     }
 
     @Override
@@ -482,6 +492,18 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
         }
         if (compound.contains("sequence")) {
             this.setSequence(compound.getInt("sequence"));
+        }
+        if (compound.contains("MentalStrength")) {
+            this.setMentalStrength(compound.getInt("MentalStrength"));
+        }
+        if (compound.contains("Sequence")) {
+            this.setSequence(compound.getInt("Sequence"));
+        }
+        if (compound.contains("Spirituality")) {
+            this.setSpirituality(compound.getInt("Spirituality"));
+        }
+        if (compound.contains("MaxSpirituality")) {
+            this.setMaxSpirituality(compound.getInt("MaxSpirituality"));
         }
 
         setCombatTask();
@@ -567,6 +589,13 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
     }
     public void setSequence(int sequence) {
         this.entityData.set(SEQUENCE, sequence);
+    }
+
+    public int getMentalStrength() {
+        return this.entityData.get(MENTAL_STRENGTH);
+    }
+    public void setMentalStrength(int mentalStrength) {
+        this.entityData.set(MENTAL_STRENGTH, mentalStrength);
     }
 
 

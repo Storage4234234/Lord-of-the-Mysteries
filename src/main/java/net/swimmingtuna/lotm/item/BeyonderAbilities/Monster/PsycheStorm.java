@@ -96,7 +96,7 @@ public class PsycheStorm extends SimpleAbilityItem {
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, LivingEntity::isAlive).forEach(livingEntity -> {
                 if (livingEntity != player) {
                     double corruption = livingEntity.getPersistentData().getDouble("corruption");
-                    livingEntity.hurt(BeyonderUtil.magicSource(player), damage);
+                    BeyonderUtil.applyMentalDamage(player, livingEntity, damage);
                     livingEntity.getPersistentData().putDouble("corruption", corruption + corruptionAddition);
                     livingEntity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, duration, 1, false, false));
                 }

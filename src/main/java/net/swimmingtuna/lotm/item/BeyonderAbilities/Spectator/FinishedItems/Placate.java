@@ -16,6 +16,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -53,7 +54,7 @@ public class Placate extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (holder.getCurrentSequence() <= 4) {
+        if (holder.getCurrentSequence() <= 4 || player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {
             removeHarmfulEffects(player);
             addCooldown(player);
             useSpirituality(player);

@@ -53,7 +53,7 @@ public class ProphesizeDemise extends SimpleAbilityItem {
         int dir = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
         addCooldown(player, stack.getItem(), 3000 / dir);
         useSpirituality(player);
-        prophesizeDemise(interactionTarget);
+        prophesizeDemise(player,interactionTarget);
         return InteractionResult.SUCCESS;
     }
 
@@ -89,8 +89,11 @@ public class ProphesizeDemise extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public void prophesizeDemise(LivingEntity interactionTarget) {
-        if (!interactionTarget.level().isClientSide()) {
+    public void prophesizeDemise(Player player,LivingEntity interactionTarget) {
+        if (!interactionTarget.level().isClientSide() && !player.level().isClientSide()) {
+            if (player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {
+                interactionTarget.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), 40, 1, false,false));
+            }
             interactionTarget.addEffect(new MobEffectInstance(ModEffects.SPECTATORDEMISE.get(), 600, 1, false, false));
         }
     }

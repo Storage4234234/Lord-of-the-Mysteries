@@ -65,12 +65,14 @@ public class LOTM {
         Set<String> classNames = new HashSet<>();
         List<ModFileScanData> modFileScanData = ModList.get().getAllScanData();
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        DamageTypeInit.DAMAGE_TYPES.register(modEventBus);
         MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
         BeyonderClassInit.BEYONDER_CLASS.register(modEventBus);
         BeyonderHolderAttacher.register();
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.commonSpec);
         BlockEntityInit.register(modEventBus);
         CreativeTabInit.register(modEventBus);
+        DamageTypeInit.DAMAGE_TYPES.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(new GameRuleInit());
         ItemInit.register(modEventBus);
         BlockInit.register(modEventBus);

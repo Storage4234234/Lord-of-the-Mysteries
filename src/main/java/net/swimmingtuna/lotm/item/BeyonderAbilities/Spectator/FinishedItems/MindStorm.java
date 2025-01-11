@@ -89,12 +89,12 @@ public class MindStorm extends SimpleAbilityItem {
             int duration = 300 - (sequence * 25);
             int damage =  (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MIND_STORM.get());
             if (dreamIntoReality.getValue() == 2) {
-                damage = 50 - (sequence * 2);
+                damage = (int) ((int) (float)1.5 * BeyonderUtil.getDamage(player).get(ItemInit.MIND_STORM.get()));
             }
             interactionTarget.addEffect(new MobEffectInstance(ModEffects.AWE.get(), (int) (duration * 0.5), 1, false, false));
             interactionTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, duration, 1, false, false));
             interactionTarget.addEffect(new MobEffectInstance(MobEffects.CONFUSION, duration, 1, false, false));
-            interactionTarget.hurt(interactionTarget.damageSources().magic(), damage);
+            BeyonderUtil.applyMentalDamage(player, interactionTarget, damage);
             if (!player.isCreative()) {
                 player.getCooldowns().addCooldown(this, 200);
             }

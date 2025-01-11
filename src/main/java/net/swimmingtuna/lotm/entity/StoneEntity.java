@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
@@ -19,6 +20,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
+import net.swimmingtuna.lotm.networking.packet.UpdateEntityLocationS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -26,6 +29,8 @@ import virtuoel.pehkui.api.ScaleTypes;
 import java.util.Random;
 
 public class StoneEntity extends AbstractArrow {
+
+    private static final EntityDataAccessor<Integer> DATA_BB = SynchedEntityData.defineId(StoneEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_STONE_DAMAGE = SynchedEntityData.defineId(StoneEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_DANGEROUS = SynchedEntityData.defineId(StoneEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_STONE_XROT = SynchedEntityData.defineId(StoneEntity.class, EntityDataSerializers.INT);
@@ -58,6 +63,7 @@ public class StoneEntity extends AbstractArrow {
         this.entityData.define(DATA_STONE_STAYATY, 0.0f);
         this.entityData.define(DATA_STONE_STAYATZ, 0.0f);
         this.entityData.define(DATA_STONE_YROT, 0);
+        this.entityData.define(DATA_BB, 6);
     }
 
     @Override
@@ -133,6 +139,10 @@ public class StoneEntity extends AbstractArrow {
             this.discard();
         }
         if (!this.level().isClientSide()) {
+            Vec3 currentPos = this.position();
+            for (ServerPlayer player : level().getEntitiesOfClass(ServerPlayer.class, this.getBoundingBox().inflate(100))) {
+                LOTMNetworkHandler.sendToPlayer(new UpdateEntityLocationS2C(currentPos.x(), currentPos.y(), currentPos.z(), this.getId()), player);
+            }
             if (getRemoveAndHurt()) {
                 if (!getSent() && this.getOwner() != null) {
                     this.hurtMarked = true;
@@ -156,7 +166,7 @@ public class StoneEntity extends AbstractArrow {
                         }
                     }
                 }
-                for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(10))) {
+                for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getBB()))) {
                     if (entity != this.getOwner()) {
                         entity.hurt(BeyonderUtil.explosionSource(entity), getDamage());
                         this.discard();
@@ -187,6 +197,14 @@ public class StoneEntity extends AbstractArrow {
 
     public int getDamage() {
         return this.entityData.get(DATA_STONE_DAMAGE);
+    }
+
+    public void setBB(int bb) {
+        this.entityData.set(DATA_BB, bb);
+    }
+
+    public int getBB() {
+        return this.entityData.get(DATA_BB);
     }
 
     public float getStoneStayAtX() {

@@ -22,6 +22,9 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
+
+import static net.swimmingtuna.lotm.events.ModEvents.lastSentInvisibilityStates;
 
 public class PsychologicalInvisibility extends SimpleAbilityItem {
 
@@ -34,14 +37,14 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        storeAndReleaseArmor(player);
+        psychologicalInvisibilityTest(player);
         if (ClientShouldntRenderInvisibilityData.getShouldntRender()) {
             addCooldown(player);
         }
         return InteractionResult.SUCCESS;
     }
 
-    private static void storeAndReleaseArmor(Player player) {
+    private static void psychologicalInvisibility(Player player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean shouldntRender = ClientShouldntRenderInvisibilityData.getShouldntRender();
@@ -58,6 +61,33 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
                 player.displayClientMessage(Component.literal("You are now visible"), true);
                 tag.putBoolean("psychologicalInvisibility", false);
                 LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderInvisibilityPacketS2C(false, player.getUUID()), (ServerPlayer) player);
+            }
+        }
+    }
+
+    private static void psychologicalInvisibilityTest(Player player) {
+        if (!player.level().isClientSide()) {
+            CompoundTag tag = player.getPersistentData();
+            boolean newState = !tag.getBoolean("psychologicalInvisibility");
+
+            if (newState) {
+                for (Mob mob : player.level().getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(50))) {
+                    if (mob.getTarget() == player) {
+                        mob.setTarget(null);
+                    }
+                }
+                player.displayClientMessage(Component.literal("You are now invisible"), true);
+            } else {
+                player.displayClientMessage(Component.literal("You are now visible"), true);
+            }
+
+            tag.putBoolean("psychologicalInvisibility", newState);
+
+            UUID playerId = player.getUUID();
+            Boolean lastState = lastSentInvisibilityStates.get(playerId);
+            if (lastState == null || lastState != newState) {
+                LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(newState, playerId));
+                lastSentInvisibilityStates.put(playerId, newState);
             }
         }
     }

@@ -114,10 +114,12 @@ public class RoarEntity extends AbstractHurtingProjectile {
         ParticleEngine particleEngine = Minecraft.getInstance().particleEngine;
         Particle particle = particleEngine.createParticle(ParticleTypes.SONIC_BOOM, this.getX(), this.getY(), this.getZ(),0,0,0);
         assert particle != null;
-        particle.scale(ScaleTypes.BASE.getScaleData(this).getScale());
         ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
         float radius = 3 * scaleData.getScale();
         if (!this.level().isClientSide()) {
+            if (this.level() instanceof ServerLevel serverLevel) {
+                serverLevel.sendParticles(ParticleTypes.SONIC_BOOM, this.getX(), this.getY(), this.getZ(), 0,0,0,0,0);
+            }
             BlockPos center = new BlockPos((int) this.getX(), (int) this.getY(), (int) this.getZ());
             for (BlockPos pos : BlockPos.betweenClosed(center.offset(-(int) radius, -(int) radius, -(int) radius), center.offset((int) radius, (int) radius, (int) radius))) {
                 Vec3i vec = new Vec3i(pos.getX(), pos.getY(), pos.getZ());

@@ -97,7 +97,7 @@ public class MindReading extends SimpleAbilityItem {
                     player.sendSystemMessage(Component.literal("The target player's inventory is empty.").withStyle(ChatFormatting.AQUA));
                 }
 
-                if (dreamIntoReality.getValue() == 2) {
+                if (dreamIntoReality.getValue() >= 2) {
                     interactionTarget.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 1, false, false));
                 }
             } else {

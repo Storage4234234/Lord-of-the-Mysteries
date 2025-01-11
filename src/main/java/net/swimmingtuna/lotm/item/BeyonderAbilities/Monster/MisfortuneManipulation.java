@@ -267,8 +267,7 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
         }
     }
 
-    public static void livingUseAbilityMisfortuneManipulation(LivingEntityUseItemEvent event) {
-        LivingEntity livingEntity = event.getEntity();
+    public static void livingUseAbilityMisfortuneManipulation(LivingEntity livingEntity) {
         CompoundTag tag = livingEntity.getPersistentData();
         if (!livingEntity.level().isClientSide() && livingEntity instanceof Player player) {
             int selfTarget = tag.getInt("abilitySelfTarget");

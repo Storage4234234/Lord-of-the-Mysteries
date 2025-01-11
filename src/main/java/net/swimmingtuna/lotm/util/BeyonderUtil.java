@@ -5,6 +5,7 @@ import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -25,7 +26,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -65,6 +65,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static net.swimmingtuna.lotm.init.DamageTypeInit.MENTAL_DAMAGE;
 
 public class BeyonderUtil {
 
@@ -146,6 +148,23 @@ public class BeyonderUtil {
         Holder<DamageType> damageTypeHolder = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT);
         return new DamageSource(damageTypeHolder, entity, entity, entity.getOnPos().getCenter());
     }
+
+    public static DamageSource mentalSource(Level level, LivingEntity attacker, LivingEntity target) {
+        final Registry<DamageType> registry = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
+        final Holder.Reference<DamageType> damage = registry.getHolderOrThrow(MENTAL_DAMAGE);
+        return new MentalDamageSource(damage, attacker, target);
+    }
+
+    public static boolean applyMentalDamage(LivingEntity attacker, LivingEntity target, float baseAmount) {
+        Level level = attacker.level();
+        Holder<DamageType> damageTypeHolder = level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(MENTAL_DAMAGE);
+        MentalDamageSource damageSource = new MentalDamageSource(damageTypeHolder, attacker, target);
+        float calculatedDamage = damageSource.calculateDamage(baseAmount);
+        return target.hurt(damageSource, calculatedDamage);
+    }
+
+
+
 
     public static StructurePlaceSettings getStructurePlaceSettings(BlockPos pos) {
         BoundingBox boundingBox = new BoundingBox(
@@ -873,12 +892,12 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.BATTLE_HYPNOTISM.get(), 400.0f - (sequence * 20));
         damageMap.put(ItemInit.CONSCIOUSNESS_STROLL.get(), 0.0f);
         damageMap.put(ItemInit.DISCERN.get(),  0.0f);
-        damageMap.put(ItemInit.DRAGON_BREATH.get(), (float) (60.0f - (sequence * 4) * dreamIntoReality));
+        damageMap.put(ItemInit.DRAGON_BREATH.get(), (float) (60.0f * dreamIntoReality) - (sequence * 4));
         damageMap.put(ItemInit.DREAM_INTO_REALITY.get(), 0.0f);
         damageMap.put(ItemInit.DREAM_WALKING.get(), 0.0f);
         damageMap.put(ItemInit.DREAM_WEAVING.get(), 20.0f - (sequence * 3));
         damageMap.put(ItemInit.ENVISION_BARRIER.get(), 101.0f - (sequence * 20));
-        damageMap.put(ItemInit.ENVISION_DEATH.get(), (float) (40.0f - (sequence * 10) + (dreamIntoReality * 5)));
+        damageMap.put(ItemInit.ENVISION_DEATH.get(), (float) (40.0f + (dreamIntoReality * 5)) - (sequence * 10));
         damageMap.put(ItemInit.ENVISION_HEALTH.get(), (float) (0.66f - (sequence * 0.05) + (dreamIntoReality * 0.05f)));
         damageMap.put(ItemInit.ENVISION_KINGDOM.get(), 0.0f);
         damageMap.put(ItemInit.ENVISION_LIFE.get(), (3.0f + (sequence)));
@@ -887,16 +906,16 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.ENVISION_WEATHER.get(), (float) (500.0f / dreamIntoReality));
         damageMap.put(ItemInit.FRENZY.get(), (float) ((15.0f - sequence) * dreamIntoReality));
         damageMap.put(ItemInit.MANIPULATE_MOVEMENT.get(), 0.0f);
-        damageMap.put(ItemInit.MANIPULATE_EMOTION.get(), 100.0f - (sequence * 10));
+        damageMap.put(ItemInit.MANIPULATE_EMOTION.get(), 50.0f - (sequence * 5));
         damageMap.put(ItemInit.MANIPULATE_FONDNESS.get(), (float) (600.0f * dreamIntoReality));
         damageMap.put(ItemInit.MENTAL_PLAGUE.get(), (float) (200.0f / dreamIntoReality));
-        damageMap.put(ItemInit.METEOR_NO_LEVEL_SHOWER.get(), 10.0f - (4 * sequence));
-        damageMap.put(ItemInit.METEOR_SHOWER.get(),  10.0f - (4 * sequence));
+        damageMap.put(ItemInit.METEOR_NO_LEVEL_SHOWER.get(), (float) (10.0f + dreamIntoReality * 2) - (4 * sequence));
+        damageMap.put(ItemInit.METEOR_SHOWER.get(),  (float) (10.0f + dreamIntoReality * 2) - (4 * sequence));
         damageMap.put(ItemInit.MIND_READING.get(), 0.0f);
-        damageMap.put(ItemInit.MIND_STORM.get(), 50.0f - (sequence * 3));
+        damageMap.put(ItemInit.MIND_STORM.get(), 30.0f - (sequence * 2));
         damageMap.put(ItemInit.NIGHTMARE.get(), 40.0f - (sequence * 2));
         damageMap.put(ItemInit.PLACATE.get(), 0.0f);
-        damageMap.put(ItemInit.PLAGUE_STORM.get(), (float) (20.0f - (sequence * 3) * dreamIntoReality));
+        damageMap.put(ItemInit.PLAGUE_STORM.get(), (float) ((float) (12.0f * dreamIntoReality) - (sequence * 1.5)));
         damageMap.put(ItemInit.PROPHESIZE_DEMISE.get(), 0.0f);
         damageMap.put(ItemInit.PROPHESIZE_TELEPORT_BLOCK.get(), (float) ((500.0f * dreamIntoReality) - (sequence * 100)));
         damageMap.put(ItemInit.PROPHESIZE_TELEPORT_PLAYER.get(), (float) ((500.0f * dreamIntoReality) - (sequence * 100)));
@@ -1049,4 +1068,35 @@ public class BeyonderUtil {
         executeCommand(server, "/beyonderrecipe add lotm:spectator_3_potion iceandfire:dragon_skull_fire born_in_chaos_v1:lord_pumpkinheads_lamp");
         executeCommand(server, "/beyonderrecipe add lotm:spectator_2_potion terramity:fortunes_favor soulsweapons:lord_soul_day_stalker soulsweapons:lord_soul_night_prowler");
     }
+
+
+
+    public static boolean isPhysicalDamage(DamageSource source) {
+        return source.is(DamageTypes.FALL) || source.is(DamageTypes.CACTUS) || source.is(DamageTypes.FLY_INTO_WALL) || source.is(DamageTypes.GENERIC) || source.is(DamageTypes.FALLING_BLOCK) || source.is(DamageTypes.FALLING_ANVIL) || source.is(DamageTypes.FALLING_STALACTITE) || source.is(DamageTypes.STING) ||
+                source.is(DamageTypes.MOB_ATTACK) || source.is(DamageTypes.MOB_ATTACK_NO_AGGRO) || source.is(DamageTypes.PLAYER_ATTACK) || source.is(DamageTypes.ARROW) || source.is(DamageTypes.TRIDENT) || source.is(DamageTypes.MOB_PROJECTILE) || source.is(DamageTypes.FIREBALL) || source.is(DamageTypes.UNATTRIBUTED_FIREBALL) ||
+                source.is(DamageTypes.IN_FIRE) || source.is(DamageTypes.WITHER_SKULL) || source.is(DamageTypes.PLAYER_EXPLOSION) || source.is(DamageTypes.PLAYER_ATTACK) || source.is(DamageTypes.FIREWORKS) || source.is(DamageTypes.FREEZE) || source.is(DamageTypes.ON_FIRE) || source.is(DamageTypes.LAVA) || source.is(DamageTypes.HOT_FLOOR) || source.is(DamageTypes.HOT_FLOOR);
+    }
+    public static boolean isSupernaturalDamage(DamageSource source) {
+        return source.is(DamageTypes.MAGIC) || source.is(DamageTypes.ON_FIRE) || source.is(DamageTypes.LIGHTNING_BOLT) || source.is(DamageTypes.DRAGON_BREATH) || source.is(DamageTypes.WITHER) || source.is(MENTAL_DAMAGE);
+    }
+
+
+
+    public static int getMentalStrength(LivingEntity livingEntity) {
+        int mentalStrength = 10; // Default value
+        if (!livingEntity.level().isClientSide()) {
+            if (livingEntity instanceof Player player) {
+                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                mentalStrength = Math.max(1, holder.getMentalStrength());
+            } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
+                mentalStrength = Math.max(1, playerMobEntity.getMentalStrength());
+            } else {
+                mentalStrength = Math.max(1, (int) (livingEntity.getMaxHealth() / 2));
+            }
+        }
+        System.out.println("mental strength is " + mentalStrength);
+        return mentalStrength;
+    }
+
+
 }

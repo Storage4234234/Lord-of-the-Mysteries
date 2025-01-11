@@ -1,0 +1,9 @@
+{
+  "exhaustion": 0.1,
+  "message_id": "mental_damage",
+  "scaling": "when_caused_by_living_non_player",
+  "effects": "hurt",
+  "bypasses_armor": true,
+  "bypasses_enchantments": true,
+  "bypasses_magic": true
+}

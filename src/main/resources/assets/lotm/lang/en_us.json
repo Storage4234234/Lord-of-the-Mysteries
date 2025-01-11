@@ -333,6 +333,8 @@
   "lotm.beyonder.spectator1": "Author",
   "lotm.beyonder.spectator0": "Visionary",
   "creativetab.abilities_tab": "Beyonder Abilities",
-  "creativetab.ingredients_tab": "Beyonder Ingredients"
+  "creativetab.ingredients_tab": "Beyonder Ingredients",
+
+  "death.attack.lotm.mental_damage": "%1&s suffered from a mental attack"
 
 }

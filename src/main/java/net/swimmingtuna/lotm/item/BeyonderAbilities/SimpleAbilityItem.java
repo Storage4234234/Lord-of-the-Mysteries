@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.item.BeyonderAbilities;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -15,9 +16,12 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
+import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 public abstract class SimpleAbilityItem extends Item implements Ability {
 
@@ -61,7 +65,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        if (!level.isClientSide()) {
+        if (!level.isClientSide() && checkIfCanUseAbility(player)) {
             InteractionResult interactionResult = useAbility(level, player, hand);
             return new InteractionResultHolder<>(interactionResult, player.getItemInHand(hand));
         }
@@ -209,5 +213,27 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
 
     public int getRequiredSequence() {
         return this.requiredSequence;
+    }
+
+    private boolean checkIfCanUseAbility(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide()) {
+            MisfortuneManipulation.livingUseAbilityMisfortuneManipulation(livingEntity);
+            CompoundTag tag = livingEntity.getPersistentData();
+            if (livingEntity.getMainHandItem().getItem() instanceof SimpleAbilityItem simpleAbilityItem) {
+                if (livingEntity.hasEffect(ModEffects.STUN.get())) {
+                    if (livingEntity instanceof Player) {
+                        livingEntity.sendSystemMessage(Component.literal("You are stunned and unable to use abilities for another " + (int) Objects.requireNonNull(livingEntity.getEffect(ModEffects.STUN.get())).getDuration() / 20 + " seconds.").withStyle(ChatFormatting.RED));
+                    }
+                    return false;
+                } else if (tag.getInt("cantUseAbility") >= 1) {
+                    tag.putInt("cantUseAbility", tag.getInt("cantUseAbility") - 1);
+                    if (livingEntity instanceof Player) {
+                        livingEntity.sendSystemMessage(Component.literal("How unlucky! You messed up and couldn't use your ability!").withStyle(ChatFormatting.RED));
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

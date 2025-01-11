@@ -42,8 +42,6 @@ public class DragonBreath extends SimpleAbilityItem {
 
     public static void dragonbreath(Player player) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
             int sequence = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.DRAGON_BREATH.get());
             DragonBreathEntity.shootDragonBreath(player, sequence, player.getX(), player.getY(), player.getZ());
         }

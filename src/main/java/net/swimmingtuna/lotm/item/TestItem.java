@@ -19,6 +19,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
+import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
@@ -62,9 +63,10 @@ public class TestItem extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
-            CompoundTag tag = player.getPersistentData();
-            interactionTarget.getPersistentData().putBoolean("inSpiritWorld", !interactionTarget.getPersistentData().getBoolean("inSpiritWorld"));
-            player.sendSystemMessage(Component.literal("tag put as " + interactionTarget.getPersistentData().getBoolean("inSpiritWorld")));
+            if (interactionTarget instanceof PlayerMobEntity playerMobEntity) {
+                playerMobEntity.setMentalStrength(200);
+                player.sendSystemMessage(Component.literal("mental strength is now " + playerMobEntity.getMentalStrength()));
+            }
         }
         return InteractionResult.SUCCESS;
     }
@@ -81,7 +83,6 @@ public class TestItem extends SimpleAbilityItem {
                 }
             }
             tag.putInt("cantUseAbility", 5);
-
         }
 
         return InteractionResult.SUCCESS;

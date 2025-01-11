@@ -70,7 +70,7 @@ public class DragonBreathEntity extends BeamEntity {
     public static void shootDragonBreath(LivingEntity player, int power, double x, double y, double z) {
         DragonBreathEntity dragonBreath = new DragonBreathEntity(player, power);
         dragonBreath.teleportTo(x,y+1,z);
-        dragonBreath.setDamage(power * 0.5f);
+        dragonBreath.setDamage(power * 0.4f);
         dragonBreath.setIsDragonbreath(true);
         dragonBreath.setFrenzyTime((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.DRAGON_BREATH.get()));
         player.level().addFreshEntity(dragonBreath);

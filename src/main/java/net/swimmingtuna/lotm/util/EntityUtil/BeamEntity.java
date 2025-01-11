@@ -9,7 +9,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -124,7 +123,7 @@ public abstract class BeamEntity extends LOTMProjectile {
 
 
     protected Vec3 calculateSpawnPos(LivingEntity owner) {
-        return new Vec3(owner.getX(), owner.getEyeY() - (this.getBbHeight() / 2.0F) + 0.5 , owner.getZ())
+        return new Vec3(owner.getX(), owner.getEyeY() - (this.getBbHeight() / 2.0F) + 0.5, owner.getZ())
                 .add(RotationUtil.getTargetAdjustedLookAngle(owner));
     }
 
@@ -182,13 +181,17 @@ public abstract class BeamEntity extends LOTMProjectile {
                     if (entity == owner) {
                         continue;
                     }
-                    if (!(entity instanceof Player)) {
-                        entity.hurt(BeyonderUtil.genericSource(this), this.getDamage());
+                    if (!getIsDragonBreath() && this.getOwner() != null) {
+                        entity.hurt(BeyonderUtil.lightningSource(this.getOwner()), this.getDamage());
+                    } else if (!getIsDragonBreath() && this.getOwner() == null) {
+                        entity.hurt(BeyonderUtil.lightningSource(this), this.getDamage());
+                    } else if (getIsDragonBreath() && (this.getOwner() != null && this.getOwner() instanceof LivingEntity pOwner) && (entity instanceof LivingEntity livingEntity)) {
+                       BeyonderUtil.applyMentalDamage(pOwner, livingEntity, this.getDamage());
                     } else {
-                        entity.hurt(BeyonderUtil.genericSource(this), this.getDamage() * 2);
+                        entity.hurt(BeyonderUtil.lightningSource(this), this.getDamage());
                     }
                     if (entity instanceof LivingEntity livingEntity && getIsDragonBreath()) {
-                        livingEntity.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), getFrenzyTime(), 1, false,false));
+                        livingEntity.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), getFrenzyTime(), 1, false, false));
                     }
                     if (this.causesFire()) {
                         entity.setSecondsOnFire(5);
@@ -239,7 +242,7 @@ public abstract class BeamEntity extends LOTMProjectile {
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(DAMAGE,20.0F);
+        this.entityData.define(DAMAGE, 20.0F);
         this.entityData.define(DATA_YAW, 0.0F);
         this.entityData.define(DATA_PITCH, 0.0F);
         this.entityData.define(DRAGON_BREATH, false);

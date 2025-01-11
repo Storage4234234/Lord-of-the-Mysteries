@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
@@ -19,6 +20,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
+import net.swimmingtuna.lotm.networking.packet.UpdateEntityLocationS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -26,6 +29,8 @@ import virtuoel.pehkui.api.ScaleTypes;
 import java.util.Random;
 
 public class NetherrackEntity extends AbstractArrow {
+
+    private static final EntityDataAccessor<Integer> DATA_BB = SynchedEntityData.defineId(NetherrackEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_NETHERRACK_DAMAGE = SynchedEntityData.defineId(NetherrackEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_DANGEROUS = SynchedEntityData.defineId(NetherrackEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_NETHERRACK_XROT = SynchedEntityData.defineId(NetherrackEntity.class, EntityDataSerializers.INT);
@@ -59,6 +64,7 @@ public class NetherrackEntity extends AbstractArrow {
         this.entityData.define(DATA_NETHERRACK_STAYATY, 0.0f);
         this.entityData.define(DATA_NETHERRACK_STAYATZ, 0.0f);
         this.entityData.define(DATA_NETHERRACK_YROT, 0);
+        this.entityData.define(DATA_BB, 6);
     }
 
     @Override
@@ -132,6 +138,10 @@ public class NetherrackEntity extends AbstractArrow {
             this.discard();
         }
         if (!this.level().isClientSide()) {
+            Vec3 currentPos = this.position();
+            for (ServerPlayer player : level().getEntitiesOfClass(ServerPlayer.class, this.getBoundingBox().inflate(100))) {
+                LOTMNetworkHandler.sendToPlayer(new UpdateEntityLocationS2C(currentPos.x(), currentPos.y(), currentPos.z(), this.getId()), player);
+            }
             if (getRemoveAndHurt()) {
                 if (!getSent() && this.getOwner() != null) {
                     this.setDeltaMovement(this.getOwner().getX() - this.getX() + getNetherrackStayAtX(),this.getOwner().getY() - this.getY() + getNetherrackStayAtY(),this.getOwner().getZ() - this.getZ() + getNetherrackStayAtZ());
@@ -154,7 +164,7 @@ public class NetherrackEntity extends AbstractArrow {
                         }
                     }
                 }
-                for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(10))) {
+                for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getBB()))) {
                     if (entity != this.getOwner()) {
                         entity.hurt(BeyonderUtil.genericSource(this), getDamage());
                     }
@@ -177,6 +187,14 @@ public class NetherrackEntity extends AbstractArrow {
 
     public int getNetherrackXRot() {
         return this.entityData.get(DATA_NETHERRACK_XROT);
+    }
+
+    public void setBB(int bb) {
+        this.entityData.set(DATA_BB, bb);
+    }
+
+    public int getBB() {
+        return this.entityData.get(DATA_BB);
     }
 
     public int getNetherrackYRot() {

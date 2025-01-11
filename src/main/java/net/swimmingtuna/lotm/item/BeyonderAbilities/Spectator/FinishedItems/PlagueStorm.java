@@ -91,9 +91,9 @@ public class PlagueStorm extends SimpleAbilityItem {
                     continue;
                 }
                 if (entityInRange != interactionTarget) {
-                    entityInRange.hurt(entityInRange.damageSources().magic(),  BeyonderUtil.getDamage(player).get(ItemInit.PLAGUE_STORM.get()));
+                    BeyonderUtil.applyMentalDamage(player, interactionTarget, BeyonderUtil.getDamage(player).get(ItemInit.PLAGUE_STORM.get()));
                 } else {
-                    entityInRange.hurt(entityInRange.damageSources().magic() , BeyonderUtil.getDamage(player).get(ItemInit.PLAGUE_STORM.get()) * 2);
+                    BeyonderUtil.applyMentalDamage(player, interactionTarget,2 * BeyonderUtil.getDamage(player).get(ItemInit.PLAGUE_STORM.get()));
                 }
                 entityInRange.addEffect(new MobEffectInstance(MobEffects.WITHER, 80, 2, false, false));
                 entityInRange.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 1, false, false));

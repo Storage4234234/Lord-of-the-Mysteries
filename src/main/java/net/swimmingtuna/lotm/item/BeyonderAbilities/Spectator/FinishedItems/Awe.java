@@ -50,12 +50,12 @@ public class Awe extends SimpleAbilityItem {
             int sequence = holder.getCurrentSequence();
             int dir = (int) dreamIntoReality.getValue();
             double radius = (18.0 - sequence) * dir;
-            float damage = (float) ((27.0 - (sequence * 1.5)) * (Math.max(1, dir * 0.75)));
+            float damage = (float) (10.0 * (Math.max(1, dir * 0.5)) - (sequence * 0.6));
             int duration = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.AWE.get());
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
                 if (entity != player) {
                     entity.addEffect((new MobEffectInstance(ModEffects.AWE.get(), duration, 1, false, false)));
-                    entity.hurt(entity.damageSources().magic(), damage);
+                    BeyonderUtil.applyMentalDamage(player, entity, damage);
                 }
             }
         }

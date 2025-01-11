@@ -249,12 +249,23 @@ public class TornadoEntity extends AbstractHurtingProjectile {
                 double dz = entity.getZ() - this.getZ();
                 double distance = Math.sqrt(dx * dx + dz * dz);
                 if (this.tickCount % 10 == 0) {
-                    if (entity.getPersistentData().getInt("luckTornadoResistance") >= 1) {
-                        entity.hurt(BeyonderUtil.genericSource(this), 2);
-                    } else if (entity.getPersistentData().getInt("luckTornadoImmunity") >= 1) {
-                        continue;
-                    } else
-                    entity.hurt(BeyonderUtil.genericSource(this), 5);
+                    if (!getTornadoLightning()) {
+                        if (entity.getPersistentData().getInt("luckTornadoResistance") >= 1) {
+                            entity.hurt(BeyonderUtil.genericSource(this), 2);
+                        } else if (entity.getPersistentData().getInt("luckTornadoImmunity") >= 1) {
+                            continue;
+                        } else {
+                            entity.hurt(BeyonderUtil.genericSource(this), 5);
+                        }
+                    } else if (getTornadoLightning() && getOwner() != null && getOwner() instanceof LivingEntity owner && entity instanceof LivingEntity living){
+                        if (entity.getPersistentData().getInt("luckTornadoResistance") >= 1) {
+                            BeyonderUtil.applyMentalDamage(owner, living, 5);
+                        } else if (entity.getPersistentData().getInt("luckTornadoImmunity") >= 1) {
+                            continue;
+                        } else {
+                            BeyonderUtil.applyMentalDamage(owner, living, 12);
+                        }
+                    }
                 }
                 if (distance < tornadoRadius) {
                     double angle = Math.atan2(dz, dx) + Math.PI / 2; // Change angle to push outward

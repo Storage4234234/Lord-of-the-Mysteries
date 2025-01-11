@@ -82,8 +82,8 @@ public class Nightmare extends SimpleAbilityItem {
             int sequence = holder.getCurrentSequence();
             int dir = (int) dreamIntoReality.getValue();
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.NIGHTMARE.get());
-            float damagePlayer = ((float) (60.0 * dir) - (sequence * 5));
-            float damageMob = ((float) (40.0 * dir) - (sequence * 3));
+            float damagePlayer = ((float) (30.0 * dir) - (sequence * 2));
+            float damageMob = ((float) (20.0 * dir) - (sequence));
             int duration = 200 - (sequence * 20);
             AABB boundingBox = new AABB(targetPos).inflate(radius);
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, entity -> entity.isAlive()).forEach(livingEntity -> {
@@ -100,13 +100,13 @@ public class Nightmare extends SimpleAbilityItem {
                             }
                         }
                         if (nightmareAttribute.getValue() >= 3) {
-                            livingEntity.hurt(livingEntity.damageSources().magic(), damagePlayer);
+                            BeyonderUtil.applyMentalDamage(player, livingEntity, damagePlayer);
                             nightmareAttribute.setBaseValue(0);
                         }
                         player.sendSystemMessage(Component.literal(playerName + "'s nightmare value is:" + (int) nightmareAttribute.getValue()).withStyle(BeyonderUtil.getStyle(player)));
 
                     } else {
-                        livingEntity.hurt(livingEntity.damageSources().magic(), damageMob);
+                        BeyonderUtil.applyMentalDamage(player, livingEntity, damageMob);
                     }
                 }
             });
