@@ -260,7 +260,6 @@ public class BeyonderUtil {
             }
             if (sequence <= 6) {
                 abilityNames.add(ItemInit.WIND_MANIPULATION_BLADE.get());
-                abilityNames.add(ItemInit.WIND_MANIPULATION_CUSHION.get());
                 abilityNames.add(ItemInit.WIND_MANIPULATION_FLIGHT.get());
                 abilityNames.add(ItemInit.WIND_MANIPULATION_SENSE.get());
             }
@@ -371,6 +370,41 @@ public class BeyonderUtil {
                 abilityNames.add(ItemInit.PROBABILITYEFFECT.get());
                 abilityNames.add(ItemInit.PROBABILITYINFINITEFORTUNE.get());
                 abilityNames.add(ItemInit.PROBABILITYINFINITEMISFORTUNE.get());
+            }
+            if (holder.currentClassMatches(BeyonderClassInit.WARRIOR)) {
+                if (sequence <= 6) {
+                    abilityNames.add(ItemInit.GIGANTIFICATION.get());
+                    abilityNames.add(ItemInit.LIGHTOFDAWN.get());
+                    abilityNames.add(ItemInit.DAWNARMORY.get());
+                    abilityNames.add(ItemInit.DAWNWEAPONRY.get());
+                }
+                if (sequence <= 4) {
+                    abilityNames.add(ItemInit.EYEOFDEMONHUNTING.get());
+                    abilityNames.add(ItemInit.WARRIORDANGERSENSE.get());
+                }
+                if (sequence <= 3) {
+                    abilityNames.add(ItemInit.MERCURYLIQUEFICATION.get());
+                    abilityNames.add(ItemInit.SILVERRAPIER.get());
+                    abilityNames.add(ItemInit.SILVERARMORY.get());
+                    abilityNames.add(ItemInit.LIGHTCONCEALMENT.get());
+                }
+                if (sequence <= 2) {
+                    abilityNames.add(ItemInit.BEAMOFGLORY.get());
+                    abilityNames.add(ItemInit.AURAOFGLORY.get());
+                    abilityNames.add(ItemInit.TWILIGHTSWORD.get());
+                    abilityNames.add(ItemInit.MERCURYCAGE.get());
+                }
+                if (sequence <= 1) {
+                    abilityNames.add(ItemInit.DIVINEHANDLEFT.get());
+                    abilityNames.add(ItemInit.DIVINEHANDRIGHT.get());
+                    abilityNames.add(ItemInit.TWILIGHTMANIFESTATION.get());
+                    abilityNames.add(ItemInit.SILVERLIGHT.get());
+                }
+                if (sequence <= 0) {
+                    abilityNames.add(ItemInit.AURAOFTWILIGHT.get());
+                    abilityNames.add(ItemInit.GLOBEOFTWILIGHT.get());
+                    abilityNames.add(ItemInit.BEAMOFTWILIGHT.get());
+                }
             }
         }
         return abilityNames;
@@ -543,12 +577,9 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.MATTER_ACCELERATION_BLOCKS.get())));
 
             } else if (heldItem.getItem() instanceof WindManipulationBlade) {
-                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.WIND_MANIPULATION_CUSHION.get())));
-
-            } else if (heldItem.getItem() instanceof WindManipulationCushion) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.WIND_MANIPULATION_FLIGHT.get())));
 
-            } else if (heldItem.getItem() instanceof WindManipulationFlight) {
+            }  else if (heldItem.getItem() instanceof WindManipulationFlight) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.WIND_MANIPULATION_SENSE.get())));
 
             } else if (heldItem.getItem() instanceof WindManipulationSense) {
@@ -681,12 +712,9 @@ public class BeyonderUtil {
                 pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.MATTER_ACCELERATION_BLOCKS.get())));
                 heldItem.shrink(1);
             } else if (heldItem.getItem() instanceof WindManipulationBlade) {
-                pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.WIND_MANIPULATION_CUSHION.get())));
-                heldItem.shrink(1);
-            } else if (heldItem.getItem() instanceof WindManipulationCushion) {
                 pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.WIND_MANIPULATION_FLIGHT.get())));
                 heldItem.shrink(1);
-            } else if (heldItem.getItem() instanceof WindManipulationFlight) {
+            }  else if (heldItem.getItem() instanceof WindManipulationFlight) {
                 pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.WIND_MANIPULATION_SENSE.get())));
                 heldItem.shrink(1);
             } else if (heldItem.getItem() instanceof WindManipulationSense) {
@@ -882,7 +910,6 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.WATER_COLUMN.get(), 200.0f - (sequence * 60));
         damageMap.put(ItemInit.WATER_SPHERE.get(), 200.0f - (sequence * 20));
         damageMap.put(ItemInit.WIND_MANIPULATION_BLADE.get(), 7.0f - sequence);
-        damageMap.put(ItemInit.WIND_MANIPULATION_CUSHION.get(), 0.0f);
         damageMap.put(ItemInit.WIND_MANIPULATION_FLIGHT.get(), 0.0f);
         damageMap.put(ItemInit.WIND_MANIPULATION_SENSE.get(), 0.0f);
 
@@ -962,6 +989,9 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.REBOOTSELF.get(), 0.0f);
         damageMap.put(ItemInit.SPIRITVISION.get(), 0.0f);
         damageMap.put(ItemInit.WHISPEROFCORRUPTION.get(), (float) sequence);
+
+        //WARRIOR
+        damageMap.put(ItemInit.GIGANTIFICATION.get(), 9.0f - sequence);
         return damageMap;
     }
 

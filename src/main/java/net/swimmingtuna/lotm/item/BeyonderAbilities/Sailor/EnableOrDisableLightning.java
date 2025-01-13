@@ -40,9 +40,10 @@ public class EnableOrDisableLightning extends SimpleAbilityItem {
             CompoundTag tag = player.getPersistentData();
             boolean lightning = tag.getBoolean("SailorLightning");
             tag.putBoolean("SailorLightning", !lightning);
-            player.displayClientMessage(Component.literal("Lightning effect turned " + (lightning ? "off" : "on")).withStyle(ChatFormatting.DARK_BLUE).withStyle(ChatFormatting.BOLD), true);
+            player.displayClientMessage(Component.literal("Lightning effect turned " + (lightning ? "off" : "on")).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.BOLD), true);
         }
     }
+
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {

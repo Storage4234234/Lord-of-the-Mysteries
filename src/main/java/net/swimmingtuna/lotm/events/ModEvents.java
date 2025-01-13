@@ -195,7 +195,7 @@ public class ModEvents {
     public static void onPlayerTickServer(TickEvent.PlayerTickEvent event) {
         Player player = event.player;
         Style style = BeyonderUtil.getStyle(player);
-        CompoundTag playerPersistentData = player.getPersistentData();
+        CompoundTag tag = player.getPersistentData();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
         int sequence = holder.getCurrentSequence();
@@ -206,7 +206,8 @@ public class ModEvents {
             checkForProjectiles(player);
         }
         if (!player.level().isClientSide() && player.tickCount % 20 == 0) {
-            //player.sendSystemMessage(Component.literal("value is " + playerPersistentData.getInt("wintryBladeSelf")));
+            //int x = tag.getInt("psychologicalInvisibilityHurt");
+            //player.sendSystemMessage(Component.literal("value is " + x));
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
@@ -230,7 +231,7 @@ public class ModEvents {
         {
             FateReincarnation.monsterReincarnationChecker(player);
         }
-        monsterDangerSense(playerPersistentData, holder, player);
+        monsterDangerSense(tag, holder, player);
         {
             decrementMonsterAttackEvent(player);
         }
@@ -265,28 +266,28 @@ public class ModEvents {
         }
         {
             long startTime = System.nanoTime();
-            nightmare(player, playerPersistentData);
+            nightmare(player, tag);
             long endTime = System.nanoTime();
             times.put("nightmare", endTime - startTime);
         }
 
         {
             long startTime = System.nanoTime();
-            calamityIncarnationTornado(playerPersistentData, player);
+            calamityIncarnationTornado(tag, player);
             long endTime = System.nanoTime();
             times.put("calamityIncarnationTornado", endTime - startTime);
         }
 
         {
             long startTime = System.nanoTime();
-            psychologicalInvisibility(player, playerPersistentData, holder);
+            psychologicalInvisibility(player, tag, holder);
             long endTime = System.nanoTime();
             times.put("psychologicalInvisibility", endTime - startTime);
         }
         monsterDomainIntHandler(player);
         {
             long startTime = System.nanoTime();
-            windManipulationSense(playerPersistentData, holder, player);
+            windManipulationSense(tag, holder, player);
             long endTime = System.nanoTime();
             times.put("windManipulationSense", endTime - startTime);
         }
@@ -300,14 +301,7 @@ public class ModEvents {
 
         {
             long startTime = System.nanoTime();
-            windManipulationCushion(playerPersistentData, player);
-            long endTime = System.nanoTime();
-            times.put("windManipulationCushion", endTime - startTime);
-        }
-
-        {
-            long startTime = System.nanoTime();
-            windManipulationGuide(playerPersistentData, holder, player);
+            windManipulationGuide(tag, holder, player);
             long endTime = System.nanoTime();
             times.put("windManipulationGuide", endTime - startTime);
         }
@@ -321,13 +315,13 @@ public class ModEvents {
 
         {
             long startTime = System.nanoTime();
-            consciousnessStroll(playerPersistentData, player);
+            consciousnessStroll(tag, player);
             long endTime = System.nanoTime();
             times.put("consciousnessStroll", endTime - startTime);
         }
         {
             long startTime = System.nanoTime();
-            prophesizeTeleportation(playerPersistentData, player);
+            prophesizeTeleportation(tag, player);
             long endTime = System.nanoTime();
             times.put("prophesizeTeleportationCounter", endTime - startTime);
         }
@@ -362,7 +356,7 @@ public class ModEvents {
 
         {
             long startTime = System.nanoTime();
-            envisionKingdom(playerPersistentData, player, holder, serverLevel);
+            envisionKingdom(tag, player, holder, serverLevel);
             long endTime = System.nanoTime();
             times.put("envisionKingdom", endTime - startTime);
         }
@@ -376,7 +370,7 @@ public class ModEvents {
 
         {
             long startTime = System.nanoTime();
-            calamityIncarnationTsunamiTick(playerPersistentData, player, serverLevel);
+            calamityIncarnationTsunamiTick(tag, player, serverLevel);
             long endTime = System.nanoTime();
             times.put("calamityIncarnationTsunami", endTime - startTime);
         }
@@ -390,21 +384,21 @@ public class ModEvents {
 
         {
             long startTime = System.nanoTime();
-            extremeColdness(playerPersistentData, holder, player);
+            extremeColdness(tag, holder, player);
             long endTime = System.nanoTime();
             times.put("extremeColdness", endTime - startTime);
         }
 
         {
             long startTime = System.nanoTime();
-            hurricane(playerPersistentData, player);
+            hurricane(tag, player);
             long endTime = System.nanoTime();
             times.put("hurricane", endTime - startTime);
         }
 
         {
             long startTime = System.nanoTime();
-            lightningStorm(player, playerPersistentData, style, holder);
+            lightningStorm(player, tag, style, holder);
             long endTime = System.nanoTime();
             times.put("lightningStorm", endTime - startTime);
         }
@@ -418,7 +412,7 @@ public class ModEvents {
 
         {
             long startTime = System.nanoTime();
-            ragingBlows(playerPersistentData, holder, player);
+            ragingBlows(tag, holder, player);
             long endTime = System.nanoTime();
             times.put("ragingBlows", endTime - startTime);
         }
@@ -431,7 +425,7 @@ public class ModEvents {
         }
         {
             long startTime = System.nanoTime();
-            sirenSongs(playerPersistentData, holder, player, sequence);
+            sirenSongs(tag, holder, player, sequence);
             long endTime = System.nanoTime();
             times.put("sirenSongs", endTime - startTime);
         }
@@ -440,13 +434,13 @@ public class ModEvents {
         }
         {
             long startTime = System.nanoTime();
-            starOfLightning(player, playerPersistentData);
+            starOfLightning(player, tag);
             long endTime = System.nanoTime();
             times.put("starOfLightning", endTime - startTime);
         }
         {
             long startTime = System.nanoTime();
-            tsunami(playerPersistentData, player);
+            tsunami(tag, player);
             long endTime = System.nanoTime();
             times.put("tsunami", endTime - startTime);
         }
@@ -458,7 +452,7 @@ public class ModEvents {
         }
         {
             long startTime = System.nanoTime();
-            windManipulationFlight(player, playerPersistentData);
+            windManipulationFlight(player, tag);
             long endTime = System.nanoTime();
             times.put("windManipulationFlight", endTime - startTime);
         }
@@ -500,9 +494,20 @@ public class ModEvents {
         if (player.tickCount % 10 == 0) {
             boolean currentState = playerPersistentData.getBoolean("psychologicalInvisibility");
             if (currentState) {
+                    Collection<MobEffectInstance> effects = player.getActiveEffects();
+                    effects.forEach(effect -> {
+                        if (effect.isAmbient()  || effect.isVisible()) {
+                            MobEffectInstance newEffect = new MobEffectInstance(effect.getEffect(), effect.getDuration(), effect.getAmplifier(), false, false, false);
+                            effect.update(newEffect);
+                        }
+                    });
+                for (Mob mob : player.level().getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(40))) {
+                    if (mob.getTarget() == player) {
+                        mob.setTarget(null);
+                    }
+                }
                 holder.useSpirituality((int) holder.getMaxSpirituality() / 100);
             }
-
             UUID playerId = player.getUUID();
             Boolean lastState = lastSentInvisibilityStates.get(playerId);
             if (lastState == null || lastState != currentState) {
@@ -512,10 +517,33 @@ public class ModEvents {
         }
     }
 
-    private static void psychologicalInvisibilityHurt(Player entity) {
-        if (ClientShouldntRenderInvisibilityData.getShouldntRender()) {
-            entity.getPersistentData().putBoolean("psychologicalInvisibility", false);
-            LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderInvisibilityPacketS2C(false, entity.getUUID()), (ServerPlayer) entity);
+
+
+    private static void psychologicalInvisibilityHurt(LivingHurtEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (!entity.level().isClientSide()) {
+            if (ClientShouldntRenderInvisibilityData.getShouldntRender()) {
+                CompoundTag tag = entity.getPersistentData();
+                int x = tag.getInt("psychologicalInvisibilityHurt");
+                tag.putInt("psychologicalInvisibilityHurt", x + 100);
+            }
+        }
+    }
+    private static void psychologicalInvisibilityHurtTick(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide()) {
+            CompoundTag tag = livingEntity.getPersistentData();
+            int x = tag.getInt("psychologicalInvisibilityHurt");
+            if (x >= 1) {
+                tag.putInt("psychologicalInvisibilityHurt", x - 1);
+            }
+            if (x >= 500 && ClientShouldntRenderInvisibilityData.getShouldntRender()) {
+                livingEntity.getPersistentData().putBoolean("psychologicalInvisibility", false);
+                LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(false, livingEntity.getUUID()));
+                tag.putInt("psychologicalInvisibilityHurt", 0);
+                if (livingEntity instanceof Player player) {
+                    player.getCooldowns().addCooldown(ItemInit.PSYCHOLOGICAL_INVISIBILITY.get(), 240);
+                }
+            }
         }
     }
 
@@ -627,44 +655,49 @@ public class ModEvents {
         }
     }
 
-    private static void windManipulationCushion(CompoundTag playerPersistentData, Player player) {
-        //WIND MANIPULATION CUSHION
-        int cushion = playerPersistentData.getInt("windManipulationCushion");
-        if (cushion >= 1) {
-            WindManipulationCushion.summonWindCushionParticles(player);
-            playerPersistentData.putInt("windManipulationCushion", cushion - 1);
-            player.resetFallDistance();
-        }
-        if (cushion >= 20 && player.getDeltaMovement().y <= 0) {
-            player.setDeltaMovement(player.getDeltaMovement().x(), player.getDeltaMovement().y() * 0.7, player.getDeltaMovement().z());
-            player.hurtMarked = true;
-        }
-        if (cushion == 1) {
-            player.setDeltaMovement(player.getLookAngle().scale(2.0f));
-            player.hurtMarked = true;
-            player.resetFallDistance();
-        }
-    }
-
 
     private static void windManipulationGuide(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
         //WIND MANIPULATION GLIDE
-        int regularFlight = playerPersistentData.getInt("sailorFlight");
         boolean enhancedFlight = playerPersistentData.getBoolean("sailorFlight1");
-        if (holder.currentClassMatches(BeyonderClassInit.SAILOR) &&
-                        holder.getCurrentSequence() <= 7 &&
-                        player.isShiftKeyDown() &&
-                        player.getDeltaMovement().y() < 0 &&
-                        !player.getAbilities().instabuild &&
-                        !enhancedFlight &&
-                        regularFlight == 0
-        ) {
+        if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 6 && player.isShiftKeyDown() && player.fallDistance >= 3 && !player.getAbilities().instabuild && !enhancedFlight) {
             Vec3 movement = player.getDeltaMovement();
             double deltaX = Math.cos(Math.toRadians(player.getYRot() + 90)) * 0.06;
             double deltaZ = Math.sin(Math.toRadians(player.getYRot() + 90)) * 0.06;
             player.setDeltaMovement(movement.x + deltaX, -0.05, movement.z + deltaZ);
-            player.resetFallDistance();
+            player.fallDistance = 5;
             player.hurtMarked = true;
+        }
+    }
+
+    private static void windManipulationCushion(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide()) {
+            CompoundTag tag = livingEntity.getPersistentData();
+            if (livingEntity instanceof Player player) {
+                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                if (holder.currentClassMatches(BeyonderClassInit.SAILOR.get()) && holder.getCurrentSequence() <= 6 && player.getDeltaMovement().y() < 0 && !player.getAbilities().instabuild && !tag.getBoolean("sailorFlight1")) {
+                    BlockPos pos = player.blockPosition();
+                    Level level = player.level();
+                    boolean hasBlock = false;
+                    for (int i = 1; i <= 5; i++) {
+                        BlockPos checkPos = pos.below(i);
+                        if (!level.getBlockState(checkPos).isAir()) {
+                            hasBlock = true;
+                            break;
+                        }
+                    }
+
+                    if (hasBlock) {
+                        tag.putInt("sailorWindBounce", 5);
+                    }
+                }
+            }
+            int bounce = tag.getInt("sailorWindBounce");
+            if (bounce >= 1) {
+                tag.putInt("sailorWindBounce", bounce - 1);
+                livingEntity.hurtMarked = true;
+                livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().x(), -0.2, livingEntity.getDeltaMovement().z());
+                livingEntity.resetFallDistance();
+            }
         }
     }
 
@@ -1633,36 +1666,6 @@ public class ModEvents {
         }
     }
 
-    private static void windManipulationFlight1(Player player, CompoundTag playerPersistentData) {
-        //WIND MANIPULATION FLIGHT
-        Vec3 lookVector = player.getLookAngle();
-        if (!playerPersistentData.getBoolean("sailorFlight1")) {
-            return;
-        }
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (!holder.useSpirituality(2)) {
-            return;
-        }
-        int flight = playerPersistentData.getInt("sailorFlight");
-        int flightCancel = playerPersistentData.getInt("sailorFlightDamageCancel");
-        if (flightCancel >= 1) {
-            playerPersistentData.putInt("sailorFlightDamageCancel", flightCancel + 1);
-        }
-        if (flightCancel >= 300) {
-            playerPersistentData.putInt("sailorFlightDamageCancel", 0);
-        }
-        if (flight >= 1) {
-            playerPersistentData.putInt("sailorFlight", flight + 1);
-        }
-        if (flight <= 60 && flight % 20 == 0) {
-            player.setDeltaMovement(lookVector.x * 2, lookVector.y * 2, lookVector.z * 2);
-            player.hurtMarked = true;
-        }
-        if (flight > 60) {
-            playerPersistentData.putInt("sailorFlight", 0);
-        }
-    }
-
     private static void windManipulationFlight(Player player, CompoundTag tag) {
         Vec3 lookVector = player.getLookAngle();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
@@ -1756,6 +1759,8 @@ public class ModEvents {
             if (entity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
             }
+            psychologicalInvisibilityHurtTick(entity);
+            //windManipulationCushion(entity);
             //sendSpiritWorldPackets(entity);
             WintryBlade.wintryBladeTick(event);
             warriorGiant(entity);
@@ -2873,6 +2878,7 @@ public class ModEvents {
         DamageSource source = event.getSource();
         Entity entitySource = source.getEntity();
         if (!event.getEntity().level().isClientSide()) {
+            warriorDamageNegation(event);
             boolean entityInSpiritWorld = tag.getBoolean("inSpiritWorld");
             if (entitySource != null) {
                 CompoundTag sourceTag = entitySource.getPersistentData();
@@ -2937,7 +2943,7 @@ public class ModEvents {
             }
             //SAILOR FLIGHT
             if (entity instanceof Player player) {
-                psychologicalInvisibilityHurt(player);
+                psychologicalInvisibilityHurt(event);
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                 int flightCancel = tag.getInt("sailorFlightDamageCancel");
                 if (!player.level().isClientSide()) {

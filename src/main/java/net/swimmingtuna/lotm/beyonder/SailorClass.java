@@ -251,7 +251,6 @@ public class SailorClass implements BeyonderClass {
         items.put(7, ItemInit.AQUEOUS_LIGHT_PUSH.get());
 
         items.put(6, ItemInit.WIND_MANIPULATION_BLADE.get());
-        items.put(6, ItemInit.WIND_MANIPULATION_CUSHION.get());
         items.put(6, ItemInit.WIND_MANIPULATION_FLIGHT.get());
         items.put(6, ItemInit.WIND_MANIPULATION_SENSE.get());
 

@@ -40,6 +40,8 @@ public class WindManipulationBlade extends SimpleAbilityItem {
         }
     }
 
+
+
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use, shoots out a blade of wind"));

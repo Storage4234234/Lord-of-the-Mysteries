@@ -1,5 +1,6 @@
 package net.swimmingtuna.lotm.events;
 
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
@@ -15,6 +16,8 @@ import net.swimmingtuna.lotm.client.AbilityOverlay;
 import net.swimmingtuna.lotm.client.SpiritualityBarOverlay;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
+
+import java.util.Collection;
 
 
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -49,6 +52,11 @@ public class ClientEvents {
         LivingEntity entity = event.getEntity();
         if (ClientShouldntRenderInvisibilityData.getShouldntRender() && entity.getUUID().equals(ClientShouldntRenderInvisibilityData.getLivingUUID())) {
             event.setCanceled(true);
+            if (event.getRenderer().shadowRadius == 1.0f) {
+                event.getRenderer().shadowRadius = 0.0f;
+            }
+        } else if (event.getRenderer().shadowRadius == 0.0f) {
+            event.getRenderer().shadowRadius = 1.0f;
         }
         //    if (ClientShouldntRenderSpiritWorldData.getShouldntRender(entity.getUUID())) {
         //        event.setCanceled(true);

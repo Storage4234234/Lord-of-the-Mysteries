@@ -60,7 +60,6 @@ public class CreativeTabInit {
                         event.accept(ItemInit.AQUEOUS_LIGHT_PULL.get());
                         event.accept(ItemInit.AQUEOUS_LIGHT_PUSH.get());
                         event.accept(ItemInit.WIND_MANIPULATION_BLADE.get());
-                        event.accept(ItemInit.WIND_MANIPULATION_CUSHION.get());
                         event.accept(ItemInit.WIND_MANIPULATION_FLIGHT.get());
                         event.accept(ItemInit.WIND_MANIPULATION_SENSE.get());
                         event.accept(ItemInit.SAILOR_LIGHTNING.get());
@@ -137,6 +136,29 @@ public class CreativeTabInit {
                         event.accept(ItemInit.PROBABILITYINFINITEFORTUNE.get());
                         event.accept(ItemInit.WHISPEROFCORRUPTION.get());
                         event.accept(ItemInit.MISFORTUNEIMPLOSION.get());
+
+                        event.accept(ItemInit.GIGANTIFICATION.get());
+                        event.accept(ItemInit.LIGHTOFDAWN.get());
+                        event.accept(ItemInit.DAWNARMORY.get());
+                        event.accept(ItemInit.DAWNWEAPONRY.get());
+                        event.accept(ItemInit.EYEOFDEMONHUNTING.get());
+                        event.accept(ItemInit.WARRIORDANGERSENSE.get());
+                        event.accept(ItemInit.MERCURYLIQUEFICATION.get());
+                        event.accept(ItemInit.SILVERRAPIER.get());
+                        event.accept(ItemInit.LIGHTCONCEALMENT.get());
+                        event.accept(ItemInit.SILVERARMORY.get());
+                        event.accept(ItemInit.BEAMOFGLORY.get());
+                        event.accept(ItemInit.AURAOFGLORY.get());
+                        event.accept(ItemInit.TWILIGHTSWORD.get());
+                        event.accept(ItemInit.MERCURYCAGE.get());
+                        event.accept(ItemInit.DIVINEHANDRIGHT.get());
+                        event.accept(ItemInit.DIVINEHANDLEFT.get());
+                        event.accept(ItemInit.TWILIGHTMANIFESTATION.get());
+                        event.accept(ItemInit.SILVERLIGHT.get());
+                        event.accept(ItemInit.AURAOFTWILIGHT.get());
+                        event.accept(ItemInit.GLOBEOFTWILIGHT.get());
+                        event.accept(ItemInit.BEAMOFTWILIGHT.get());
+
                     })
                     .build());
 

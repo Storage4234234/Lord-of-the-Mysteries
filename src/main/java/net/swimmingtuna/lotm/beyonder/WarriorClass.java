@@ -207,7 +207,27 @@ public class WarriorClass implements BeyonderClass {
     @Override
     public Multimap<Integer, Item> getItems() {
         HashMultimap<Integer, Item> items = HashMultimap.create();
-        items.put(0, ItemInit.PLACATE.get());
+        items.put(6, ItemInit.GIGANTIFICATION.get());
+        items.put(6, ItemInit.LIGHTOFDAWN.get());
+        items.put(6, ItemInit.DAWNARMORY.get());
+        items.put(6, ItemInit.DAWNWEAPONRY.get());
+        items.put(4, ItemInit.EYEOFDEMONHUNTING.get());
+        items.put(4, ItemInit.WARRIORDANGERSENSE.get());
+        items.put(3, ItemInit.MERCURYLIQUEFICATION.get());
+        items.put(3, ItemInit.SILVERRAPIER.get());
+        items.put(3, ItemInit.SILVERARMORY.get());
+        items.put(3, ItemInit.LIGHTCONCEALMENT.get());
+        items.put(2, ItemInit.BEAMOFGLORY.get());
+        items.put(2, ItemInit.AURAOFGLORY.get());
+        items.put(2, ItemInit.TWILIGHTSWORD.get());
+        items.put(2, ItemInit.MERCURYCAGE.get());
+        items.put(1, ItemInit.DIVINEHANDLEFT.get());
+        items.put(1, ItemInit.DIVINEHANDRIGHT.get());
+        items.put(1, ItemInit.TWILIGHTMANIFESTATION.get());
+        items.put(1, ItemInit.SILVERLIGHT.get());
+        items.put(0, ItemInit.AURAOFTWILIGHT.get());
+        items.put(0, ItemInit.GLOBEOFTWILIGHT.get());
+        items.put(0, ItemInit.BEAMOFTWILIGHT.get());
         return items;
     }
 

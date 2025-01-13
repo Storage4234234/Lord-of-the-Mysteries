@@ -111,9 +111,6 @@ public class RoarEntity extends AbstractHurtingProjectile {
     @Override
     public void tick() {
         super.tick();
-        ParticleEngine particleEngine = Minecraft.getInstance().particleEngine;
-        Particle particle = particleEngine.createParticle(ParticleTypes.SONIC_BOOM, this.getX(), this.getY(), this.getZ(),0,0,0);
-        assert particle != null;
         ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
         float radius = 3 * scaleData.getScale();
         if (!this.level().isClientSide()) {

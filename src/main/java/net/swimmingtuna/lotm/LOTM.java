@@ -268,7 +268,6 @@ public class LOTM {
             event.accept(ItemInit.AQUEOUS_LIGHT_PUSH);
             event.accept(ItemInit.WIND_MANIPULATION_FLIGHT);
             event.accept(ItemInit.WIND_MANIPULATION_BLADE);
-            event.accept(ItemInit.WIND_MANIPULATION_CUSHION);
             event.accept(ItemInit.WIND_MANIPULATION_SENSE);
             event.accept(ItemInit.ACIDIC_RAIN);
             event.accept(ItemInit.AQUATIC_LIFE_MANIPULATION);
@@ -280,6 +279,28 @@ public class LOTM {
             event.accept(ItemInit.DEATHKNELL);
             event.accept(ItemInit.SYMPHONYOFHATRED);
             event.accept(ItemInit.WINTRYBLADE);
+            event.accept(ItemInit.GIGANTIFICATION);
+            event.accept(ItemInit.LIGHTOFDAWN);
+            event.accept(ItemInit.DAWNARMORY);
+            event.accept(ItemInit.DAWNWEAPONRY);
+            event.accept(ItemInit.EYEOFDEMONHUNTING);
+            event.accept(ItemInit.WARRIORDANGERSENSE);
+            event.accept(ItemInit.MERCURYLIQUEFICATION);
+            event.accept(ItemInit.SILVERRAPIER);
+            event.accept(ItemInit.SILVERARMORY);
+            event.accept(ItemInit.LIGHTCONCEALMENT);
+            event.accept(ItemInit.BEAMOFGLORY);
+            event.accept(ItemInit.AURAOFGLORY);
+            event.accept(ItemInit.TWILIGHTSWORD);
+            event.accept(ItemInit.MERCURYCAGE);
+            event.accept(ItemInit.DIVINEHANDRIGHT);
+            event.accept(ItemInit.DIVINEHANDLEFT);
+            event.accept(ItemInit.TWILIGHTMANIFESTATION);
+            event.accept(ItemInit.SILVERLIGHT);
+            event.accept(ItemInit.AURAOFTWILIGHT);
+            event.accept(ItemInit.GLOBEOFTWILIGHT);
+            event.accept(ItemInit.BEAMOFTWILIGHT);
+
         }
         if (event.getTabKey() == CreativeModeTabs.OP_BLOCKS) {
             event.accept(BlockInit.VISIONARY_BARRIER_BLOCK);

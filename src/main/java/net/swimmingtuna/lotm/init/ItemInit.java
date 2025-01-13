@@ -12,6 +12,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.*;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderPotion;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderResetPotion;
 import net.swimmingtuna.lotm.item.OtherItems.LuckBottleItem;
@@ -189,8 +190,6 @@ public class ItemInit {
             () -> new WindManipulationFlight(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> WIND_MANIPULATION_BLADE = ITEMS.register("windmanipulationblade",
             () -> new WindManipulationBlade(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> WIND_MANIPULATION_CUSHION = ITEMS.register("windmanipulationcushion",
-            () -> new WindManipulationCushion(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> WIND_MANIPULATION_SENSE = ITEMS.register("windmanipulationsense",
             () -> new WindManipulationSense(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ACIDIC_RAIN = ITEMS.register("acidicrain",
@@ -279,6 +278,50 @@ public class ItemInit {
             () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ENVISION_HEALTH = ITEMS.register("envisionhealth",
             () -> new EnvisionHealth(new Item.Properties().stacksTo(1)));
+
+    //WARRIOR
+    public static final RegistryObject<Item> GIGANTIFICATION = ITEMS.register("gigantification",
+            () -> new Gigantification(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> LIGHTOFDAWN = ITEMS.register("lightofdawn",
+            () -> new LightOfDawn(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> DAWNARMORY = ITEMS.register("dawnarmory",
+            () -> new DawnArmory(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> DAWNWEAPONRY = ITEMS.register("dawnweaponry",
+            () -> new DawnWeaponry(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> EYEOFDEMONHUNTING = ITEMS.register("eyeofdemonhunting",
+            () -> new EyeOfDemonHunting(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> WARRIORDANGERSENSE = ITEMS.register("warriordangersense",
+            () -> new WarriorDangerSense(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> MERCURYLIQUEFICATION = ITEMS.register("mercuryliquefication",
+            () -> new MercuryLiquefication(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> SILVERRAPIER = ITEMS.register("silverrapier",
+            () -> new SilverRapier(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> SILVERARMORY = ITEMS.register("silverarmory",
+            () -> new SilverArmory(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> LIGHTCONCEALMENT = ITEMS.register("lightconcealment",
+            () -> new LightConcealment(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> BEAMOFGLORY = ITEMS.register("beamofglory",
+            () -> new BeamOfGlory(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> AURAOFGLORY = ITEMS.register("auraofglory",
+            () -> new AuraOfGlory(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TWILIGHTSWORD = ITEMS.register("twilightsword",
+            () -> new TwilightSword(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> MERCURYCAGE = ITEMS.register("mercurycage",
+            () -> new MercuryCage(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> DIVINEHANDRIGHT = ITEMS.register("divinehandright",
+            () -> new DivineHandRight(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> DIVINEHANDLEFT = ITEMS.register("divinehandleft",
+            () -> new DivineHandLeft(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TWILIGHTMANIFESTATION = ITEMS.register("twilightmanifestation",
+            () -> new TwilightManifestation(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> SILVERLIGHT = ITEMS.register("silverlight",
+            () -> new SilverLight(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> AURAOFTWILIGHT = ITEMS.register("auraoftwilight",
+            () -> new AuraOfTwilight(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> GLOBEOFTWILIGHT = ITEMS.register("globeoftwilight",
+            () -> new GlobeOfTwilight(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> BEAMOFTWILIGHT = ITEMS.register("beamoftwilight",
+            () -> new BeamOfTwilight(new Item.Properties().stacksTo(1)));
 
 
     //INGREDIENTS
