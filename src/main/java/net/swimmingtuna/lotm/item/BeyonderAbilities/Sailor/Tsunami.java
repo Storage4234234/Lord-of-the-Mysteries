@@ -107,7 +107,7 @@ public class Tsunami extends SimpleAbilityItem {
 
         int waveWidth = 80;
         int waveHeight = 10;
-        int startDistance = 85;
+        int startDistance = 15;
 
         for (int w = -waveWidth / 2; w < waveWidth / 2; w++) {
             for (int h = 0; h < waveHeight; h++) {

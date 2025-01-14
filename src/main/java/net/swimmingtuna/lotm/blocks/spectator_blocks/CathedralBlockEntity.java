@@ -75,7 +75,7 @@ public class CathedralBlockEntity extends BlockEntity implements TickableBlockEn
         }
         if (ticks >= 800) {
             int radius = 300;
-            level.setBlock(this.getBlockPos(), Blocks.AIR.defaultBlockState(), 3);
+            level.setBlock(this.getBlockPos(), Blocks.AIR.defaultBlockState(), 2);
             List<ItemEntity> items = level.getEntitiesOfClass(ItemEntity.class,
                     new AABB(worldPosition.offset(-radius, -radius, -radius), worldPosition.offset(radius, radius, radius)));
 

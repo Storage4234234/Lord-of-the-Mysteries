@@ -144,6 +144,7 @@ public class ModEvents {
         BeyonderUtil.leftClickEmpty(event.getEntity());
     }
 
+    @SubscribeEvent
     public static void mobEffectEvent(MobEffectEvent.Added event) {
         LivingEntity entity = event.getEntity();
         if (entity.level() instanceof ServerLevel serverLevel) {
@@ -160,6 +161,7 @@ public class ModEvents {
         }
 
     }
+
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void leftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
@@ -536,11 +538,12 @@ public class ModEvents {
             if (x >= 1) {
                 tag.putInt("psychologicalInvisibilityHurt", x - 1);
             }
-            if (x >= 500 && ClientShouldntRenderInvisibilityData.getShouldntRender()) {
+            if (x >= 400 && ClientShouldntRenderInvisibilityData.getShouldntRender()) {
                 livingEntity.getPersistentData().putBoolean("psychologicalInvisibility", false);
                 LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(false, livingEntity.getUUID()));
                 tag.putInt("psychologicalInvisibilityHurt", 0);
                 if (livingEntity instanceof Player player) {
+                    player.displayClientMessage(Component.literal("You got hit too many times, you're now visible").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
                     player.getCooldowns().addCooldown(ItemInit.PSYCHOLOGICAL_INVISIBILITY.get(), 240);
                 }
             }
@@ -610,7 +613,7 @@ public class ModEvents {
         if (!windManipulationSense) {
             return;
         }
-        if (!holder.useSpirituality(2)) return;
+        if (!holder.useSpirituality(1)) return;
         double radius = 100 - (holder.getCurrentSequence() * 10);
         for (Player otherPlayer : player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius))) {
             if (otherPlayer == player) {
@@ -1394,8 +1397,9 @@ public class ModEvents {
         if (sirenSongWeaken % 20 == 0 && sirenSongWeaken != 0) { //make it for 380,360,430 etc.
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.SIREN_SONG_WEAKEN.get())))) {
                 if (entity != player) {
-                    entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 19, 2, false, false));
-                    entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 19, 2, false, false));
+
+                    entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 21, 2, false, false));
+                    entity.addEffect(new MobEffectInstance(ModEffects.ABILITY_WEAKNESS.get(), 21, 1, false, false));
                 }
             }
         }
@@ -1563,6 +1567,7 @@ public class ModEvents {
             }
         }
     }
+
 
     private static void domainDropsExperience(LivingExperienceDropEvent event) {
         //MONSTER PROVIDENCE DOMAIN
@@ -1759,6 +1764,7 @@ public class ModEvents {
             if (entity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
             }
+            livingNoMoveEffect(event);
             psychologicalInvisibilityHurtTick(entity);
             //windManipulationCushion(entity);
             //sendSpiritWorldPackets(entity);
@@ -2345,7 +2351,10 @@ public class ModEvents {
     private static void rippleOfMisfortune(Player player) { //ADD CHECKS FOR NEARBY MONSTERS AT SEQ 6 AND 3
         if (!player.level().isClientSide() && player.getPersistentData().getBoolean("monsterRipple")) {
             Level level = player.level();
-            int enhancement = CalamityEnhancementData.getInstance((ServerLevel) player.level()).getCalamityEnhancement();
+            int enhancement = 1;
+            if (level instanceof ServerLevel serverLevel) {
+                enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+            }
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             holder.useSpirituality(200);
             for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENABLEDISABLERIPPLE.get())))) {
@@ -2644,6 +2653,7 @@ public class ModEvents {
         }
     }
 
+
     @SubscribeEvent
     public static void attackEvent(LivingAttackEvent event) {
         LivingEntity attacked = event.getEntity();
@@ -2903,7 +2913,11 @@ public class ModEvents {
                 int tornadoImmunity = tag.getInt("luckTornadoImmunity");
                 int lotmLightningImmunity = tag.getInt("calamityLOTMLightningImmunity");
                 int lightningStormImmunity = tag.getInt("calamityLightningStormImmunity");
-                int enhancement = CalamityEnhancementData.getInstance((ServerLevel) entity.level()).getCalamityEnhancement();
+                Level level = entity.level();
+                int enhancement = 1;
+                if (level instanceof ServerLevel serverLevel) {
+                    enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+                }
                 if (enhancement >= 2) {
                     event.setAmount((float) (event.getAmount() + (enhancement * 0.25)));
                 }
@@ -4078,6 +4092,21 @@ public class ModEvents {
     public static int getCooldown(ServerPlayer player) {
         return player.getPersistentData().getInt("leftClickCooldown");
     }
+
+    public static void livingNoMoveEffect(LivingEvent.LivingTickEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (entity instanceof Player) {
+            return;
+        }
+        if (entity.hasEffect(ModEffects.STUN.get()) || entity.hasEffect(ModEffects.PARALYSIS.get()) || entity.hasEffect(ModEffects.AWE.get())) {
+            entity.setDeltaMovement(0, entity.getDeltaMovement().y, 0);
+            if (entity instanceof Mob mob) {
+                mob.getNavigation().stop();
+
+            }
+        }
+    }
+
 
     public static void sendSpiritWorldPackets(LivingEntity livingEntity) {
         CompoundTag tag = livingEntity.getPersistentData();

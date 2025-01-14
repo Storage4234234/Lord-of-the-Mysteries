@@ -50,7 +50,11 @@ public class LuckManipulation extends SimpleAbilityItem {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             double luck = tag.getDouble("luck");
             double misfortune = tag.getDouble("misfortune");
-            int enhancement = CalamityEnhancementData.getInstance((ServerLevel) player.level()).getCalamityEnhancement();
+            Level level = player.level();
+            int enhancement = 1;
+            if (level instanceof ServerLevel serverLevel) {
+                enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+            }
             int luckManipulation = tag.getInt("luckManipulationItem");
             if (luckManipulation == 1) { //regen
                 BeyonderUtil.applyMobEffect(player, MobEffects.REGENERATION, 300 - (holder.getCurrentSequence() * 30), 2, true, true);

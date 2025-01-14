@@ -155,7 +155,7 @@ public class RoarEntity extends AbstractHurtingProjectile {
                     }
                 }
             }
-            float damage = 10.0F * scaleData.getScale();
+            float damage = 20.0F * scaleData.getScale();
             float explosionRadius = 3 * scaleData.getScale();
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(explosionRadius))) {
                 if (entity != this.getOwner()) {

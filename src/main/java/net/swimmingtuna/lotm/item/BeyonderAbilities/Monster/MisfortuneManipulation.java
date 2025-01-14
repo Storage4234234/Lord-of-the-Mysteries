@@ -195,7 +195,7 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
         if (entity instanceof Player player) {
             if (player.tickCount % 2 == 0 && !level.isClientSide()) {
                 if (player.getMainHandItem().getItem() instanceof MisfortuneManipulation) {
-                    player.displayClientMessage(Component.literal("Current Misfortune Manipulation is: " + misfortuneManipulationString(player)), true);
+                    player.displayClientMessage(Component.literal("Current Misfortune Manipulation is: " + misfortuneManipulationString(player)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GRAY), true);
                 }
             }
         }
@@ -239,7 +239,11 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
             int y = (int) entity.getY();
             int z = (int) entity.getZ();
             Vec3 targetPos = new Vec3(x, y, z);
-            int enhancement = CalamityEnhancementData.getInstance((ServerLevel) entity.level()).getCalamityEnhancement();
+            Level level = player.level();
+            int enhancement = 1;
+            if (level instanceof ServerLevel serverLevel) {
+                enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+            }
             MeteorEntity meteor = new MeteorEntity(EntityInit.METEOR_ENTITY.get(), entity.level());
             meteor.teleportTo(x + (Math.random() * 100) - 50, y + 150 + (Math.random() * 100) - 50, z + (Math.random() * 100) - 50);
             meteor.noPhysics = true;

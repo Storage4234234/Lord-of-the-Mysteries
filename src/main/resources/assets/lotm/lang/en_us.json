@@ -35,6 +35,9 @@
   "item.lotm.deathknell": "Death Knell",
   "item.lotm.symphonyofhatred": "Syphony of Hatred",
   "item.lotm.wintryblade": "Wintry Blade",
+  "item.lotm.swordofdawn": "Sword of Dawn",
+  "item.lotm.pickaxeofdawn": "Pickaxe of Dawn",
+  "item.lotm.spearofdawn": "Spear of Dawn",
   "lotm.effect.awe": "Awe",
   "lotm.effect.bleeding": "Bleeding",
   "lotm.effect.stun": "Stun",
@@ -311,6 +314,7 @@
   "item.lotm.monster_0_potion": "Wheel of Fortune Potion",
 
   "item.lotm.zqdsndnkawdnsalnkw": "Icon for the Mod - Useless",
+  "item.lotm.zywdyasdhwahdoioshd": "Icon for the Mod - Useless",
 
 
 
@@ -357,6 +361,7 @@
   "lotm.beyonder.spectator1": "Author",
   "lotm.beyonder.spectator0": "Visionary",
   "creativetab.abilities_tab": "Beyonder Abilities",
+  "creativetab.beyonderingredients_tab": "Beyonder Ingredients",
   "creativetab.ingredients_tab": "Beyonder Ingredients",
 
   "death.attack.lotm.mental_damage": "%1&s suffered from a mental attack"

@@ -19,6 +19,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
+import net.swimmingtuna.lotm.entity.HurricaneOfLightEntity;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -26,6 +27,7 @@ import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderSpiritWorldPacketS2C;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderSpiritWorldData;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
+import net.swimmingtuna.lotm.util.effect.ModEffects;
 
 public class TestItem extends SimpleAbilityItem {
 
@@ -82,7 +84,7 @@ public class TestItem extends SimpleAbilityItem {
                     player.getCooldowns().removeCooldown(stack.getItem());
                 }
             }
-            tag.putInt("cantUseAbility", 5);
+
         }
 
         return InteractionResult.SUCCESS;

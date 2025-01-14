@@ -1,10 +1,13 @@
 package net.swimmingtuna.lotm.events;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.ViewportEvent;
@@ -16,6 +19,7 @@ import net.swimmingtuna.lotm.client.AbilityOverlay;
 import net.swimmingtuna.lotm.client.SpiritualityBarOverlay;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
+import net.swimmingtuna.lotm.util.effect.ModEffects;
 
 import java.util.Collection;
 

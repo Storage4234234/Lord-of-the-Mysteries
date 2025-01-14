@@ -54,7 +54,6 @@ public class LightningBall extends SimpleAbilityItem {
 
     public void lightningBall(Player player) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             LightningBallEntity lightningBall = new LightningBallEntity(EntityInit.LIGHTNING_BALL.get(), player.level(), true);
             lightningBall.setSummoned(true);
             lightningBall.setBallXRot((float) ((Math.random() * 20) - 10));

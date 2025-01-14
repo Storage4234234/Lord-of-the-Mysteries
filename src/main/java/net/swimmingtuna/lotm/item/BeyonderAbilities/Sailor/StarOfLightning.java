@@ -93,7 +93,7 @@ public class StarOfLightning extends SimpleAbilityItem {
                 hitPos.offset((int) radius, (int) radius, (int) radius))) {
             if (pos.distSqr(hitPos) <= radius * radius) {
                 if (livingEntity.level().getBlockState(pos).getDestroySpeed(livingEntity.level(), pos) >= 0) {
-                    livingEntity.level().setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+                    livingEntity.level().setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                 }
             }
         }

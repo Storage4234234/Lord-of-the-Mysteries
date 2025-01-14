@@ -16,7 +16,7 @@ public class CreativeTabInit {
     public static final RegistryObject<CreativeModeTab> ABILITIES_TAB = CREATIVE_MODE_TABS.register("abilities_tab",
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(ItemInit.AWE.get()))
                     .title(Component.translatable("creativetab.abilities_tab"))
-                    .icon(() -> new ItemStack(ItemInit.ICONITEM.get()))
+                    .icon(() -> new ItemStack(ItemInit.ABILITYICONTAB.get()))
                     .displayItems((parameters, event) -> {
                         event.accept(ItemInit.BEYONDER_ABILITY_USER.get());
                         event.accept(ItemInit.MIND_READING.get());
@@ -163,8 +163,8 @@ public class CreativeTabInit {
                     .build());
 
     public static final RegistryObject<CreativeModeTab> INGREDIENTS_TAB = CREATIVE_MODE_TABS.register("ingredients_tab",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ItemInit.AWE.get()))
-                    .title(Component.translatable("creativetab.abilities_tab"))
+            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ItemInit.INGREDIENTSICONTAB.get()))
+                    .title(Component.translatable("creativetab.beyonderingredients_tab"))
                     .icon(() -> new ItemStack(ItemInit.RED_CHESTNUT_FLOWER.get()))
                     .displayItems((parameters, output) -> {
                         output.accept(ItemInit.SPIRIT_EATER_STOMACH_POUCH.get());

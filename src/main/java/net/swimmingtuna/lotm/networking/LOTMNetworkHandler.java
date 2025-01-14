@@ -89,6 +89,11 @@ public class LOTMNetworkHandler {
                 .encoder(MisfortuneManipulationLeftClickC2S::toByte)
                 .consumerMainThread(MisfortuneManipulationLeftClickC2S::handle)
                 .add();
+        INSTANCE.messageBuilder(DawnWeaponryLeftClickC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(DawnWeaponryLeftClickC2S::new)
+                .encoder(DawnWeaponryLeftClickC2S::toByte)
+                .consumerMainThread(DawnWeaponryLeftClickC2S::handle)
+                .add();
         INSTANCE.messageBuilder(MonsterCalamityIncarnationLeftClickC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(MonsterCalamityIncarnationLeftClickC2S::new)
                 .encoder(MonsterCalamityIncarnationLeftClickC2S::toByte)

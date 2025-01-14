@@ -89,8 +89,10 @@ public class AuraOfChaos extends SimpleAbilityItem {
                 if (player.tickCount % 20 == 0) {
                     holder.useSpirituality(150);
                 }
-                int enhancement = CalamityEnhancementData.getInstance((ServerLevel) entity.level()).getCalamityEnhancement();
-                for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.AURAOFCHAOS.get())))) {
+                int enhancement = 1;
+                if (level instanceof ServerLevel serverLevel) {
+                    enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+                }                for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.AURAOFCHAOS.get())))) {
                     CompoundTag persistentData = livingEntity.getPersistentData();
                     Random random = new Random();
                     int randomInt = random.nextInt(350);

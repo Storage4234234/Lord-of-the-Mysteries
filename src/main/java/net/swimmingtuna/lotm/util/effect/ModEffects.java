@@ -35,7 +35,7 @@ public class ModEffects {
             () -> new ParalysisEffect(MobEffectCategory.HARMFUL, 3124687));
     public static final RegistryObject<MobEffect> NOREGENERATION = MOB_EFFECTS.register("noregeneration",
             () -> new NoRegenerationEffect(MobEffectCategory.HARMFUL, 3124687));
-    public static final RegistryObject<MobEffect> TWILIGHT = MOB_EFFECTS.register("twilight",
+    public static final RegistryObject<MobEffect> ABILITY_WEAKNESS = MOB_EFFECTS.register("twilight",
             () -> new NoRegenerationEffect(MobEffectCategory.HARMFUL, 3124687));
     public static final RegistryObject<MobEffect> ARMOR_WEAKNESS = MOB_EFFECTS.register("armor_weakness",
             ArmorWeaknessEffect::new);

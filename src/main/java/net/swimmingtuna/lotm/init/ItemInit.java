@@ -1,7 +1,6 @@
 package net.swimmingtuna.lotm.init;
 
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tiers;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -15,8 +14,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.*;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderPotion;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderResetPotion;
-import net.swimmingtuna.lotm.item.OtherItems.LuckBottleItem;
-import net.swimmingtuna.lotm.item.OtherItems.LuckyGoldCoin;
+import net.swimmingtuna.lotm.item.OtherItems.*;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.SymphonyOfHatred;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
@@ -340,7 +338,9 @@ public class ItemInit {
     //UTIL
     public static final RegistryObject<Item> BEYONDER_ABILITY_USER = ITEMS.register("beyonderabilityuser",
             () -> new BeyonderAbilityUser(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> ICONITEM = ITEMS.register("zqdsndnkawdnsalnkw",
+    public static final RegistryObject<Item> ABILITYICONTAB = ITEMS.register("zqdsndnkawdnsalnkw",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> INGREDIENTSICONTAB = ITEMS.register("zywdyasdhwahdoioshd",
             () -> new Item(new Item.Properties().stacksTo(1)));
 
 
@@ -420,6 +420,12 @@ public class ItemInit {
             () -> new SymphonyOfHatred(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> WINTRYBLADE = ITEMS.register("wintryblade",
             () -> new WintryBlade(Tiers.NETHERITE, 4,-2,new Item.Properties()));
+    public static final RegistryObject<Item> SWORDOFDAWN = ITEMS.register("swordofdawn",
+            () -> new SwordOfDawn(Tiers.NETHERITE, 10,-2.8f,new Item.Properties()));
+    public static final RegistryObject<Item> PICKAXEOFDAWN = ITEMS.register("pickaxeofdawn",
+            () -> new PickaxeOfDawn(Tiers.NETHERITE, 0,0,new Item.Properties()));
+    public static final RegistryObject<Item> SPEAROFDAWN = ITEMS.register("spearofdawn",
+            () -> new SpearOfDawn(Tiers.NETHERITE, 4,-1.5f,new Item.Properties()));
 
 
     public static void register(IEventBus eventBus) {

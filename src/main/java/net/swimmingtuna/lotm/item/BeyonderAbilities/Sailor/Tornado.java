@@ -65,7 +65,7 @@ public class Tornado extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             TornadoEntity tornado = new TornadoEntity(player.level(), player, 0, 0, 0);
             tornado.setTornadoHeight((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.TORNADO.get()));
-            tornado.setTornadoRadius((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.TORNADO.get()) / 4);
+            tornado.setTornadoRadius((int) ((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.TORNADO.get()) / 2.5));
             if (sequence <= 0) {
                 tornado.setTornadoLightning(true);
                 tornado.setTornadoLifecount(400);

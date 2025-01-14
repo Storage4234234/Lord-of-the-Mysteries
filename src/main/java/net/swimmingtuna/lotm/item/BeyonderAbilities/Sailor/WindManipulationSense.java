@@ -10,8 +10,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -41,6 +43,41 @@ public class WindManipulationSense extends SimpleAbilityItem {
             boolean windManipulationSense = tag.getBoolean("windManipulationSense");
             tag.putBoolean("windManipulationSense", !windManipulationSense);
             player.displayClientMessage(Component.literal("Wind Sense Turned " + (windManipulationSense ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
+            int sequence = BeyonderUtil.getSequence(player);
+            double radius = 100 - (sequence * 10);
+            for (Player otherPlayer : player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius))) {
+                if (otherPlayer == player) {
+                    continue;
+                }
+                Vec3 directionToPlayer = otherPlayer.position().subtract(player.position()).normalize();
+                Vec3 lookAngle = player.getLookAngle();
+                double horizontalAngle = Math.atan2(directionToPlayer.x, directionToPlayer.z) - Math.atan2(lookAngle.x, lookAngle.z);
+
+                String horizontalDirection;
+                if (Math.abs(horizontalAngle) < Math.PI / 4) {
+                    horizontalDirection = "in front of";
+                } else if (horizontalAngle < -Math.PI * 3 / 4 || horizontalAngle > Math.PI * 3 / 4) {
+                    horizontalDirection = "behind";
+                } else if (horizontalAngle < 0) {
+                    horizontalDirection = "to the right of";
+                } else {
+                    horizontalDirection = "to the left of";
+                }
+
+                String verticalDirection;
+                if (directionToPlayer.y > 0.2) {
+                    verticalDirection = "above";
+                } else if (directionToPlayer.y < -0.2) {
+                    verticalDirection = "below";
+                } else {
+                    verticalDirection = "at the same level as";
+                }
+
+                String message = otherPlayer.getName().getString() + " is " + horizontalDirection + " and " + verticalDirection + " you.";
+                if (player.tickCount % 200 == 0) {
+                    player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
+                }
+            }
         }
     }
     @Override

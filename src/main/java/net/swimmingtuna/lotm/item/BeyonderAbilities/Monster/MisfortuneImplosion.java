@@ -50,7 +50,11 @@ public class MisfortuneImplosion extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int sequence = holder.getCurrentSequence();
-            int enhancement = CalamityEnhancementData.getInstance((ServerLevel) player.level()).getCalamityEnhancement();
+            Level level = player.level();
+            int enhancement = 1;
+            if (level instanceof ServerLevel serverLevel) {
+                enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+            }
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEIMPLOSION.get());
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
                 if (entity != player) {
@@ -84,8 +88,11 @@ public class MisfortuneImplosion extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int sequence = holder.getCurrentSequence();
-            int enhancement = CalamityEnhancementData.getInstance((ServerLevel) player.level()).getCalamityEnhancement();
-            double radius = (250 - (sequence * 100) + (enhancement * 50));
+            Level level = player.level();
+            int enhancement = 1;
+            if (level instanceof ServerLevel serverLevel) {
+                enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+            }            double radius = (250 - (sequence * 100) + (enhancement * 50));
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
                 if (entity != player) {
                     CompoundTag tag = entity.getPersistentData();

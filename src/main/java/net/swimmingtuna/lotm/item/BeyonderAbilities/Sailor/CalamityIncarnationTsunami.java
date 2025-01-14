@@ -94,7 +94,7 @@ public class CalamityIncarnationTsunami extends SimpleAbilityItem {
                     if (distance <= maxRemovalRadius && distance >= minRemovalRadius) {
                         BlockPos blockPos = playerPos.offset(sphereX, sphereY, sphereZ);
                         if (level.getBlockState(blockPos).getBlock() == Blocks.WATER) {
-                            level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
+                            level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 2);
                         }
                     }
                 }

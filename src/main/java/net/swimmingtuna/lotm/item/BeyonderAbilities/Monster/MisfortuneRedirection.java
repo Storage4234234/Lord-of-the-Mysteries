@@ -108,7 +108,11 @@ public class MisfortuneRedirection extends SimpleAbilityItem {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             for (LivingEntity livingEntity : interactionTarget.level().getEntitiesOfClass(LivingEntity.class, interactionTarget.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEREDIRECTION.get())))) {
                 CompoundTag tag = livingEntity.getPersistentData();
-                int enhancement = CalamityEnhancementData.getInstance((ServerLevel) player.level()).getCalamityEnhancement();
+                int enhancement = 1;
+                Level level = player.level();
+                if (level instanceof ServerLevel serverLevel) {
+                    enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+                }
                 int paralysisDuration = 0;
                 int lotmLightningCount = 0;
                 int mcLightningCount = 0;
@@ -343,7 +347,11 @@ public class MisfortuneRedirection extends SimpleAbilityItem {
     public static void misfortuneLivingTickEvent(LivingEvent.LivingTickEvent event) {
         LivingEntity livingEntity = event.getEntity();
         if (!livingEntity.level().isClientSide() && livingEntity.tickCount % 20 == 0) {
-            int enhancement = CalamityEnhancementData.getInstance((ServerLevel) livingEntity.level()).getCalamityEnhancement();
+            Level level = livingEntity.level();
+            int enhancement = 1;
+            if (level instanceof ServerLevel serverLevel) {
+                enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+            }
             if (livingEntity.getPersistentData().getInt("misfortuneRedirectionLightning") >= 1) {
                 LightningEntity lightning = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), livingEntity.level());
                 lightning.setSpeed(5.0f);
@@ -373,8 +381,11 @@ public class MisfortuneRedirection extends SimpleAbilityItem {
         int z = (int) (livingEntity.getX() + (Math.random() * 40) - 20);
         int surfaceY = livingEntity.level().getHeight(Heightmap.Types.WORLD_SURFACE, x, z) + 1;
         Random random = new Random();
-        int enhancement = CalamityEnhancementData.getInstance((ServerLevel) livingEntity.level()).getCalamityEnhancement();
-        ItemStack leatherHelmet = new ItemStack(Items.LEATHER_HELMET);
+        Level level = livingEntity.level();
+        int enhancement = 1;
+        if (level instanceof ServerLevel serverLevel) {
+            enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+        }        ItemStack leatherHelmet = new ItemStack(Items.LEATHER_HELMET);
         ItemStack leatherChestplate = new ItemStack(Items.LEATHER_CHESTPLATE);
         ItemStack leatherLeggings = new ItemStack(Items.LEATHER_LEGGINGS);
         ItemStack leatherBoots = new ItemStack(Items.LEATHER_BOOTS);

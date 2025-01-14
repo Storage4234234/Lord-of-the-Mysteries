@@ -112,7 +112,11 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
         LivingEntity entity = event.getEntity();
         CompoundTag tag = entity.getPersistentData();
         Vec3 lookVec = entity.getLookAngle();
-        int enhancement = CalamityEnhancementData.getInstance((ServerLevel) entity.level()).getCalamityEnhancement();
+        Level level = entity.level();
+        int enhancement = 1;
+        if (level instanceof ServerLevel serverLevel) {
+            enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+        }
         int meteor = tag.getInt("calamityIncarnationInMeteor");
         int tornado = tag.getInt("calamityIncarnationInTornado");
         int lightning = tag.getInt("calamityIncarnationInLightning");

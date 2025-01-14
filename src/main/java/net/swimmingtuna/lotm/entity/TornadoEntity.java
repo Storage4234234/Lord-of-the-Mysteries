@@ -206,7 +206,7 @@ public class TornadoEntity extends AbstractHurtingProjectile {
 
         if (this.level().isClientSide) {
             double sizeFactor = (tornadoRadius + 1) * (tornadoHeight + 1) / 1000.0;
-            int particleCount = Math.max(20, (int) (50 * sizeFactor));
+            int particleCount = Math.max(20, (int) (100 * sizeFactor));
             double baseX = this.getX();
             double baseY = this.getY();
             double baseZ = this.getZ();
@@ -232,7 +232,6 @@ public class TornadoEntity extends AbstractHurtingProjectile {
                 );
             }
         } else {
-            Vec3 pos = this.position();
             Random random = new Random();
             List<Entity> entities = this.level().getEntities(this, boundingBox);
             entities.removeIf(Objects::isNull);
@@ -255,7 +254,7 @@ public class TornadoEntity extends AbstractHurtingProjectile {
                         } else if (entity.getPersistentData().getInt("luckTornadoImmunity") >= 1) {
                             continue;
                         } else {
-                            entity.hurt(BeyonderUtil.genericSource(this), 5);
+                            entity.hurt(BeyonderUtil.genericSource(this), (float) getTornadoHeight() / 4);
                         }
                     } else if (getTornadoLightning() && getOwner() != null && getOwner() instanceof LivingEntity owner && entity instanceof LivingEntity living){
                         if (entity.getPersistentData().getInt("luckTornadoResistance") >= 1) {

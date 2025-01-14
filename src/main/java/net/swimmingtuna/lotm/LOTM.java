@@ -279,6 +279,9 @@ public class LOTM {
             event.accept(ItemInit.DEATHKNELL);
             event.accept(ItemInit.SYMPHONYOFHATRED);
             event.accept(ItemInit.WINTRYBLADE);
+            event.accept(ItemInit.SWORDOFDAWN);
+            event.accept(ItemInit.SPEAROFDAWN);
+            event.accept(ItemInit.PICKAXEOFDAWN);
             event.accept(ItemInit.GIGANTIFICATION);
             event.accept(ItemInit.LIGHTOFDAWN);
             event.accept(ItemInit.DAWNARMORY);
