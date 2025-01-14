@@ -41,7 +41,7 @@ public class ChaosAmplification extends SimpleAbilityItem {
         if (entity instanceof Player player) {
             if (player.tickCount % 2 == 0 && !level.isClientSide()) {
                 if (player.getMainHandItem().getItem() instanceof ChaosAmplification) {
-                    player.displayClientMessage(Component.literal("Current Calamity Enhancement Value will be: " + player.getPersistentData().getInt("calamityEnhancementItemValue")), true);
+                    player.displayClientMessage(Component.literal("Current Calamity Enhancement Value will be: " + player.getPersistentData().getInt("calamityEnhancementItemValue")).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GRAY), true);
                 }
             }
         }

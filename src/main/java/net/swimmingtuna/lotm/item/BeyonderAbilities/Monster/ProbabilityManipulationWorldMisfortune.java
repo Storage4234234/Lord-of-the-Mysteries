@@ -41,7 +41,7 @@ public class ProbabilityManipulationWorldMisfortune extends SimpleAbilityItem {
         if (entity instanceof Player player) {
             if (player.tickCount % 2 == 0 && !level.isClientSide()) {
                 if (player.getMainHandItem().getItem() instanceof ProbabilityManipulationWorldMisfortune) {
-                    player.displayClientMessage(Component.literal("Probability of misfortunate events to happen will be amplified by: " + player.getPersistentData().getInt("probabilityManipulationWorldMisfortuneValue")), true);
+                    player.displayClientMessage(Component.literal("Probability of misfortunate events to happen will be amplified by: " + player.getPersistentData().getInt("probabilityManipulationWorldMisfortuneValue")).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED), true);
                 }
             }
         }

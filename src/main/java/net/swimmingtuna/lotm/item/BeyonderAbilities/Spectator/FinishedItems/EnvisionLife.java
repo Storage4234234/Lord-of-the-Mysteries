@@ -87,7 +87,7 @@ public class EnvisionLife extends SimpleAbilityItem {
 
                         // Get the translated name of the entity
                         String entityName = entity.getType().getDescription().getString();
-                        player.displayClientMessage(Component.literal("Envisioned a " + entityName + " into the world"), true);
+                        player.displayClientMessage(Component.literal("Envisioned a " + entityName + " into the world").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLUE), true);
                     } else {
                         // Get the translated name for the error message too
                         String entityName = entity.getType().getDescription().getString();

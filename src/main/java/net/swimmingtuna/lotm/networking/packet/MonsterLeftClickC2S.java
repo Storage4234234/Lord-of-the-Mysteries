@@ -38,7 +38,7 @@ public class MonsterLeftClickC2S {
                 List<MonsterDomainBlockEntity> ownedDomains = MonsterDomainBlockEntity.getDomainsOwnedBy(player.level(), player);
                 if (ownedDomains.isEmpty()) {
                     player.displayClientMessage(Component.literal("You don't own any Domains!")
-                            .withStyle(ChatFormatting.RED), true);
+                            .withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
                     return;
                 }
                 CompoundTag tag = heldItem.getOrCreateTag();

@@ -74,7 +74,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
         if (entity instanceof Player player) {
             if (player.tickCount % 2 == 0 && !level.isClientSide()) {
                 if (player.getMainHandItem().getItem() instanceof MonsterCalamityIncarnation) {
-                    player.displayClientMessage(Component.literal("Current Calamity Incarnation is: " + calamityIncarnationString(player)), true);
+                    player.displayClientMessage(Component.literal("Current Calamity Incarnation is: " + calamityIncarnationString(player)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GRAY), true);
                 }
             }
         }

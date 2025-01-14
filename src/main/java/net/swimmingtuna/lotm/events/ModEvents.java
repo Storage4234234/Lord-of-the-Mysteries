@@ -589,7 +589,7 @@ public class ModEvents {
 
                 String message = otherPlayer.getName().getString() + " is " + horizontalDirection + " and " + verticalDirection + " you.";
                 if (player.tickCount % 200 == 0) {
-                    player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE));
+                    player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY));
                 }
             }
         }
@@ -3083,7 +3083,7 @@ public class ModEvents {
                             projectile.getPersistentData().putInt("windDodgeProjectilesCounter", 100);
                             livingEntity.getPersistentData().putInt("windMovingProjectilesCounter", livingEntity.getPersistentData().getInt("windMovingProjectilesCounter") - 1);
                             if (livingEntity instanceof Player player) {
-                                player.displayClientMessage(Component.literal("A gust of wind moved a projectile headed towards you").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.WHITE), true);
+                                player.displayClientMessage(Component.literal("A gust of wind moved a projectile headed towards you").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN), true);
                             }
                         }
                     } else {
@@ -3116,7 +3116,7 @@ public class ModEvents {
                                             projectile.hurtMarked = true;
                                             projectile.getPersistentData().putInt("monsterReverseProjectiles", 60);
                                             if (livingEntity instanceof Player player) {
-                                                player.displayClientMessage(Component.literal("A strong breeze luckily reversed a projectile headed towards you").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.WHITE), true);
+                                                player.displayClientMessage(Component.literal("A strong breeze luckily reversed a projectile headed towards you").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN), true);
                                             }
                                         }
                                     }

@@ -194,8 +194,7 @@ public class ServerEvents {
         String message = event.getMessage().getString();
         if (holder.currentClassMatches(BeyonderClassInit.SPECTATOR) && !player.level().isClientSide() && player.getMainHandItem().getItem() instanceof EnvisionLocation && holder.getCurrentSequence() == 0) {
             if (!holder.currentClassMatches(BeyonderClassInit.SPECTATOR)) {
-                player.displayClientMessage(Component.literal("You are not of the Spectator pathway")
-                        .withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
+                player.displayClientMessage(Component.literal("You are not of the Spectator pathway").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
                 event.setCanceled(true);
                 return;
             }
@@ -231,8 +230,7 @@ public class ServerEvents {
                 holder.useSpirituality((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LOCATION.get()));
                 event.getPlayer().displayClientMessage(Component.literal("Teleported to " + targetPlayer.getName().getString()).withStyle(BeyonderUtil.getStyle(player)), true);
             } else {
-                event.getPlayer().displayClientMessage(Component.literal("Invalid coordinates or player name: " + message)
-                        .withStyle(BeyonderUtil.getStyle(player)), true);
+                event.getPlayer().displayClientMessage(Component.literal("Invalid coordinates or player name: " + message).withStyle(BeyonderUtil.getStyle(player)), true);
             }
             event.setCanceled(true);
         }

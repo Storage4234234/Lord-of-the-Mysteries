@@ -37,7 +37,7 @@ public class MonsterProjectileControl extends SimpleAbilityItem {
             CompoundTag tag = player.getPersistentData();
             boolean monsterProjectileControl = tag.getBoolean("monsterProjectileControl");
             tag.putBoolean("monsterProjectileControl", !monsterProjectileControl);
-            player.displayClientMessage(Component.literal("Projectile Movement Turned " + (monsterProjectileControl ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE), true);
+            player.displayClientMessage(Component.literal("Projectile Movement Turned " + (monsterProjectileControl ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
         }
     }
 

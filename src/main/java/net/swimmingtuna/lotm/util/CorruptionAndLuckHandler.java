@@ -1783,7 +1783,7 @@ public class CorruptionAndLuckHandler {
                     pPlayer.addItem(Items.DIAMOND.getDefaultInstance());
                     pPlayer.addItem(Items.DIAMOND.getDefaultInstance());
                 }
-                pPlayer.displayClientMessage(Component.literal("How lucky! You found some diamonds on the ground"), true);
+                pPlayer.displayClientMessage(Component.literal("How lucky! You found some diamonds on the ground").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD), true);
                 tag.putInt("luckDiamonds", 0);
             }
             int stoneImmunity = tag.getInt("luckStoneDamageImmunity");

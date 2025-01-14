@@ -164,36 +164,36 @@ public class FalseProphecy extends SimpleAbilityItem {
         CompoundTag tag = pPlayer.getPersistentData();
         int falseProphecyString = tag.getInt("falseProphecyItem");
         if (falseProphecyString == 1) {
-            return Component.literal("Shifting will give great misfortune").withStyle(ChatFormatting.RED);
+            return Component.literal("Shifting will give great misfortune").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD);
         }
         if (falseProphecyString == 2) {
-            return Component.literal("Standing still will cause a grave illness").withStyle(ChatFormatting.RED);
+            return Component.literal("Standing still will cause a grave illness").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD);
         }
         if (falseProphecyString == 3) {
-            return Component.literal("Jumping will cause all abilities to go on cooldown").withStyle(ChatFormatting.RED);
+            return Component.literal("Jumping will cause all abilities to go on cooldown").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD);
         }
         if (falseProphecyString == 4) {
-            return Component.literal("Sprinting will cause great damage").withStyle(ChatFormatting.RED);
+            return Component.literal("Sprinting will cause great damage").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD);
         }
         if (falseProphecyString == 5) {
-            return Component.literal("Attacking a mob will cause the next 5 damage instances the player takes to be doubled as true damage").withStyle(ChatFormatting.RED);
+            return Component.literal("Attacking a mob will cause the next 5 damage instances the player takes to be doubled as true damage").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD);
         }
         if (falseProphecyString == 6) {
-            return Component.literal("Shifting will give great fortune").withStyle(ChatFormatting.GREEN);
+            return Component.literal("Shifting will give great fortune").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD);
         }
         if (falseProphecyString == 7) {
-            return Component.literal("Standing still will give many beneficial effects").withStyle(ChatFormatting.GREEN);
+            return Component.literal("Standing still will give many beneficial effects").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD);
         }
         if (falseProphecyString == 8) {
-            return Component.literal("Jumping will cause their ability cooldowns to be reset").withStyle(ChatFormatting.GREEN);
+            return Component.literal("Jumping will cause their ability cooldowns to be reset").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD);
         }
         if (falseProphecyString == 9) {
-            return Component.literal("Sprinting will cause the player to ignore the next 5 times they take damage to be nullified").withStyle(ChatFormatting.GREEN);
+            return Component.literal("Sprinting will cause the player to ignore the next 5 times they take damage to be nullified").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD);
         }
         if (falseProphecyString == 10) {
-            return Component.literal("Attacking a mob will cause the next 5 melee hits to deal double damage as true damage").withStyle(ChatFormatting.GREEN);
+            return Component.literal("Attacking a mob will cause the next 5 melee hits to deal double damage as true damage").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD);
         } else {
-            return Component.literal("None").withStyle(ChatFormatting.GRAY);
+            return Component.literal("None").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.BOLD);
         }
     }
 

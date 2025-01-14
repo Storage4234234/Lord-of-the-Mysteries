@@ -44,7 +44,7 @@ public class LuckGifting extends SimpleAbilityItem {
                 return InteractionResult.FAIL;
             }
             if ((double) player.getPersistentData().getInt("monsterLuckGifting") / 2 <= player.getPersistentData().getDouble("luck")) {
-                player.displayClientMessage(Component.literal("Not enough luck").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(Component.literal("Not enough luck").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
                 return InteractionResult.FAIL;
             }
             useSpirituality(player);

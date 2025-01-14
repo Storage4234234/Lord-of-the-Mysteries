@@ -51,10 +51,10 @@ public class RebootSelf extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             if (player.isShiftKeyDown()) {
                 saveDataReboot(player, player.getPersistentData());
-                player.displayClientMessage(Component.literal("Saved State.").withStyle(ChatFormatting.GREEN), true);
+                player.displayClientMessage(Component.literal("Saved State.").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD), true);
             } else {
                 restoreDataReboot(player, player.getPersistentData());
-                player.displayClientMessage(Component.literal("Loaded State.").withStyle(ChatFormatting.GREEN), true);
+                player.displayClientMessage(Component.literal("Loaded State.").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD), true);
             }
         }
     }

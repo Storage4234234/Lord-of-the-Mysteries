@@ -38,7 +38,7 @@ public class ChaosWalkerDisableEnable extends SimpleAbilityItem {
             CompoundTag tag = player.getPersistentData();
             boolean chaosWalkerCombat = tag.getBoolean("monsterChaosWalkerCombat");
             tag.putBoolean("monsterChaosWalkerCombat", !chaosWalkerCombat);
-            player.displayClientMessage(Component.literal("Chaos Walker Combat is: " + (chaosWalkerCombat ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE), true);
+            player.displayClientMessage(Component.literal("Chaos Walker Combat is: " + (chaosWalkerCombat ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
         }
     }
 

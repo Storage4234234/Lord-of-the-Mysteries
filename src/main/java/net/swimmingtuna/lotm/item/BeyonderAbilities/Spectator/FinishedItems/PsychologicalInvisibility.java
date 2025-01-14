@@ -56,9 +56,9 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
                 }
                 LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderInvisibilityPacketS2C(true, player.getUUID()), (ServerPlayer) player);
                 tag.putBoolean("psychologicalInvisibility", true);
-                player.displayClientMessage(Component.literal("You are now invisible"), true);
+                player.displayClientMessage(Component.literal("You are now invisible").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN), true);
             } else {
-                player.displayClientMessage(Component.literal("You are now visible"), true);
+                player.displayClientMessage(Component.literal("You are now visible").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED), true);
                 tag.putBoolean("psychologicalInvisibility", false);
                 LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderInvisibilityPacketS2C(false, player.getUUID()), (ServerPlayer) player);
             }
@@ -76,9 +76,9 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
                         mob.setTarget(null);
                     }
                 }
-                player.displayClientMessage(Component.literal("You are now invisible"), true);
+                player.displayClientMessage(Component.literal("You are now invisible").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN), true);
             } else {
-                player.displayClientMessage(Component.literal("You are now visible"), true);
+                player.displayClientMessage(Component.literal("You are now visible").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED), true);
             }
 
             tag.putBoolean("psychologicalInvisibility", newState);

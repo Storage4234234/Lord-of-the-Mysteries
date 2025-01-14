@@ -38,7 +38,7 @@ public class EnableDisableRipple extends SimpleAbilityItem {
             CompoundTag tag = player.getPersistentData();
             boolean ripple = tag.getBoolean("monsterRipple");
             tag.putBoolean("monsterRipple", !ripple);
-            player.displayClientMessage(Component.literal("Ripple of Chaos " + (ripple ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE), true);
+            player.displayClientMessage(Component.literal("Ripple of Chaos " + (ripple ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
         }
     }
 

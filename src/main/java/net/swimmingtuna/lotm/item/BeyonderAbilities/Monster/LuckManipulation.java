@@ -100,7 +100,7 @@ public class LuckManipulation extends SimpleAbilityItem {
         if (entity instanceof Player player) {
             if (player.tickCount % 2 == 0 && !level.isClientSide()) {
                 if (player.getMainHandItem().getItem() instanceof LuckManipulation) {
-                    player.displayClientMessage(Component.literal("Current Luck Manipulation is: " + luckManipulationString(player)), true);
+                    player.displayClientMessage(Component.literal("Current Luck Manipulation is: " + luckManipulationString(player)).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.BOLD), true);
                 }
             }
         }
