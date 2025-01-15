@@ -19,7 +19,7 @@ public class AbilitiesCommand {
                 .executes(context -> {
                     BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(context.getSource().getPlayerOrException());
                     if (holder.getCurrentClass() == null) {
-                        context.getSource().sendFailure(Component.literal("You are not in any class!"));
+                        context.getSource().sendFailure(Component.literal("You don't have a pathway"));
                         return 0;
                     }
                     context.getSource().getPlayer().openMenu(new MenuProvider() {

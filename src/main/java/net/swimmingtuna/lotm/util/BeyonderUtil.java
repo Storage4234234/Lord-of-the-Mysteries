@@ -1001,6 +1001,10 @@ public class BeyonderUtil {
         //WARRIOR
         damageMap.put(ItemInit.GIGANTIFICATION.get(), (9.0f - sequence) / abilityWeakness);
         damageMap.put(ItemInit.SWORDOFDAWN.get(), (150.0f - (sequence * 15)) / abilityWeakness);
+        damageMap.put(ItemInit.DAWNARMORY.get(), (150.0f - (sequence * 15)) / abilityWeakness);
+        damageMap.put(ItemInit.DAWNWEAPONRY.get(), (150.0f - (sequence * 15)) / abilityWeakness);
+        damageMap.put(ItemInit.SILVERARMORY.get(), (150.0f - (sequence * 15)) / abilityWeakness);
+        damageMap.put(ItemInit.LIGHTOFDAWN.get(), (100.0f - (sequence * 10)) / abilityWeakness);
         return damageMap;
     }
 

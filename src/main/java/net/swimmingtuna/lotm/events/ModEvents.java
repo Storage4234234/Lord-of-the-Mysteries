@@ -595,6 +595,50 @@ public class ModEvents {
         }
     }
 
+    private static void warriorDangerSense(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
+        //WIND MANIPULATION SENSE
+        boolean warriorDangerSense = playerPersistentData.getBoolean("warriorDangerSense");
+        if (!warriorDangerSense) {
+            return;
+        }
+        double radius = 200 - (holder.getCurrentSequence() * 20);
+        for (Player otherPlayer : player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius))) {
+            if (otherPlayer == player) {
+                continue;
+            }
+            if (otherPlayer.getMainHandItem().getItem() instanceof SimpleAbilityItem || otherPlayer.getMainHandItem().getItem() instanceof ProjectileWeaponItem || otherPlayer.getMainHandItem().getItem() instanceof SwordItem || otherPlayer.getMainHandItem().getItem() instanceof AxeItem) { //also add for sealed artifacts
+                Vec3 directionToPlayer = otherPlayer.position().subtract(player.position()).normalize();
+                Vec3 lookAngle = player.getLookAngle();
+                double horizontalAngle = Math.atan2(directionToPlayer.x, directionToPlayer.z) - Math.atan2(lookAngle.x, lookAngle.z);
+
+                String horizontalDirection;
+                if (Math.abs(horizontalAngle) < Math.PI / 4) {
+                    horizontalDirection = "in front of";
+                } else if (horizontalAngle < -Math.PI * 3 / 4 || horizontalAngle > Math.PI * 3 / 4) {
+                    horizontalDirection = "behind";
+                } else if (horizontalAngle < 0) {
+                    horizontalDirection = "to the right of";
+                } else {
+                    horizontalDirection = "to the left of";
+                }
+
+                String verticalDirection;
+                if (directionToPlayer.y > 0.2) {
+                    verticalDirection = "above";
+                } else if (directionToPlayer.y < -0.2) {
+                    verticalDirection = "below";
+                } else {
+                    verticalDirection = "at the same level as";
+                }
+
+                String message = otherPlayer.getName().getString() + " is " + horizontalDirection + " and " + verticalDirection + " you.";
+                if (player.tickCount % 200 == 0) {
+                    player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.BOLD, ChatFormatting.RED));
+                }
+            }
+        }
+    }
+
     @SubscribeEvent
     public static void sealItemCanceler(PlayerInteractEvent.RightClickItem event) {
         Player player = event.getEntity();
@@ -1204,7 +1248,7 @@ public class ModEvents {
                     lightningEntity.setMaxLength(30);
                     lightningEntity.setOwner(player);
                     lightningEntity.setNoUp(true);
-                    lightningEntity.teleportTo(x1 + ((Math.random() * 300) - (double) 300 / 2), y1 + 80, z1 + ((Math.random() * 300) - (double) 300 / 2));
+                    lightningEntity.teleportTo(x1 + ((Math.random() * 300) - (double) 300 / 2), y1 + 130, z1 + ((Math.random() * 300) - (double) 300 / 2));
                     player.level().addFreshEntity(lightningEntity);
                 }
                 if (tyrantVer >= 1) {
@@ -1227,7 +1271,7 @@ public class ModEvents {
                 lightningEntity.setMaxLength(30);
                 lightningEntity.setOwner(player);
                 lightningEntity.setNoUp(true);
-                lightningEntity.teleportTo(sailorStormVecX + ((Math.random() * distance) - distance / 2), sailorStormVecY + 80, sailorStormVecZ + ((Math.random() * distance) - distance / 2));
+                lightningEntity.teleportTo(sailorStormVecX + ((Math.random() * distance) - distance / 2), sailorStormVecY + 130, sailorStormVecZ + ((Math.random() * distance) - distance / 2));
                 player.level().addFreshEntity(lightningEntity);
             }
             playerPersistentData.putInt("sailorLightningStorm", sailorLightningStorm - 1);
@@ -1747,7 +1791,7 @@ public class ModEvents {
                     lightningEntity.teleportTo(livingEntity.getX(), lightningEntity.getY() + 50, lightningEntity.getZ());
                     lightningEntity.setTargetPos(livingEntity.getOnPos().getCenter());
                 } else {
-                    lightningEntity.teleportTo(x1 + ((Math.random() * 150) - (double) 150 / 2), y1 + 80, z1 + ((Math.random() * 150) - (double) 150 / 2));
+                    lightningEntity.teleportTo(x1 + ((Math.random() * 150) - (double) 150 / 2), y1 + 130, z1 + ((Math.random() * 150) - (double) 150 / 2));
                 }
                 lightningEntity.level().addFreshEntity(lightningEntity);
             }

@@ -302,8 +302,14 @@ public class LOTM {
             event.accept(ItemInit.SILVERLIGHT);
             event.accept(ItemInit.AURAOFTWILIGHT);
             event.accept(ItemInit.GLOBEOFTWILIGHT);
-            event.accept(ItemInit.BEAMOFTWILIGHT);
-
+            event.accept(ItemInit.DAWN_HELMET);
+            event.accept(ItemInit.DAWN_CHESTPLATE);
+            event.accept(ItemInit.DAWN_LEGGINGS);
+            event.accept(ItemInit.DAWN_BOOTS);
+            event.accept(ItemInit.SILVER_HELMET);
+            event.accept(ItemInit.SILVER_CHESTPLATE);
+            event.accept(ItemInit.SILVER_LEGGINGS);
+            event.accept(ItemInit.SILVER_BOOTS);
         }
         if (event.getTabKey() == CreativeModeTabs.OP_BLOCKS) {
             event.accept(BlockInit.VISIONARY_BARRIER_BLOCK);

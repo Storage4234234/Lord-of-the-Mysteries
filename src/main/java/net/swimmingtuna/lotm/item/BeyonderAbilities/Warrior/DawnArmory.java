@@ -1,15 +1,19 @@
 package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior;
 
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import virtuoel.pehkui.api.ScaleData;
-import virtuoel.pehkui.api.ScaleTypes;
 
 public class DawnArmory extends SimpleAbilityItem {
 
@@ -25,15 +29,65 @@ public class DawnArmory extends SimpleAbilityItem {
         }
         addCooldown(player);
         useSpirituality(player);
-        startGigantification(player);
+        storeAndPutArmor(player);
         return InteractionResult.SUCCESS;
     }
 
-    public static void startGigantification(LivingEntity livingEntity) {
-        if (!livingEntity.level().isClientSide()) {
-            ScaleData scaleData = ScaleTypes.BASE.getScaleData(livingEntity);
-            scaleData.setTargetScale(3.0f);
+    public static void storeAndPutArmor(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide() && livingEntity instanceof Player player) {
+            CompoundTag persistentData = player.getPersistentData();
+            boolean isDawnArmorOn = persistentData.getBoolean("dawnArmorOn");
+            if (!isDawnArmorOn) {
+                CompoundTag armorData = new CompoundTag();
+                ListTag armorItems = new ListTag();
+                for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+                    ItemStack armorStack = player.getItemBySlot(slot);
+                    if (!armorStack.isEmpty()) {
+                        CompoundTag slotTag = new CompoundTag();
+                        slotTag.putInt("dawnArmorSlot", slot.getIndex());
+                        armorStack.save(slotTag);
+                        armorItems.add(slotTag);
+                        player.setItemSlot(slot, ItemStack.EMPTY);
+                    }
+                }
+                player.setItemSlot(EquipmentSlot.HEAD, createEnchantedArmor(ItemInit.DAWN_HELMET.get().getDefaultInstance()));
+                player.setItemSlot(EquipmentSlot.CHEST, createEnchantedArmor(ItemInit.DAWN_CHESTPLATE.get().getDefaultInstance()));
+                player.setItemSlot(EquipmentSlot.LEGS,  createEnchantedArmor(ItemInit.DAWN_LEGGINGS.get().getDefaultInstance()));
+                player.setItemSlot(EquipmentSlot.FEET, createEnchantedArmor(ItemInit.DAWN_BOOTS.get().getDefaultInstance()));
+                armorData.put("Items", armorItems);
+                persistentData.put("dawnStoredArmorData", armorData);
+                persistentData.putBoolean("dawnArmorOn", true);
+            } else {
+                for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+                    ItemStack currentArmor = player.getItemBySlot(slot);
+                    if (!currentArmor.isEmpty() && (currentArmor.is(ItemInit.DAWN_HELMET.get()) || currentArmor.is(ItemInit.DAWN_CHESTPLATE.get()) || currentArmor.is(ItemInit.DAWN_LEGGINGS.get()) || currentArmor.is(ItemInit.DAWN_BOOTS.get()))) {
+                        player.setItemSlot(slot, ItemStack.EMPTY);
+                    }
+                }
+                if (persistentData.contains("dawnStoredArmorData")) {
+                    CompoundTag armorData = persistentData.getCompound("dawnStoredArmorData");
+                    ListTag armorItems = armorData.getList("Items", 10);
+                    for (int i = 0; i < armorItems.size(); i++) {
+                        CompoundTag slotTag = armorItems.getCompound(i);
+                        int slotIndex = slotTag.getInt("dawnArmorSlot");
+                        ItemStack armorStack = ItemStack.of(slotTag);
+                        EquipmentSlot slot = EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, slotIndex);
+                        if (slot != null) {
+                            player.setItemSlot(slot, armorStack);
+                        }
+                    }
+                    persistentData.remove("dawnStoredArmorData");
+                }
+                persistentData.putBoolean("dawnArmorOn", false);
             }
         }
     }
+    private static ItemStack createEnchantedArmor(ItemStack armor) {
+        armor.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 1);
+        armor.enchant(Enchantments.UNBREAKING, 3);
+        armor.enchant(Enchantments.FALL_PROTECTION, 3);
+        return armor;
+    }
+}
+
 

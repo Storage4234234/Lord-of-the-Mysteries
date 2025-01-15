@@ -6,10 +6,11 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.swimmingtuna.lotm.entity.DawnRayEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import virtuoel.pehkui.api.ScaleData;
-import virtuoel.pehkui.api.ScaleTypes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 
 public class LightOfDawn extends SimpleAbilityItem {
 
@@ -25,15 +26,34 @@ public class LightOfDawn extends SimpleAbilityItem {
         }
         addCooldown(player);
         useSpirituality(player);
-        startGigantification(player);
+        sunriseGleam(player);
         return InteractionResult.SUCCESS;
     }
 
-    public static void startGigantification(LivingEntity livingEntity) {
+    public static void sunriseGleam(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
-            ScaleData scaleData = ScaleTypes.BASE.getScaleData(livingEntity);
-            scaleData.setTargetScale(3.0f);
+            int sequence = BeyonderUtil.getSequence(livingEntity);
+            int maxLifetime = 500 - (sequence * 50);
+
+            for (int i = 0; i < 5; i++) {
+                // Calculate angle for this ray (72 degrees apart = 360/5)
+                float angle = i * 72f;
+
+                DawnRayEntity ray = new DawnRayEntity(
+                        livingEntity.level(),
+                        livingEntity.getX(),
+                        livingEntity.getY() + 10, // Spawn height
+                        livingEntity.getZ()
+                );
+
+                ray.setAngle(angle);
+                ray.setYRot(angle); // Add this line to set initial rotation
+                ray.setMaxLifetime(maxLifetime);
+                ray.setRotationSpeed(5); // Make sure to set rotation speed
+
+                livingEntity.level().addFreshEntity(ray);
             }
         }
     }
+}
 

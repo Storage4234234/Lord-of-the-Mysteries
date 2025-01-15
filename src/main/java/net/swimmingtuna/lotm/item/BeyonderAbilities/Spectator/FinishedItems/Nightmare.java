@@ -82,9 +82,9 @@ public class Nightmare extends SimpleAbilityItem {
             int sequence = holder.getCurrentSequence();
             int dir = (int) dreamIntoReality.getValue();
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.NIGHTMARE.get());
-            float damagePlayer = ((float) (30.0 * dir) - (sequence * 2));
+            float damagePlayer = ((float) (40.0 * dir) - (sequence * 2));
             float damageMob = ((float) (20.0 * dir) - (sequence));
-            int duration = 200 - (sequence * 20);
+            int duration = 300 - (sequence * 20);
             AABB boundingBox = new AABB(targetPos).inflate(radius);
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, entity -> entity.isAlive()).forEach(livingEntity -> {
                 AttributeInstance nightmareAttribute = livingEntity.getAttribute(ModAttributes.NIGHTMARE.get());

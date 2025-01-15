@@ -65,6 +65,22 @@ public class LightningEntity extends AbstractHurtingProjectile {
     }
 
     @Override
+    public boolean shouldRenderAtSqrDistance(double pDistance) {
+        return true;
+    }
+
+    @Override
+    public boolean shouldRender(double pX, double pY, double pZ) {
+        return true;
+    }
+
+    @Override
+    public AABB getBoundingBoxForCulling() {
+        return this.getBoundingBox().inflate(10.0D, 30.0D, 10.0D);
+    }
+
+
+    @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(MAX_LENGTH, 100);

@@ -7,14 +7,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 
 public class DawnWeaponry extends SimpleAbilityItem {
@@ -44,20 +43,39 @@ public class DawnWeaponry extends SimpleAbilityItem {
                 Inventory inventory = player.getInventory();
                 switch (x) {
                     case 1 -> {
-                        ItemStack sword = new ItemStack(ItemInit.SWORDOFDAWN.get());
+                        ItemStack sword = createSword(ItemInit.SWORDOFDAWN.get().getDefaultInstance());
                         inventory.setItem(selectedSlot, sword);
                     }
                     case 2 -> {
-                        ItemStack axe = new ItemStack(ItemInit.PICKAXEOFDAWN.get());
+                        ItemStack axe = createPickaxe(ItemInit.PICKAXEOFDAWN.get().getDefaultInstance());
                         inventory.setItem(selectedSlot, axe);
                     }
                     case 3 -> {
-                        ItemStack trident = new ItemStack(ItemInit.SPEAROFDAWN.get());
+                        ItemStack trident = createSpear(ItemInit.SPEAROFDAWN.get().getDefaultInstance());
                         inventory.setItem(selectedSlot, trident);
                     }
                 }
             }
         }
+    }
+    private static ItemStack createSword(ItemStack armor) {
+        armor.enchant(Enchantments.SHARPNESS, 5);
+        armor.enchant(Enchantments.KNOCKBACK, 2);
+        armor.enchant(Enchantments.UNBREAKING, 3);
+        armor.enchant(Enchantments.FIRE_ASPECT,2);
+        return armor;
+    }
+    private static ItemStack createSpear(ItemStack armor) {
+        armor.enchant(Enchantments.SHARPNESS, 3);
+        armor.enchant(Enchantments.UNBREAKING, 3);
+        armor.enchant(Enchantments.LOYALTY, 1);
+        return armor;
+    }
+    private static ItemStack createPickaxe(ItemStack armor) {
+        armor.enchant(Enchantments.BLOCK_EFFICIENCY, 5);
+        armor.enchant(Enchantments.BLOCK_FORTUNE, 2);
+        armor.enchant(Enchantments.UNBREAKING, 3);
+        return armor;
     }
 
     private static int findClosestEmptySlot(Player player) {
@@ -87,7 +105,6 @@ public class DawnWeaponry extends SimpleAbilityItem {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
         if (entity instanceof Player player) {
             if (player.tickCount % 2 == 0 && !level.isClientSide()) {
-                int selectedSlot = findClosestEmptySlot(player);
                 if (player.getMainHandItem().getItem() instanceof DawnWeaponry) {
                     player.displayClientMessage(Component.literal("Dawn Weaponry Choice is: " + dawnWeaponryString(player)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.YELLOW), true);
                 }

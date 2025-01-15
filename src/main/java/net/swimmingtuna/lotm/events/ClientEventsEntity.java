@@ -30,6 +30,7 @@ public class ClientEventsEntity {
     }
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(EntityInit.DAWN_RAY_ENTITY.get(), DawnRayRenderer::new);
         event.registerEntityRenderer(EntityInit.METEOR_ENTITY.get(), MeteorEntityRenderer::new);
         event.registerEntityRenderer(EntityInit.DEATH_KNELL_BULLET_ENTITY.get(), BulletEntityRenderer::new);
         event.registerEntityRenderer(EntityInit.METEOR_TRAIL_ENTITY.get(), MeteorTrailRenderer::new);

@@ -1,5 +1,6 @@
 package net.swimmingtuna.lotm.init;
 
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Tiers;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -19,6 +20,7 @@ import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.SymphonyOfHatred;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
 import net.swimmingtuna.lotm.item.TestItem;
+import net.swimmingtuna.lotm.util.ModArmorMaterials;
 
 public class ItemInit {
     public static final DeferredRegister<Item> ITEMS =
@@ -409,24 +411,44 @@ public class ItemInit {
             () -> new BeyonderResetPotion(new Item.Properties().stacksTo(1)));
 
 
-    //OTHER
-    public static final RegistryObject<Item> LUCKBOTTLEITEM = ITEMS.register("luckbottleitem",
-            () -> new LuckBottleItem(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> LUCKYGOLDCOIN = ITEMS.register("luckygoldcoin",
-            () -> new LuckyGoldCoin(new Item.Properties().stacksTo(1)));
+    //SEALED ARTIFACTS
+
     public static final RegistryObject<Item> DEATHKNELL = ITEMS.register("deathknell",
             () -> new DeathKnell(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> SYMPHONYOFHATRED = ITEMS.register("symphonyofhatred",
             () -> new SymphonyOfHatred(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> WINTRYBLADE = ITEMS.register("wintryblade",
             () -> new WintryBlade(Tiers.NETHERITE, 4,-2,new Item.Properties()));
+
+
+    //OTHER
+    public static final RegistryObject<Item> DAWN_HELMET = ITEMS.register("dawn_helmet",
+            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.HELMET,new Item.Properties()));
+    public static final RegistryObject<Item> DAWN_CHESTPLATE = ITEMS.register("dawn_chestplate",
+            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.CHESTPLATE,new Item.Properties()));
+    public static final RegistryObject<Item> DAWN_LEGGINGS = ITEMS.register("dawn_leggings",
+            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.LEGGINGS,new Item.Properties()));
+    public static final RegistryObject<Item> DAWN_BOOTS = ITEMS.register("dawn_boots",
+            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.BOOTS,new Item.Properties()));
+    public static final RegistryObject<Item> SILVER_HELMET = ITEMS.register("silver_helmet",
+            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.HELMET,new Item.Properties()));
+    public static final RegistryObject<Item> SILVER_CHESTPLATE = ITEMS.register("silver_chestplate",
+            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.CHESTPLATE,new Item.Properties()));
+    public static final RegistryObject<Item> SILVER_LEGGINGS = ITEMS.register("silver_leggings",
+            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.LEGGINGS,new Item.Properties()));
+    public static final RegistryObject<Item> SILVER_BOOTS = ITEMS.register("silver_boots",
+            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.BOOTS,new Item.Properties()));
+
     public static final RegistryObject<Item> SWORDOFDAWN = ITEMS.register("swordofdawn",
             () -> new SwordOfDawn(Tiers.NETHERITE, 10,-2.8f,new Item.Properties()));
     public static final RegistryObject<Item> PICKAXEOFDAWN = ITEMS.register("pickaxeofdawn",
             () -> new PickaxeOfDawn(Tiers.NETHERITE, 0,0,new Item.Properties()));
     public static final RegistryObject<Item> SPEAROFDAWN = ITEMS.register("spearofdawn",
             () -> new SpearOfDawn(Tiers.NETHERITE, 4,-1.5f,new Item.Properties()));
-
+    public static final RegistryObject<Item> LUCKBOTTLEITEM = ITEMS.register("luckbottleitem",
+            () -> new LuckBottleItem(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> LUCKYGOLDCOIN = ITEMS.register("luckygoldcoin",
+            () -> new LuckyGoldCoin(new Item.Properties().stacksTo(1)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
