@@ -56,10 +56,9 @@ public class LuckChanneling extends SimpleAbilityItem {
                         if (livingEntity == player) {
                             livingEntity.getPersistentData().putDouble("luck", newLuck / 2);
                             luckBottleAmount += (newLuck);
-                        } else {
+                        } else if (!BeyonderUtil.isAllyOf(player, livingEntity)) {
                             luckBottleAmount += newLuck;
                             livingEntity.getPersistentData().putDouble("luck", 0);
-
                         }
                     }
                     LuckBottleItem.setLuckAmount(luckBottle, (int) luckBottleAmount);

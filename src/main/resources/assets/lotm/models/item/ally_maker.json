@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "lotm:item/monster6"
+    "layer0": "lotm:item/ally_maker"
   }
 }

@@ -87,16 +87,22 @@ public class AuraOfChaos extends SimpleAbilityItem {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                 int sequence = holder.getCurrentSequence();
                 if (player.tickCount % 20 == 0) {
-                    holder.useSpirituality(150);
+                    if (holder.getSpirituality() >= 150) {
+                        holder.useSpirituality(150);
+                    } else {
+                        tag.putBoolean("monsterAuraOfChaos", false);
+                        player.sendSystemMessage(Component.literal("Aura of Chaos was turned off due to not enough spirituality").withStyle(ChatFormatting.RED));
+                    }
                 }
                 int enhancement = 1;
                 if (level instanceof ServerLevel serverLevel) {
                     enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
-                }                for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.AURAOFCHAOS.get())))) {
+                }
+                for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.AURAOFCHAOS.get())))) {
                     CompoundTag persistentData = livingEntity.getPersistentData();
                     Random random = new Random();
                     int randomInt = random.nextInt(350);
-                    if (livingEntity != entity && entity.tickCount % 200 == 0) {
+                    if (livingEntity != entity && !BeyonderUtil.isAllyOf(player, livingEntity) && entity.tickCount % 200 == 0) {
                         if (randomInt >= 95 && randomInt <= 100) {
                             int random1 = (int) ((Math.random() * 200) - 100);
                             MeteorEntity.summonMeteorAtPositionWithScale(entity,  livingEntity.getX() + random1, livingEntity.getY() - 25,livingEntity.getZ() + random1, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), 6 );

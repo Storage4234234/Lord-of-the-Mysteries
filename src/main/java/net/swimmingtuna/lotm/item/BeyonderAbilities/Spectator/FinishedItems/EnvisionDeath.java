@@ -44,7 +44,7 @@ public class EnvisionDeath extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             double radius = 300;
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-                if (entity != player) {
+                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
                     int entityHealth = (int) entity.getHealth();
                     if (entityHealth <= BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_DEATH.get())) {
                         entity.hurt(entity.damageSources().magic(), 40 + (5 * dir));

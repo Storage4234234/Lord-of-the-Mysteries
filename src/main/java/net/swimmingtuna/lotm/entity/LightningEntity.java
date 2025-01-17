@@ -488,9 +488,18 @@ public class LightningEntity extends AbstractHurtingProjectile {
                     }
                 } else {
                     if (!BeyonderUtil.isBeyonderCapable(livingEntity)) {
-                        livingEntity.hurt(BeyonderUtil.lightningSource(this.getOwner()), (float) (Math.max((double) getDamage() / 3, getDamage() - (entity.distanceToSqr(hitPos.getCenter())))));
+                        if (this.getOwner() != null) {
+                            livingEntity.hurt(BeyonderUtil.lightningSource(this.getOwner()), (float) (Math.max((double) getDamage() / 3, getDamage() - (entity.distanceToSqr(hitPos.getCenter())))));
+                        } else {
+                            livingEntity.hurt(livingEntity.damageSources().lightningBolt(), (float) (Math.max((double) getDamage() / 3, getDamage() - (entity.distanceToSqr(hitPos.getCenter())))));
+                        }
                     } else {
-                        livingEntity.hurt(BeyonderUtil.lightningSource(this.getOwner()), (float) (Math.max((double) getDamage() / 3, (getDamage() - (entity.distanceToSqr(hitPos.getCenter()))) * 2)));
+                        if (this.getOwner() != null) {
+                            livingEntity.hurt(BeyonderUtil.lightningSource(this.getOwner()), (float) (Math.max((double) getDamage() / 3, (getDamage() - (entity.distanceToSqr(hitPos.getCenter())) * 2))));
+                        } else {
+                            livingEntity.hurt(livingEntity.damageSources().lightningBolt(), (float) (Math.max((double) getDamage() / 3, getDamage() - (entity.distanceToSqr(hitPos.getCenter())) * 2)));
+
+                        }
                     }
                 }
             }

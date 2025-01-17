@@ -56,7 +56,7 @@ public class ManipulateFondness extends SimpleAbilityItem {
     private static void manipulateFondness(Player player) {
         if (!player.level().isClientSide()) {
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
-                if (entity != player && entity.hasEffect(ModEffects.MANIPULATION.get())) {
+                if (entity != player && entity.hasEffect(ModEffects.MANIPULATION.get()) && !BeyonderUtil.isAllyOf(player, entity)) {
                     entity.addEffect(new MobEffectInstance(ModEffects.BATTLEHYPNOTISM.get(),(int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MANIPULATE_FONDNESS.get()), 1, false, false));
                     for (Mob mob : entity.level().getEntitiesOfClass(Mob.class, entity.getBoundingBox().inflate(50))) {
                         mob.setTarget(entity);

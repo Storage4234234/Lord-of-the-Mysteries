@@ -26,6 +26,7 @@ import net.swimmingtuna.lotm.entity.TornadoEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
@@ -129,6 +130,14 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             tag.putInt("monsterCalamityImmunity", immunity - 1);
         }
         if (meteor >= 1) {
+            if (meteor <= 180) {
+                for (MeteorEntity meteorEntity : entity.level().getEntitiesOfClass(MeteorEntity.class, entity.getBoundingBox().inflate(80))) {
+                    if (meteorEntity == null || (meteorEntity != null && meteorEntity.getOwner() != entity)) {
+                        tag.putInt("calamityIncarnationInMeteor", 0);
+                        tag.putInt("monsterCalamityImmunity", 0);
+                    }
+                }
+            }
             tag.putInt("monsterCalamityImmunity", 10);
             int x = tag.getInt("calamityIncarnationInMeteorX");
             int y = tag.getInt("calamityIncarnationInMeteorY");
@@ -139,7 +148,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
                 tag.putInt("calamityIncarnationInMeteorZ", (int) entity.getZ());
             }
             if (meteor == 198) {
-                entity.teleportTo(entity.getX(), entity.getY() + 100, entity.getY());
+                entity.teleportTo(entity.getX(), entity.getY() + 100, entity.getZ());
             }
             if (meteor == 195) {
                 MeteorEntity meteorEntity = new MeteorEntity(EntityInit.METEOR_ENTITY.get(), entity.level());
@@ -228,7 +237,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             if (entity instanceof Player player) {
                 int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
                 for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate((150 - (sequence * 20)) + (enhancement * 40)))) {
-                    if (livingEntity != entity) {
+                    if (livingEntity != entity && !BeyonderUtil.isAllyOf(entity, livingEntity)) {
                         if (sequence >= 4) {
                             livingEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 2 + enhancement, false, false));
                             livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, enhancement, false, false));
@@ -244,7 +253,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
                             livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 2 + enhancement, false, false));
                             livingEntity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 40, 3 + enhancement, false, false));
                             livingEntity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 40, 2 + enhancement, false, false));
-                            livingEntity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 40, enhancement,false,false));
+                            livingEntity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 40, enhancement, false, false));
                         }
                     }
                 }
@@ -260,6 +269,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             }
         }
     }
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);

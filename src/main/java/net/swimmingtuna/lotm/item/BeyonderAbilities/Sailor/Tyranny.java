@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +44,7 @@ public class Tyranny extends SimpleAbilityItem {
             double radius = 500;
             int duration = 250;
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-                if (entity != player) {
+                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
                     entity.addEffect(new MobEffectInstance(ModEffects.STUN.get(), duration, 1, false, false));
                 }
             }

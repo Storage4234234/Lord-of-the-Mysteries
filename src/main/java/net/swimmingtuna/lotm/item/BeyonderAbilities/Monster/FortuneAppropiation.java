@@ -40,7 +40,7 @@ public class FortuneAppropiation extends SimpleAbilityItem {
     private void appropiateFortune(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(BeyonderUtil.getDamage(livingEntity).get(ItemInit.FORTUNEAPPROPIATION.get())))) {
-                if (entity != livingEntity) {
+                if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
                     CompoundTag tag = entity.getPersistentData();
                     CompoundTag livingTag = livingEntity.getPersistentData();
 

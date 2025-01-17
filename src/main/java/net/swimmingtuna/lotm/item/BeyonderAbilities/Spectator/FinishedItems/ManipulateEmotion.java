@@ -58,7 +58,7 @@ public class ManipulateEmotion extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             float damage = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MANIPULATE_EMOTION.get());
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
-                if (entity != player && entity.hasEffect(ModEffects.MANIPULATION.get())) {
+                if (entity != player && entity.hasEffect(ModEffects.MANIPULATION.get()) && !BeyonderUtil.isAllyOf(player, entity)) {
                     if (!BeyonderUtil.isBeyonderCapable(entity)) {
                         BeyonderUtil.applyMentalDamage(player, entity, damage * 2);
                     } else {

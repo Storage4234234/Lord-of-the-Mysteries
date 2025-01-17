@@ -103,7 +103,7 @@ public class ProbabilityManipulationMisfortune extends SimpleAbilityItem {
             for (Player pPlayer : level.players()) {
                 for (LivingEntity livingEntity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.PROBABILITYMISFORTUNE.get())))) {
                     if (player.isShiftKeyDown()) {
-                        if (livingEntity != player) {
+                        if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
                             giveMisfortuneEvents(livingEntity);
                         }
                     } else {

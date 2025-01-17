@@ -46,7 +46,7 @@ public class ProphesizeTeleportPlayer extends SimpleAbilityItem {
             int dir = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
             double radius = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.PROPHESIZE_TELEPORT_BLOCK.get());
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-                if (entity != player && !entity.level().isClientSide()) {
+                if (entity != player && !entity.level().isClientSide() && !BeyonderUtil.isAllyOf(player, entity)) {
                     entity.getPersistentData().putInt("prophesizeTeleportationCounter", (int) (300 * Math.random()));
                     entity.getPersistentData().putInt("prophesizeTeleportX", (int) player.getX());
                     entity.getPersistentData().putInt("prophesizeTeleportY", (int) player.getY());

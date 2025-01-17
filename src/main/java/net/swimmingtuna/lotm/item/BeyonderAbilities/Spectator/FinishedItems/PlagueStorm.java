@@ -86,18 +86,18 @@ public class PlagueStorm extends SimpleAbilityItem {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
             interactionTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 80, 1, false, false));
-            for (LivingEntity entityInRange : interactionTarget.level().getEntitiesOfClass(LivingEntity.class, interactionTarget.getBoundingBox().inflate(30 * dreamIntoReality.getValue()))) {
-                if (entityInRange == player) {
+            for (LivingEntity entity : interactionTarget.level().getEntitiesOfClass(LivingEntity.class, interactionTarget.getBoundingBox().inflate(30 * dreamIntoReality.getValue()))) {
+                if (entity == player || BeyonderUtil.isAllyOf(player, entity)) {
                     continue;
                 }
-                if (entityInRange != interactionTarget) {
+                if (entity != interactionTarget) {
                     BeyonderUtil.applyMentalDamage(player, interactionTarget, BeyonderUtil.getDamage(player).get(ItemInit.PLAGUE_STORM.get()));
                 } else {
                     BeyonderUtil.applyMentalDamage(player, interactionTarget,2 * BeyonderUtil.getDamage(player).get(ItemInit.PLAGUE_STORM.get()));
                 }
-                entityInRange.addEffect(new MobEffectInstance(MobEffects.WITHER, 80, 2, false, false));
-                entityInRange.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 1, false, false));
-                entityInRange.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 80, 1, false, false));
+                entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 80, 2, false, false));
+                entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 1, false, false));
+                entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 80, 1, false, false));
             }
         }
     }

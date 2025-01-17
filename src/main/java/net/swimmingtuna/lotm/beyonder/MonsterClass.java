@@ -234,9 +234,10 @@ public class MonsterClass implements BeyonderClass {
     @Override
     public Multimap<Integer, Item> getItems() {
         HashMultimap<Integer, Item> items = HashMultimap.create();
-        items.put(9, ItemInit.BEYONDER_ABILITY_USER.get());
         items.put(9, ItemInit.SPIRITVISION.get());
         items.put(9, ItemInit.MONSTERDANGERSENSE.get());
+        items.put(9, ItemInit.BEYONDER_ABILITY_USER.get());
+        items.put(9, ItemInit.ALLY_MAKER.get());
 
         items.put(8, ItemInit.MONSTERPROJECTILECONTROL.get());
 

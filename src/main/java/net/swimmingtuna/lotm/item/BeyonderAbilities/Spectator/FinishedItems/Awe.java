@@ -53,7 +53,7 @@ public class Awe extends SimpleAbilityItem {
             float damage = (float) (17.0 * (Math.max(1, dir * 0.5)) - (sequence * 1.2));
             int duration = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.AWE.get());
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-                if (entity != player) {
+                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
                     entity.addEffect((new MobEffectInstance(ModEffects.AWE.get(), duration, 1, false, false)));
                     BeyonderUtil.applyMentalDamage(player, entity, damage);
                 }

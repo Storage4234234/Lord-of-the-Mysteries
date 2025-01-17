@@ -15,6 +15,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
@@ -101,7 +102,7 @@ public class StormSealEntity extends AbstractHurtingProjectile {
         float radius = 3 * scaleData.getScale();
         if (!this.level().isClientSide()) {
             for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius * 0.75))) {
-                if (livingEntity != null && livingEntity.getMaxHealth() >= 50 && livingEntity != this.getOwner()) {
+                if (livingEntity != null && livingEntity.getMaxHealth() >= 50 && livingEntity != this.getOwner() && (this.getOwner() instanceof LivingEntity living && !BeyonderUtil.isAllyOf(living, livingEntity))) {
                     livingEntity.getPersistentData().putInt("inStormSeal", 3600);
                     livingEntity.getPersistentData().putInt("stormSealX", (int) livingEntity.getX());
                     livingEntity.getPersistentData().putInt("stormSealY", (int) livingEntity.getY());

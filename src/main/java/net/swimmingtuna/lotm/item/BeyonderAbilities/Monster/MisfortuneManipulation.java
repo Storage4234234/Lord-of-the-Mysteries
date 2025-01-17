@@ -121,7 +121,7 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
             }
             if (misfortuneManipulation == 2) {
                 TornadoEntity tornadoEntity = new TornadoEntity(EntityInit.TORNADO_ENTITY.get(), player.level());
-                tornadoEntity.setTornadoLifecount(400 - (holder.getCurrentSequence() * 60));
+                tornadoEntity.setTornadoLifecount(300 - (holder.getCurrentSequence() * 50));
                 tornadoEntity.setOwner(player);
                 tornadoEntity.setTornadoPickup(true);
                 tornadoEntity.setTornadoRadius((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) * 4);

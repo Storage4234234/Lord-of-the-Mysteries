@@ -55,7 +55,7 @@ public class MatterAccelerationEntities extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             AABB searchBox = player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.MATTER_ACCELERATION_ENTITIES.get()));
             for (Entity entity : player.level().getEntitiesOfClass(Entity.class, searchBox)) {
-                if (entity != player && (entity instanceof LivingEntity || entity instanceof Projectile)) {
+                if (entity != player && (entity instanceof LivingEntity || entity instanceof Projectile) && (entity instanceof LivingEntity living && !BeyonderUtil.isAllyOf(player, living))) {
                     Vec3 currentMovement = entity.getDeltaMovement();
                     double speed = currentMovement.length();
                     Vec3 normalizedMovement = currentMovement.normalize();

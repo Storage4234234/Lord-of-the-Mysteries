@@ -204,10 +204,13 @@ public class LightningBallEntity extends AbstractHurtingProjectile {
                     this.discard();
                 }
                 BlockPos centerPos = this.blockPosition();
-                int currentRadius = lightningArea / 5; // Base radius
+                int currentRadius = lightningArea / 5;
                 spawnRandomLightning(centerPos, currentRadius, lightningArea);
                 this.getPersistentData().putInt("lightningRadiusCounter", lightningArea - 1);
-                System.out.println("Current lightning radius counter: " + lightningArea);
+                tickCount++;
+            }
+            if (this.tickCount % 300 == 0) {
+                this.discard();
             }
         }
     }

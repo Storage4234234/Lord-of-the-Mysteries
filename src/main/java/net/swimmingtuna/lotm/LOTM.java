@@ -120,6 +120,7 @@ public class LOTM {
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ItemInit.TEST_ITEM);
+            event.accept(ItemInit.ALLY_MAKER);
             event.accept(ItemInit.LIGHTNING_STORM);
             event.accept(ItemInit.ROAR);
             event.accept(ItemInit.CALAMITY_INCARNATION_TSUNAMI);

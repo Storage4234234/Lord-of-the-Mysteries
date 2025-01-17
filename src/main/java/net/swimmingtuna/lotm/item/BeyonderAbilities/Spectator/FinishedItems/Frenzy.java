@@ -94,10 +94,9 @@ public class Frenzy extends SimpleAbilityItem {
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.FRENZY.get());
             float damage = (float) (17 - (sequence * 0.75));
             int duration = 250 - (sequence * 12) * dreamIntoRealityValue;
-
             AABB boundingBox = new AABB(targetPos).inflate(radius);
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, LivingEntity::isAlive).forEach(livingEntity -> {
-                if (livingEntity != player) {
+                if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
                     livingEntity.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), duration, 1, false, false));
                     BeyonderUtil.applyMentalDamage(player, livingEntity, damage);
                 }

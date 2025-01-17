@@ -93,6 +93,7 @@ public class SpectatorClass implements BeyonderClass {
     public Multimap<Integer, Item> getItems() {
         HashMultimap<Integer, Item> items = HashMultimap.create();
         items.put(9, ItemInit.BEYONDER_ABILITY_USER.get());
+        items.put(9, ItemInit.ALLY_MAKER.get());
         items.put(8, ItemInit.MIND_READING.get());
         items.put(7, ItemInit.AWE.get());
         items.put(7, ItemInit.FRENZY.get());

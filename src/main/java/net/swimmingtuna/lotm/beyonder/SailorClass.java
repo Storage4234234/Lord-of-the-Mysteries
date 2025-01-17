@@ -242,6 +242,8 @@ public class SailorClass implements BeyonderClass {
     public Multimap<Integer, Item> getItems() {
         HashMultimap<Integer, Item> items = HashMultimap.create();
         items.put(9, ItemInit.BEYONDER_ABILITY_USER.get());
+        items.put(9, ItemInit.ALLY_MAKER.get());
+
         items.put(8, ItemInit.RAGING_BLOWS.get());
         items.put(8, ItemInit.SAILORPROJECTILECTONROL.get());
 

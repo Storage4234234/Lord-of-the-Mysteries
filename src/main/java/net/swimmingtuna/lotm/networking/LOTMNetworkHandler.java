@@ -9,6 +9,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.networking.packet.*;
+import net.swimmingtuna.lotm.util.AllyInformation.SyncAlliesPacket;
 import net.swimmingtuna.lotm.util.CapabilitySyncer.network.SimpleEntityCapabilityStatusPacket;
 
 import java.util.List;
@@ -49,10 +50,20 @@ public class LOTMNetworkHandler {
                 .encoder(DeathKnellLeftClickC2S::toByte)
                 .consumerMainThread(DeathKnellLeftClickC2S::handle)
                 .add();
+        INSTANCE.messageBuilder(SyncAlliesPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncAlliesPacket::decode)
+                .encoder(SyncAlliesPacket::encode)
+                .consumerMainThread(SyncAlliesPacket::handle)
+                .add();
         INSTANCE.messageBuilder(MonsterLeftClickC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(MonsterLeftClickC2S::new)
                 .encoder(MonsterLeftClickC2S::toByte)
                 .consumerMainThread(MonsterLeftClickC2S::handle)
+                .add();
+        INSTANCE.messageBuilder(GigantificationC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(GigantificationC2S::new)
+                .encoder(GigantificationC2S::toByte)
+                .consumerMainThread(GigantificationC2S::handle)
                 .add();
         INSTANCE.messageBuilder(AddItemInInventoryC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(AddItemInInventoryC2S::new)

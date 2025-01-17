@@ -51,7 +51,7 @@ public class ThunderClap extends SimpleAbilityItem {
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.THUNDER_CLAP.get());
             int duration = 100 - (sequence * 20);
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-                if (entity != player) {
+                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
                     entity.addEffect((new MobEffectInstance(ModEffects.STUN.get(), duration, 1, false, false)));
                 }
             }

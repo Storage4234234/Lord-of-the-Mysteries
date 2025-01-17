@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -35,6 +36,7 @@ import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MeteorEntity extends AbstractHurtingProjectile {
     private static final EntityDataAccessor<Boolean> DATA_DANGEROUS = SynchedEntityData.defineId(MeteorEntity.class, EntityDataSerializers.BOOLEAN);
@@ -84,6 +86,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
                     this.explodeMeteorBlock(hitPos, radius, scale);
                 }
             }
+            Objects.requireNonNull(this.getOwner()).getPersistentData().putInt("calamityIncarnationInMeteor", 0);
             explodeMeteorBlock(hitPos, radius, scale);
             this.discard();
         }
@@ -108,6 +111,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
                 this.level().playSound(null, this.getOnPos(), SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 30.0f, 1.0f);
                 this.discard();
             }
+            Objects.requireNonNull(this.getOwner()).getPersistentData().putInt("calamityIncarnationInMeteor", 0);
         }
     }
 

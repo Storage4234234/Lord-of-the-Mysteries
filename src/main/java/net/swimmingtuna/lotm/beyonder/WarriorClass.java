@@ -217,6 +217,8 @@ public class WarriorClass implements BeyonderClass {
     @Override
     public Multimap<Integer, Item> getItems() {
         HashMultimap<Integer, Item> items = HashMultimap.create();
+        items.put(9, ItemInit.BEYONDER_ABILITY_USER.get());
+        items.put(9, ItemInit.ALLY_MAKER.get());
         items.put(6, ItemInit.GIGANTIFICATION.get());
         items.put(6, ItemInit.LIGHTOFDAWN.get());
         items.put(6, ItemInit.DAWNARMORY.get());

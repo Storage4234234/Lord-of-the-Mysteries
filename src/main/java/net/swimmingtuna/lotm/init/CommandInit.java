@@ -24,5 +24,6 @@ public class CommandInit {
         PlayerMobsCommand.register(event.getDispatcher());
         FatedConnectionCommand.register(event.getDispatcher(), event.getBuildContext());
         BeyonderRecipeCommand.register(event.getDispatcher(), event.getBuildContext());
+        AllyCommand.register(event.getDispatcher());
     }
 }

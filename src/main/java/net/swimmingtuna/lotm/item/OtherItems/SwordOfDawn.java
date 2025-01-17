@@ -74,8 +74,8 @@ public class SwordOfDawn extends SwordItem {
     public boolean hurtEnemy(ItemStack pStack, LivingEntity pTarget, LivingEntity pAttacker) {
         if (BeyonderUtil.isPurifiable(pTarget)) {
             pTarget.hurt(BeyonderUtil.magicSource(pAttacker), this.getDamage());
-            pTarget.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 2, false, false));
-            pTarget.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 2, false, false));
+            pTarget.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 2, true, true));
+            pTarget.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 2, true, true));
         }
         return super.hurtEnemy(pStack, pTarget, pAttacker);
     }

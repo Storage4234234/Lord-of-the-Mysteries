@@ -98,7 +98,7 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
             AABB boundingBox = new AABB(pos).inflate(1); // Adjust size as needed
             List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, boundingBox);
             for (LivingEntity entity : entities) {
-                if (entity != player) {
+                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
                     entity.hurt(level.damageSources().lightningBolt(), BeyonderUtil.getDamage(player).get(ItemInit.MATTER_ACCELERATION_SELF.get())); // Adjust damage amount as needed
                 }
             }

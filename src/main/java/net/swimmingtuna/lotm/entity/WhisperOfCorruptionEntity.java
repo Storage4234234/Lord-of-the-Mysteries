@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -91,7 +92,7 @@ public class WhisperOfCorruptionEntity extends AbstractHurtingProjectile {
             if (this.tickCount % 10 == 0) {
                 for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 1.5))) {
                     if (this.getOwner() != null) {
-                        if (livingEntity != this.getOwner()) {
+                        if (livingEntity != this.getOwner() && (this.getOwner() instanceof LivingEntity living && !BeyonderUtil.isAllyOf(living, livingEntity))) {
                             livingEntity.getPersistentData().putDouble("corruption", livingEntity.getPersistentData().getDouble("corruption") + scale);
 
                         }

@@ -94,7 +94,7 @@ public class PsycheStorm extends SimpleAbilityItem {
             int duration = 200 - (sequence * 20);
             AABB boundingBox = new AABB(targetPos).inflate(radius);
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, LivingEntity::isAlive).forEach(livingEntity -> {
-                if (livingEntity != player) {
+                if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
                     double corruption = livingEntity.getPersistentData().getDouble("corruption");
                     BeyonderUtil.applyMentalDamage(player, livingEntity, damage);
                     livingEntity.getPersistentData().putDouble("corruption", corruption + corruptionAddition);

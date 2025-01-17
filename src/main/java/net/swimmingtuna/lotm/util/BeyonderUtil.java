@@ -55,10 +55,12 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.DawnWeaponry;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.Gigantification;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.*;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.AllyInformation.PlayerAllyData;
 import net.swimmingtuna.lotm.util.ClientData.ClientLeftclickCooldownData;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
@@ -77,8 +79,12 @@ public class BeyonderUtil {
         }
         List<Projectile> projectiles = player.level().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(50));
         for (Projectile projectile : projectiles) {
-            if (projectile.getOwner() == player && projectile.tickCount > 6 && projectile.tickCount < 100) {
-                return projectile;
+            CompoundTag tag = projectile.getPersistentData();
+            int x = tag.getInt("windDodgeProjectilesCounter");
+            if (x == 0) {
+                if (projectile.getOwner() == player && projectile.tickCount > 6 && projectile.tickCount < 100) {
+                    return projectile;
+                }
             }
         }
         return null;
@@ -96,7 +102,7 @@ public class BeyonderUtil {
         Vec3 projectilePos = projectile.position();
         List<LivingEntity> nearbyEntities = projectile.level().getEntitiesOfClass(LivingEntity.class, projectile.getBoundingBox().inflate(maxValue));
         for (LivingEntity entity : nearbyEntities) {
-            if (entity != owner && !entity.level().isClientSide()) {
+            if (entity != owner && !entity.level().isClientSide() && (owner instanceof LivingEntity living && !BeyonderUtil.isAllyOf(living, entity))) {
                 double distance = entity.distanceToSqr(projectilePos);
                 if (distance < maxValue && distance > minValue && distance < closestDistance) {
                     closestDistance = distance;
@@ -163,8 +169,6 @@ public class BeyonderUtil {
         float calculatedDamage = damageSource.calculateDamage(baseAmount);
         return target.hurt(damageSource, calculatedDamage);
     }
-
-
 
 
     public static StructurePlaceSettings getStructurePlaceSettings(BlockPos pos) {
@@ -549,13 +553,13 @@ public class BeyonderUtil {
         if (!heldItem.isEmpty()) {
             if (heldItem.getItem() instanceof DawnWeaponry) {
                 LOTMNetworkHandler.sendToServer(new DawnWeaponryLeftClickC2S());
+            } else if (heldItem.getItem() instanceof Gigantification) {
+                LOTMNetworkHandler.sendToServer(new GigantificationC2S());
             }
-            if (heldItem.getItem() instanceof MonsterDomainTeleporation) {
+            else if (heldItem.getItem() instanceof MonsterDomainTeleporation) {
                 LOTMNetworkHandler.sendToServer(new MonsterLeftClickC2S());
-            }
-            if (heldItem.getItem() instanceof BeyonderAbilityUser) {
+            } else if (heldItem.getItem() instanceof BeyonderAbilityUser) {
                 LOTMNetworkHandler.sendToServer(new LeftClickC2S()); //DIFFERENT FOR LEFT CLICK BLOCK
-
             } else if (heldItem.getItem() instanceof AqueousLightPush) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AQUEOUS_LIGHT_PULL.get())));
 
@@ -583,7 +587,7 @@ public class BeyonderUtil {
             } else if (heldItem.getItem() instanceof WindManipulationBlade) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.WIND_MANIPULATION_FLIGHT.get())));
 
-            }  else if (heldItem.getItem() instanceof WindManipulationFlight) {
+            } else if (heldItem.getItem() instanceof WindManipulationFlight) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.WIND_MANIPULATION_SENSE.get())));
 
             } else if (heldItem.getItem() instanceof WindManipulationSense) {
@@ -718,7 +722,7 @@ public class BeyonderUtil {
             } else if (heldItem.getItem() instanceof WindManipulationBlade) {
                 pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.WIND_MANIPULATION_FLIGHT.get())));
                 heldItem.shrink(1);
-            }  else if (heldItem.getItem() instanceof WindManipulationFlight) {
+            } else if (heldItem.getItem() instanceof WindManipulationFlight) {
                 pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.WIND_MANIPULATION_SENSE.get())));
                 heldItem.shrink(1);
             } else if (heldItem.getItem() instanceof WindManipulationSense) {
@@ -869,7 +873,7 @@ public class BeyonderUtil {
         int sequence = 0;
         int abilityWeakness = 1;
         if (livingEntity.hasEffect(ModEffects.ABILITY_WEAKNESS.get())) {
-            abilityWeakness = Math.max(1,(livingEntity.getEffect(ModEffects.ABILITY_WEAKNESS.get())).getAmplifier());
+            abilityWeakness = Math.max(1, (livingEntity.getEffect(ModEffects.ABILITY_WEAKNESS.get())).getAmplifier());
         }
         if (livingEntity instanceof Player player) {
             sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
@@ -877,8 +881,8 @@ public class BeyonderUtil {
             sequence = playerMobEntity.getCurrentSequence();
         }
         //SAILOR
-        damageMap.put(ItemInit.ACIDIC_RAIN.get(), (50.0f - (sequence * 7)) /abilityWeakness);
-        damageMap.put(ItemInit.AQUATIC_LIFE_MANIPULATION.get(), (50.0f - (sequence * 5)) /abilityWeakness);
+        damageMap.put(ItemInit.ACIDIC_RAIN.get(), (50.0f - (sequence * 7)) / abilityWeakness);
+        damageMap.put(ItemInit.AQUATIC_LIFE_MANIPULATION.get(), (50.0f - (sequence * 5)) / abilityWeakness);
         damageMap.put(ItemInit.AQUEOUS_LIGHT_PUSH.get(), (8.0f - sequence) / abilityWeakness);
         damageMap.put(ItemInit.AQUEOUS_LIGHT_PULL.get(), (8.0f - sequence) / abilityWeakness);
         damageMap.put(ItemInit.AQUEOUS_LIGHT_DROWN.get(), (8.0f - sequence) / abilityWeakness);
@@ -988,7 +992,7 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.PROBABILITYFORTUNE.get(), (200.0f) / abilityWeakness);
         damageMap.put(ItemInit.PROBABILITYEFFECT.get(), (200.0f) / abilityWeakness);
         damageMap.put(ItemInit.PROBABILITYINFINITEFORTUNE.get(), (2000.0f) / abilityWeakness);
-        damageMap.put(ItemInit.PROBABILITYINFINITEMISFORTUNE.get(),(2000.0f) / abilityWeakness);
+        damageMap.put(ItemInit.PROBABILITYINFINITEMISFORTUNE.get(), (2000.0f) / abilityWeakness);
         damageMap.put(ItemInit.PROBABILITYMISFORTUNE.get(), (200.0f) / abilityWeakness);
         damageMap.put(ItemInit.PROBABILITYWIPE.get(), (200.0f) / abilityWeakness);
         damageMap.put(ItemInit.PROBABILITYFORTUNEINCREASE.get(), (0.0f) / abilityWeakness);
@@ -1113,16 +1117,15 @@ public class BeyonderUtil {
     }
 
 
-
     public static boolean isPhysicalDamage(DamageSource source) {
         return source.is(DamageTypes.FALL) || source.is(DamageTypes.CACTUS) || source.is(DamageTypes.FLY_INTO_WALL) || source.is(DamageTypes.GENERIC) || source.is(DamageTypes.FALLING_BLOCK) || source.is(DamageTypes.FALLING_ANVIL) || source.is(DamageTypes.FALLING_STALACTITE) || source.is(DamageTypes.STING) ||
                 source.is(DamageTypes.MOB_ATTACK) || source.is(DamageTypes.MOB_ATTACK_NO_AGGRO) || source.is(DamageTypes.PLAYER_ATTACK) || source.is(DamageTypes.ARROW) || source.is(DamageTypes.TRIDENT) || source.is(DamageTypes.MOB_PROJECTILE) || source.is(DamageTypes.FIREBALL) || source.is(DamageTypes.UNATTRIBUTED_FIREBALL) ||
                 source.is(DamageTypes.IN_FIRE) || source.is(DamageTypes.WITHER_SKULL) || source.is(DamageTypes.PLAYER_EXPLOSION) || source.is(DamageTypes.PLAYER_ATTACK) || source.is(DamageTypes.FIREWORKS) || source.is(DamageTypes.FREEZE) || source.is(DamageTypes.ON_FIRE) || source.is(DamageTypes.LAVA) || source.is(DamageTypes.HOT_FLOOR) || source.is(DamageTypes.HOT_FLOOR);
     }
+
     public static boolean isSupernaturalDamage(DamageSource source) {
         return source.is(DamageTypes.MAGIC) || source.is(DamageTypes.ON_FIRE) || source.is(DamageTypes.LIGHTNING_BOLT) || source.is(DamageTypes.DRAGON_BREATH) || source.is(DamageTypes.WITHER) || source.is(MENTAL_DAMAGE);
     }
-
 
 
     public static int getMentalStrength(LivingEntity livingEntity) {
@@ -1141,9 +1144,16 @@ public class BeyonderUtil {
     }
 
     public static boolean isPurifiable(LivingEntity livingEntity) {
-        return  livingEntity.getName().getString().toLowerCase().contains("skeleton") || livingEntity.getName().getString().toLowerCase().contains("demon") || livingEntity.getName().getString().toLowerCase().contains("ghost") || livingEntity.getName().getString().toLowerCase().contains("wraith") || livingEntity.getName().getString().toLowerCase().contains("zombie") || livingEntity.getName().getString().toLowerCase().contains("undead") || livingEntity.getPersistentData().getBoolean("isWraith");
+        return livingEntity.getName().getString().toLowerCase().contains("skeleton") || livingEntity.getName().getString().toLowerCase().contains("demon") || livingEntity.getName().getString().toLowerCase().contains("ghost") || livingEntity.getName().getString().toLowerCase().contains("wraith") || livingEntity.getName().getString().toLowerCase().contains("zombie") || livingEntity.getName().getString().toLowerCase().contains("undead") || livingEntity.getPersistentData().getBoolean("isWraith");
 
     }
 
+    public static boolean isAllyOf(LivingEntity livingEntity, LivingEntity ally) {
+        if (livingEntity.level() instanceof ServerLevel serverLevel) {
+            PlayerAllyData allyData = serverLevel.getDataStorage().computeIfAbsent(PlayerAllyData::load, PlayerAllyData::create, "player_allies");
+            return allyData.areAllies(livingEntity.getUUID(), ally.getUUID());
+        }
+        return false;
+    }
 
 }

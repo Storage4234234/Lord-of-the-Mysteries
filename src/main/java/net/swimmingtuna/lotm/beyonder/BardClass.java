@@ -79,7 +79,8 @@ public class BardClass implements BeyonderClass {
     @Override
     public Multimap<Integer, Item> getItems() {
         HashMultimap<Integer, Item> items = HashMultimap.create();
-        items.put(0, ItemInit.PLACATE.get());
+        items.put(9, ItemInit.BEYONDER_ABILITY_USER.get());
+        items.put(9, ItemInit.ALLY_MAKER.get());
         return items;
     }
 
