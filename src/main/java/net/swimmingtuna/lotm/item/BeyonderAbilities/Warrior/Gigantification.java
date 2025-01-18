@@ -97,5 +97,12 @@ public class Gigantification extends SimpleAbilityItem {
 
         }
     }
+    public static boolean isGigantified(LivingEntity living) {
+        CompoundTag tag = living.getPersistentData();
+        boolean isGiant = tag.getBoolean("warriorGiant");
+        boolean isHoGGiant = tag.getBoolean("handOfGodGiant");
+        boolean isTwilightGiant = tag.getBoolean("twilightGiant");
+        return isGiant || isHoGGiant || isTwilightGiant;
+    }
 }
 

@@ -24,7 +24,7 @@ import virtuoel.pehkui.api.ScaleTypes;
 public class WhisperOfCorruptionEntity extends AbstractHurtingProjectile {
     private static final EntityDataAccessor<Boolean> DATA_DANGEROUS = SynchedEntityData.defineId(WhisperOfCorruptionEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> LIFETIME = SynchedEntityData.defineId(WhisperOfCorruptionEntity.class, EntityDataSerializers.INT);
-
+    private int entitiesAffected = 0;
     public WhisperOfCorruptionEntity(EntityType<? extends WhisperOfCorruptionEntity> entityType, Level level) {
         super(entityType, level);
     }
@@ -89,12 +89,13 @@ public class WhisperOfCorruptionEntity extends AbstractHurtingProjectile {
                     serverLevel.sendParticles(ParticleTypes.ENCHANT, particleX, particleY, particleZ, 0, random, random, random, 0);
                 }
             }
-            if (this.tickCount % 10 == 0) {
+            if (this.tickCount % 15 == 0) {
                 for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 1.5))) {
                     if (this.getOwner() != null) {
                         if (livingEntity != this.getOwner() && (this.getOwner() instanceof LivingEntity living && !BeyonderUtil.isAllyOf(living, livingEntity))) {
                             livingEntity.getPersistentData().putDouble("corruption", livingEntity.getPersistentData().getDouble("corruption") + scale);
-
+                            int sequence = BeyonderUtil.getSequence(livingEntity);
+                            this.tickCount+= (20 - (sequence * 2));
                         }
                     } else {
                         livingEntity.getPersistentData().putDouble("corruption", livingEntity.getPersistentData().getDouble("corruption") + scale);

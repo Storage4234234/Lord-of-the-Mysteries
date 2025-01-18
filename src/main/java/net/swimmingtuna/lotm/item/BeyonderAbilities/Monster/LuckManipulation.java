@@ -126,7 +126,7 @@ public class LuckManipulation extends SimpleAbilityItem {
             return "Mobs will get Distracted from you";
         }
         if (luckManipulation == 6) {
-            return "Players that hurt you recently will get poisoned and stunned";
+            return "Next attacker will get poisoned and stunned";
         }
         if (luckManipulation == 7) {
             return "Ignore the next damage";

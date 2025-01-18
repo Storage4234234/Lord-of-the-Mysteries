@@ -482,9 +482,9 @@ public class LightningEntity extends AbstractHurtingProjectile {
             if (entity instanceof LivingEntity livingEntity) {
                 if (this.getOwner() == null) {
                     if (!BeyonderUtil.isBeyonderCapable(livingEntity)) {
-                        livingEntity.hurt(BeyonderUtil.lightningSource(this), (float) (Math.max((double) getDamage() / 5, getDamage() - (entity.distanceToSqr(hitPos.getCenter())))));
+                        livingEntity.hurt(livingEntity.damageSources().lightningBolt(), (float) (Math.max((double) getDamage() / 5, getDamage() - (entity.distanceToSqr(hitPos.getCenter())))));
                     } else {
-                        livingEntity.hurt(BeyonderUtil.lightningSource(this.getOwner()), (float) (Math.max((double) getDamage() / 5, (getDamage() - (entity.distanceToSqr(hitPos.getCenter()))) * 2)));
+                        livingEntity.hurt(livingEntity.damageSources().lightningBolt(), (float) (Math.max((double) getDamage() / 5, (getDamage() - (entity.distanceToSqr(hitPos.getCenter()))) * 2)));
                     }
                 } else {
                     if (!BeyonderUtil.isBeyonderCapable(livingEntity)) {

@@ -218,6 +218,7 @@ public class DeathKnell extends Item {
             int f = tag.getInt("deathKnellNightFear");
             if (a >= 1 && livingEntity.isInWaterOrRain()) {
                 applyFear(livingEntity);
+                tag.putInt("deathKnellWaterFear", a - 1);
             }
             if (b >= 1) {
                 BlockPos entityPos = livingEntity.blockPosition();
@@ -235,6 +236,7 @@ public class DeathKnell extends Item {
                 if (isFireNearby) {
                     applyFear(livingEntity);
                 }
+                tag.putInt("deathKnellFireFear", b - 1);
             }
             if (c >= 1) {
                 for (Mob mob : livingEntity.level().getEntitiesOfClass(Mob.class, livingEntity.getBoundingBox().inflate(15))) {
@@ -242,6 +244,7 @@ public class DeathKnell extends Item {
                         applyFear(livingEntity);
                     }
                 }
+                tag.putInt("deathKnellMobFear", c - 1);
             }
             if (d >= 1) {
                 for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(15))) {
@@ -251,6 +254,7 @@ public class DeathKnell extends Item {
                         }
                     }
                 }
+                tag.putInt("deathKnellPeacefulFear", d - 1);
             }
             if (e >= 1) {
                 for (Player player : livingEntity.level().getEntitiesOfClass(Player.class, livingEntity.getBoundingBox().inflate(15))) {
@@ -260,12 +264,14 @@ public class DeathKnell extends Item {
                         }
                     }
                 }
+                tag.putInt("deathKnellPlayerFear", e - 1);
             }
             if (f >= 1) {
                 if (livingEntity.level().isNight()) {
                     applyFear(livingEntity);
                 }
             }
+            tag.putInt("deathKnellNightFear", f - 1);
         }
     }
 

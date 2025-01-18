@@ -165,6 +165,11 @@ public class LOTMNetworkHandler {
                 .encoder(SendParticleS2C::encode)
                 .consumerMainThread(SendParticleS2C::handle)
                 .add();
+        INSTANCE.messageBuilder(SendDustParticleS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SendDustParticleS2C::new)
+                .encoder(SendDustParticleS2C::encode)
+                .consumerMainThread(SendDustParticleS2C::handle)
+                .add();
         INSTANCE.messageBuilder(SyncAbilitiesS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SyncAbilitiesS2C::new)
                 .encoder(SyncAbilitiesS2C::encode)

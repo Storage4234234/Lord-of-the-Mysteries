@@ -249,7 +249,7 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
             meteor.noPhysics = true;
             meteor.setOwner(player);
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(meteor);
-            scaleData.setScale(5 + (enhancement));
+            scaleData.setScale(3 + (enhancement));
             scaleData.markForSync(true);
             Vec3 randomizedTargetPos = targetPos.add((Math.random() * 20 - 10), (Math.random() * 20 - 10), (Math.random() * 20 - 10));
             double speed = 4.0;

@@ -66,6 +66,7 @@ import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -87,6 +88,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.Batt
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.DreamIntoReality;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionBarrier;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocationBlink;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.EyeOfDemonHunting;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.LightOfDawn;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
@@ -132,6 +134,7 @@ public class ModEvents {
             );
         }
     }
+
 
     @SubscribeEvent
     public static void onLevelLoad(LevelEvent.Load event) {
@@ -525,6 +528,7 @@ public class ModEvents {
                         mob.setTarget(null);
                     }
                 }
+                player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 11, 1, false, false));
                 holder.useSpirituality((int) holder.getMaxSpirituality() / 100);
             }
             UUID playerId = player.getUUID();
@@ -540,7 +544,7 @@ public class ModEvents {
     private static void psychologicalInvisibilityHurt(LivingHurtEvent event) {
         LivingEntity entity = event.getEntity();
         if (!entity.level().isClientSide()) {
-            if (ClientShouldntRenderInvisibilityData.getShouldntRender()) {
+            if (entity.getPersistentData().getBoolean("psychologicalInvisibility")) {
                 CompoundTag tag = entity.getPersistentData();
                 int x = tag.getInt("psychologicalInvisibilityHurt");
                 tag.putInt("psychologicalInvisibilityHurt", x + 100);
@@ -555,7 +559,7 @@ public class ModEvents {
             if (x >= 1) {
                 tag.putInt("psychologicalInvisibilityHurt", x - 1);
             }
-            if (x >= 400 && ClientShouldntRenderInvisibilityData.getShouldntRender()) {
+            if (x >= 400 && livingEntity.getPersistentData().getBoolean("psychologicalInvisibility")) {
                 livingEntity.getPersistentData().putBoolean("psychologicalInvisibility", false);
                 LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(false, livingEntity.getUUID()));
                 tag.putInt("psychologicalInvisibilityHurt", 0);
@@ -1829,6 +1833,7 @@ public class ModEvents {
             if (entity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
             }
+            EyeOfDemonHunting.eyeTick(event);
             livingNoMoveEffect(event);
             psychologicalInvisibilityHurtTick(entity);
             //windManipulationCushion(entity);
@@ -4244,6 +4249,8 @@ public class ModEvents {
             SpiritWorldVisibilityTracker.removeEntity(event.getEntity().getUUID());
         }
     }
+
+
 
 //@SubscribeEvent
 //public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {

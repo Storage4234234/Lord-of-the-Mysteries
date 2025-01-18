@@ -130,6 +130,7 @@ public class AbilityRegisterCommand {
     public static void tickEvent(ServerPlayer player) {
         syncRegisteredAbilitiesToClient(player);
     }
+
     private static String findCombinationForNumber(int number) {
         for (Map.Entry<String, Integer> entry : COMBINATION_MAP.entrySet()) {
             if (entry.getValue() == number) {

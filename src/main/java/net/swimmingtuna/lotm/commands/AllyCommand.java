@@ -66,7 +66,7 @@ public class AllyCommand {
                 return 0;
             }
             allyData.removeAlly(source.getUUID(), target.getUUID());
-            source.sendSystemMessage(Component.literal("Removed" + target.getScoreboardName() + " from allies").withStyle(ChatFormatting.GREEN));
+            source.sendSystemMessage(Component.literal("Removed " + target.getScoreboardName() + " from allies").withStyle(ChatFormatting.GREEN));
             target.sendSystemMessage(Component.literal(source.getScoreboardName() + " has removed you as an ally").withStyle(ChatFormatting.RED));
             return 1;
         } catch (Exception e) {

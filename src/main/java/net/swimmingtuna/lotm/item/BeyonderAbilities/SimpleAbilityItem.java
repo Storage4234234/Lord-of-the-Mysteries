@@ -219,7 +219,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         if (!livingEntity.level().isClientSide()) {
             MisfortuneManipulation.livingUseAbilityMisfortuneManipulation(livingEntity);
             CompoundTag tag = livingEntity.getPersistentData();
-            if (livingEntity.getMainHandItem().getItem() instanceof SimpleAbilityItem simpleAbilityItem) {
+            if (livingEntity.getMainHandItem().getItem() instanceof SimpleAbilityItem) {
                 if (livingEntity.hasEffect(ModEffects.STUN.get())) {
                     if (livingEntity instanceof Player) {
                         livingEntity.sendSystemMessage(Component.literal("You are stunned and unable to use abilities for another " + (int) Objects.requireNonNull(livingEntity.getEffect(ModEffects.STUN.get())).getDuration() / 20 + " seconds.").withStyle(ChatFormatting.RED));

@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.init.ItemInit;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.Gigantification;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
@@ -135,7 +136,9 @@ public class WarriorClass implements BeyonderClass {
                     resistance = 0;
                     regen = 0;
                 } else if (sequenceLevel == 6) {
-                    scaleData.setScale(1.3f);
+                    if (!Gigantification.isGigantified(player)) {
+                        scaleData.setScale(1.3f);
+                    }
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
@@ -146,7 +149,9 @@ public class WarriorClass implements BeyonderClass {
                     resistance = 0;
                     regen = 0;
                 } else if (sequenceLevel == 5) {
-                    scaleData.setScale(1.5f);
+                    if (!Gigantification.isGigantified(player)) {
+                        scaleData.setScale(1.5f);
+                    }
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
@@ -157,6 +162,9 @@ public class WarriorClass implements BeyonderClass {
                     resistance = 1;
                     regen = 1;
                 } else if (sequenceLevel == 4) {
+                    if (!Gigantification.isGigantified(player)) {
+                        scaleData.setScale(1.5f);
+                    }
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
@@ -167,7 +175,9 @@ public class WarriorClass implements BeyonderClass {
                     resistance = 1;
                     regen = 2;
                 } else if (sequenceLevel == 3) {
-                    scaleData.setScale(2.0f);
+                    if (!Gigantification.isGigantified(player)) {
+                        scaleData.setScale(2.0f);
+                    }
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
@@ -178,7 +188,9 @@ public class WarriorClass implements BeyonderClass {
                     resistance = 1;
                     regen = 2;
                 } else if (sequenceLevel == 2) {
-                    scaleData.setScale(2.3f);
+                    if (!Gigantification.isGigantified(player)) {
+                        scaleData.setScale(2.3f);
+                    }
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
@@ -189,6 +201,9 @@ public class WarriorClass implements BeyonderClass {
                     resistance = 2;
                     regen = 2;
                 } else if (sequenceLevel == 1) {
+                    if (!Gigantification.isGigantified(player)) {
+                        scaleData.setScale(2.3f);
+                    }
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
@@ -199,7 +214,9 @@ public class WarriorClass implements BeyonderClass {
                     resistance = 2;
                     regen = 2;
                 } else if (sequenceLevel == 0) {
-                    scaleData.setScale(2.5f);
+                    if (!Gigantification.isGigantified(player)) {
+                        scaleData.setScale(2.5f);
+                    }
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);

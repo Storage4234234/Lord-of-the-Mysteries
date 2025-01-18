@@ -4,7 +4,6 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Mob;
@@ -37,7 +36,7 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        psychologicalInvisibilityTest(player);
+        psychologicalInvisibility(player);
         if (ClientShouldntRenderInvisibilityData.getShouldntRender()) {
             addCooldown(player);
         }
@@ -45,27 +44,6 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
     }
 
     private static void psychologicalInvisibility(Player player) {
-        if (!player.level().isClientSide()) {
-            CompoundTag tag = player.getPersistentData();
-            boolean shouldntRender = ClientShouldntRenderInvisibilityData.getShouldntRender();
-            if (!shouldntRender) {
-                for (Mob mob : player.level().getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(50))) {
-                    if (mob.getTarget() == player) {
-                        mob.setTarget(null);
-                    }
-                }
-                LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderInvisibilityPacketS2C(true, player.getUUID()), (ServerPlayer) player);
-                tag.putBoolean("psychologicalInvisibility", true);
-                player.displayClientMessage(Component.literal("You are now invisible").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN), true);
-            } else {
-                player.displayClientMessage(Component.literal("You are now visible").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED), true);
-                tag.putBoolean("psychologicalInvisibility", false);
-                LOTMNetworkHandler.sendToPlayer(new SyncShouldntRenderInvisibilityPacketS2C(false, player.getUUID()), (ServerPlayer) player);
-            }
-        }
-    }
-
-    private static void psychologicalInvisibilityTest(Player player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean newState = !tag.getBoolean("psychologicalInvisibility");

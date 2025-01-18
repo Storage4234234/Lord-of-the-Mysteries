@@ -1,5 +1,6 @@
 package net.swimmingtuna.lotm.util;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
@@ -68,6 +69,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static net.swimmingtuna.lotm.init.DamageTypeInit.MENTAL_DAMAGE;
 
@@ -425,99 +429,102 @@ public class BeyonderUtil {
         if (player.level().isClientSide()) {
             return;
         }
+        if (player.hasEffect(ModEffects.STUN.get())) {
+            player.sendSystemMessage(Component.literal("You are stunned and unable to use abilities for another " + (int) Objects.requireNonNull(player.getEffect(ModEffects.STUN.get())).getDuration() / 20 + " seconds.").withStyle(ChatFormatting.RED));
+        } else {
 
-        CompoundTag persistentData = player.getPersistentData();
-        if (!persistentData.contains(REGISTERED_ABILITIES_KEY, Tag.TAG_COMPOUND)) {
-            player.sendSystemMessage(Component.literal("No registered abilities found."));
-            return;
-        }
+            CompoundTag persistentData = player.getPersistentData();
+            if (!persistentData.contains(REGISTERED_ABILITIES_KEY, Tag.TAG_COMPOUND)) {
+                player.sendSystemMessage(Component.literal("No registered abilities found."));
+                return;
+            }
 
-        CompoundTag registeredAbilities = persistentData.getCompound(REGISTERED_ABILITIES_KEY);
-        if (!registeredAbilities.contains(String.valueOf(abilityNumber), Tag.TAG_STRING)) {
-            player.sendSystemMessage(Component.literal("Ability " + abilityNumber + " not found."));
-            return;
-        }
+            CompoundTag registeredAbilities = persistentData.getCompound(REGISTERED_ABILITIES_KEY);
+            if (!registeredAbilities.contains(String.valueOf(abilityNumber), Tag.TAG_STRING)) {
+                player.sendSystemMessage(Component.literal("Ability " + abilityNumber + " not found."));
+                return;
+            }
 
-        ResourceLocation resourceLocation = new ResourceLocation(registeredAbilities.getString(String.valueOf(abilityNumber)));
-        Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
-        if (item == null) {
-            player.sendSystemMessage(Component.literal("Item not found in registry for ability " + abilityNumber + " with resource location: " + resourceLocation));
-            return;
-        }
-        String itemName = item.getDescription().getString();
-        if (!(item instanceof Ability ability)) {
-            player.sendSystemMessage(Component.literal("Registered ability ").append(itemName).append(" for ability number " + abilityNumber + " is not an ability."));
-            return;
-        }
+            ResourceLocation resourceLocation = new ResourceLocation(registeredAbilities.getString(String.valueOf(abilityNumber)));
+            Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
+            if (item == null) {
+                player.sendSystemMessage(Component.literal("Item not found in registry for ability " + abilityNumber + " with resource location: " + resourceLocation));
+                return;
+            }
+            String itemName = item.getDescription().getString();
+            if (!(item instanceof Ability ability)) {
+                player.sendSystemMessage(Component.literal("Registered ability ").append(itemName).append(" for ability number " + abilityNumber + " is not an ability."));
+                return;
+            }
 
-        if (player.getCooldowns().isOnCooldown(item)) {
-            player.sendSystemMessage(Component.literal("Ability ").append(itemName).append(" is on cooldown!"));
-            return;
-        }
-        double entityReach = ability.getEntityReach();
-        double blockReach = ability.getBlockReach();
+            if (player.getCooldowns().isOnCooldown(item)) {
+                player.sendSystemMessage(Component.literal("Ability ").append(itemName).append(" is on cooldown!"));
+                return;
+            }
+            double entityReach = ability.getEntityReach();
+            double blockReach = ability.getBlockReach();
 
-        boolean hasEntityInteraction = false;
-        try {
-            Method entityMethod = ability.getClass().getDeclaredMethod("useAbilityOnEntity", ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class);
-            hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity", ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class));
-        } catch (NoSuchMethodException ignored) {
-        }
+            boolean hasEntityInteraction = false;
+            try {
+                Method entityMethod = ability.getClass().getDeclaredMethod("useAbilityOnEntity", ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class);
+                hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity", ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class));
+            } catch (NoSuchMethodException ignored) {
+            }
 
-        boolean hasBlockInteraction = false;
-        try {
-            Method blockMethod = ability.getClass().getDeclaredMethod("useAbilityOnBlock", UseOnContext.class);
-            hasBlockInteraction = !blockMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnBlock", UseOnContext.class));
-        } catch (NoSuchMethodException ignored) {
-        }
-        if (hasEntityInteraction) {
-            Vec3 eyePosition = player.getEyePosition();
-            Vec3 lookVector = player.getLookAngle();
-            Vec3 reachVector = eyePosition.add(lookVector.x * entityReach, lookVector.y * entityReach, lookVector.z * entityReach);
+            boolean hasBlockInteraction = false;
+            try {
+                Method blockMethod = ability.getClass().getDeclaredMethod("useAbilityOnBlock", UseOnContext.class);
+                hasBlockInteraction = !blockMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnBlock", UseOnContext.class));
+            } catch (NoSuchMethodException ignored) {
+            }
+            if (hasEntityInteraction) {
+                Vec3 eyePosition = player.getEyePosition();
+                Vec3 lookVector = player.getLookAngle();
+                Vec3 reachVector = eyePosition.add(lookVector.x * entityReach, lookVector.y * entityReach, lookVector.z * entityReach);
 
-            AABB searchBox = player.getBoundingBox().inflate(entityReach);
-            EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(
-                    player.level(),
-                    player,
-                    eyePosition,
-                    reachVector,
-                    searchBox,
-                    entity -> !entity.isSpectator() && entity.isPickable(),
-                    0.0f
-            );
-            if (entityHit != null && entityHit.getEntity() instanceof LivingEntity livingEntity) {
-                InteractionResult result = ability.useAbilityOnEntity(player.getItemInHand(hand), player, livingEntity, hand);
-                player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true); // Display ability name
+                AABB searchBox = player.getBoundingBox().inflate(entityReach);
+                EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(
+                        player.level(),
+                        player,
+                        eyePosition,
+                        reachVector,
+                        searchBox,
+                        entity -> !entity.isSpectator() && entity.isPickable(),
+                        0.0f
+                );
+                if (entityHit != null && entityHit.getEntity() instanceof LivingEntity livingEntity) {
+                    InteractionResult result = ability.useAbilityOnEntity(player.getItemInHand(hand), player, livingEntity, hand);
+                    player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true); // Display ability name
 
-                if (result != InteractionResult.PASS) {
-                    return;
+                    if (result != InteractionResult.PASS) {
+                        return;
+                    }
                 }
             }
-        }
-        if (hasBlockInteraction) {
-            Vec3 eyePosition = player.getEyePosition();
-            Vec3 lookVector = player.getLookAngle();
-            Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
+            if (hasBlockInteraction) {
+                Vec3 eyePosition = player.getEyePosition();
+                Vec3 lookVector = player.getLookAngle();
+                Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
 
-            BlockHitResult blockHit = player.level().clip(new ClipContext(
-                    eyePosition,
-                    reachVector,
-                    ClipContext.Block.OUTLINE,
-                    ClipContext.Fluid.NONE,
-                    player
-            ));
-            if (blockHit.getType() != HitResult.Type.MISS) {
-                UseOnContext context = new UseOnContext(player.level(), player, hand, player.getItemInHand(hand), blockHit);
-                InteractionResult result = ability.useAbilityOnBlock(context);
-                player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true); // Display ability name
-                if (result != InteractionResult.PASS) {
-                    return;
+                BlockHitResult blockHit = player.level().clip(new ClipContext(
+                        eyePosition,
+                        reachVector,
+                        ClipContext.Block.OUTLINE,
+                        ClipContext.Fluid.NONE,
+                        player
+                ));
+                if (blockHit.getType() != HitResult.Type.MISS) {
+                    UseOnContext context = new UseOnContext(player.level(), player, hand, player.getItemInHand(hand), blockHit);
+                    InteractionResult result = ability.useAbilityOnBlock(context);
+                    player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true); // Display ability name
+                    if (result != InteractionResult.PASS) {
+                        return;
+                    }
                 }
             }
+            player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true); // Display ability name
+            ability.useAbility(player.level(), player, hand);
         }
-        player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true); // Display ability name
-        ability.useAbility(player.level(), player, hand);
-
     }
 
     public static Style getStyle(Player player) {
@@ -555,8 +562,7 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new DawnWeaponryLeftClickC2S());
             } else if (heldItem.getItem() instanceof Gigantification) {
                 LOTMNetworkHandler.sendToServer(new GigantificationC2S());
-            }
-            else if (heldItem.getItem() instanceof MonsterDomainTeleporation) {
+            } else if (heldItem.getItem() instanceof MonsterDomainTeleporation) {
                 LOTMNetworkHandler.sendToServer(new MonsterLeftClickC2S());
             } else if (heldItem.getItem() instanceof BeyonderAbilityUser) {
                 LOTMNetworkHandler.sendToServer(new LeftClickC2S()); //DIFFERENT FOR LEFT CLICK BLOCK
@@ -1156,4 +1162,14 @@ public class BeyonderUtil {
         return false;
     }
 
+    public static void useSpirituality(LivingEntity living, int spirituality) {
+        if (!living.level().isClientSide()) {
+            if (living instanceof Player player) {
+                BeyonderHolderAttacher.getHolderUnwrap(player).useSpirituality(spirituality);
+            } else if (living instanceof PlayerMobEntity playerMobEntity) {
+                playerMobEntity.useSpirituality(spirituality);
+            }
+        }
+    }
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 }

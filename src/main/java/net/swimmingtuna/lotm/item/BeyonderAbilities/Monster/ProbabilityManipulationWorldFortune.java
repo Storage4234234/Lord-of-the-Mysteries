@@ -83,9 +83,9 @@ public class ProbabilityManipulationWorldFortune extends SimpleAbilityItem {
             }
             if (livingEntity.getMainHandItem().getItem() instanceof ProbabilityManipulationWorldMisfortune) {
                 if (misfortune <= 4) {
-                    tag.putInt("probabilityManipulationWorldFortuneValue", misfortune + 1);
+                    tag.putInt("probabilityManipulationWorldMisfortuneValue", misfortune + 1);
                 } else {
-                    tag.putInt("probabilityManipulationWorldFortuneValue", 0);
+                    tag.putInt("probabilityManipulationWorldMisfortuneValue", 0);
                 }
             }
         }
