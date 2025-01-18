@@ -16,7 +16,7 @@ import java.util.List;
 public class ConsciousnessStroll extends SimpleAbilityItem {
 
     public ConsciousnessStroll (Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 3, 300, 0);
+        super(properties, BeyonderClassInit.SPECTATOR, 3, 300, 400);
     }
 
 

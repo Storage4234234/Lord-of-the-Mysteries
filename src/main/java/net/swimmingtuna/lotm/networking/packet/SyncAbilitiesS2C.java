@@ -33,12 +33,13 @@ public class SyncAbilitiesS2C {
         }
     }
 
-    public static void handle(SyncAbilitiesS2C msg, Supplier<NetworkEvent.Context> contextSupplier) {
+    public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
-            for (Map.Entry<String, String> entry : msg.abilities.entrySet()) {
-                ClientAbilitiesData.setAbilities(entry.getKey(), entry.getValue());
-            }
+            // Clear existing abilities first
+            ClientAbilitiesData.clearAbilities();
+            // Add each ability with its combination
+            abilities.forEach(ClientAbilitiesData::setAbilities);
         });
         context.setPacketHandled(true);
     }

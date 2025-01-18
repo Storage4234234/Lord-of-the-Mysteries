@@ -22,9 +22,8 @@ public class ClearAbilitiesS2C {
 
     public static void handle(ClearAbilitiesS2C msg, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
-        context.enqueueWork(() -> {
-            ClientAbilitiesData.clearAbilities();
-        });
+        context.enqueueWork(
+                ClientAbilitiesData::clearAbilities);
         context.setPacketHandled(true);
     }
 }

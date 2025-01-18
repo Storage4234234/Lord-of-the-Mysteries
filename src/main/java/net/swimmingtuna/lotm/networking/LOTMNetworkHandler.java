@@ -170,6 +170,11 @@ public class LOTMNetworkHandler {
                 .encoder(SendDustParticleS2C::encode)
                 .consumerMainThread(SendDustParticleS2C::handle)
                 .add();
+        INSTANCE.messageBuilder(SyncAbilityCooldownsS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncAbilityCooldownsS2C::decode)
+                .encoder(SyncAbilityCooldownsS2C::encode)
+                .consumerMainThread(SyncAbilityCooldownsS2C::handle)
+                .add();
         INSTANCE.messageBuilder(SyncAbilitiesS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SyncAbilitiesS2C::new)
                 .encoder(SyncAbilitiesS2C::encode)
@@ -192,7 +197,7 @@ public class LOTMNetworkHandler {
     }
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
-        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message); //also got no clue lmao
+        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
     }
 }
 

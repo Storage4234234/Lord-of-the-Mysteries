@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
@@ -12,16 +13,21 @@ import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.client.AbilityOverlay;
 import net.swimmingtuna.lotm.client.SpiritualityBarOverlay;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
+import net.swimmingtuna.lotm.util.ClientData.ClientAbilityCooldownData;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 
 
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -49,6 +55,18 @@ public class ClientEvents {
     //        event.setCanceled(true);
     //    }
     //}
+
+    @SubscribeEvent
+    @OnlyIn(Dist.CLIENT)
+    public static void clientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            Map<String, Integer> currentCooldowns = new HashMap<>(ClientAbilityCooldownData.getCooldowns());
+            for (Map.Entry<String, Integer> entry : currentCooldowns.entrySet()) {
+                int newValue = entry.getValue() - 1;
+                ClientAbilityCooldownData.setAbilityCooldown(entry.getKey(), newValue);
+            }
+        }
+    }
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)

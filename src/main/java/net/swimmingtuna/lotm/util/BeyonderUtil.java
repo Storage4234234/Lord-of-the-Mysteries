@@ -215,8 +215,8 @@ public class BeyonderUtil {
             if (sequence <= 5) {
                 abilityNames.add(ItemInit.GUIDANCE.get());
                 abilityNames.add(ItemInit.ALTERATION.get());
-                abilityNames.add(ItemInit.DREAM_WALKING.get());
                 abilityNames.add(ItemInit.NIGHTMARE.get());
+                abilityNames.add(ItemInit.DREAM_WALKING.get());
             }
             if (sequence <= 4) {
                 abilityNames.remove(ItemInit.FRENZY.get());
@@ -430,100 +430,136 @@ public class BeyonderUtil {
             return;
         }
         if (player.hasEffect(ModEffects.STUN.get())) {
-            player.sendSystemMessage(Component.literal("You are stunned and unable to use abilities for another " + (int) Objects.requireNonNull(player.getEffect(ModEffects.STUN.get())).getDuration() / 20 + " seconds.").withStyle(ChatFormatting.RED));
-        } else {
+            player.sendSystemMessage(Component.literal("You are stunned and unable to use abilities for another " +
+                            (int) Objects.requireNonNull(player.getEffect(ModEffects.STUN.get())).getDuration() / 20 + " seconds.")
+                    .withStyle(ChatFormatting.RED));
+            return;
+        }
 
-            CompoundTag persistentData = player.getPersistentData();
-            if (!persistentData.contains(REGISTERED_ABILITIES_KEY, Tag.TAG_COMPOUND)) {
-                player.sendSystemMessage(Component.literal("No registered abilities found."));
-                return;
-            }
+        CompoundTag persistentData = player.getPersistentData();
+        if (!persistentData.contains(REGISTERED_ABILITIES_KEY, Tag.TAG_COMPOUND)) {
+            player.sendSystemMessage(Component.literal("No registered abilities found."));
+            return;
+        }
 
-            CompoundTag registeredAbilities = persistentData.getCompound(REGISTERED_ABILITIES_KEY);
-            if (!registeredAbilities.contains(String.valueOf(abilityNumber), Tag.TAG_STRING)) {
-                player.sendSystemMessage(Component.literal("Ability " + abilityNumber + " not found."));
-                return;
-            }
+        CompoundTag registeredAbilities = persistentData.getCompound(REGISTERED_ABILITIES_KEY);
+        if (!registeredAbilities.contains(String.valueOf(abilityNumber), Tag.TAG_STRING)) {
+            player.sendSystemMessage(Component.literal("Ability " + abilityNumber + " not found."));
+            return;
+        }
 
-            ResourceLocation resourceLocation = new ResourceLocation(registeredAbilities.getString(String.valueOf(abilityNumber)));
-            Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
-            if (item == null) {
-                player.sendSystemMessage(Component.literal("Item not found in registry for ability " + abilityNumber + " with resource location: " + resourceLocation));
-                return;
-            }
-            String itemName = item.getDescription().getString();
-            if (!(item instanceof Ability ability)) {
-                player.sendSystemMessage(Component.literal("Registered ability ").append(itemName).append(" for ability number " + abilityNumber + " is not an ability."));
-                return;
-            }
+        ResourceLocation resourceLocation = new ResourceLocation(registeredAbilities.getString(String.valueOf(abilityNumber)));
+        Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
+        if (item == null) {
+            player.sendSystemMessage(Component.literal("Item not found in registry for ability " + abilityNumber +
+                    " with resource location: " + resourceLocation));
+            return;
+        }
 
-            if (player.getCooldowns().isOnCooldown(item)) {
-                player.sendSystemMessage(Component.literal("Ability ").append(itemName).append(" is on cooldown!"));
-                return;
-            }
-            double entityReach = ability.getEntityReach();
-            double blockReach = ability.getBlockReach();
+        String itemName = item.getDescription().getString();
+        if (!(item instanceof Ability ability)) {
+            player.sendSystemMessage(Component.literal("Registered ability ").append(itemName)
+                    .append(" for ability number " + abilityNumber + " is not an ability."));
+            return;
+        }
 
-            boolean hasEntityInteraction = false;
-            try {
-                Method entityMethod = ability.getClass().getDeclaredMethod("useAbilityOnEntity", ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class);
-                hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity", ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class));
-            } catch (NoSuchMethodException ignored) {
-            }
+        if (player.getCooldowns().isOnCooldown(item)) {
+            player.sendSystemMessage(Component.literal("Ability ").append(itemName).append(" is on cooldown!"));
+            return;
+        }
 
-            boolean hasBlockInteraction = false;
-            try {
-                Method blockMethod = ability.getClass().getDeclaredMethod("useAbilityOnBlock", UseOnContext.class);
-                hasBlockInteraction = !blockMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnBlock", UseOnContext.class));
-            } catch (NoSuchMethodException ignored) {
-            }
-            if (hasEntityInteraction) {
-                Vec3 eyePosition = player.getEyePosition();
-                Vec3 lookVector = player.getLookAngle();
-                Vec3 reachVector = eyePosition.add(lookVector.x * entityReach, lookVector.y * entityReach, lookVector.z * entityReach);
+        double entityReach = ability.getEntityReach();
+        double blockReach = ability.getBlockReach();
+        boolean successfulUse = false;
 
-                AABB searchBox = player.getBoundingBox().inflate(entityReach);
-                EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(
-                        player.level(),
-                        player,
-                        eyePosition,
-                        reachVector,
-                        searchBox,
-                        entity -> !entity.isSpectator() && entity.isPickable(),
-                        0.0f
-                );
-                if (entityHit != null && entityHit.getEntity() instanceof LivingEntity livingEntity) {
-                    InteractionResult result = ability.useAbilityOnEntity(player.getItemInHand(hand), player, livingEntity, hand);
-                    player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true); // Display ability name
+        // Check for existence of methods
+        boolean hasEntityInteraction = false;
+        boolean hasBlockInteraction = false;
+        boolean hasGeneralAbility = false;
 
-                    if (result != InteractionResult.PASS) {
-                        return;
-                    }
+        try {
+            Method entityMethod = ability.getClass().getDeclaredMethod("useAbilityOnEntity",
+                    ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class);
+            hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity",
+                    ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class));
+        } catch (NoSuchMethodException ignored) {}
+
+        try {
+            Method blockMethod = ability.getClass().getDeclaredMethod("useAbilityOnBlock", UseOnContext.class);
+            hasBlockInteraction = !blockMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnBlock", UseOnContext.class));
+        } catch (NoSuchMethodException ignored) {}
+
+        try {
+            Method generalMethod = ability.getClass().getDeclaredMethod("useAbility", Level.class, Player.class, InteractionHand.class);
+            hasGeneralAbility = !generalMethod.equals(Ability.class.getDeclaredMethod("useAbility", Level.class, Player.class, InteractionHand.class));
+        } catch (NoSuchMethodException ignored) {}
+
+        // Check for entity interaction
+        if (hasEntityInteraction) {
+            Vec3 eyePosition = player.getEyePosition();
+            Vec3 lookVector = player.getLookAngle();
+            Vec3 reachVector = eyePosition.add(lookVector.x * entityReach, lookVector.y * entityReach, lookVector.z * entityReach);
+
+            AABB searchBox = player.getBoundingBox().inflate(entityReach);
+            EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(
+                    player.level(),
+                    player,
+                    eyePosition,
+                    reachVector,
+                    searchBox,
+                    entity -> !entity.isSpectator() && entity.isPickable(),
+                    0.0f
+            );
+
+            if (entityHit != null && entityHit.getEntity() instanceof LivingEntity livingEntity) {
+                InteractionResult result = ability.useAbilityOnEntity(player.getItemInHand(hand), player, livingEntity, hand);
+                if (result != InteractionResult.PASS) {
+                    successfulUse = true;
                 }
             }
-            if (hasBlockInteraction) {
-                Vec3 eyePosition = player.getEyePosition();
-                Vec3 lookVector = player.getLookAngle();
-                Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
+        }
 
-                BlockHitResult blockHit = player.level().clip(new ClipContext(
-                        eyePosition,
-                        reachVector,
-                        ClipContext.Block.OUTLINE,
-                        ClipContext.Fluid.NONE,
-                        player
-                ));
-                if (blockHit.getType() != HitResult.Type.MISS) {
-                    UseOnContext context = new UseOnContext(player.level(), player, hand, player.getItemInHand(hand), blockHit);
-                    InteractionResult result = ability.useAbilityOnBlock(context);
-                    player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true); // Display ability name
-                    if (result != InteractionResult.PASS) {
-                        return;
-                    }
+        // Check for block interaction
+        if (!successfulUse && hasBlockInteraction) {
+            Vec3 eyePosition = player.getEyePosition();
+            Vec3 lookVector = player.getLookAngle();
+            Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
+
+            BlockHitResult blockHit = player.level().clip(new ClipContext(
+                    eyePosition,
+                    reachVector,
+                    ClipContext.Block.OUTLINE,
+                    ClipContext.Fluid.NONE,
+                    player
+            ));
+
+            if (blockHit.getType() != HitResult.Type.MISS) {
+                UseOnContext context = new UseOnContext(player.level(), player, hand, player.getItemInHand(hand), blockHit);
+                InteractionResult result = ability.useAbilityOnBlock(context);
+                if (result != InteractionResult.PASS) {
+                    successfulUse = true;
                 }
             }
-            player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true); // Display ability name
+        }
+
+        // Handle different cases
+        if ((hasEntityInteraction || hasBlockInteraction) && !hasGeneralAbility) {
+            if (successfulUse) {
+                player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
+            } else {
+                player.displayClientMessage(Component.literal("Missed: " + itemName).withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
+            }
+        } else if (!hasEntityInteraction && !hasBlockInteraction) {
+            // If it's just a general ability with no targeting
             ability.useAbility(player.level(), player, hand);
+            player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
+        } else if (successfulUse) {
+            // If it has both targeted and general abilities, and the targeted one succeeded
+            player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
+        } else {
+            // If it has both targeted and general abilities, but the targeted one missed
+            ability.useAbility(player.level(), player, hand);
+            player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
         }
     }
 
@@ -953,7 +989,7 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.MANIPULATE_MOVEMENT.get(), (0.0f) / abilityWeakness);
         damageMap.put(ItemInit.MANIPULATE_EMOTION.get(), (50.0f - (sequence * 5)) / abilityWeakness);
         damageMap.put(ItemInit.MANIPULATE_FONDNESS.get(), (float) (600.0f * dreamIntoReality) / abilityWeakness);
-        damageMap.put(ItemInit.MENTAL_PLAGUE.get(), (float) (200.0f / dreamIntoReality) / abilityWeakness);
+        damageMap.put(ItemInit.MENTAL_PLAGUE.get(), (float) (200.0f / dreamIntoReality) * abilityWeakness);
         damageMap.put(ItemInit.METEOR_NO_LEVEL_SHOWER.get(), (float) ((10.0f + dreamIntoReality * 2) - (4 * sequence)) / abilityWeakness);
         damageMap.put(ItemInit.METEOR_SHOWER.get(), (float) ((10.0f + dreamIntoReality * 2) - (4 * sequence)) / abilityWeakness);
         damageMap.put(ItemInit.MIND_READING.get(), (0.0f));
@@ -1122,6 +1158,282 @@ public class BeyonderUtil {
         executeCommand(server, "/beyonderrecipe add lotm:spectator_2_potion terramity:fortunes_favor soulsweapons:lord_soul_day_stalker soulsweapons:lord_soul_night_prowler");
     }
 
+    public static void registerAbilities(Player player,MinecraftServer server) {
+        int sequence = BeyonderUtil.getSequence(player);
+        BeyonderClass beyonderClass = getPathway(player);
+        System.out.println("Sequence: " + sequence);
+        System.out.println("Pathway: " + beyonderClass);
+        if (beyonderClass == BeyonderClassInit.SPECTATOR.get()) {
+            player.sendSystemMessage(Component.literal("spectator"));
+            if (sequence == 9) {
+                player.sendSystemMessage(Component.literal("No abilities to register"));
+            } else if (sequence >= 8) {
+                executeCommand(server, "/abilityput LRRLL lotm:mindreading");
+            } else if (sequence == 7) {
+                executeCommand(server, "/abilityput LRRLL lotm:mindreading");
+                executeCommand(server, "/abilityput LLLLL lotm:awe");
+                executeCommand(server, "/abilityput LLLRL lotm:frenzy");
+                executeCommand(server, "/abilityput RRRLR lotm:placate");
+            } else if (sequence == 6) {
+                executeCommand(server, "/abilityput LRRLL lotm:mindreading");
+                executeCommand(server, "/abilityput LLLLL lotm:awe");
+                executeCommand(server, "/abilityput LLLRL lotm:frenzy");
+                executeCommand(server, "/abilityput RRRLR lotm:placate");
+                executeCommand(server, "/abilityput RRRLL lotm:psychologicalinvisibility");
+            } else if (sequence == 5) {
+                executeCommand(server, "/abilityput LRRLL lotm:mindreading");
+                executeCommand(server, "/abilityput LLLLL lotm:awe");
+                executeCommand(server, "/abilityput LLLRL lotm:frenzy");
+                executeCommand(server, "/abilityput RRRLR lotm:placate");
+                executeCommand(server, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                executeCommand(server, "/abilityput RRRRR lotm:dreamwalking");
+            } else if (sequence == 4) {
+                executeCommand(server, "/abilityput LRRLL lotm:mindreading");
+                executeCommand(server, "/abilityput LLLLL lotm:awe");
+                executeCommand(server, "/abilityput LLLRL lotm:frenzy");
+                executeCommand(server, "/abilityput RRRLR lotm:placate");
+                executeCommand(server, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                executeCommand(server, "/abilityput RRRRR lotm:dreamwalking");
+                executeCommand(server, "/abilityput RRRRL lotm:dragonbreath");
+                executeCommand(server, "/abilityput RLLLL lotm:mindstorm");
+            } else if (sequence == 3) {
+                executeCommand(server, "/abilityput LRRLL lotm:mindreading");
+                executeCommand(server, "/abilityput LLLLL lotm:awe");
+                executeCommand(server, "/abilityput LLLRL lotm:frenzy");
+                executeCommand(server, "/abilityput RRRLR lotm:placate");
+                executeCommand(server, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                executeCommand(server, "/abilityput RRRRR lotm:dreamwalking");
+                executeCommand(server, "/abilityput RRRRL lotm:dragonbreath");
+                executeCommand(server, "/abilityput RLLLL lotm:plaguestorm");
+            } else if (sequence == 2) {
+                executeCommand(server, "/abilityput LRRLL lotm:mindreading");
+                executeCommand(server, "/abilityput LLLLL lotm:awe");
+                executeCommand(server, "/abilityput LLLRL lotm:frenzy");
+                executeCommand(server, "/abilityput RRRLR lotm:placate");
+                executeCommand(server, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                executeCommand(server, "/abilityput RRRRR lotm:dreamwalking");
+                executeCommand(server, "/abilityput RRRRL lotm:dragonbreath");
+                executeCommand(server, "/abilityput RLLLL lotm:plaguestorm");
+                executeCommand(server, "/abilityput RRLRR lotm:dreamintoreality");
+                executeCommand(server, "/abilityput LLLLR lotm:discern");
+            } else if (sequence == 1) {
+                executeCommand(server, "/abilityput LRRLL lotm:mindreading");
+                executeCommand(server, "/abilityput LLLLL lotm:awe");
+                executeCommand(server, "/abilityput LLLRL lotm:frenzy");
+                executeCommand(server, "/abilityput RRRLR lotm:placate");
+                executeCommand(server, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                executeCommand(server, "/abilityput RRRRR lotm:dreamwalking");
+                executeCommand(server, "/abilityput RRRRL lotm:dragonbreath");
+                executeCommand(server, "/abilityput RLLLL lotm:plaguestorm");
+                executeCommand(server, "/abilityput RRLRR lotm:dreamintoreality");
+                executeCommand(server, "/abilityput LLLLR lotm:discern");
+                executeCommand(server, "/abilityput LLRRR lotm:prophesizeblock");
+                executeCommand(server, "/abilityput LLRLR lotm:prophesizeplayer");
+                executeCommand(server, "/abilityput LLRLL lotm:prophesizedemise");
+                executeCommand(server, "/abilityput RRLLL lotm:meteorshower");
+            } else if (sequence == 0) {
+                executeCommand(server, "/abilityput LRRLL lotm:mindreading");
+                executeCommand(server, "/abilityput LLLLL lotm:awe");
+                executeCommand(server, "/abilityput LLLRL lotm:frenzy");
+                executeCommand(server, "/abilityput RRRLR lotm:placate");
+                executeCommand(server, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                executeCommand(server, "/abilityput RRRRR lotm:dreamwalking");
+                executeCommand(server, "/abilityput RRRRL lotm:dragonbreath");
+                executeCommand(server, "/abilityput RLLLL lotm:plaguestorm");
+                executeCommand(server, "/abilityput RRLRR lotm:dreamintoreality");
+                executeCommand(server, "/abilityput LLLLR lotm:discern");
+                executeCommand(server, "/abilityput LLRRR lotm:prophesizeblock");
+                executeCommand(server, "/abilityput LLRLR lotm:prophesizeplayer");
+                executeCommand(server, "/abilityput LLRLL lotm:prophesizedemise");
+                executeCommand(server, "/abilityput RRLLL lotm:meteorshower");
+                executeCommand(server, "/abilityput RLRRR lotm:envisionhealth");
+                executeCommand(server, "/abilityput RLLRR lotm:envisionbarrier");
+                executeCommand(server, "/abilityput LLRRL lotm:envisionlocationblink");
+            }
+        } else if (beyonderClass == BeyonderClassInit.MONSTER.get()) {
+            player.sendSystemMessage(Component.literal("monster"));
+            if (sequence == 9) {
+                executeCommand(server, "/abilityput RLRRL lotm:monsterdangersense");
+            } else if (sequence >= 8) {
+                executeCommand(server, "/abilityput RLRRL lotm:monsterdangersense");
+            } else if (sequence == 7) {
+                executeCommand(server, "/abilityput RLRRL lotm:monsterdangersense");
+                executeCommand(server, "/abilityput RRLLR lotm:luckperception");
+            } else if (sequence == 6) {
+                executeCommand(server, "/abilityput RLRRL lotm:monsterdangersense");
+                executeCommand(server, "/abilityput RRLLR lotm:luckperception");
+                executeCommand(server, "/abilityput LLLRR lotm:psychestorm");
+            } else if (sequence == 5) {
+                executeCommand(server, "/abilityput RLRRL lotm:monsterdangersense");
+                executeCommand(server, "/abilityput RRLLR lotm:luckperception");
+                executeCommand(server, "/abilityput LLLRR lotm:psychestorm");
+                executeCommand(server, "/abilityput RRLLL lotm:luckfuturetelling");
+                executeCommand(server, "/abilityput LLLLL lotm:misfortunebestowal");
+            } else if (sequence == 4) {
+                executeCommand(server, "/abilityput RLRRL lotm:monsterdangersense");
+                executeCommand(server, "/abilityput RRLLR lotm:luckperception");
+                executeCommand(server, "/abilityput LLLRR lotm:psychestorm");
+                executeCommand(server, "/abilityput RRLLL lotm:luckfuturetelling");
+                executeCommand(server, "/abilityput LLLLL lotm:misfortunebestowal");
+                executeCommand(server, "/abilityput LRRLL lotm:providencedomain");
+                executeCommand(server, "/abilityput LRLLL lotm:misfortunedomain");
+            } else if (sequence == 3) {
+                executeCommand(server, "/abilityput RLRRL lotm:monsterdangersense");
+                executeCommand(server, "/abilityput RRLLR lotm:luckperception");
+                executeCommand(server, "/abilityput LLLRR lotm:psychestorm");
+                executeCommand(server, "/abilityput RRLLL lotm:luckfuturetelling");
+                executeCommand(server, "/abilityput LLLLL lotm:misfortunebestowal");
+                executeCommand(server, "/abilityput LRRLL lotm:providencedomain");
+                executeCommand(server, "/abilityput LRLLL lotm:misfortunedomain");
+                executeCommand(server, "/abilityput RRRRR lotm:auraofchaos");
+                executeCommand(server, "/abilityput RRRRL lotm:chaoswalkercombat");
+                executeCommand(server, "/abilityput LRRRR lotm:enabledisableripple");
+            } else if (sequence == 2) {
+                executeCommand(server, "/abilityput RLRRL lotm:monsterdangersense");
+                executeCommand(server, "/abilityput RRLLR lotm:luckperception");
+                executeCommand(server, "/abilityput LLLRR lotm:psychestorm");
+                executeCommand(server, "/abilityput RRLLL lotm:luckfuturetelling");
+                executeCommand(server, "/abilityput LLLLL lotm:misfortunebestowal");
+                executeCommand(server, "/abilityput LRRLL lotm:providencedomain");
+                executeCommand(server, "/abilityput LRLLL lotm:misfortunedomain");
+                executeCommand(server, "/abilityput RRRRR lotm:auraofchaos");
+                executeCommand(server, "/abilityput RRRLL lotm:chaoswalkercombat");
+                executeCommand(server, "/abilityput LRRRR lotm:enabledisableripple");
+                executeCommand(server, "/abilityput RRRRL lotm:whispersofcorruption");
+                executeCommand(server, "/abilityput LRRRR lotm:misfortuneimplosion");
+            } else if (sequence == 1) {
+                executeCommand(server, "/abilityput RLRRL lotm:monsterdangersense");
+                executeCommand(server, "/abilityput RRLLR lotm:luckperception");
+                executeCommand(server, "/abilityput LLLRR lotm:psychestorm");
+                executeCommand(server, "/abilityput RRLLL lotm:luckfuturetelling");
+                executeCommand(server, "/abilityput LLLLL lotm:misfortunebestowal");
+                executeCommand(server, "/abilityput LRRLL lotm:providencedomain");
+                executeCommand(server, "/abilityput LRLLL lotm:misfortunedomain");
+                executeCommand(server, "/abilityput RRRRR lotm:auraofchaos");
+                executeCommand(server, "/abilityput RRRLL lotm:chaoswalkercombat");
+                executeCommand(server, "/abilityput LRRRR lotm:enabledisableripple");
+                executeCommand(server, "/abilityput RRRRL lotm:whispersofcorruption");
+                executeCommand(server, "/abilityput LRRRR lotm:misfortuneimplosion");
+                executeCommand(server, "/abilityput RLLLL lotm:rebootself");
+                executeCommand(server, "/abilityput RRRLR lotm:cycleoffate");
+                executeCommand(server, "/abilityput RRLRR lotm:fatereincarnation");
+            } else if (sequence == 0) {
+                executeCommand(server, "/abilityput RLRRL lotm:monsterdangersense");
+                executeCommand(server, "/abilityput RRLLR lotm:luckperception");
+                executeCommand(server, "/abilityput LLLRR lotm:psychestorm");
+                executeCommand(server, "/abilityput RRLLL lotm:luckfuturetelling");
+                executeCommand(server, "/abilityput LLLLL lotm:misfortunebestowal");
+                executeCommand(server, "/abilityput LRRLL lotm:providencedomain");
+                executeCommand(server, "/abilityput LRLLL lotm:misfortunedomain");
+                executeCommand(server, "/abilityput RRRRR lotm:auraofchaos");
+                executeCommand(server, "/abilityput RRRLL lotm:chaoswalkercombat");
+                executeCommand(server, "/abilityput LRRRR lotm:enabledisableripple");
+                executeCommand(server, "/abilityput RRRRL lotm:whispersofcorruption");
+                executeCommand(server, "/abilityput LRRRR lotm:misfortuneimplosion");
+                executeCommand(server, "/abilityput RLLLL lotm:rebootself");
+                executeCommand(server, "/abilityput RRRLR lotm:cycleoffate");
+                executeCommand(server, "/abilityput RRLRR lotm:fatereincarnation");
+                executeCommand(server, "/abilityput LLLRL lotm:probabilityinfinitefortune");
+                executeCommand(server, "/abilityput RLRRR lotm:probabilityinfinitemisfortune");
+                executeCommand(server, "/abilityput LRLRL lotm:probabilityfortune");
+                executeCommand(server, "/abilityput RLRLR lotm:probabilitymisfortune");
+            }
+        } else if (beyonderClass == BeyonderClassInit.SAILOR.get()) {
+            player.sendSystemMessage(Component.literal("sailor"));
+            if (sequence == 9) {
+                player.sendSystemMessage(Component.literal("No abilities to register"));
+            } else if (sequence >= 8) {
+                executeCommand(server, "/abilityput LLLLL lotm:ragingblows");
+            } else if (sequence == 7) {
+                executeCommand(server, "/abilityput LLLLL lotm:ragingblows");
+            } else if (sequence == 6) {
+                executeCommand(server, "/abilityput LLLLL lotm:ragingblows");
+            } else if (sequence == 5) {
+                executeCommand(server, "/abilityput LLLLL lotm:ragingblows");
+                executeCommand(server, "/abilityput RRRRR lotm:sailorlightning");
+                executeCommand(server, "/abilityput LLRRL lotm:acidicrain");
+                executeCommand(server, "/abilityput LRRLL lotm:watersphere");
+            } else if (sequence == 4) {
+                executeCommand(server, "/abilityput LLLLL lotm:ragingblows");
+                executeCommand(server, "/abilityput RRRRR lotm:sailorlightning");
+                executeCommand(server, "/abilityput LLRRL lotm:acidicrain");
+                executeCommand(server, "/abilityput LRRLL lotm:watersphere");
+                executeCommand(server, "/abilityput LLLRR lotm:tornado");
+                executeCommand(server, "/abilityput LLLLR lotm:roar");
+                executeCommand(server, "/abilityput RRRLL lotm:earthquake");
+            } else if (sequence == 3) {
+                executeCommand(server, "/abilityput LLLLL lotm:ragingblows");
+                executeCommand(server, "/abilityput RRRRR lotm:sailorlightning");
+                executeCommand(server, "/abilityput LLRRL lotm:acidicrain");
+                executeCommand(server, "/abilityput LRRLL lotm:watersphere");
+                executeCommand(server, "/abilityput LLLRR lotm:tornado");
+                executeCommand(server, "/abilityput LLLLR lotm:roar");
+                executeCommand(server, "/abilityput RRRLL lotm:earthquake");
+                executeCommand(server, "/abilityput LRRRR lotm:sonicboom");
+                executeCommand(server, "/abilityput RRRRL lotm:lightningbranch");
+                executeCommand(server, "/abilityput RRLLR lotm:thunderclap");
+            } else if (sequence == 2) {
+                executeCommand(server, "/abilityput LLLLL lotm:ragingblows");
+                executeCommand(server, "/abilityput RRRRR lotm:sailorlightning");
+                executeCommand(server, "/abilityput LLRRL lotm:acidicrain");
+                executeCommand(server, "/abilityput LRRLL lotm:watersphere");
+                executeCommand(server, "/abilityput LLLRR lotm:tornado");
+                executeCommand(server, "/abilityput LLLLR lotm:roar");
+                executeCommand(server, "/abilityput RRRLL lotm:earthquake");
+                executeCommand(server, "/abilityput LRRRR lotm:sonicboom");
+                executeCommand(server, "/abilityput RRRRL lotm:lightningbranch");
+                executeCommand(server, "/abilityput RRLLR lotm:thunderclap");
+                executeCommand(server, "/abilityput LRLRL lotm:lightningball");
+                executeCommand(server, "/abilityput RRLLL lotm:extremecoldness");
+                executeCommand(server, "/abilityput LRRLR lotm:raineyes");
+                executeCommand(server, "/abilityput RLRRL lotm:volcaniceruption");
+            } else if (sequence == 1) {
+
+                executeCommand(server, "/abilityput LLLLL lotm:ragingblows");
+                executeCommand(server, "/abilityput RRRRR lotm:sailorlightning");
+                executeCommand(server, "/abilityput LLRRL lotm:acidicrain");
+                executeCommand(server, "/abilityput LRRLL lotm:watersphere");
+                executeCommand(server, "/abilityput LLLRR lotm:tornado");
+                executeCommand(server, "/abilityput LLLLR lotm:roar");
+                executeCommand(server, "/abilityput RRRLL lotm:earthquake");
+                executeCommand(server, "/abilityput LRRRR lotm:sonicboom");
+                executeCommand(server, "/abilityput RRRRL lotm:lightningbranch");
+                executeCommand(server, "/abilityput RRLLR lotm:thunderclap");
+                executeCommand(server, "/abilityput LRLRL lotm:lightningball");
+                executeCommand(server, "/abilityput RRLLL lotm:extremecoldness");
+                executeCommand(server, "/abilityput LRRLR lotm:raineyes");
+                executeCommand(server, "/abilityput RLRRL lotm:volcaniceruption");
+                executeCommand(server, "/abilityput LRLLL lotm:lightningballabsorb");
+                executeCommand(server, "/abilityput RRRLR lotm:sailorlightningtravel");
+                executeCommand(server, "/abilityput LLRRR lotm:staroflightning");
+                executeCommand(server, "/abilityput LRLLR lotm:lightningredirection");
+
+            } else if (sequence == 0) {
+                executeCommand(server, "/abilityput LLLLL lotm:ragingblows");
+                executeCommand(server, "/abilityput RRRRR lotm:sailorlightning");
+                executeCommand(server, "/abilityput LLRRL lotm:acidicrain");
+                executeCommand(server, "/abilityput LRRLL lotm:watersphere");
+                executeCommand(server, "/abilityput LLLRR lotm:tornado");
+                executeCommand(server, "/abilityput LLLLR lotm:roar");
+                executeCommand(server, "/abilityput RRRLL lotm:earthquake");
+                executeCommand(server, "/abilityput LRRRR lotm:sonicboom");
+                executeCommand(server, "/abilityput RRRRL lotm:lightningbranch");
+                executeCommand(server, "/abilityput RRLLR lotm:thunderclap");
+                executeCommand(server, "/abilityput LRLRL lotm:lightningball");
+                executeCommand(server, "/abilityput RRLLL lotm:extremecoldness");
+                executeCommand(server, "/abilityput LRRLR lotm:raineyes");
+                executeCommand(server, "/abilityput RLRRL lotm:volcaniceruption");
+                executeCommand(server, "/abilityput LRLLL lotm:lightningballabsorb");
+                executeCommand(server, "/abilityput RRRLR lotm:sailorlightningtravel");
+                executeCommand(server, "/abilityput LLRRR lotm:staroflightning");
+                executeCommand(server, "/abilityput LRLLR lotm:lightningredirection");
+                executeCommand(server, "/abilityput RLLLL lotm:tyranny");
+                executeCommand(server, "/abilityput RLLLR lotm:stormseal");
+            }
+        }
+    }
+
+
 
     public static boolean isPhysicalDamage(DamageSource source) {
         return source.is(DamageTypes.FALL) || source.is(DamageTypes.CACTUS) || source.is(DamageTypes.FLY_INTO_WALL) || source.is(DamageTypes.GENERIC) || source.is(DamageTypes.FALLING_BLOCK) || source.is(DamageTypes.FALLING_ANVIL) || source.is(DamageTypes.FALLING_STALACTITE) || source.is(DamageTypes.STING) ||
@@ -1171,5 +1483,5 @@ public class BeyonderUtil {
             }
         }
     }
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
 }

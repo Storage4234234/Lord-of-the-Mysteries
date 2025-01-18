@@ -42,7 +42,7 @@ import java.util.List;
 public class ProphesizeDemise extends SimpleAbilityItem {
 
     public ProphesizeDemise(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 1, 1000, 0, 400, 400);
+        super(properties, BeyonderClassInit.SPECTATOR, 1, 1000, 3000, 400, 400);
     }
 
     @Override

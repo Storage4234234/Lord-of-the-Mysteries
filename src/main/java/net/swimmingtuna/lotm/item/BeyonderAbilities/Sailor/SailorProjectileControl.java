@@ -19,7 +19,7 @@ import java.util.List;
 
 public class SailorProjectileControl extends SimpleAbilityItem {
     public SailorProjectileControl(Properties properties) {
-        super(properties, BeyonderClassInit.SAILOR, 9, 0, 0);
+        super(properties, BeyonderClassInit.SAILOR, 9, 0, 20);
     }
 
     @Override

@@ -34,7 +34,7 @@ import java.util.Set;
 public class MatterAccelerationSelf extends SimpleAbilityItem {
 
     public MatterAccelerationSelf(Properties properties) {
-        super(properties, BeyonderClassInit.SAILOR, 0, 0, 300); //cooldown fix for all items that rely on smth
+        super(properties, BeyonderClassInit.SAILOR, 0, 0, 300);
     }
 
     @Override

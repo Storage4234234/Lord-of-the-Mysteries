@@ -8,6 +8,7 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
@@ -73,6 +74,7 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
@@ -93,10 +95,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.LightOfDawn;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
-import net.swimmingtuna.lotm.networking.packet.BatchedSpiritWorldUpdatePacketS2C;
-import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
-import net.swimmingtuna.lotm.networking.packet.SyncLeftClickCooldownS2C;
-import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderInvisibilityPacketS2C;
+import net.swimmingtuna.lotm.networking.packet.*;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.AllyInformation.PlayerAllyData;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
@@ -113,15 +112,17 @@ import virtuoel.pehkui.api.ScaleTypes;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.ProbabilityManipulationWorldFortune.probabilityManipulationWorld;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.CalamityIncarnationTsunami.calamityIncarnationTsunamiTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.Earthquake.isOnSurface;
+import static net.swimmingtuna.lotm.util.BeyonderUtil.getAbilities;
 import static net.swimmingtuna.lotm.world.worldgen.dimension.DimensionInit.SPIRIT_WORLD_LEVEL_KEY;
 
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID)
 public class ModEvents {
-
+    private static final Map<Item, Integer> abilityCooldowns = new HashMap<>();
 
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
@@ -236,6 +237,7 @@ public class ModEvents {
                 if (holder.getCurrentSequence() != 0 && ClientSequenceData.getCurrentSequence() == 0) {
                     ClientSequenceData.setCurrentSequence(-1);
                 }
+
             }
 
 
@@ -245,6 +247,7 @@ public class ModEvents {
                 setCooldown(serverPlayer, currentCooldown);
             }
         }
+        abilityCooldownsServerTick(event);
 
 
         Map<String, Long> times = new HashMap<>();
@@ -1799,13 +1802,13 @@ public class ModEvents {
         //MISFORTUNE MANIPULATION
         if (livingEntity.tickCount % 5 == 0) {
             CompoundTag tag = livingEntity.getPersistentData();
-            int sailorLightningStorm1 = tag.getInt("sailorLightningStorm1");
-            int x1 = livingEntity.getPersistentData().getInt("sailorStormVecX1");
-            int y1 = livingEntity.getPersistentData().getInt("sailorStormVecY1");
-            int z1 = livingEntity.getPersistentData().getInt("sailorStormVecZ1");
-            if (sailorLightningStorm1 >= 1) {
+            int sailorLightningStorm2 = tag.getInt("sailorLightningStorm2");
+            int x1 = livingEntity.getPersistentData().getInt("sailorStormVecX2");
+            int y1 = livingEntity.getPersistentData().getInt("sailorStormVecY2");
+            int z1 = livingEntity.getPersistentData().getInt("sailorStormVecZ2");
+            if (sailorLightningStorm2 >= 1) {
                 Random random = new Random();
-                tag.putInt("sailorLightningStorm1", sailorLightningStorm1 - 1);
+                tag.putInt("sailorLightningStorm2", sailorLightningStorm2 - 1);
                 LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), livingEntity.level());
                 lightningEntity.setSpeed(7.0f);
                 lightningEntity.setDamage(8);
@@ -1851,6 +1854,7 @@ public class ModEvents {
             AuraOfChaos.auraOfChaos(event);
             NoRegenerationEffect.preventRegeneration(entity);
             MisfortuneRedirection.misfortuneLivingTickEvent(event);
+            livingLightningStorm(entity);
             LightOfDawn.sunriseGleamTick(event);
             doubleProphecyDamageHelper(event);
             showMonsterParticles(entity);
@@ -2215,9 +2219,6 @@ public class ModEvents {
                 int z = tag.getInt("stormSealZ");
                 tag.putInt("inStormSeal", tag.getInt("inStormSeal") - 1);
                 entity.teleportTo(x, y, z);
-            }
-            if (!(entity instanceof Player)) {
-                livingLightningStorm(entity);
             }
         }
     }
@@ -2649,7 +2650,7 @@ public class ModEvents {
                             List<SimpleAbilityItem> validAbilities = new ArrayList<>();
 
                             // First collect all valid abilities
-                            for (Item item : BeyonderUtil.getAbilities(pPlayer)) {
+                            for (Item item : getAbilities(pPlayer)) {
                                 if (item instanceof SimpleAbilityItem simpleAbilityItem) {  // Changed to SimpleAbilityItem instead of Ability
                                     boolean hasEntityInteraction = false;
                                     try {
@@ -2702,7 +2703,7 @@ public class ModEvents {
                     } else
                     if (randomInt == 13) {
                         if (livingEntity instanceof Player itemPlayer) {
-                            for (Item item : BeyonderUtil.getAbilities(itemPlayer)) {
+                            for (Item item : getAbilities(itemPlayer)) {
                                 if (item instanceof SimpleAbilityItem simpleAbilityItem) {
                                     int currentCooldown = (int) player.getCooldowns().getCooldownPercent(item, 0);
                                     int cooldownToSet = simpleAbilityItem.getCooldown() * (100 - currentCooldown) + (enhancement * 10);
@@ -4250,6 +4251,48 @@ public class ModEvents {
         }
     }
 
+    public static void abilityCooldownsServerTick(TickEvent.PlayerTickEvent event) {
+        Player player = event.player;
+        if (!player.level().isClientSide()) {
+            if (player instanceof ServerPlayer serverPlayer) {
+                Map<String, Integer> cooldowns = new HashMap<>();
+
+                // Get the player's persistent data to access registered ability combinations
+                CompoundTag tag = serverPlayer.getPersistentData();
+                if (tag.contains(AbilityRegisterCommand.REGISTERED_ABILITIES_KEY, Tag.TAG_COMPOUND)) {
+                    CompoundTag registeredAbilities = tag.getCompound(AbilityRegisterCommand.REGISTERED_ABILITIES_KEY);
+
+                    // For each registered ability combination
+                    for (String combinationNumber : registeredAbilities.getAllKeys()) {
+                        String abilityResourceLocationString = registeredAbilities.getString(combinationNumber);
+                        ResourceLocation resourceLocation = new ResourceLocation(abilityResourceLocationString);
+                        Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
+
+                        if (item instanceof SimpleAbilityItem simpleAbilityItem && player.getCooldowns().isOnCooldown(item)) {
+                            float cooldownPercent = player.getCooldowns().getCooldownPercent(item, 0.0F);
+                            if (cooldownPercent > 0) {
+                                int totalCooldown = simpleAbilityItem.getCooldown();
+                                int remainingCooldown = (int) (totalCooldown * cooldownPercent);
+
+                                if (remainingCooldown > 0) {
+                                    // Convert combination number to actual combination string (LLLLL, RRRRR, etc.)
+                                    String combination = AbilityRegisterCommand.findCombinationForNumber(Integer.parseInt(combinationNumber));
+                                    if (!combination.isEmpty()) {
+                                        cooldowns.put(combination, remainingCooldown);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!cooldowns.isEmpty()) {
+                    SyncAbilityCooldownsS2C syncPacket = new SyncAbilityCooldownsS2C(cooldowns);
+                    LOTMNetworkHandler.sendToPlayer(syncPacket, serverPlayer);
+                }
+            }
+        }
+    }
 
 
 //@SubscribeEvent

@@ -30,7 +30,7 @@ import java.util.List;
 public class EnvisionLocationBlink extends SimpleAbilityItem {
 
     public EnvisionLocationBlink(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 0, 0, 0);
+        super(properties, BeyonderClassInit.SPECTATOR, 0, 0, 20);
     }
 
     @Override

@@ -33,7 +33,7 @@ import java.util.List;
 public class MentalPlague extends SimpleAbilityItem {
 
     public MentalPlague(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 4, 200, 0,100,100);
+        super(properties, BeyonderClassInit.SPECTATOR, 4, 200, 200,100,100);
     }
 
     @Override

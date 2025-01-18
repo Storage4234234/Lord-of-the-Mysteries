@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -60,6 +61,17 @@ public class AbilityRegisterCommand {
                                         StringArgumentType.getString(context, "combination"),
                                         ResourceArgument.getResource(context, "item", Registries.ITEM)
                                 )))));
+        dispatcher.register(Commands.literal("abilityput")
+                .then(Commands.literal("load")
+                        .executes(context -> {
+                            BeyonderUtil.registerAbilities(
+                                    context.getSource().getPlayerOrException(),
+                                    context.getSource().getPlayerOrException().getServer()
+                            );
+                            context.getSource().sendSuccess(() ->
+                                    Component.literal("Loaded all pathway abilities").withStyle(ChatFormatting.GREEN), true);
+                            return 1;
+                        })));
     }
 
     private static int registerAbility(CommandSourceStack source, String combination, Holder.Reference<Item> itemReference) throws CommandSyntaxException {
@@ -131,7 +143,7 @@ public class AbilityRegisterCommand {
         syncRegisteredAbilitiesToClient(player);
     }
 
-    private static String findCombinationForNumber(int number) {
+    public static String findCombinationForNumber(int number) {
         for (Map.Entry<String, Integer> entry : COMBINATION_MAP.entrySet()) {
             if (entry.getValue() == number) {
                 return entry.getKey();

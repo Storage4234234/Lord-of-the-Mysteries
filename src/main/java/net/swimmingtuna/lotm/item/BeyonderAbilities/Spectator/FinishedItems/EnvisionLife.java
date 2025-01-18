@@ -28,7 +28,7 @@ import java.util.List;
 public class EnvisionLife extends SimpleAbilityItem {
 
     public EnvisionLife(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 0, 0, 0);
+        super(properties, BeyonderClassInit.SPECTATOR, 0, 0, 400);
     }
 
 
@@ -60,8 +60,9 @@ public class EnvisionLife extends SimpleAbilityItem {
 
             EntityType<?> entityType = ForgeRegistries.ENTITY_TYPES.getValue(resourceLocation);
 
+            int cooldownTimer = (int) player.getCooldowns().getCooldownPercent(ItemInit.ENVISION_LIFE.get(), 0.0f);
             int waitMakeLifeCounter = player.getPersistentData().getInt("waitMakeLifeTimer");
-            if (waitMakeLifeCounter == 0) {
+            if (cooldownTimer == 0) {
                 Entity entity = entityType.create(level);
                 if (entity != null && entity instanceof Mob mob) {
                     entity.setPos(x, y, z);
@@ -84,7 +85,7 @@ public class EnvisionLife extends SimpleAbilityItem {
                     if (holder.getSpirituality() >= mob.getMaxHealth() * BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LIFE.get())) {
                         holder.useSpirituality((int) (mob.getMaxHealth() * BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LIFE.get())));
                         level.addFreshEntity(entity);
-
+                        player.getCooldowns().addCooldown(ItemInit.ENVISION_LIFE.get(), 400);
                         // Get the translated name of the entity
                         String entityName = entity.getType().getDescription().getString();
                         player.displayClientMessage(Component.literal("Envisioned a " + entityName + " into the world").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLUE), true);
@@ -95,7 +96,7 @@ public class EnvisionLife extends SimpleAbilityItem {
                     }
                 }
             } else {
-                player.sendSystemMessage(Component.literal("Ability on Cooldown for " + (400 - waitMakeLifeCounter) / 20 + " seconds"));
+                player.sendSystemMessage(Component.literal("Ability on Cooldown for " + (400 - cooldownTimer) / 20 + " seconds"));
             }
         }
     }

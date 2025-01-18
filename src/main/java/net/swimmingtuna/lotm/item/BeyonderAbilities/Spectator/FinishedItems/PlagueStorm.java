@@ -45,6 +45,8 @@ public class PlagueStorm extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         addCooldown(player);
+        addCooldown(player, ItemInit.MENTAL_PLAGUE.get(), 200);
+        addCooldown(player, ItemInit.MIND_STORM.get(), 200);
         useSpirituality(player);
         plagueStorm(player, interactionTarget);
         return InteractionResult.SUCCESS;

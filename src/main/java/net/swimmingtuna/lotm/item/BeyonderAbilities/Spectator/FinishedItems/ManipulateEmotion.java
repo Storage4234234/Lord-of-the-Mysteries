@@ -26,7 +26,7 @@ import java.util.List;
 public class ManipulateEmotion extends SimpleAbilityItem {
 
     public ManipulateEmotion(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 4, 500, 0);
+        super(properties, BeyonderClassInit.SPECTATOR, 4, 500, 1200);
     }
 
 
