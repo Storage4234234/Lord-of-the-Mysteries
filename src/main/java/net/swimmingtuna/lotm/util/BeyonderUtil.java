@@ -987,7 +987,7 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.ENVISION_WEATHER.get(), (float) (500.0f / dreamIntoReality) / abilityWeakness);
         damageMap.put(ItemInit.FRENZY.get(), (float) ((15.0f - sequence) * dreamIntoReality) / abilityWeakness);
         damageMap.put(ItemInit.MANIPULATE_MOVEMENT.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.MANIPULATE_EMOTION.get(), (50.0f - (sequence * 5)) / abilityWeakness);
+        damageMap.put(ItemInit.MANIPULATE_EMOTION.get(), (30.0f - (sequence * 3)) / abilityWeakness);
         damageMap.put(ItemInit.MANIPULATE_FONDNESS.get(), (float) (600.0f * dreamIntoReality) / abilityWeakness);
         damageMap.put(ItemInit.MENTAL_PLAGUE.get(), (float) (200.0f / dreamIntoReality) * abilityWeakness);
         damageMap.put(ItemInit.METEOR_NO_LEVEL_SHOWER.get(), (float) ((10.0f + dreamIntoReality * 2) - (4 * sequence)) / abilityWeakness);

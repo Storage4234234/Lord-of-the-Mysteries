@@ -20,6 +20,9 @@ public class EntityInit {
     public static final RegistryObject<EntityType<DawnRayEntity>> DAWN_RAY_ENTITY =
             ENTITIES.register("dawn_ray_entity", () -> EntityType.Builder.<DawnRayEntity>of(DawnRayEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).build(new ResourceLocation(LOTM.MOD_ID, "dawn_ray_entity").toString()));
+    public static final RegistryObject<EntityType<GuardianBoxEntity>> GUARDIAN_BOX_ENTITY =
+            ENTITIES.register("guardian_box_entity", () -> EntityType.Builder.<GuardianBoxEntity>of(GuardianBoxEntity::new, MobCategory.MISC)
+                    .sized(0.5f,0.5f).build(new ResourceLocation(LOTM.MOD_ID, "guardian_box_entity").toString()));
     public static final RegistryObject<EntityType<DeathKnellBulletEntity>> DEATH_KNELL_BULLET_ENTITY =
             ENTITIES.register("death_knell_bullet", () -> EntityType.Builder.<DeathKnellBulletEntity>of(DeathKnellBulletEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).build(new ResourceLocation(LOTM.MOD_ID, "death_knell_bullet").toString()));

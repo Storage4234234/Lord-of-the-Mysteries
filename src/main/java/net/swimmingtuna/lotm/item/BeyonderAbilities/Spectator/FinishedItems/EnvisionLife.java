@@ -3,10 +3,8 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -20,9 +18,7 @@ import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class EnvisionLife extends SimpleAbilityItem {
@@ -45,55 +41,60 @@ public class EnvisionLife extends SimpleAbilityItem {
 
 
     public static void spawnMob(Player player, String mobName) {
-        if (!player.level().isClientSide()) {
+        if (!player.level().isClientSide() && player.level() instanceof ServerLevel serverLevel) {
             Level level = player.level();
-            double x = player.getX();
-            double y = player.getY();
-            double z = player.getZ();
-
-            // Create resource location and check if it exists in registry
             ResourceLocation resourceLocation = new ResourceLocation(mobName);
+
             if (!ForgeRegistries.ENTITY_TYPES.containsKey(resourceLocation)) {
                 player.sendSystemMessage(Component.literal("Invalid mob name: " + mobName));
                 return;
             }
 
             EntityType<?> entityType = ForgeRegistries.ENTITY_TYPES.getValue(resourceLocation);
-
             int cooldownTimer = (int) player.getCooldowns().getCooldownPercent(ItemInit.ENVISION_LIFE.get(), 0.0f);
-            int waitMakeLifeCounter = player.getPersistentData().getInt("waitMakeLifeTimer");
+
             if (cooldownTimer == 0) {
-                Entity entity = entityType.create(level);
-                if (entity != null && entity instanceof Mob mob) {
-                    entity.setPos(x, y, z);
-                    LivingEntity highestHealthTarget = null;
-                    float maxHealth = Float.MIN_VALUE;
-                    for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(150))) {
-                        if (livingEntity != player) {
-                            float currentHealth = livingEntity.getHealth();
-                            if (currentHealth > maxHealth) {
-                                maxHealth = currentHealth;
-                                highestHealthTarget = livingEntity;
-                            }
+                // Find highest health target
+                LivingEntity highestHealthTarget = null;
+                float maxHealth = Float.MIN_VALUE;
+                for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(150))) {
+                    if (livingEntity != player) {
+                        float currentHealth = livingEntity.getHealth();
+                        if (currentHealth > maxHealth) {
+                            maxHealth = currentHealth;
+                            highestHealthTarget = livingEntity;
                         }
                     }
-                    if (highestHealthTarget != null) {
-                        ((Mob) entity).setTarget(highestHealthTarget);
-                    }
+                }
 
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                    if (holder.getSpirituality() >= mob.getMaxHealth() * BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LIFE.get())) {
-                        holder.useSpirituality((int) (mob.getMaxHealth() * BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LIFE.get())));
-                        level.addFreshEntity(entity);
-                        player.getCooldowns().addCooldown(ItemInit.ENVISION_LIFE.get(), 400);
-                        // Get the translated name of the entity
-                        String entityName = entity.getType().getDescription().getString();
-                        player.displayClientMessage(Component.literal("Envisioned a " + entityName + " into the world").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLUE), true);
-                    } else {
-                        // Get the translated name for the error message too
-                        String entityName = entity.getType().getDescription().getString();
-                        player.sendSystemMessage(Component.literal("You need " + (mob.getMaxHealth() * BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LIFE.get()) - holder.getSpirituality()) + " more spirituality in order to envision " + entityName));
+                // Spawn the entity using EntityType.spawn
+                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                if (entityType != null) {
+                    Entity entity = entityType.spawn(serverLevel, player.blockPosition(), MobSpawnType.NATURAL);
+
+                    if (entity instanceof Mob mob) {
+                        if (holder.getSpirituality() >= mob.getMaxHealth() * BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LIFE.get())) {
+                            holder.useSpirituality((int) (mob.getMaxHealth() * BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LIFE.get())));
+
+                            if (highestHealthTarget != null) {
+                                mob.setTarget(highestHealthTarget);
+                            }
+
+                            player.getCooldowns().addCooldown(ItemInit.ENVISION_LIFE.get(), 400);
+                            String entityName = entity.getType().getDescription().getString();
+                            player.displayClientMessage(Component.literal("Envisioned a " + entityName + " into the world")
+                                    .withStyle(ChatFormatting.BOLD)
+                                    .withStyle(ChatFormatting.BLUE), true);
+                        } else {
+                            entity.remove(Entity.RemovalReason.DISCARDED);
+                            String entityName = entity.getType().getDescription().getString();
+                            player.sendSystemMessage(Component.literal("You need " +
+                                    (mob.getMaxHealth() * BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LIFE.get()) - holder.getSpirituality()) +
+                                    " more spirituality in order to envision " + entityName));
+                        }
                     }
+                } else {
+                    player.sendSystemMessage(Component.literal("Entity doesn't exist").withStyle(ChatFormatting.RED));
                 }
             } else {
                 player.sendSystemMessage(Component.literal("Ability on Cooldown for " + (400 - cooldownTimer) / 20 + " seconds"));
@@ -101,18 +102,6 @@ public class EnvisionLife extends SimpleAbilityItem {
         }
     }
 
-    @Nullable
-    private static Player findNearestPlayer(Level world, double x, double y, double z, double range, Player excludedPlayer) {
-        List<Player> players = world.getEntitiesOfClass(Player.class, excludedPlayer.getBoundingBox().inflate(range), player -> player != excludedPlayer);
-        if (players.isEmpty()) {
-            return null;
-        }
-
-
-        players.sort(Comparator.comparing(player -> player.distanceToSqr(x, y, z)));
-
-        return players.get(0);
-    }
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);

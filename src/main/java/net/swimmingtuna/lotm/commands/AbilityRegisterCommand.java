@@ -2,6 +2,7 @@ package net.swimmingtuna.lotm.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.ChatFormatting;
@@ -15,14 +16,22 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
+import net.swimmingtuna.lotm.caps.BeyonderHolder;
+import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Ability;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.ClearAbilitiesS2C;
 import net.swimmingtuna.lotm.networking.packet.SyncAbilitiesS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
+import net.swimmingtuna.lotm.world.worlddata.BeyonderRecipeData;
 
 import java.util.HashMap;
 import java.util.List;
@@ -63,21 +72,14 @@ public class AbilityRegisterCommand {
                                 )))));
         dispatcher.register(Commands.literal("abilityput")
                 .then(Commands.literal("load")
-                        .executes(context -> {
-                            BeyonderUtil.registerAbilities(
-                                    context.getSource().getPlayerOrException(),
-                                    context.getSource().getPlayerOrException().getServer()
-                            );
-                            context.getSource().sendSuccess(() ->
-                                    Component.literal("Loaded all pathway abilities").withStyle(ChatFormatting.GREEN), true);
-                            return 1;
-                        })));
+                        .executes(AbilityRegisterCommand::loadBeyonderAbilities)));
+
     }
 
     private static int registerAbility(CommandSourceStack source, String combination, Holder.Reference<Item> itemReference) throws CommandSyntaxException {
         ServerPlayer player = source.getPlayerOrException();
         if (!COMBINATION_MAP.containsKey(combination)) {
-            source.sendFailure(Component.literal("Invalid combination. Please use a valid 5-character combination of L and R."));
+            source.sendFailure(Component.literal("Invalid combination. Please use a valid 5-character combination of L and R.").withStyle(ChatFormatting.RED));
             return 0;
         }
         int combinationNumber = COMBINATION_MAP.get(combination);
@@ -89,7 +91,7 @@ public class AbilityRegisterCommand {
             throw NOT_ABILITY.create(resourceLocation);
         }
         if (!availableAbilities.contains(item)) {
-            source.sendFailure(Component.literal("Ability not available: " + itemReference));
+            source.sendFailure(Component.literal("Ability not available: " + itemReference).withStyle(ChatFormatting.RED));
             return 0;
         }
 
@@ -104,7 +106,7 @@ public class AbilityRegisterCommand {
 
         registeredAbilities.putString(String.valueOf(combinationNumber), resourceLocation.toString());
         tag.put(REGISTERED_ABILITIES_KEY, registeredAbilities);
-        source.sendSuccess(() -> Component.literal("Added ability: ").append(Component.translatable(item.getDescriptionId())).append(Component.literal(" for combination " + combination)), true);
+        source.sendSuccess(() -> Component.literal("Added ability: ").append(Component.translatable(item.getDescriptionId())).append(Component.literal(" for combination " + combination).withStyle(ChatFormatting.GREEN)), true);
 
         return 1;
     }
@@ -133,7 +135,7 @@ public class AbilityRegisterCommand {
             }
             if (abilitiesToSync.isEmpty()) {
                 LOTMNetworkHandler.sendToPlayer(new ClearAbilitiesS2C(), player);
-                player.sendSystemMessage(Component.literal("Cleared Abilities"));
+                player.sendSystemMessage(Component.literal("Cleared Abilities").withStyle(ChatFormatting.GREEN));
             }
         }
     }
@@ -150,5 +152,307 @@ public class AbilityRegisterCommand {
             }
         }
         return "";
+    }
+
+    private static int loadBeyonderAbilities(CommandContext<CommandSourceStack> context) {
+        try {
+            ServerLevel level = context.getSource().getLevel();
+            BeyonderRecipeData recipeData = BeyonderRecipeData.getInstance(level);
+            recipeData.clearRecipes();
+            loadAbilities(context);
+            context.getSource().sendSuccess(() -> Component.literal("Successfully registered all available beyonder abilities!")
+                    .withStyle(ChatFormatting.GREEN), true);
+            return 1;
+        } catch (Exception e) {
+            context.getSource().sendFailure(Component.literal("Error loading beyonder ability: " + e.getMessage())
+                    .withStyle(ChatFormatting.RED));
+            return 0;
+        }
+    }
+
+    private static void excecuteAbilityCommand(CommandContext<CommandSourceStack> context, String command) {
+        try {
+            context.getSource().getServer().getCommands().performPrefixedCommand(
+                    context.getSource(), command.substring(1)); // Remove the leading '/' from command
+        } catch (Exception e) {
+            context.getSource().sendFailure(Component.literal("Failed to load abilities")
+                    .withStyle(ChatFormatting.RED));
+        }
+    }
+
+    private static void loadAbilities(CommandContext<CommandSourceStack> context) {
+        Player player = context.getSource().getPlayer();
+        if (player != null) {
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+            int sequence = BeyonderUtil.getSequence(player);
+            BeyonderClass beyonderClass = holder.getCurrentClass();
+            if (beyonderClass == BeyonderClassInit.SPECTATOR.get()) {
+                if (sequence == 9) {
+                    player.sendSystemMessage(Component.literal("No abilities to register"));
+                } else if (sequence >= 8) {
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
+                } else if (sequence == 7) {
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
+                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
+                } else if (sequence == 6) {
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
+                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                } else if (sequence == 5) {
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
+                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dreamwalking");
+                } else if (sequence == 4) {
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
+                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dreamwalking");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dragonbreath");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:mindstorm");
+                } else if (sequence == 3) {
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
+                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dreamwalking");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dragonbreath");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:plaguestorm");
+                } else if (sequence == 2) {
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
+                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dreamwalking");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dragonbreath");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:plaguestorm");
+                    excecuteAbilityCommand(context, "/abilityput RRLRR lotm:dreamintoreality");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:discern");
+                } else if (sequence == 1) {
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
+                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dreamwalking");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dragonbreath");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:plaguestorm");
+                    excecuteAbilityCommand(context, "/abilityput RRLRR lotm:dreamintoreality");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:discern");
+                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:prophesizeblock");
+                    excecuteAbilityCommand(context, "/abilityput LLRLR lotm:prophesizeplayer");
+                    excecuteAbilityCommand(context, "/abilityput LLRLL lotm:prophesizedemise");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:meteorshower");
+                } else if (sequence == 0) {
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
+                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dreamwalking");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dragonbreath");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:plaguestorm");
+                    excecuteAbilityCommand(context, "/abilityput RRLRR lotm:dreamintoreality");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:discern");
+                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:prophesizeblock");
+                    excecuteAbilityCommand(context, "/abilityput LLRLR lotm:prophesizeplayer");
+                    excecuteAbilityCommand(context, "/abilityput LLRLL lotm:prophesizedemise");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:meteorshower");
+                    excecuteAbilityCommand(context, "/abilityput RLRRR lotm:envisionhealth");
+                    excecuteAbilityCommand(context, "/abilityput RLLRR lotm:envisionbarrier");
+                    excecuteAbilityCommand(context, "/abilityput LLRRL lotm:envisionlocationblink");
+                }
+            } else if (beyonderClass == BeyonderClassInit.MONSTER.get()) {
+                player.sendSystemMessage(Component.literal("monster"));
+                if (sequence == 9) {
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
+                } else if (sequence >= 8) {
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
+                } else if (sequence == 7) {
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:luckperception");
+                } else if (sequence == 6) {
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:luckperception");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:psychestorm");
+                } else if (sequence == 5) {
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:luckperception");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:psychestorm");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:luckfuturetelling");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:misfortunebestowal");
+                } else if (sequence == 4) {
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:luckperception");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:psychestorm");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:luckfuturetelling");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:misfortunebestowal");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:providencedomain");
+                    excecuteAbilityCommand(context, "/abilityput LRLLL lotm:misfortunedomain");
+                } else if (sequence == 3) {
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:luckperception");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:psychestorm");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:luckfuturetelling");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:misfortunebestowal");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:providencedomain");
+                    excecuteAbilityCommand(context, "/abilityput LRLLL lotm:misfortunedomain");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:auraofchaos");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:chaoswalkercombat");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:enabledisableripple");
+                } else if (sequence == 2) {
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:luckperception");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:psychestorm");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:luckfuturetelling");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:misfortunebestowal");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:providencedomain");
+                    excecuteAbilityCommand(context, "/abilityput LRLLL lotm:misfortunedomain");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:auraofchaos");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:chaoswalkercombat");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:enabledisableripple");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:whispersofcorruption");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:misfortuneimplosion");
+                } else if (sequence == 1) {
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:luckperception");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:psychestorm");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:luckfuturetelling");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:misfortunebestowal");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:providencedomain");
+                    excecuteAbilityCommand(context, "/abilityput LRLLL lotm:misfortunedomain");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:auraofchaos");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:chaoswalkercombat");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:enabledisableripple");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:whispersofcorruption");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:misfortuneimplosion");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:rebootself");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:cycleoffate");
+                    excecuteAbilityCommand(context, "/abilityput RRLRR lotm:fatereincarnation");
+                } else if (sequence == 0) {
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:luckperception");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:psychestorm");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:luckfuturetelling");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:misfortunebestowal");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:providencedomain");
+                    excecuteAbilityCommand(context, "/abilityput LRLLL lotm:misfortunedomain");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:auraofchaos");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:chaoswalkercombat");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:enabledisableripple");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:whispersofcorruption");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:misfortuneimplosion");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:rebootself");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:cycleoffate");
+                    excecuteAbilityCommand(context, "/abilityput RRLRR lotm:fatereincarnation");
+                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:probabilityinfinitefortune");
+                    excecuteAbilityCommand(context, "/abilityput RLRRR lotm:probabilityinfinitemisfortune");
+                    excecuteAbilityCommand(context, "/abilityput LRLRL lotm:probabilityfortune");
+                    excecuteAbilityCommand(context, "/abilityput RLRLR lotm:probabilitymisfortune");
+                }
+            } else if (beyonderClass == BeyonderClassInit.SAILOR.get()) {
+                player.sendSystemMessage(Component.literal("sailor"));
+                if (sequence == 9) {
+                    player.sendSystemMessage(Component.literal("No abilities to register"));
+                } else if (sequence >= 8) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:ragingblows");
+                } else if (sequence == 7) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:ragingblows");
+                } else if (sequence == 6) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:ragingblows");
+                } else if (sequence == 5) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:ragingblows");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:sailorlightning");
+                    excecuteAbilityCommand(context, "/abilityput LLRRL lotm:acidicrain");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:watersphere");
+                } else if (sequence == 4) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:ragingblows");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:sailorlightning");
+                    excecuteAbilityCommand(context, "/abilityput LLRRL lotm:acidicrain");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:watersphere");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:tornado");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:roar");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:earthquake");
+                } else if (sequence == 3) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:ragingblows");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:sailorlightning");
+                    excecuteAbilityCommand(context, "/abilityput LLRRL lotm:acidicrain");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:watersphere");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:tornado");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:roar");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:earthquake");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:sonicboom");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:lightningbranch");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:thunderclap");
+                } else if (sequence == 2) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:ragingblows");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:sailorlightning");
+                    excecuteAbilityCommand(context, "/abilityput LLRRL lotm:acidicrain");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:watersphere");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:tornado");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:roar");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:earthquake");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:sonicboom");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:lightningbranch");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:thunderclap");
+                    excecuteAbilityCommand(context, "/abilityput LRLRL lotm:lightningball");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:extremecoldness");
+                    excecuteAbilityCommand(context, "/abilityput LRRLR lotm:raineyes");
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:volcaniceruption");
+                } else if (sequence == 1) {
+
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:ragingblows");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:sailorlightning");
+                    excecuteAbilityCommand(context, "/abilityput LLRRL lotm:acidicrain");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:watersphere");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:tornado");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:roar");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:earthquake");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:sonicboom");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:lightningbranch");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:thunderclap");
+                    excecuteAbilityCommand(context, "/abilityput LRLRL lotm:lightningball");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:extremecoldness");
+                    excecuteAbilityCommand(context, "/abilityput LRRLR lotm:raineyes");
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:volcaniceruption");
+                    excecuteAbilityCommand(context, "/abilityput LRLLL lotm:lightningballabsorb");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:sailorlightningtravel");
+                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:staroflightning");
+                    excecuteAbilityCommand(context, "/abilityput LRLLR lotm:lightningredirection");
+
+                } else if (sequence == 0) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:ragingblows");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:sailorlightning");
+                    excecuteAbilityCommand(context, "/abilityput LLRRL lotm:acidicrain");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:watersphere");
+                    excecuteAbilityCommand(context, "/abilityput LLLRR lotm:tornado");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:roar");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:earthquake");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:sonicboom");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:lightningbranch");
+                    excecuteAbilityCommand(context, "/abilityput RRLLR lotm:thunderclap");
+                    excecuteAbilityCommand(context, "/abilityput LRLRL lotm:lightningball");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:extremecoldness");
+                    excecuteAbilityCommand(context, "/abilityput LRRLR lotm:raineyes");
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:volcaniceruption");
+                    excecuteAbilityCommand(context, "/abilityput LRLLL lotm:lightningballabsorb");
+                    excecuteAbilityCommand(context, "/abilityput RRRLR lotm:sailorlightningtravel");
+                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:staroflightning");
+                    excecuteAbilityCommand(context, "/abilityput LRLLR lotm:lightningredirection");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:tyranny");
+                    excecuteAbilityCommand(context, "/abilityput RLLLR lotm:stormseal");
+                }
+            }
+        }
     }
 }

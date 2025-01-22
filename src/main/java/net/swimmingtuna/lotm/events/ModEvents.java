@@ -67,7 +67,6 @@ import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -76,6 +75,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.swimmingtuna.lotm.LOTM;
+import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.client.Configs;
@@ -100,8 +100,8 @@ import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.AllyInformation.PlayerAllyData;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ClientData.ClientSequenceData;
-import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
 import net.swimmingtuna.lotm.util.CorruptionAndLuckHandler;
+import net.swimmingtuna.lotm.util.ModArmorMaterials;
 import net.swimmingtuna.lotm.util.SpiritWorldVisibilityTracker;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.util.effect.NoRegenerationEffect;
@@ -112,7 +112,6 @@ import virtuoel.pehkui.api.ScaleTypes;
 
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.ProbabilityManipulationWorldFortune.probabilityManipulationWorld;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.CalamityIncarnationTsunami.calamityIncarnationTsunamiTick;
@@ -248,7 +247,6 @@ public class ModEvents {
             }
         }
         abilityCooldownsServerTick(event);
-
 
         Map<String, Long> times = new HashMap<>();
         {
@@ -544,6 +542,8 @@ public class ModEvents {
     }
 
 
+
+
     private static void psychologicalInvisibilityHurt(LivingHurtEvent event) {
         LivingEntity entity = event.getEntity();
         if (!entity.level().isClientSide()) {
@@ -618,6 +618,7 @@ public class ModEvents {
             }
         }
     }
+
 
     private static void warriorDangerSense(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
         //WIND MANIPULATION SENSE
@@ -1812,13 +1813,14 @@ public class ModEvents {
                 LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), livingEntity.level());
                 lightningEntity.setSpeed(7.0f);
                 lightningEntity.setDamage(8);
-                lightningEntity.setDeltaMovement((Math.random() * 0.4) - 0.2, -3, (Math.random() * 0.4) - 0.2);
                 lightningEntity.setMaxLength(30);
                 lightningEntity.setNoUp(true);
-                if (random.nextInt(30) == 1) {
+                if (random.nextInt(15) == 1) {
                     lightningEntity.teleportTo(livingEntity.getX(), lightningEntity.getY() + 50, lightningEntity.getZ());
                     lightningEntity.setTargetPos(livingEntity.getOnPos().getCenter());
+                    lightningEntity.setDeltaMovement(0, -3, 0);
                 } else {
+                    lightningEntity.setDeltaMovement((Math.random() * 0.4) - 0.2, -3, (Math.random() * 0.4) - 0.2);
                     lightningEntity.teleportTo(x1 + ((Math.random() * 150) - (double) 150 / 2), y1 + 130, z1 + ((Math.random() * 150) - (double) 150 / 2));
                 }
                 lightningEntity.level().addFreshEntity(lightningEntity);
@@ -2700,8 +2702,7 @@ public class ModEvents {
                                 player.level().addFreshEntity(vex);
                             }
                         }
-                    } else
-                    if (randomInt == 13) {
+                    } else if (randomInt == 13) {
                         if (livingEntity instanceof Player itemPlayer) {
                             for (Item item : getAbilities(itemPlayer)) {
                                 if (item instanceof SimpleAbilityItem simpleAbilityItem) {
@@ -2713,8 +2714,7 @@ public class ModEvents {
                                 }
                             }
                         }
-                    }  else
-                    if (randomInt == 0) {
+                    } else if (randomInt == 0) {
                         boolean healthCheck = player.getHealth() >= livingEntity.getHealth();
                         if (healthCheck) {
                             double x = player.getX() - livingEntity.getX();
@@ -2741,6 +2741,17 @@ public class ModEvents {
         Entity attacker = event.getSource().getEntity();
         if (attacker != null) {
             if (!attacker.level().isClientSide()) {
+                if (attacker instanceof LivingEntity livingEntity) {
+                    BeyonderClass pathway = BeyonderUtil.getPathway(livingEntity);
+                    boolean x = attacked.getHealth() <= attacked.getMaxHealth() * 0.4f || attacked.hasEffect(MobEffects.WEAKNESS) || attacked.hasEffect(ModEffects.ABILITY_WEAKNESS.get()) || attacked.hasEffect(MobEffects.WITHER) || attacked.hasEffect(MobEffects.POISON);
+                    if (pathway != null) {
+                        if (pathway == BeyonderClassInit.WARRIOR.get() && x) {
+                            DamageSource source = event.getSource();
+                            float amount = event.getAmount();
+                            attacked.hurt(attacked.damageSources().generic(), amount / 2);
+                        }
+                    }
+                }
                 if (attacked instanceof Player pPlayer) {
                     BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
                     if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 5) {
@@ -2828,16 +2839,41 @@ public class ModEvents {
             boolean isPhysical = BeyonderUtil.isPhysicalDamage(source);
             boolean isSupernatural = BeyonderUtil.isSupernaturalDamage(source);
             float amount = event.getAmount();
+            int sequence = -1;
+            if (livingEntity instanceof Player player) {
+                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                sequence = holder.getCurrentSequence();
+            } else if (livingEntity instanceof PlayerMobEntity player) {
+                sequence = player.getCurrentSequence();
+            }
             //if wearing silver armor, if damage is under 25 HP, it's damage is reduced by 80%
             boolean isWarrior = (livingEntity instanceof Player player && BeyonderHolderAttacher.getHolderUnwrap(player).currentClassMatches(BeyonderClassInit.WARRIOR) || (livingEntity instanceof PlayerMobEntity playerMobEntity && playerMobEntity.getCurrentPathway() == BeyonderClassInit.WARRIOR));
-            if (isWarrior) {
-                int sequence = -1;
-                if (livingEntity instanceof Player player) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                    sequence = holder.getCurrentSequence();
-                } else if (livingEntity instanceof PlayerMobEntity player) {
-                    sequence = player.getCurrentSequence();
+            if (hasFullSilverArmor(livingEntity) || hasFullDawnArmor(livingEntity)) {
+                if (hasFullSilverArmor(livingEntity)) {
+                    if (!(isWarrior && sequence > 3)) {
+                        if (event.getAmount() <= 20) {
+                            event.setAmount(0);
+                        } else {
+                            event.setAmount(amount * 0.33f);
+                        }
+                    } else {
+                        if (event.getAmount() <= 40 - (sequence * 7)) {
+                            event.setCanceled(true);
+                        } else {
+                            event.setAmount(amount * 0.33f);
+                        }
+                    }
+                } else if (hasFullDawnArmor(livingEntity)) {
+                    if (event.getAmount() <= 10) {
+                        event.setAmount(0);
+                    } else if (isSupernatural) {
+                        event.setAmount(amount / 2);
+                    }
                 }
+            }
+            boolean x = hasFullDawnArmor(livingEntity);
+            if (isWarrior) {
+
                 if (sequence == 8) {
                     if (isSupernatural) {
                         event.setAmount((float) (amount * 0.75));
@@ -2849,78 +2885,99 @@ public class ModEvents {
                         event.setAmount((float) (amount * 0.7));
                     }
                 } else if (sequence == 6) {
-                    //if wearing dawn armor, if damage is under 10 HP, ignore it
                     if (isSupernatural) {
                         event.setAmount((float) (amount * 0.7));
                     } else if (isPhysical) {
                         if (!isGiant) {
                             event.setAmount((float) (amount * 0.6));
                         } else {
-                            event.setAmount((float) (amount * 0.45));
+                            if (event.getAmount() <= 5) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.45));
+                            }
                         }
                     }
                 } else if (sequence == 5) {
-                    //if wearing dawn armor, if damage is under 15 HP, ignore it
                     if (isSupernatural) {
                         event.setAmount((float) (amount * 0.7));
                     } else if (isPhysical) {
                         if (!isGiant) {
                             event.setAmount((float) (amount * 0.5));
                         } else {
-                            event.setAmount((float) (amount * 0.35));
+                            if (event.getAmount() <= 7) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.35));
+                            }
                         }
                     }
                 } else if (sequence == 4) {
-                    //if wearing dawn armor, if damage is under 15 HP, ignore it
                     if (isSupernatural) {
                         event.setAmount((float) (amount * 0.6));
                     } else if (isPhysical) {
                         if (!isGiant) {
                             event.setAmount((float) (amount * 0.45));
                         } else {
-                            event.setAmount((float) (amount * 0.35));
+                            if (event.getAmount() <= 10) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.35));
+                            }
                         }
                     }
                 } else if (sequence == 3 || sequence == 2) {
-                    //if wearing dawn armor, if damage is under 15 HP, ignore it
                     if (isSupernatural) {
-                        //if wearing silver armor, make it 50% of original
                         event.setAmount((float) (amount * 0.6));
                     } else if (isPhysical) {
                         if (!isGiant) {
                             event.setAmount((float) (amount * 0.4));
                         } else {
-                            event.setAmount((float) (amount * 0.35));
+                            if (amount <= 15) {
+                                event.setCanceled(true);
+                            } else {
+                                event.setAmount((float) (amount * 0.35));
+                            }
                         }
                     }
                 } else if (sequence == 1) {
-                    //if wearing dawn armor, if damage is under 10 HP, ignore it
-                    //if wearing silver armor, make it 50% of original
                     if (isSupernatural) {
                         if (isHoGGiant) {
-                            event.setAmount((float) (amount * 0.5));
-                        } else {
-                            event.setAmount((float) (amount * 0.5));
+                            if (event.getAmount() <= 20) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.3));
+                            }
                         }
                     } else if (isPhysical) {
                         if (isHoGGiant) {
-                            event.setAmount((float) (amount * 0.275));
+                            if (event.getAmount() <= 20) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.275));
+                            }
                         } else {
                             event.setAmount((float) (amount * 0.35));
                         }
                     }
                 } else if (sequence == 0) {
-                    //if wearing dawn armor, if damage is under 10 HP, ignore it
-                    //if wearing silver armor, make it 50% of original
                     if (isSupernatural) {
                         if (isTwilightGiant) {
-                            event.setAmount((float) (amount * 0.2));
+                            if (event.getAmount() <= 25) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.2));
+                            }
                         } else {
                             event.setAmount((float) (amount * 0.5));
                         }
                     } else if (isPhysical) {
                         if (isHoGGiant) {
-                            event.setAmount((float) (amount * 0.2));
+                            if (event.getAmount() <= 25) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.2));
+                            }
                         } else {
                             event.setAmount((float) (amount * 0.35));
                         }
@@ -2945,11 +3002,11 @@ public class ModEvents {
                         double z = 0;
                         Random random = new Random();
                         if (random.nextInt(2) == 0) {
-                            x = amount * -0.15;
-                            z = amount * -0.15;
+                            x = Math.min(3, amount * -0.15);
+                            z = Math.min(3, amount * -0.15);
                         } else {
-                            x = amount * 0.15;
-                            z = amount * 0.15;
+                            x = Math.min(3, amount * 0.15);
+                            z = Math.min(3, amount * 0.15);
                         }
                         entity.setDeltaMovement(x, 1, z);
                         entity.hurtMarked = true;
@@ -4292,6 +4349,32 @@ public class ModEvents {
                 }
             }
         }
+    }
+
+    public static boolean hasFullDawnArmor(LivingEntity entity) {
+        if (entity == null) return false;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+                ItemStack itemStack = entity.getItemBySlot(slot);
+                if (!(itemStack.getItem() instanceof ArmorItem armor) || armor.getMaterial() != ModArmorMaterials.DAWN) {
+                    return false; // If any slot is not diamond armor, return false
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean hasFullSilverArmor(LivingEntity entity) {
+        if (entity == null) return false;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+                ItemStack itemStack = entity.getItemBySlot(slot);
+                if (!(itemStack.getItem() instanceof ArmorItem armor) || armor.getMaterial() != ModArmorMaterials.DAWN) {
+                    return false; // If any slot is not diamond armor, return false
+                }
+            }
+        }
+        return true;
     }
 
 

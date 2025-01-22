@@ -55,6 +55,11 @@ public class LOTMNetworkHandler {
                 .encoder(SyncAlliesPacket::encode)
                 .consumerMainThread(SyncAlliesPacket::handle)
                 .add();
+        INSTANCE.messageBuilder(SyncShouldntRenderInvisibilityPacketS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SyncShouldntRenderInvisibilityPacketS2C::new)
+                .encoder(SyncShouldntRenderInvisibilityPacketS2C::encode)
+                .consumerMainThread(SyncShouldntRenderInvisibilityPacketS2C::handle)
+                .add();
         INSTANCE.messageBuilder(MonsterLeftClickC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(MonsterLeftClickC2S::new)
                 .encoder(MonsterLeftClickC2S::toByte)
@@ -139,11 +144,6 @@ public class LOTMNetworkHandler {
                 .decoder(SyncLeftClickCooldownS2C::new)
                 .encoder(SyncLeftClickCooldownS2C::encode)
                 .consumerMainThread(SyncLeftClickCooldownS2C::handle)
-                .add();
-        INSTANCE.messageBuilder(SyncShouldntRenderInvisibilityPacketS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(SyncShouldntRenderInvisibilityPacketS2C::new)
-                .encoder(SyncShouldntRenderInvisibilityPacketS2C::encode)
-                .consumerMainThread(SyncShouldntRenderInvisibilityPacketS2C::handle)
                 .add();
         INSTANCE.messageBuilder(SyncShouldntRenderSpiritWorldPacketS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SyncShouldntRenderSpiritWorldPacketS2C::new)

@@ -1,14 +1,9 @@
 package net.swimmingtuna.lotm.events;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.ViewportEvent;
@@ -22,12 +17,9 @@ import net.swimmingtuna.lotm.client.SpiritualityBarOverlay;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.util.ClientData.ClientAbilityCooldownData;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
-import net.swimmingtuna.lotm.util.effect.ModEffects;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
 
 
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -74,14 +66,11 @@ public class ClientEvents {
         LivingEntity entity = event.getEntity();
         if (ClientShouldntRenderInvisibilityData.getShouldntRender() && entity.getUUID().equals(ClientShouldntRenderInvisibilityData.getLivingUUID())) {
             event.setCanceled(true);
-            if (event.getRenderer().shadowRadius == 1.0f) {
-                event.getRenderer().shadowRadius = 0.0f;
-            }
-        } else if (event.getRenderer().shadowRadius == 0.0f) {
-            event.getRenderer().shadowRadius = 1.0f;
         }
+
         //    if (ClientShouldntRenderSpiritWorldData.getShouldntRender(entity.getUUID())) {
         //        event.setCanceled(true);
         //    }
     }
+
 }

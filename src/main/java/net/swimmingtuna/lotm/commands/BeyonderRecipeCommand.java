@@ -133,6 +133,7 @@ public class BeyonderRecipeCommand {
             return 0;
         }
     }
+
     private static void loadMonsterRecipes(CommandContext<CommandSourceStack> context) {
         executeRecipeCommand(context, "/beyonderrecipe add lotm:monster_9_potion bossominium:flower_of_genesis bossominium:redstone_hard_drive minecraft:rotten_flesh alexscaves:charred_remnant samurai_dynasty:jorogumo_eye");
         executeRecipeCommand(context, "/beyonderrecipe add lotm:monster_8_potion legendary_monsters:crystal_of_sandstorm alexscaves:sweet_tooth minecraft:netherite_scrap mutantmonsters:hulk_hammer legendary_monsters:primal_ice_shard");
