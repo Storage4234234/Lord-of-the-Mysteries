@@ -128,7 +128,6 @@ public class GuardianBoxEntity extends Entity {
         compound.putInt("maxSize", this.getMaxSize());
     }
 
-    @Override
     public void tick() {
         super.tick();
         if (!this.level().isClientSide()) {
@@ -137,33 +136,37 @@ public class GuardianBoxEntity extends Entity {
             this.setMaxSize((int) scaleData.getScale());
             UUID ownerUUID = this.getOwnerUUID().orElse(null);
             if (ownerUUID != null) {
-                LivingEntity owner = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(64), entity -> entity.getUUID().equals(ownerUUID)).stream().findFirst().orElse(null);
+                LivingEntity owner = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(150), entity -> entity.getUUID().equals(ownerUUID)).stream().findFirst().orElse(null);
                 if (owner != null) {
-                    for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getMaxSize()))) {
+                    for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getMaxSize() + 5))) {
                         if (BeyonderUtil.isAllyOf(owner, livingEntity)) {
                             if (livingEntity != owner) {
                                 livingEntity.getPersistentData().putUUID("guardianProtection", ownerUUID);
                                 livingEntity.getPersistentData().putInt("guardianProtectionTimer", 10);
                             }
                         } else {
-                            if (livingEntity != owner) {
+                            if (livingEntity != owner && this.tickCount % 10 == 0) {
                                 int sequence = BeyonderUtil.getSequence(livingEntity);
-                                Vec3 direction = livingEntity.position().subtract(this.position()).normalize();
-                                double pushBackStrength = 1.0 + (10 - sequence) * 0.2;
-                                livingEntity.setDeltaMovement(direction.scale(-pushBackStrength));
+                                double x = livingEntity.getX() - this.getX();
+                                double y = livingEntity.getY() - this.getY();
+                                double z = livingEntity.getZ() - this.getZ();
+                                double magnitude = Math.sqrt(x * x + y * y + z * z);
+                                livingEntity.setDeltaMovement(x / magnitude * 4, y / magnitude * 4, z / magnitude * 4);
                                 livingEntity.hurtMarked = true;
                                 int additionalDamage = (10 - sequence) * 2;
                                 this.setDamage((int) (damage + additionalDamage));
                             }
                         }
-                        livingEntity.sendSystemMessage(Component.literal("In Box"));
                     }
-                    for (Projectile projectile : this.level().getEntitiesOfClass(Projectile.class, this.getBoundingBox().inflate(getMaxSize() + 3))) {
-                        if (projectile.getOwner() != owner || !BeyonderUtil.isAllyOf(owner, (LivingEntity) projectile.getOwner())) {
-                            Vec3 movement = projectile.getDeltaMovement();
+                    for (Projectile projectile : this.level().getEntitiesOfClass(Projectile.class, this.getBoundingBox().inflate(getMaxSize() + 5))) {
+                        if (projectile.getOwner() == null || !projectile.getOwner().getUUID().equals(ownerUUID)) {
                             ScaleData pScaleData = ScaleTypes.BASE.getScaleData(projectile);
                             this.setDamage((int) (damage + (int) ((pScaleData.getScale() * 10) + projectile.getDeltaMovement().y() + projectile.getDeltaMovement().x() + projectile.getDeltaMovement().z())));
-                            projectile.setDeltaMovement(movement.x() * -0.2f, movement.y() * -0.2f, movement.z() * -0.2f);
+                            double x = projectile.getX() - this.getX();
+                            double y = projectile.getY() - this.getY();
+                            double z = projectile.getZ() - this.getZ();// Reversed direction for pushing away
+                            double magnitude = Math.sqrt(x * x + y * y + z * z);
+                            projectile.setDeltaMovement(x / magnitude * 4, y / magnitude * 4, z / magnitude * 4);
                             projectile.hurtMarked = true;
                         }
                     }

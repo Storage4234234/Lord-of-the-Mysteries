@@ -107,7 +107,7 @@ public class SwordOfDawn extends SwordItem {
                     GuardianBoxEntity guardianBoxEntity = new GuardianBoxEntity(EntityInit.GUARDIAN_BOX_ENTITY.get(), pPlayer.level());
                     int sequence = BeyonderUtil.getSequence(pPlayer);
                     ScaleData scaleData = ScaleTypes.BASE.getScaleData(guardianBoxEntity);
-                    scaleData.setTargetScale(20 - (sequence));
+                    scaleData.setTargetScale(18 - (sequence));
                     guardianBoxEntity.setOwnerUUID(pPlayer.getUUID());
                     guardianBoxEntity.teleportTo(pPlayer.getX(), pPlayer.getY(), pPlayer.getZ());
                     guardianBoxEntity.setMaxHealth(300 - (sequence * 20));
