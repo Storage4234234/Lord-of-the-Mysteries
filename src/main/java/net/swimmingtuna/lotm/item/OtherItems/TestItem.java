@@ -16,8 +16,10 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
+import net.swimmingtuna.lotm.entity.GuardianBoxEntity;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 
@@ -76,16 +78,12 @@ public class TestItem extends SimpleAbilityItem {
                     player.getCooldowns().removeCooldown(stack.getItem());
                 }
             }
-
+            GuardianBoxEntity boxEntity = new GuardianBoxEntity(EntityInit.GUARDIAN_BOX_ENTITY.get(), level);
+            boxEntity.setMaxSize((int) (Math.random() * 20));
+            boxEntity.teleportTo(player.getX(), player.getY(), player.getZ());
+            player.level().addFreshEntity(boxEntity);
         }
 
         return InteractionResult.SUCCESS;
-    }
-
-    public static void switchDimension(Player player) {
-        if (!player.level().isClientSide()) {
-            for (LivingEntity living : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(1000))) {
-            }
-        }
     }
 }

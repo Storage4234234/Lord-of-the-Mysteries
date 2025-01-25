@@ -1,5 +1,6 @@
 package net.swimmingtuna.lotm.events;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
@@ -16,6 +17,7 @@ import net.swimmingtuna.lotm.client.AbilityOverlay;
 import net.swimmingtuna.lotm.client.SpiritualityBarOverlay;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.util.ClientData.ClientAbilityCooldownData;
+import net.swimmingtuna.lotm.util.ClientData.ClientAntiConcealmentData;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
 
 import java.util.HashMap;
@@ -64,13 +66,13 @@ public class ClientEvents {
     @OnlyIn(Dist.CLIENT)
     public static void livingRender(RenderLivingEvent.Pre<?, ?> event) {
         LivingEntity entity = event.getEntity();
-        if (ClientShouldntRenderInvisibilityData.getShouldntRender() && entity.getUUID().equals(ClientShouldntRenderInvisibilityData.getLivingUUID())) {
-            event.setCanceled(true);
+        if (!ClientAntiConcealmentData.getAntiConceal()) {
+            if (ClientShouldntRenderInvisibilityData.getShouldntRender() && entity.getUUID().equals(ClientShouldntRenderInvisibilityData.getLivingUUID())) {
+                event.setCanceled(true);
+            }
         }
-
         //    if (ClientShouldntRenderSpiritWorldData.getShouldntRender(entity.getUUID())) {
         //        event.setCanceled(true);
         //    }
     }
-
 }

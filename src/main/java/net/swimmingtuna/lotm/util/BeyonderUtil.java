@@ -499,7 +499,6 @@ public class BeyonderUtil {
             Vec3 eyePosition = player.getEyePosition();
             Vec3 lookVector = player.getLookAngle();
             Vec3 reachVector = eyePosition.add(lookVector.x * entityReach, lookVector.y * entityReach, lookVector.z * entityReach);
-
             AABB searchBox = player.getBoundingBox().inflate(entityReach);
             EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(
                     player.level(),

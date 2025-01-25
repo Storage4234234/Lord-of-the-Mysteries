@@ -125,7 +125,7 @@ public class WintryBlade extends SwordItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level
             level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("A transparent, triangular blade that will slow down those hit on the first hit, heavily slow down and confuse them on the second, and stun them in place for a long time on the third. The amount of time can stack.").withStyle(ChatFormatting.DARK_GRAY).withStyle(ChatFormatting.BOLD));
+//        tooltipComponents.add(Component.literal("A transparent, triangular blade that will slow down those hit on the first hit, heavily slow down and confuse them on the second, and stun them in place for a long time on the third. The amount of time can stack.").withStyle(ChatFormatting.DARK_GRAY).withStyle(ChatFormatting.BOLD));
         tooltipComponents.add(Component.literal("In addition, apart from the user, those around the user will slow down over time, having the effects of being hit happen gradually").withStyle(ChatFormatting.DARK_BLUE));
         tooltipComponents.add(Component.literal("Drawback: As long as Wintry Blade is in your inventory, you will slow down more and more, until you're frozen permanently. You can reverse the effects up until that point in both yourself and others affected by this blade by being on fire.").withStyle(ChatFormatting.GRAY));
 

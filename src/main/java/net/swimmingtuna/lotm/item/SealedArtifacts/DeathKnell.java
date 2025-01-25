@@ -68,9 +68,9 @@ public class DeathKnell extends Item {
         CompoundTag tag = pPlayer.getPersistentData();
         int x = tag.getInt("deathKnell");
         if (x == 1) {
-            return "Weakness Attack";
+            return "Weakness Shot";
         } else if (x == 2) {
-            return "Lethal Attack";
+            return "Lethal Shot";
         } else if (x == 3) {
             return "Slaughtering";
         }
@@ -287,11 +287,11 @@ public class DeathKnell extends Item {
     }
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("A special gun that allows you to pour in spirituality into it by left clicking in order to change it's function").withStyle(ChatFormatting.DARK_RED).withStyle(ChatFormatting.BOLD));
-        tooltipComponents.add(Component.literal("Weakness Attack: Use to lower a target's defenses by decreasing their armor value for a short time").withStyle(ChatFormatting.RED));
-        tooltipComponents.add(Component.literal("Lethal Attack: Use to deal extra damage").withStyle(ChatFormatting.DARK_RED));
+        tooltipComponents.add(Component.literal("A special gun that allows you to pour in spirituality into it, powering it up. You can left click in order to swap between three functions.").withStyle(ChatFormatting.DARK_RED).withStyle(ChatFormatting.BOLD));
+        tooltipComponents.add(Component.literal("Weakness Shot: Use to lower a target's defenses by decreasing their armor value for a short time").withStyle(ChatFormatting.RED));
+        tooltipComponents.add(Component.literal("Lethal Shot: Use to deal extra damage").withStyle(ChatFormatting.DARK_RED));
         tooltipComponents.add(Component.literal("Slaughtering: Use to deal a bit extra damage than lethal attack, but if a target's HP is lower than 30%, then it deals double damage").withStyle(ChatFormatting.DARK_GRAY));
-        tooltipComponents.add(Component.literal("Drawback: On use, gain either a fear of water, fire, monsters, peaceful mobs, players, the night, or water for a while. If you encounter any of these, you will become significantly weaker and slower").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.literal("Drawback: On use, gain either a fear of water, fire, monsters, peaceful mobs, players, or the night for a while. If you encounter any of these, you will become significantly weaker and slower.").withStyle(ChatFormatting.GRAY));
 
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }

@@ -1838,6 +1838,7 @@ public class ModEvents {
             if (entity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
             }
+            GuardianBoxEntity.decrementGuardianTimer(entity);
             EyeOfDemonHunting.eyeTick(event);
             livingNoMoveEffect(event);
             psychologicalInvisibilityHurtTick(entity);
@@ -2826,6 +2827,15 @@ public class ModEvents {
         }
     }
 
+    public static void dawnArmorTickEvent(LivingEvent.LivingTickEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (entity.tickCount % 20 == 0 &&!entity.level().isClientSide() && BeyonderUtil.getPathway(entity) == BeyonderClassInit.WARRIOR.get() && BeyonderUtil.getSequence(entity) <= 6) {
+            if (hasFullDawnArmor(entity)) {
+                BeyonderUtil.useSpirituality(entity, 15);
+            }
+        }
+    }
+
     public static void warriorDamageNegation(LivingHurtEvent event) {
         LivingEntity livingEntity = event.getEntity();
         DamageSource source = event.getSource();
@@ -3026,6 +3036,7 @@ public class ModEvents {
         DamageSource source = event.getSource();
         Entity entitySource = source.getEntity();
         if (!event.getEntity().level().isClientSide()) {
+            GuardianBoxEntity.guardianHurtEvent(event);
             warriorDamageNegation(event);
             boolean entityInSpiritWorld = tag.getBoolean("inSpiritWorld");
             if (entitySource != null) {
@@ -4351,13 +4362,14 @@ public class ModEvents {
         }
     }
 
+
     public static boolean hasFullDawnArmor(LivingEntity entity) {
         if (entity == null) return false;
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (slot.getType() == EquipmentSlot.Type.ARMOR) {
                 ItemStack itemStack = entity.getItemBySlot(slot);
                 if (!(itemStack.getItem() instanceof ArmorItem armor) || armor.getMaterial() != ModArmorMaterials.DAWN) {
-                    return false; // If any slot is not diamond armor, return false
+                    return false;
                 }
             }
         }
