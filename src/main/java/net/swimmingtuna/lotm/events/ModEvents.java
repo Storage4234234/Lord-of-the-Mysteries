@@ -90,7 +90,9 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.Batt
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.DreamIntoReality;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionBarrier;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocationBlink;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.EnableOrDisableProtection;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.EyeOfDemonHunting;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.Gigantification;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.LightOfDawn;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
@@ -99,6 +101,7 @@ import net.swimmingtuna.lotm.networking.packet.*;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.AllyInformation.PlayerAllyData;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
+import net.swimmingtuna.lotm.util.ClientData.ClientAntiConcealmentData;
 import net.swimmingtuna.lotm.util.ClientData.ClientSequenceData;
 import net.swimmingtuna.lotm.util.CorruptionAndLuckHandler;
 import net.swimmingtuna.lotm.util.ModArmorMaterials;
@@ -162,6 +165,18 @@ public class ModEvents {
     }
 
     @SubscribeEvent
+    public static void craftEvent(PlayerEvent.ItemCraftedEvent event) {
+        Player player = event.getEntity();
+        if (!player.level().isClientSide()) {
+            if (BeyonderUtil.getPathway(player) != BeyonderClassInit.WARRIOR.get() && BeyonderUtil.getSequence(player) > 4) {
+                if (event.getCrafting().getItem() == ItemInit.LIGHTNINGRUNE.get() || event.getCrafting().getItem() == ItemInit.CONFUSIONRUNE.get() || event.getCrafting().getItem() == ItemInit.FLAMERUNE.get() || event.getCrafting().getItem() == ItemInit.WITHERRUNE.get() || event.getCrafting().getItem() == ItemInit.FREEZERUNE.get()) {
+                    event.setCanceled(true);
+                    player.sendSystemMessage(Component.literal("You aren't the right pathway and sequence to be able to craft this.").withStyle(ChatFormatting.RED));
+                }
+            }
+        }
+    }
+    @SubscribeEvent
     public static void mobEffectEvent(MobEffectEvent.Added event) {
         LivingEntity entity = event.getEntity();
         if (entity.level() instanceof ServerLevel serverLevel) {
@@ -208,7 +223,6 @@ public class ModEvents {
         CompoundTag playerPersistentData = player.getPersistentData();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         int sequence = holder.getCurrentSequence();
-
     }
 
     @SubscribeEvent
@@ -226,12 +240,17 @@ public class ModEvents {
             checkForProjectiles(player);
         }
         if (!player.level().isClientSide() && player.tickCount % 20 == 0) {
-            //int x = tag.getInt("psychologicalInvisibilityHurt");
+            //boolean x = ClientAntiConcealmentData.getAntiConceal();
             //player.sendSystemMessage(Component.literal("value is " + x));
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
             if (player.tickCount % 20 == 0) {
+                for (LivingEntity living : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(40))) {
+                    if (living.hasEffect(MobEffects.INVISIBILITY)) {
+                        LOTMNetworkHandler.sendToPlayer(new RemoveInvisibiltyS2C(living.getUUID()), serverPlayer);
+                    }
+                }
                 AbilityRegisterCommand.tickEvent(serverPlayer);
                 if (holder.getCurrentSequence() != 0 && ClientSequenceData.getCurrentSequence() == 0) {
                     ClientSequenceData.setCurrentSequence(-1);
@@ -246,6 +265,7 @@ public class ModEvents {
                 setCooldown(serverPlayer, currentCooldown);
             }
         }
+
         abilityCooldownsServerTick(event);
 
         Map<String, Long> times = new HashMap<>();
@@ -668,6 +688,7 @@ public class ModEvents {
     public static void sealItemCanceler(PlayerInteractEvent.RightClickItem event) {
         Player player = event.getEntity();
         if (!player.level().isClientSide()) {
+            EyeOfDemonHunting.demonHunterAlchemy(event);
             CompoundTag tag = player.getPersistentData();
             int sealCounter = tag.getInt("sailorSeal");
             if (sealCounter >= 1) {
@@ -1838,8 +1859,11 @@ public class ModEvents {
             if (entity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
             }
+            Gigantification.gigantificationScale(event);
+            EnableOrDisableProtection.warriorProtectionTick(event);
             GuardianBoxEntity.decrementGuardianTimer(entity);
             EyeOfDemonHunting.eyeTick(event);
+            EyeOfDemonHunting.demonHunterAntiConcealment(event);
             livingNoMoveEffect(event);
             psychologicalInvisibilityHurtTick(entity);
             //windManipulationCushion(entity);

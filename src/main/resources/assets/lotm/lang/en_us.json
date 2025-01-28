@@ -192,6 +192,7 @@
 
   "item.lotm.monsterdomainteleportation": "Domain Teleporation",
 
+  "item.lotm.luckygoldcoin": "Lucky Gold Coin",
   "item.lotm.luckbottleitem": "Bottle o' Luck",
   "item.lotm.dawn_helmet": "Dawn Helmet",
   "item.lotm.dawn_chestplate": "Dawn Chestplate",
@@ -201,6 +202,13 @@
   "item.lotm.silver_chestplate": "Silver Chestplate",
   "item.lotm.silver_leggings": "Silver Leggings",
   "item.lotm.silver_boots": "Silver Boots",
+  "item.lotm.lightningstrikerune": "Lightning Strike Rune",
+  "item.lotm.flamerune": "Flame Rune",
+  "item.lotm.witherrune": "Wither Rune",
+  "item.lotm.freezerune": "Freeze Rune",
+  "item.lotm.confusionrune": "Confusion Rune",
+
+
 
 
   "item.lotm.windmanipulationflight": "Wind Manipulation: Flight",
@@ -254,6 +262,7 @@
   "item.lotm.lightofdawn": "Light of Dawn",
   "item.lotm.dawnarmory": "Dawn Armory",
   "item.lotm.dawnweaponry": "Dawn Weaponry",
+  "item.lotm.enabledisableprotection": "Enable/Disable Protection",
   "item.lotm.eyeofdemonhunting": "Enable/Disable Eye of Demon Hunting",
   "item.lotm.warriordangersense": "Enable/Disable Danger Sense",
   "item.lotm.mercuryliquefication": "Mercury Liquefication",
@@ -373,6 +382,16 @@
   "creativetab.beyonderingredients_tab": "Beyonder Ingredients",
   "creativetab.ingredients_tab": "Beyonder Ingredients",
 
-  "death.attack.lotm.mental_damage": "%1&s suffered from a mental attack"
+  "death.attack.lotm.mental_damage": "%1&s suffered from a mental attack",
+
+  "enchantment.lotm.lightning_strike": "Lightning Strike",
+  "enchantment.lotm.flame": "Flame Aspect",
+  "enchantment.lotm.wither": "Withering",
+  "enchantment.lotm.confusion": "Confusion",
+  "enchantment.lotm.freeze": "Freeze"
+
+
+
+
 
 }

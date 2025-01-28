@@ -141,6 +141,7 @@ public class CreativeTabInit {
                         event.accept(ItemInit.LIGHTOFDAWN.get());
                         event.accept(ItemInit.DAWNARMORY.get());
                         event.accept(ItemInit.DAWNWEAPONRY.get());
+                        event.accept(ItemInit.ENABLEDISABLEPROTECTION.get());
                         event.accept(ItemInit.EYEOFDEMONHUNTING.get());
                         event.accept(ItemInit.WARRIORDANGERSENSE.get());
                         event.accept(ItemInit.MERCURYLIQUEFICATION.get());

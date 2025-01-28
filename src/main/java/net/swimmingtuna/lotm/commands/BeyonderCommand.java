@@ -18,13 +18,9 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.ClearAbilitiesS2C;
-import net.swimmingtuna.lotm.networking.packet.SyncAbilitiesS2C;
 import net.swimmingtuna.lotm.util.ClientData.ClientAbilitiesData;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static net.swimmingtuna.lotm.commands.AbilityRegisterCommand.REGISTERED_ABILITIES_KEY;
 

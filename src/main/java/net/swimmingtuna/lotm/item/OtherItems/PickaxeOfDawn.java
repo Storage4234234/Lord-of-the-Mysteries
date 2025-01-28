@@ -2,10 +2,6 @@ package net.swimmingtuna.lotm.item.OtherItems;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,6 +26,7 @@ public class PickaxeOfDawn extends PickaxeItem {
         super(pTier, pAttackDamageModifier, pAttackSpeedModifier, pProperties);
     }
 
+
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
         if (entity instanceof LivingEntity livingEntity && !level.isClientSide()) {
@@ -37,16 +34,24 @@ public class PickaxeOfDawn extends PickaxeItem {
                 int sequence = BeyonderUtil.getSequence(livingEntity);
                 if (livingEntity instanceof Player player) {
                     BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                    if (!holder.currentClassMatches(BeyonderClassInit.WARRIOR) && sequence >= 7) {
+                    if (!holder.currentClassMatches(BeyonderClassInit.WARRIOR) || sequence >= 7) {
                         player.getInventory().setItem(itemSlot, ItemStack.EMPTY);
                     } else {
-                        holder.useSpirituality(10);
+                        if (holder.getSpirituality() >= 25) {
+                            holder.useSpirituality(25);
+                        } else {
+                            player.getInventory().setItem(itemSlot, ItemStack.EMPTY);
+                        }
                     }
                 } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
-                    if (playerMobEntity.getCurrentPathway() != BeyonderClassInit.WARRIOR) {
+                    if (playerMobEntity.getCurrentPathway() != BeyonderClassInit.WARRIOR || playerMobEntity.getCurrentSequence() >= 7) {
                         removeItemFromSlot(livingEntity, stack);
                     } else {
-                        playerMobEntity.useSpirituality(10);
+                        if (playerMobEntity.getSpirituality() >= 25) {
+                            playerMobEntity.useSpirituality(25);
+                        } else {
+                            removeItemFromSlot(livingEntity, stack);
+                        }
                     }
                 } else {
                     removeItemFromSlot(livingEntity, stack);

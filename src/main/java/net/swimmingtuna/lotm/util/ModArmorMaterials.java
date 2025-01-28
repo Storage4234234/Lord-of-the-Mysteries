@@ -7,8 +7,6 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.swimmingtuna.lotm.LOTM;
 
-import java.util.function.Supplier;
-
 public enum ModArmorMaterials implements ArmorMaterial {
     DAWN("dawn", 26, new int[]{ 5, 7, 5, 4 }, 25, SoundEvents.ARMOR_EQUIP_GOLD, 1f, 0f),
     SILVER("silver", 15, new int[]{6, 8, 6, 5}, 9, SoundEvents.ARMOR_EQUIP_IRON, 1.5f, 0.2f);

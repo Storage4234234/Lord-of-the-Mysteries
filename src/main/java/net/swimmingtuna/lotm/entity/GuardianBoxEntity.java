@@ -1,27 +1,19 @@
 package net.swimmingtuna.lotm.entity;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.swimmingtuna.lotm.init.EntityInit;
-import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
-import net.swimmingtuna.lotm.networking.packet.UpdateEntityLocationS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
@@ -40,6 +32,7 @@ public class GuardianBoxEntity extends Entity {
     public GuardianBoxEntity(EntityType<?> type, Level level) {
         super(type, level);
         this.noPhysics = true;
+        this.noCulling = true;
     }
 
     public GuardianBoxEntity(Level level, double x, double y, double z, float maxRadius) {
@@ -58,18 +51,18 @@ public class GuardianBoxEntity extends Entity {
 
     @Override
     public boolean shouldRenderAtSqrDistance(double pDistance) {
-        return pDistance < 400000; // 128 blocks squared
+        return true;
     }
 
     @Override
     public @NotNull AABB getBoundingBoxForCulling() {
         return new AABB(
-                this.getX() - 300,
-                this.getY() - 300,
-                this.getZ() - 300,
-                this.getX() + 300,
-                this.getY() + 300,
-                this.getZ() + 300
+                this.getX() - 600,
+                this.getY() - 600,
+                this.getZ() - 600,
+                this.getX() + 600,
+                this.getY() + 600,
+                this.getZ() + 600
         );
     }
 
@@ -136,42 +129,57 @@ public class GuardianBoxEntity extends Entity {
             this.setMaxSize((int) scaleData.getScale());
             UUID ownerUUID = this.getOwnerUUID().orElse(null);
             if (ownerUUID != null) {
-                LivingEntity owner = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(150), entity -> entity.getUUID().equals(ownerUUID)).stream().findFirst().orElse(null);
+                LivingEntity owner = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getMaxSize() + 3 ), entity -> entity.getUUID().equals(ownerUUID)).stream().findFirst().orElse(null);
                 if (owner != null) {
-                    for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getMaxSize() + 5))) {
+                    for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getMaxSize() + 3))) {
                         if (BeyonderUtil.isAllyOf(owner, livingEntity)) {
-                            if (livingEntity != owner) {
-                                livingEntity.getPersistentData().putUUID("guardianProtection", ownerUUID);
-                                livingEntity.getPersistentData().putInt("guardianProtectionTimer", 10);
-                            }
+                            //possible logic in the future
                         } else {
                             if (livingEntity != owner && this.tickCount % 10 == 0) {
                                 int sequence = BeyonderUtil.getSequence(livingEntity);
-                                double x = livingEntity.getX() - this.getX();
-                                double y = livingEntity.getY() - this.getY();
-                                double z = livingEntity.getZ() - this.getZ();
-                                double magnitude = Math.sqrt(x * x + y * y + z * z);
-                                livingEntity.setDeltaMovement(x / magnitude * 4, y / magnitude * 4, z / magnitude * 4);
-                                livingEntity.hurtMarked = true;
-                                int additionalDamage = (10 - sequence) * 2;
-                                this.setDamage((int) (damage + additionalDamage));
+                                int ownerSequence = BeyonderUtil.getSequence(owner);
+                                if (sequence >= ownerSequence + 2) {
+                                    double x = livingEntity.getX() - this.getX();
+                                    double y = livingEntity.getY() - this.getY();
+                                    double z = livingEntity.getZ() - this.getZ();
+                                    double magnitude = Math.sqrt(x * x + y * y + z * z);
+                                    livingEntity.setDeltaMovement(x / magnitude * 4, y / magnitude * 4, z / magnitude * 4);
+                                    livingEntity.hurtMarked = true;
+                                    int additionalDamage = (10 - sequence) * 2;
+                                    this.setDamage((int) (damage + additionalDamage));
+                                }
+                            }
+                        }
+                        if (livingEntity == owner) {
+                            if (owner.hasEffect(MobEffects.DAMAGE_RESISTANCE)) {
+                                owner.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 10, Math.min(4,owner.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1), true, true));
+                            }
+                            if (owner.hasEffect(MobEffects.REGENERATION)) {
+                                owner.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 10, Math.min(5,owner.getEffect(MobEffects.REGENERATION).getAmplifier() + 1), true, true));
                             }
                         }
                     }
-                    for (Projectile projectile : this.level().getEntitiesOfClass(Projectile.class, this.getBoundingBox().inflate(getMaxSize() + 5))) {
-                        if (projectile.getOwner() == null || !projectile.getOwner().getUUID().equals(ownerUUID)) {
-                            ScaleData pScaleData = ScaleTypes.BASE.getScaleData(projectile);
-                            this.setDamage((int) (damage + (int) ((pScaleData.getScale() * 10) + projectile.getDeltaMovement().y() + projectile.getDeltaMovement().x() + projectile.getDeltaMovement().z())));
-                            double x = projectile.getX() - this.getX();
-                            double y = projectile.getY() - this.getY();
-                            double z = projectile.getZ() - this.getZ();// Reversed direction for pushing away
-                            double magnitude = Math.sqrt(x * x + y * y + z * z);
-                            projectile.setDeltaMovement(x / magnitude * 4, y / magnitude * 4, z / magnitude * 4);
-                            projectile.hurtMarked = true;
+                    for (Projectile projectile : this.level().getEntitiesOfClass(Projectile.class, this.getBoundingBox().inflate(getMaxSize() + 3))) {
+                        if (projectile.getOwner() == null || (projectile.getOwner() instanceof LivingEntity living && !BeyonderUtil.isAllyOf(owner, living) && !projectile.getOwner().getUUID().equals(ownerUUID))) {
+                            int sequence = 900;
+                            if (projectile.getOwner() instanceof LivingEntity living) {
+                                sequence = BeyonderUtil.getSequence(living);
+                            }
+                            int ownerSequence = BeyonderUtil.getSequence(owner);
+                            if (sequence >= ownerSequence + 2) {
+                                ScaleData pScaleData = ScaleTypes.BASE.getScaleData(projectile);
+                                this.setDamage((int) (damage + (int) ((pScaleData.getScale() * 10) + projectile.getDeltaMovement().y() + projectile.getDeltaMovement().x() + projectile.getDeltaMovement().z())));
+                                double x = projectile.getX() - this.getX();
+                                double y = projectile.getY() - this.getY();
+                                double z = projectile.getZ() - this.getZ();// Reversed direction for pushing away
+                                double magnitude = Math.sqrt(x * x + y * y + z * z);
+                                projectile.setDeltaMovement(x / magnitude * 4, y / magnitude * 4, z / magnitude * 4);
+                                projectile.hurtMarked = true;
+                            }
                         }
                     }
                 } else if (this.tickCount >= 5) {
-                    //this.discard();
+                    this.discard();
                 }
             }
             if (this.getDamage() >= this.getMaxHealth()) {
@@ -179,6 +187,8 @@ public class GuardianBoxEntity extends Entity {
             }
         }
     }
+
+
     public static void decrementGuardianTimer(LivingEntity entity) {
         if (entity.getPersistentData().getInt("guardianProtectionTimer") >= 1) {
             entity.getPersistentData().putInt("guardianProtectionTimer", entity.getPersistentData().getInt("guardianProtectionTimer") - 1);

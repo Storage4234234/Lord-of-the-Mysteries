@@ -2,7 +2,6 @@ package net.swimmingtuna.lotm.init;
 
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Tiers;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -21,7 +20,6 @@ import net.swimmingtuna.lotm.item.OtherItems.*;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.SymphonyOfHatred;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
-import net.swimmingtuna.lotm.item.OtherItems.TestItem;
 import net.swimmingtuna.lotm.util.ModArmorMaterials;
 
 public class ItemInit {
@@ -29,7 +27,6 @@ public class ItemInit {
             DeferredRegister.create(ForgeRegistries.ITEMS, LOTM.MOD_ID);
 
 
-    //ABILITIES
 
 
     //MONSTER
@@ -37,7 +34,6 @@ public class ItemInit {
             () -> new SpiritVision(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> MONSTERDANGERSENSE = ITEMS.register("monsterdangersense",
             () -> new MonsterDangerSense(new Item.Properties().stacksTo(1)));
-
     public static final RegistryObject<Item> WHISPEROFCORRUPTION = ITEMS.register("whisperofcorruption",
             () -> new WhisperOfCorruption(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> CALAMITYINCARNATION = ITEMS.register("calamityincarnation",
@@ -66,8 +62,6 @@ public class ItemInit {
             () -> new FatedConnection(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> REBOOTSELF = ITEMS.register("rebootself",
             () -> new RebootSelf(new Item.Properties().stacksTo(1)));
-
-
     public static final RegistryObject<Item> PROBABILITYMISFORTUNEINCREASE = ITEMS.register("probabilitymanipulationworldmisfortune",
             () -> new ProbabilityManipulationWorldMisfortune(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> PROBABILITYFORTUNEINCREASE = ITEMS.register("probabilitymanipulationworldfortune",
@@ -84,8 +78,6 @@ public class ItemInit {
             () -> new ProbabilityManipulationInfiniteMisfortune(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> PROBABILITYINFINITEFORTUNE = ITEMS.register("probabilityinfinitefortune",
             () -> new ProbabilityManipulationInfiniteFortune(new Item.Properties().stacksTo(1)));
-
-
     public static final RegistryObject<Item> LUCKDENIAL = ITEMS.register("luckdenial",
             () -> new LuckDenial(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> MISFORTUNEMANIPULATION = ITEMS.register("misfortunemanipulation",
@@ -288,6 +280,8 @@ public class ItemInit {
             () -> new DawnArmory(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> DAWNWEAPONRY = ITEMS.register("dawnweaponry",
             () -> new DawnWeaponry(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> ENABLEDISABLEPROTECTION = ITEMS.register("enabledisableprotection",
+            () -> new EnableOrDisableProtection(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> EYEOFDEMONHUNTING = ITEMS.register("eyeofdemonhunting",
             () -> new EyeOfDemonHunting(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> WARRIORDANGERSENSE = ITEMS.register("warriordangersense",
@@ -450,6 +444,16 @@ public class ItemInit {
             () -> new LuckBottleItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> LUCKYGOLDCOIN = ITEMS.register("luckygoldcoin",
             () -> new LuckyGoldCoin(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> LIGHTNINGRUNE = ITEMS.register("lightningstrikerune",
+            () -> new LightningStrikeRune(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> FLAMERUNE = ITEMS.register("flamerune",
+            () -> new LightningStrikeRune(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> WITHERRUNE = ITEMS.register("witherrune",
+            () -> new LightningStrikeRune(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> FREEZERUNE = ITEMS.register("freezerune",
+            () -> new LightningStrikeRune(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> CONFUSIONRUNE = ITEMS.register("confusionrune",
+            () -> new LightningStrikeRune(new Item.Properties().stacksTo(1)));
 
     //OTHER
     public static final RegistryObject<Item> BEYONDER_ABILITY_USER = ITEMS.register("beyonderabilityuser",

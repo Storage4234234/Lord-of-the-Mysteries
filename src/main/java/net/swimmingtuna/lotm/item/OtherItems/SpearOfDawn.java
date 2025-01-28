@@ -30,6 +30,7 @@ public class SpearOfDawn extends SwordItem {
         super(pTier, pAttackDamageModifier, pAttackSpeedModifier, pProperties);
     }
 
+
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
         if (entity instanceof LivingEntity livingEntity && !level.isClientSide()) {
@@ -37,16 +38,24 @@ public class SpearOfDawn extends SwordItem {
                 int sequence = BeyonderUtil.getSequence(livingEntity);
                 if (livingEntity instanceof Player player) {
                     BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                    if (!holder.currentClassMatches(BeyonderClassInit.WARRIOR) && sequence >= 7) {
+                    if (!holder.currentClassMatches(BeyonderClassInit.WARRIOR) || sequence >= 7) {
                         player.getInventory().setItem(itemSlot, ItemStack.EMPTY);
                     } else {
-                        holder.useSpirituality(25);
+                        if (holder.getSpirituality() >= 25) {
+                            holder.useSpirituality(25);
+                        } else {
+                            player.getInventory().setItem(itemSlot, ItemStack.EMPTY);
+                        }
                     }
                 } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
-                    if (playerMobEntity.getCurrentPathway() != BeyonderClassInit.WARRIOR) {
+                    if (playerMobEntity.getCurrentPathway() != BeyonderClassInit.WARRIOR || playerMobEntity.getCurrentSequence() >= 7) {
                         removeItemFromSlot(livingEntity, stack);
                     } else {
-                        playerMobEntity.useSpirituality(25);
+                        if (playerMobEntity.getSpirituality() >= 25) {
+                            playerMobEntity.useSpirituality(25);
+                        } else {
+                            removeItemFromSlot(livingEntity, stack);
+                        }
                     }
                 } else {
                     removeItemFromSlot(livingEntity, stack);

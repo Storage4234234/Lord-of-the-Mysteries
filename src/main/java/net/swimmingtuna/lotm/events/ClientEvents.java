@@ -1,6 +1,5 @@
 package net.swimmingtuna.lotm.events;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
@@ -75,4 +74,6 @@ public class ClientEvents {
         //        event.setCanceled(true);
         //    }
     }
+
+
 }

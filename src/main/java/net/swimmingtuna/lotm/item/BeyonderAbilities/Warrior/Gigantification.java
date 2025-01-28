@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
@@ -97,12 +98,59 @@ public class Gigantification extends SimpleAbilityItem {
 
         }
     }
-    public static boolean isGigantified(LivingEntity living) {
-        CompoundTag tag = living.getPersistentData();
-        boolean isGiant = tag.getBoolean("warriorGiant");
-        boolean isHoGGiant = tag.getBoolean("handOfGodGiant");
-        boolean isTwilightGiant = tag.getBoolean("twilightGiant");
-        return isGiant || isHoGGiant || isTwilightGiant;
+
+    public static void gigantificationScale(LivingEvent.LivingTickEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        CompoundTag tag = livingEntity.getPersistentData();
+        if (!livingEntity.level().isClientSide()) {
+            boolean isGiant = tag.getBoolean("warriorGiant");
+            boolean isHoGGiant = tag.getBoolean("handOfGodGiant");
+            boolean isTwilightGiant = tag.getBoolean("twilightGiant");
+            ScaleData scaleData = ScaleTypes.BASE.getScaleData(livingEntity);
+            float scale = 1.0f;
+            int sequence = BeyonderUtil.getSequence(livingEntity);
+            if (sequence == 6) {
+                scale = 1.3f;
+            } else if (sequence == 5) {
+                scale = 1.5f;
+            } else if (sequence == 4) {
+                scale = 1.5f;
+            } else if (sequence == 3) {
+                scale = 2.0f;
+            } else if (sequence == 2) {
+                scale = 2.3f;
+            } else if (sequence == 1) {
+                scale = 2.3f;
+            } else if (sequence == 0) {
+                scale = 2.5f;
+            }
+            BeyonderClass pathway = BeyonderUtil.getPathway(livingEntity);
+            if (pathway == BeyonderClassInit.WARRIOR.get()) {
+                float scaleToSet = BeyonderUtil.getDamage(livingEntity).get(ItemInit.GIGANTIFICATION.get());
+                if (!isGiant && !isHoGGiant && !isTwilightGiant) {
+                    scaleData.setTargetScale(scale);
+                } else if (isGiant && !isHoGGiant && !isTwilightGiant) {
+                    scaleData.setTargetScale(scaleToSet);
+                } else if (!isGiant && isHoGGiant && !isTwilightGiant) {
+                    scaleData.setTargetScale(scaleToSet * 2);
+                } else if (!isGiant && !isHoGGiant && isTwilightGiant) {
+                    scaleData.setTargetScale(scaleToSet * 3);
+                }
+                if (isTwilightGiant) {
+                    tag.putBoolean("handOfGodGiant", false);
+                    tag.putBoolean("warriorGiant", false);
+                } else if (isHoGGiant) {
+                    tag.putBoolean("warriorGiant", false);
+                    tag.putBoolean("twilightGiant", false);
+                } else if (isGiant) {
+                    tag.putBoolean("twilightGiant", false);
+                    tag.putBoolean("handOfGodGiant", false);
+
+                }
+            }
+        }
     }
+
+
 }
 

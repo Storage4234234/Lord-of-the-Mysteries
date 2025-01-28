@@ -32,6 +32,9 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -69,9 +72,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static net.swimmingtuna.lotm.init.DamageTypeInit.MENTAL_DAMAGE;
 
@@ -386,6 +386,9 @@ public class BeyonderUtil {
                     abilityNames.add(ItemInit.LIGHTOFDAWN.get());
                     abilityNames.add(ItemInit.DAWNARMORY.get());
                     abilityNames.add(ItemInit.DAWNWEAPONRY.get());
+                }
+                if (sequence <= 5) {
+                    abilityNames.add(ItemInit.ENABLEDISABLEPROTECTION.get());
                 }
                 if (sequence <= 4) {
                     abilityNames.add(ItemInit.EYEOFDEMONHUNTING.get());
@@ -1482,5 +1485,25 @@ public class BeyonderUtil {
             }
         }
     }
+    public static final Map<Item, Potion> EFFECT_INGREDIENTS = new HashMap<>() {{
+        put(Items.SUGAR, Potions.SWIFTNESS);
+        put(Items.RABBIT_FOOT, Potions.LEAPING);
+        put(Items.GLISTERING_MELON_SLICE, Potions.HEALING);
+        put(Items.SPIDER_EYE, Potions.POISON);
+        put(Items.PUFFERFISH, Potions.WATER_BREATHING);
+        put(Items.MAGMA_CREAM, Potions.FIRE_RESISTANCE);
+        put(Items.GOLDEN_CARROT, Potions.NIGHT_VISION);
+        put(Items.BLAZE_POWDER, Potions.STRENGTH);
+        put(Items.GHAST_TEAR, Potions.REGENERATION);
+        put(Items.TURTLE_HELMET, Potions.TURTLE_MASTER);
+        put(Items.PHANTOM_MEMBRANE, Potions.SLOW_FALLING);
+    }};
 
+    public static Potion getPotionForIngredient(Item ingredient) {
+        return EFFECT_INGREDIENTS.get(ingredient);
+    }
+
+    public static boolean isValidPotionIngredient(Item ingredient) {
+        return EFFECT_INGREDIENTS.containsKey(ingredient);
+    }
 }

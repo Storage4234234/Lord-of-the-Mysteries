@@ -65,6 +65,11 @@ public class LOTMNetworkHandler {
                 .encoder(SyncAntiConcealmentPacketS2C::encode)
                 .consumerMainThread(SyncAntiConcealmentPacketS2C::handle)
                 .add();
+        INSTANCE.messageBuilder(RemoveInvisibiltyS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(RemoveInvisibiltyS2C::new)
+                .encoder(RemoveInvisibiltyS2C::encode)
+                .consumerMainThread(RemoveInvisibiltyS2C::handle)
+                .add();
         INSTANCE.messageBuilder(MonsterLeftClickC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(MonsterLeftClickC2S::new)
                 .encoder(MonsterLeftClickC2S::toByte)

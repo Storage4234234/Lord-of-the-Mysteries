@@ -6,12 +6,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
+import net.swimmingtuna.lotm.networking.packet.BatchedSpiritWorldUpdatePacketS2C;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import net.swimmingtuna.lotm.networking.packet.BatchedSpiritWorldUpdatePacketS2C;
 
 public class SpiritWorldVisibilityTracker {
     private static final Map<UUID, Map<UUID, Boolean>> lastSentStates = new HashMap<>();

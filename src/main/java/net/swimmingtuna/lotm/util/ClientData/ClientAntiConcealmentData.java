@@ -18,4 +18,5 @@ public class ClientAntiConcealmentData {
     public static UUID getLivingUUID() {
         return livingUUID;
     }
+
 }

@@ -7,6 +7,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.PotionItem;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -23,6 +25,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.forgespi.language.ModFileScanData;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.client.ClientConfigs;
 import net.swimmingtuna.lotm.client.Configs;
@@ -40,6 +43,7 @@ import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.world.worldgen.biome.BiomeModifierRegistry;
 import org.slf4j.Logger;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,6 +75,7 @@ public class LOTM {
         BeyonderHolderAttacher.register();
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Configs.commonSpec);
         BlockEntityInit.register(modEventBus);
+        EnchantmentInit.register(modEventBus);
         CreativeTabInit.register(modEventBus);
         DamageTypeInit.DAMAGE_TYPES.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(new GameRuleInit());
@@ -103,6 +108,22 @@ public class LOTM {
 
     @SubscribeEvent
     public static void commonSetup(final FMLCommonSetupEvent event) {
+        {
+            event.enqueueWork(() -> {
+                for (Item item : ForgeRegistries.ITEMS) {
+                    if (item instanceof PotionItem) {
+                        try {
+                            Field stackSizeField = Item.class.getDeclaredField("f_41370_");
+                            stackSizeField.setAccessible(true);
+                            stackSizeField.set(item, 64);
+                            LOGGER.info("stacking_potions: stack size for potion " + item.getDescriptionId() + " changed to 64");
+                        } catch (Exception ex) {
+                            LOGGER.error("stacking_potions: " + ex.toString());
+                        }
+                    }
+                }
+            });
+        }
         LOTMNetworkHandler.register();
     }
 
@@ -113,8 +134,6 @@ public class LOTM {
         event.registerEntityRenderer(EntityInit.AQUEOUS_LIGHT_ENTITY_PUSH.get(), AqueousLightEntityPushRenderer::new);
         event.registerEntityRenderer(EntityInit.AQUEOUS_LIGHT_ENTITY_PULL.get(), AqueousLightEntityPullRenderer::new);
         event.registerEntityRenderer(EntityInit.LIGHTNING_ENTITY.get(), LightningEntityRenderer::new);
-
-
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
@@ -285,6 +304,7 @@ public class LOTM {
             event.accept(ItemInit.PICKAXEOFDAWN);
             event.accept(ItemInit.GIGANTIFICATION);
             event.accept(ItemInit.LIGHTOFDAWN);
+            event.accept(ItemInit.ENABLEDISABLEPROTECTION);
             event.accept(ItemInit.DAWNARMORY);
             event.accept(ItemInit.DAWNWEAPONRY);
             event.accept(ItemInit.EYEOFDEMONHUNTING);
@@ -351,6 +371,11 @@ public class LOTM {
             event.accept(BlockInit.LOTM_OAK_LOG);
             event.accept(ItemInit.LUCKBOTTLEITEM);
             event.accept(ItemInit.LUCKYGOLDCOIN);
+            event.accept(ItemInit.FREEZERUNE);
+            event.accept(ItemInit.FLAMERUNE);
+            event.accept(ItemInit.LIGHTNINGRUNE);
+            event.accept(ItemInit.WITHERRUNE);
+            event.accept(ItemInit.CONFUSIONRUNE);
 
             event.accept(BlockInit.VISIONARY_BLACK_STAINED_GLASS_PANE);
             event.accept(BlockInit.VISIONARY_WHITE_STAINED_GLASS_PANE);

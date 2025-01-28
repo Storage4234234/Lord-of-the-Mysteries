@@ -1,8 +1,5 @@
 package net.swimmingtuna.lotm.util.ClientData;
 
-import net.minecraft.world.item.Item;
-import net.minecraftforge.event.TickEvent;
-
 import java.util.HashMap;
 import java.util.Map;
 

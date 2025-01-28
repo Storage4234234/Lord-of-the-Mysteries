@@ -28,7 +28,10 @@ public class ParticleInit {
             PARTICLE_TYPES.register("tornado_particle", () -> new SimpleParticleType(true));
     public static final RegistryObject<SimpleParticleType> SONIC_BOOM_PARTICLE =
             PARTICLE_TYPES.register("sonic_boom_particle", () -> new SimpleParticleType(true));
-
+    public static final RegistryObject<SimpleParticleType> PLAYER_TRAIL_PARTICLE =
+            PARTICLE_TYPES.register("playertrail", () -> new SimpleParticleType(true));
+    public static final RegistryObject<SimpleParticleType> MOB_TRAIL_PARTICLE =
+            PARTICLE_TYPES.register("mobtrail", () -> new SimpleParticleType(true));
     public static final RegistryObject<SimpleParticleType> ATTACKER_POISONED_PARTICLE =
             PARTICLE_TYPES.register("attackerpoisoned", () -> new SimpleParticleType(true));
     public static final RegistryObject<SimpleParticleType> BABY_ZOMBIE_PARTICLE =
