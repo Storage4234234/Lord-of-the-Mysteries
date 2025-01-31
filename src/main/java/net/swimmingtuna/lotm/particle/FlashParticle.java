@@ -5,16 +5,16 @@ import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.NotNull;
 
-public class NullParticle extends TextureSheetParticle {
-    protected NullParticle(ClientLevel level, double xCoord, double yCoord, double zCoord, SpriteSet spriteSet, double xd, double yd, double zd) {
+public class FlashParticle extends TextureSheetParticle {
+    protected FlashParticle(ClientLevel level, double xCoord, double yCoord, double zCoord, SpriteSet spriteSet, double xd, double yd, double zd) {
         super(level, xCoord, yCoord, zCoord, xd, yd, zd);
 
-        this.friction = 0F;
+        this.friction = 0.98F;
         this.xd = xd;
         this.yd = yd;
         this.zd = zd;
-        this.quadSize *= 1;
-        this.lifetime = 16;
+        this.quadSize *= 40;
+        this.lifetime = 400;
         this.setSpriteFromAge(spriteSet);
 
         this.rCol = 1f;
@@ -46,9 +46,9 @@ public class NullParticle extends TextureSheetParticle {
         }
 
         public Particle createParticle(@NotNull SimpleParticleType particleType, @NotNull ClientLevel level, double x, double y, double z, double dx, double dy, double dz) {
-            NullParticle nullParticle = new NullParticle(level, x, y, z, this.spriteSet, dx, dy, dz);
-            nullParticle.setColor(1F, 1F, 1F);
-            return nullParticle;
+            FlashParticle flashParticle = new FlashParticle(level, x, y, z, this.spriteSet, dx, dy, dz);
+            flashParticle.setColor(1F, 1F, 1F);
+            return flashParticle;
         }
     }
 }

@@ -90,10 +90,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.Batt
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.DreamIntoReality;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionBarrier;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocationBlink;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.EnableOrDisableProtection;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.EyeOfDemonHunting;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.Gigantification;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.LightOfDawn;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.*;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
@@ -1859,6 +1856,7 @@ public class ModEvents {
             if (entity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
             }
+
             Gigantification.gigantificationScale(event);
             EnableOrDisableProtection.warriorProtectionTick(event);
             GuardianBoxEntity.decrementGuardianTimer(entity);
@@ -1888,6 +1886,7 @@ public class ModEvents {
             LuckDenial.luckDenial(entity);
             MonsterCalamityIncarnation.calamityTickEvent(event);
             dreamWeaving(entity);
+            LightConcealment.lightConcealmentTick(event);
 
             prophesizeTeleportation(tag, entity);
 

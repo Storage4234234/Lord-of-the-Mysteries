@@ -57,7 +57,7 @@ public class SonicBoomParticle extends TextureSheetParticle {
         @Override
         public SonicBoomParticle createParticle(@NotNull SimpleParticleType particleType, @NotNull ClientLevel level, double x, double y, double z, double dx, double dy, double dz) {
             SonicBoomParticle particle = new SonicBoomParticle(level, x, y, z, this.spriteSet, dx, dy, dz);
-            particle.setColor(1F, 0.80F, 0.25F);
+            particle.setColor(1F, 1F, 1F);
             return particle;
         }
     }

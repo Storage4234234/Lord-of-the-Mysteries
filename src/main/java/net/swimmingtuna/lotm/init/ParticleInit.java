@@ -14,6 +14,8 @@ public class ParticleInit {
 
     public static final RegistryObject<SimpleParticleType> NULL_PARTICLE =
             PARTICLE_TYPES.register("null_particle", () -> new SimpleParticleType(true));
+    public static final RegistryObject<SimpleParticleType> FLASH_PARTICLE =
+            PARTICLE_TYPES.register("flash_particle", () -> new SimpleParticleType(true));
     public static final RegistryObject<SimpleParticleType> HURRICANE_OF_LIGHT_PARTICLE_1 =
             PARTICLE_TYPES.register("hurricane_of_light_particle_1", () -> new SimpleParticleType(true));
     public static final RegistryObject<SimpleParticleType> HURRICANE_OF_LIGHT_PARTICLE_2 =

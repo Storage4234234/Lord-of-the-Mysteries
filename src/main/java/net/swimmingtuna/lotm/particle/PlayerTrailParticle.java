@@ -47,7 +47,7 @@ public class PlayerTrailParticle extends TextureSheetParticle {
 
         public Particle createParticle(@NotNull SimpleParticleType particleType, @NotNull ClientLevel level, double x, double y, double z, double dx, double dy, double dz) {
             PlayerTrailParticle playerTrailParticle = new PlayerTrailParticle(level, x, y, z, this.spriteSet, dx, dy, dz);
-            playerTrailParticle.setColor(1F, 0.80F, 0.25F);
+            playerTrailParticle.setColor(1F, 1F, 1F);
             return playerTrailParticle;
         }
     }

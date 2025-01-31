@@ -49,6 +49,7 @@ public class LightningStrikeRune extends Item {
         return InteractionResultHolder.sidedSuccess(stack, pLevel.isClientSide());
     }
 
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.EPIC;

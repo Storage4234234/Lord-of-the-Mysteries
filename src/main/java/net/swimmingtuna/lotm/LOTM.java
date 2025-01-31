@@ -42,6 +42,7 @@ import net.swimmingtuna.lotm.util.PlayerMobs.NameManager;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.world.worldgen.biome.BiomeModifierRegistry;
 import org.slf4j.Logger;
+import software.bernie.geckolib.GeckoLib;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -89,6 +90,7 @@ public class LOTM {
         ParticleInit.register(modEventBus);
         SoundInit.register(modEventBus);
         MenuInit.register(modEventBus);
+        GeckoLib.initialize();
 
         modEventBus.addListener(ClientEvents::onRegisterOverlays);
         BiomeModifierRegistry.BIOME_MODIFIER_SERIALIZERS.register(FMLJavaModLoadingContext.get().getModEventBus());

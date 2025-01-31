@@ -1,11 +1,17 @@
 package net.swimmingtuna.lotm.events;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.event.TickEvent;
@@ -42,12 +48,6 @@ public class ClientEvents {
         }
     }
 
-    //@SubscribeEvent
-    //public static void renderCustomHealth(RenderGuiOverlayEvent.Pre event) {
-    //    if (VanillaGuiOverlay.PLAYER_HEALTH.type() == event.getOverlay()) {
-    //        event.setCanceled(true);
-    //    }
-    //}
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
