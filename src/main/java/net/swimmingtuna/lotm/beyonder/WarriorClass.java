@@ -3,16 +3,27 @@ package net.swimmingtuna.lotm.beyonder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
+import net.swimmingtuna.lotm.caps.BeyonderHolder;
+import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.entity.PlayerMobEntity;
+import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.List;
 
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.DawnWeaponry.hasFullDawnArmor;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.DawnWeaponry.hasFullSilverArmor;
 import static net.swimmingtuna.lotm.util.BeyonderUtil.applyMobEffect;
 
 public class WarriorClass implements BeyonderClass {
@@ -248,6 +259,165 @@ public class WarriorClass implements BeyonderClass {
     public ChatFormatting getColorFormatting() {
         return ChatFormatting.DARK_RED;
     }
+    public static void warriorDamageNegation(LivingHurtEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        DamageSource source = event.getSource();
+        Entity entitySource = source.getEntity();
+        if (!livingEntity.level().isClientSide()) {
+            // boolean isWearingDawnArmor =
+            //boolean isWearingSilverArmor =
+            boolean isGiant = livingEntity.getPersistentData().getBoolean("warriorGiant");
+            boolean isHoGGiant = livingEntity.getPersistentData().getBoolean("handOfGodGiant");
+            boolean isTwilightGiant = livingEntity.getPersistentData().getBoolean("twilightGiant");
+            boolean isPhysical = BeyonderUtil.isPhysicalDamage(source);
+            boolean isSupernatural = BeyonderUtil.isSupernaturalDamage(source);
+            float amount = event.getAmount();
+            int sequence = -1;
+            if (livingEntity instanceof Player player) {
+                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                sequence = holder.getCurrentSequence();
+            } else if (livingEntity instanceof PlayerMobEntity player) {
+                sequence = player.getCurrentSequence();
+            }
+            //if wearing silver armor, if damage is under 25 HP, it's damage is reduced by 80%
+            boolean isWarrior = (livingEntity instanceof Player player && BeyonderHolderAttacher.getHolderUnwrap(player).currentClassMatches(BeyonderClassInit.WARRIOR) || (livingEntity instanceof PlayerMobEntity playerMobEntity && playerMobEntity.getCurrentPathway() == BeyonderClassInit.WARRIOR));
+            if (hasFullSilverArmor(livingEntity) || hasFullDawnArmor(livingEntity)) {
+                if (hasFullSilverArmor(livingEntity)) {
+                    if (!(isWarrior && sequence > 3)) {
+                        if (event.getAmount() <= 20) {
+                            event.setAmount(0);
+                        } else {
+                            event.setAmount(amount * 0.33f);
+                        }
+                    } else {
+                        if (event.getAmount() <= 40 - (sequence * 7)) {
+                            event.setCanceled(true);
+                        } else {
+                            event.setAmount(amount * 0.33f);
+                        }
+                    }
+                } else if (hasFullDawnArmor(livingEntity)) {
+                    if (event.getAmount() <= 10) {
+                        event.setAmount(0);
+                    } else if (isSupernatural) {
+                        event.setAmount(amount / 2);
+                    }
+                }
+            }
+            boolean x = hasFullDawnArmor(livingEntity);
+            if (isWarrior) {
 
+                if (sequence == 8) {
+                    if (isSupernatural) {
+                        event.setAmount((float) (amount * 0.75));
+                    }
+                } else if (sequence == 7) {
+                    if (isSupernatural) {
+                        event.setAmount((float) (amount * 0.75));
+                    } else if (isPhysical) {
+                        event.setAmount((float) (amount * 0.7));
+                    }
+                } else if (sequence == 6) {
+                    if (isSupernatural) {
+                        event.setAmount((float) (amount * 0.7));
+                    } else if (isPhysical) {
+                        if (!isGiant) {
+                            event.setAmount((float) (amount * 0.6));
+                        } else {
+                            if (event.getAmount() <= 5) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.45));
+                            }
+                        }
+                    }
+                } else if (sequence == 5) {
+                    if (isSupernatural) {
+                        event.setAmount((float) (amount * 0.7));
+                    } else if (isPhysical) {
+                        if (!isGiant) {
+                            event.setAmount((float) (amount * 0.5));
+                        } else {
+                            if (event.getAmount() <= 7) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.35));
+                            }
+                        }
+                    }
+                } else if (sequence == 4) {
+                    if (isSupernatural) {
+                        event.setAmount((float) (amount * 0.6));
+                    } else if (isPhysical) {
+                        if (!isGiant) {
+                            event.setAmount((float) (amount * 0.45));
+                        } else {
+                            if (event.getAmount() <= 10) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.35));
+                            }
+                        }
+                    }
+                } else if (sequence == 3 || sequence == 2) {
+                    if (isSupernatural) {
+                        event.setAmount((float) (amount * 0.6));
+                    } else if (isPhysical) {
+                        if (!isGiant) {
+                            event.setAmount((float) (amount * 0.4));
+                        } else {
+                            if (amount <= 15) {
+                                event.setCanceled(true);
+                            } else {
+                                event.setAmount((float) (amount * 0.35));
+                            }
+                        }
+                    }
+                } else if (sequence == 1) {
+                    if (isSupernatural) {
+                        if (isHoGGiant) {
+                            if (event.getAmount() <= 20) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.3));
+                            }
+                        }
+                    } else if (isPhysical) {
+                        if (isHoGGiant) {
+                            if (event.getAmount() <= 20) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.275));
+                            }
+                        } else {
+                            event.setAmount((float) (amount * 0.35));
+                        }
+                    }
+                } else if (sequence == 0) {
+                    if (isSupernatural) {
+                        if (isTwilightGiant) {
+                            if (event.getAmount() <= 25) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.2));
+                            }
+                        } else {
+                            event.setAmount((float) (amount * 0.5));
+                        }
+                    } else if (isPhysical) {
+                        if (isHoGGiant) {
+                            if (event.getAmount() <= 25) {
+                                event.setAmount(0);
+                            } else {
+                                event.setAmount((float) (amount * 0.2));
+                            }
+                        } else {
+                            event.setAmount((float) (amount * 0.35));
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }

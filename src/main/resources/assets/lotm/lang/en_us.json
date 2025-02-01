@@ -165,7 +165,7 @@
   "item.lotm.providencedomain": "Domain of Providence",
   "item.lotm.misfortunedomain": "Domain of Decay",
   "item.lotm.luckchanneling": "Luck Channeling",
-  "item.lotm.choiceofcalamity": "Disable/Enable Calamities",
+  "item.lotm.choiceofcalamity": "Enable/Disable Calamities",
 
   "item.lotm.whisperofcorruption": "Whispers of Corruption",
   "item.lotm.calamityincarnation": "Calamity Incarnation",
@@ -288,7 +288,7 @@
   "item.lotm.luckperception": "Luck Perception",
   "item.lotm.psychestorm": "Psyche Storm",
   "item.lotm.spiritvision": "Spirit Vision",
-  "item.lotm.monsterprojectilecontrol": "Monster Projectile Control",
+  "item.lotm.monsterprojectilecontrol": "Enable/Disable Projectile Computing",
   "item.lotm.luckmanipulation": "Luck Manipulation",
   "item.lotm.luckgifting": "Luck Gifting",
   "item.lotm.misfortunebestowal": "Misfortune Bestowal",

@@ -20,6 +20,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
@@ -332,6 +333,22 @@ public class FalseProphecy extends SimpleAbilityItem {
             tag.putInt("beneficialFalseProphecyJump", 0);
         }
     }
+    public static void doubleProphecyDamageHelper(LivingEvent.LivingTickEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (entity.tickCount % 5 != 0) {
+            return;
+        } else {
+            CompoundTag tag = entity.getPersistentData();
+            boolean x = tag.getBoolean("shouldDoubleProphecyDamage");
+            int y = tag.getInt("beneficialDamageDoubled");
+            if (y < 1) {
+                return;
+            } else if (!x) {
+                tag.putBoolean("shouldDoubleProphecyDamage", true);
+            }
+        }
+    }
+
 
     @Override
     public Rarity getRarity(ItemStack pStack) {

@@ -3,6 +3,7 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Monster;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -18,9 +19,13 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.blocks.MonsterDomainBlockEntity;
+import net.swimmingtuna.lotm.caps.BeyonderHolder;
+import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.BlockInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -53,6 +58,29 @@ public class DomainOfDecay extends SimpleAbilityItem {
         removeDomainOfProvidence(pContext);
         return InteractionResult.SUCCESS;
     }
+
+    public static void monsterDomainIntHandler(Player player) {
+        if (!player.level().isClientSide()) {
+            CompoundTag tag = player.getPersistentData();
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+            int sequence = holder.getCurrentSequence();
+            int maxRadius = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.DECAYDOMAIN.get());
+            int radius = tag.getInt("monsterDomainRadius");
+            if (player.tickCount % 500 == 0) {
+                tag.putInt("monsterDomainMaxRadius", maxRadius);
+            }
+            if (player.isShiftKeyDown() && (player.getMainHandItem().getItem() instanceof DomainOfDecay || player.getMainHandItem().getItem() instanceof DomainOfProvidence)) {
+                tag.putInt("monsterDomainRadius", radius + 5);
+                player.displayClientMessage(Component.literal("Current Domain Radius is " + radius).withStyle(BeyonderUtil.getStyle(player)), true);
+                if (radius >= maxRadius + 1) {
+                    player.displayClientMessage(Component.literal("Current Domain Radius is 0").withStyle(BeyonderUtil.getStyle(player)), true);
+                    tag.putInt("monsterDomainRadius", 0);
+                }
+            }
+        }
+    }
+
+
 
     private void makeDomainOfProvidence(Player player) {
         if (!player.level().isClientSide()) {

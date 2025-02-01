@@ -6,6 +6,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -14,10 +16,14 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.swimmingtuna.lotm.entity.MCLightningBoltEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
+import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -79,6 +85,76 @@ public class TsunamiSeal extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
+    public static void sealTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity entity = event.getEntity();
+        CompoundTag tag = entity.getPersistentData();
+        Level level = entity.level();
+        if (!entity.level().isClientSide()) {
+            int sealCounter = tag.getInt("sailorSeal");
+            if (sealCounter >= 3) {
+                entity.fallDistance = 0;
+                int sealX = tag.getInt("sailorSealX");
+                int sealY = tag.getInt("sailorSealY");
+                int sealZ = tag.getInt("sailorSealZ");
+                entity.teleportTo(sealX, sealY + 1000, sealZ);
+                BlockPos playerPos = entity.blockPosition();
+                double radius = 6.0;
+                double minRemovalRadius = 6.0;
+                double maxRemovalRadius = 11.0;
+
+                // Create a sphere of water around the player
+                for (int x = (int) -radius; x <= radius; x++) {
+                    for (int y = (int) -radius; y <= radius; y++) {
+                        for (int z = (int) -radius; z <= radius; z++) {
+                            double distance = Math.sqrt(x * x + y * y + z * z);
+                            if (distance <= radius) {
+                                BlockPos blockPos = playerPos.offset(x, y, z);
+                                if (level.getBlockState(blockPos).isAir() && !level.getBlockState(blockPos).is(Blocks.WATER)) {
+                                    level.setBlock(blockPos, Blocks.WATER.defaultBlockState(), 3);
+                                }
+                            }
+                        }
+                    }
+                }
+                for (int x = (int) -maxRemovalRadius; x <= maxRemovalRadius; x++) {
+                    for (int y = (int) -maxRemovalRadius; y <= maxRemovalRadius; y++) {
+                        for (int z = (int) -maxRemovalRadius; z <= maxRemovalRadius; z++) {
+                            double distance = Math.sqrt(x * x + y * y + z * z);
+                            if (distance <= maxRemovalRadius && distance >= minRemovalRadius) {
+                                BlockPos blockPos = playerPos.offset(x, y, z);
+                                if (level.getBlockState(blockPos).getBlock() == Blocks.WATER) {
+                                    level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
+                                }
+                            }
+                        }
+                    }
+                }
+                tag.putInt("sailorSeal", sealCounter - 1);
+                if (sealCounter % 20 == 0) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 40, 1, false, false));
+                    entity.addEffect(new MobEffectInstance(ModEffects.STUN.get(), 40, 3, false, false));
+                }
+            }
+            if (sealCounter == 1) {
+                double minRemovalRadius = 6.0;
+                double maxRemovalRadius = 11.0;
+                BlockPos playerPos = entity.blockPosition();
+                for (int x = (int) -maxRemovalRadius; x <= maxRemovalRadius; x++) {
+                    for (int y = (int) -maxRemovalRadius; y <= maxRemovalRadius; y++) {
+                        for (int z = (int) -maxRemovalRadius; z <= maxRemovalRadius; z++) {
+                            double distance = Math.sqrt(x * x + y * y + z * z);
+                            if (distance <= maxRemovalRadius && distance >= minRemovalRadius) {
+                                BlockPos blockPos = playerPos.offset(x, y, z);
+                                if (level.getBlockState(blockPos).getBlock() == Blocks.WATER) {
+                                    level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     public static void summonTsunami(Player player) {
         CompoundTag tag = player.getPersistentData();

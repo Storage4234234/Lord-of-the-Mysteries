@@ -6,13 +6,19 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderInvisibilityPacketS2C;
@@ -20,10 +26,8 @@ import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityDat
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import static net.swimmingtuna.lotm.events.ModEvents.lastSentInvisibilityStates;
 
 public class PsychologicalInvisibility extends SimpleAbilityItem {
 
@@ -85,4 +89,66 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
+
+    public static final Map<UUID, Boolean> lastSentInvisibilityStates = new HashMap<>();
+
+    public static void psychologicalInvisibility(Player player, CompoundTag playerPersistentData, BeyonderHolder holder) {
+        if (player.tickCount % 10 == 0) {
+            boolean currentState = playerPersistentData.getBoolean("psychologicalInvisibility");
+            if (currentState) {
+                Collection<MobEffectInstance> effects = player.getActiveEffects();
+                effects.forEach(effect -> {
+                    if (effect.isAmbient() || effect.isVisible()) {
+                        MobEffectInstance newEffect = new MobEffectInstance(effect.getEffect(), effect.getDuration(), effect.getAmplifier(), false, false, false);
+                        effect.update(newEffect);
+                    }
+                });
+                for (Mob mob : player.level().getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(40))) {
+                    if (mob.getTarget() == player) {
+                        mob.setTarget(null);
+                    }
+                }
+                player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 11, 1, false, false));
+                holder.useSpirituality((int) holder.getMaxSpirituality() / 100);
+            }
+            UUID playerId = player.getUUID();
+            Boolean lastState = lastSentInvisibilityStates.get(playerId);
+            if (lastState == null || lastState != currentState) {
+                LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(currentState, playerId));
+                lastSentInvisibilityStates.put(playerId, currentState);
+            }
+        }
+    }
+
+
+    public static void psychologicalInvisibilityHurt(LivingHurtEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (!entity.level().isClientSide()) {
+            if (entity.getPersistentData().getBoolean("psychologicalInvisibility")) {
+                CompoundTag tag = entity.getPersistentData();
+                int x = tag.getInt("psychologicalInvisibilityHurt");
+                tag.putInt("psychologicalInvisibilityHurt", x + 100);
+            }
+        }
+    }
+
+    public static void psychologicalInvisibilityHurtTick(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide()) {
+            CompoundTag tag = livingEntity.getPersistentData();
+            int x = tag.getInt("psychologicalInvisibilityHurt");
+            if (x >= 1) {
+                tag.putInt("psychologicalInvisibilityHurt", x - 1);
+            }
+            if (x >= 400 && livingEntity.getPersistentData().getBoolean("psychologicalInvisibility")) {
+                livingEntity.getPersistentData().putBoolean("psychologicalInvisibility", false);
+                LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(false, livingEntity.getUUID()));
+                tag.putInt("psychologicalInvisibilityHurt", 0);
+                if (livingEntity instanceof Player player) {
+                    player.displayClientMessage(Component.literal("You got hit too many times, you're now visible").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
+                    player.getCooldowns().addCooldown(ItemInit.PSYCHOLOGICAL_INVISIBILITY.get(), 240);
+                }
+            }
+        }
+    }
+
 }

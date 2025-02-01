@@ -281,6 +281,36 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
         }
     }
 
+    public static void livingLightningStorm(LivingEntity livingEntity) {
+        //MISFORTUNE MANIPULATION
+        if (livingEntity.tickCount % 5 == 0) {
+            CompoundTag tag = livingEntity.getPersistentData();
+            int sailorLightningStorm2 = tag.getInt("sailorLightningStorm2");
+            int x1 = livingEntity.getPersistentData().getInt("sailorStormVecX2");
+            int y1 = livingEntity.getPersistentData().getInt("sailorStormVecY2");
+            int z1 = livingEntity.getPersistentData().getInt("sailorStormVecZ2");
+            if (sailorLightningStorm2 >= 1) {
+                Random random = new Random();
+                tag.putInt("sailorLightningStorm2", sailorLightningStorm2 - 1);
+                LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), livingEntity.level());
+                lightningEntity.setSpeed(7.0f);
+                lightningEntity.setDamage(8);
+                lightningEntity.setMaxLength(30);
+                lightningEntity.setNoUp(true);
+                if (random.nextInt(15) == 1) {
+                    lightningEntity.teleportTo(livingEntity.getX(), lightningEntity.getY() + 50, lightningEntity.getZ());
+                    lightningEntity.setTargetPos(livingEntity.getOnPos().getCenter());
+                    lightningEntity.setDeltaMovement(0, -3, 0);
+                } else {
+                    lightningEntity.setDeltaMovement((Math.random() * 0.4) - 0.2, -3, (Math.random() * 0.4) - 0.2);
+                    lightningEntity.teleportTo(x1 + ((Math.random() * 150) - (double) 150 / 2), y1 + 130, z1 + ((Math.random() * 150) - (double) 150 / 2));
+                }
+                lightningEntity.level().addFreshEntity(lightningEntity);
+            }
+        }
+    }
+
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);

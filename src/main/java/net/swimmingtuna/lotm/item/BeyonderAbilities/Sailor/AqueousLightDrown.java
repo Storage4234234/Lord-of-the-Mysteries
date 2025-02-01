@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -14,6 +15,8 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.entity.AqueousLightEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
@@ -50,6 +53,41 @@ public class AqueousLightDrown extends SimpleAbilityItem {
             AqueousLightEntity.summonEntityWithSpeed(direction, initialVelocity, eyePosition, player.getX(), player.getY(), player.getZ(), player, BeyonderUtil.getDamage(player).get(ItemInit.AQUEOUS_LIGHT_DROWN.get()));
         }
     }
+
+    public static void aqueousLightDrownTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity entity = event.getEntity();
+        Level level = entity.level();
+        if (!entity.level().isClientSide()) {
+            CompoundTag tag = entity.getPersistentData();
+            BlockPos headPos = BlockPos.containing(entity.getEyePosition());
+            int aqueousLight = tag.getInt("lightDrowning");
+            if (aqueousLight == 1) {
+                entity.setAirSupply(0);
+            }
+            if (aqueousLight >= 1) {
+                if (entity.getDeltaMovement().y <= 0.2) {
+                    entity.setDeltaMovement(entity.getDeltaMovement().x, Math.min(0, entity.getDeltaMovement().y - 0.5), entity.getDeltaMovement().z);
+                }
+                tag.putInt("lightDrowning", aqueousLight + 1);
+                if (level.getBlockState(headPos).is(Blocks.AIR)) {
+                    level.setBlockAndUpdate(headPos, Blocks.WATER.defaultBlockState());
+                }
+                for (int x = -3; x <= 3; x++) {
+                    for (int y = -3; y <= 3; y++) {
+                        for (int z = -3; z <= 3; z++) {
+                            if (Math.abs(x) > 1 || Math.abs(y) > 1 || Math.abs(z) > 1) {
+                                BlockPos blockPos = headPos.offset(x, y, z);
+                                if (level.getBlockState(blockPos).is(Blocks.WATER)) {
+                                    level.setBlockAndUpdate(blockPos, Blocks.AIR.defaultBlockState());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use, summons a bubble of water that on hit, summons a water bubble that stays on the hit entity's head for a while."));
@@ -59,6 +97,26 @@ public class AqueousLightDrown extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
+
+    public static void lightDeathEvent(LivingDeathEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (!entity.level().isClientSide()) {
+            if (entity.getPersistentData().getInt("lightDrowning") >= 1) {
+                Level level = entity.level();
+                BlockPos headPos = BlockPos.containing(entity.getEyePosition());
+                for (int x = -3; x <= 3; x++) {
+                    for (int y = -3; y <= 3; y++) {
+                        for (int z = -3; z <= 3; z++) {
+                            BlockPos blockPos = headPos.offset(x, y, z);
+                            if (level.getBlockState(blockPos).is(Blocks.WATER)) {
+                                level.setBlockAndUpdate(blockPos, Blocks.AIR.defaultBlockState());
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static void lightTickEvent(Entity entity) {
@@ -108,6 +166,7 @@ public class AqueousLightDrown extends SimpleAbilityItem {
             }
         }
     }
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);

@@ -3,6 +3,7 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -13,7 +14,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.entity.LightningEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
@@ -60,6 +63,73 @@ public class LightningStorm extends SimpleAbilityItem {
             }
         }
     }
+
+    public static void lightningStorm(Player player, CompoundTag playerPersistentData, Style style, BeyonderHolder holder) {
+        //LIGHTNING STORM
+        double distance = player.getPersistentData().getDouble("sailorLightningStormDistance");
+        if (distance > 300) {
+            playerPersistentData.putDouble("sailorLightningStormDistance", 0);
+            player.displayClientMessage(Component.literal("Storm Radius Is 0").withStyle(style), true);
+        }
+        int tyrantVer = playerPersistentData.getInt("sailorLightningStormTyrant");
+        int sailorMentioned = playerPersistentData.getInt("tyrantMentionedInChat");
+        int sailorLightningStorm1 = playerPersistentData.getInt("sailorLightningStorm1");
+        int x1 = playerPersistentData.getInt("sailorStormVecX1");
+        int y1 = playerPersistentData.getInt("sailorStormVecY1");
+        int z1 = playerPersistentData.getInt("sailorStormVecZ1");
+        if (sailorMentioned >= 1) {
+            playerPersistentData.putInt("tyrantMentionedInChat", sailorMentioned - 1);
+            if (sailorLightningStorm1 >= 1) {
+                for (int i = 0; i < (tyrantVer >= 1 ? 4 : 2); i++) {
+                    LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());
+                    lightningEntity.setSpeed(10.0f);
+                    lightningEntity.setDamage(10);
+                    lightningEntity.setDeltaMovement((Math.random() * 0.4) - 0.2, -4, (Math.random() * 0.4) - 0.2);
+                    lightningEntity.setMaxLength(30);
+                    lightningEntity.setOwner(player);
+                    lightningEntity.setNoUp(true);
+                    lightningEntity.teleportTo(x1 + ((Math.random() * 300) - (double) 300 / 2), y1 + 130, z1 + ((Math.random() * 300) - (double) 300 / 2));
+                    player.level().addFreshEntity(lightningEntity);
+                }
+                if (tyrantVer >= 1) {
+                    playerPersistentData.putInt("sailorLightningStormTyrant", tyrantVer - 1);
+                }
+                playerPersistentData.putInt("sailorLightningStorm1", sailorLightningStorm1 - 1);
+            }
+        }
+
+        int sailorLightningStorm = playerPersistentData.getInt("sailorLightningStorm");
+        int stormVec = playerPersistentData.getInt("sailorStormVec");
+        double sailorStormVecX = playerPersistentData.getInt("sailorStormVecX");
+        double sailorStormVecY = playerPersistentData.getInt("sailorStormVecY");
+        double sailorStormVecZ = playerPersistentData.getInt("sailorStormVecZ");
+        if (sailorLightningStorm >= 1) {
+            for (int i = 0; i < 2; i++) {
+                LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());
+                lightningEntity.setSpeed(10.0f);
+                lightningEntity.setDeltaMovement((Math.random() * 0.4) - 0.2, -4, (Math.random() * 0.4) - 0.2);
+                lightningEntity.setMaxLength(30);
+                lightningEntity.setOwner(player);
+                lightningEntity.setNoUp(true);
+                lightningEntity.teleportTo(sailorStormVecX + ((Math.random() * distance) - distance / 2), sailorStormVecY + 130, sailorStormVecZ + ((Math.random() * distance) - distance / 2));
+                player.level().addFreshEntity(lightningEntity);
+            }
+            playerPersistentData.putInt("sailorLightningStorm", sailorLightningStorm - 1);
+        }
+        if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 3 && player.getMainHandItem().getItem() instanceof LightningStorm) {
+            if (player.isShiftKeyDown()) {
+                playerPersistentData.putInt("sailorStormVec", stormVec + 10);
+                player.displayClientMessage(Component.literal("Sailor Storm Spawn Distance is " + stormVec).withStyle(style), true);
+            }
+            if (stormVec >= 301) {
+                player.displayClientMessage(Component.literal("Sailor Storm Spawn Distance is 0").withStyle(style), true);
+                playerPersistentData.putInt("sailorStormVec", 0);
+                stormVec = 0;
+            }
+        }
+    }
+
+
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {

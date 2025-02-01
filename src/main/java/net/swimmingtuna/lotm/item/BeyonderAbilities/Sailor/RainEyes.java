@@ -5,13 +5,16 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -32,6 +35,20 @@ public class RainEyes extends SimpleAbilityItem {
         addCooldown(player);
         useSpirituality(player);
         return InteractionResult.SUCCESS;
+    }
+
+    public static void rainEyesTick(Player player) {
+        //RAIN EYES
+        if (!player.level().isRaining()) {
+            return;
+        }
+        if (player.getPersistentData().getBoolean("torrentialDownpour") && player.tickCount % 200 == 0) {
+            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.RAIN_EYES.get())))) {
+                if (entity != player && entity instanceof Player otherPlayer && otherPlayer.isInWaterOrRain()) {
+                    player.sendSystemMessage(Component.literal(otherPlayer.getName().getString() + "'s location is " + otherPlayer.getX() + ", " + otherPlayer.getY() + ", " + otherPlayer.getZ()).withStyle(ChatFormatting.BOLD));
+                }
+            }
+        }
     }
 
     @Override

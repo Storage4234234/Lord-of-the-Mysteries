@@ -2,6 +2,7 @@ package net.swimmingtuna.lotm.util.EntityUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -22,6 +23,7 @@ import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.RotationUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ public abstract class BeamEntity extends LOTMProjectile {
 
     private static final EntityDataAccessor<Boolean> DRAGON_BREATH = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> SIZE = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> FRENZY_TIME = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DATA_YAW = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DATA_PITCH = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.FLOAT);
@@ -247,6 +250,50 @@ public abstract class BeamEntity extends LOTMProjectile {
         this.entityData.define(DATA_PITCH, 0.0F);
         this.entityData.define(DRAGON_BREATH, false);
         this.entityData.define(FRENZY_TIME, 1);
+        this.entityData.define(SIZE, 1);
+    }
+
+    @Override
+    protected void readAdditionalSaveData(@NotNull CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+        if (compound.contains("damage")) {
+            this.setDamage(compound.getFloat("damage"));
+        }
+        if (compound.contains("data_yaw")) {
+            this.setYaw(compound.getFloat("data_yaw"));
+        }
+        if (compound.contains("data_pitch")) {
+            this.setPitch(compound.getFloat("data_pitch"));
+        }
+        if (compound.contains("dragon_breath")) {
+            this.setIsDragonbreath(compound.getBoolean("dragon_breath"));
+        }
+        if (compound.contains("frenzy_time")) {
+            this.setFrenzyTime(compound.getInt("frenzy_time"));
+        }
+        if (compound.contains("size")) {
+            this.setSize(compound.getInt("size"));
+        }
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
+        compound.putFloat("damage", this.getDamage());
+        compound.putFloat("data_yaw", this.getYaw());
+        compound.putFloat("data_pitch", this.getPitch());
+        compound.putBoolean("dragon_breath", this.getIsDragonBreath());
+        compound.putInt("frenzy_time", this.getFrenzyTime());
+        compound.putInt("size", this.getSize());
+    }
+
+
+    public int getSize() {
+        return this.entityData.get(SIZE);
+    }
+
+    public void setSize(int size) {
+        this.entityData.set(SIZE, size);
     }
 
     public float getYaw() {

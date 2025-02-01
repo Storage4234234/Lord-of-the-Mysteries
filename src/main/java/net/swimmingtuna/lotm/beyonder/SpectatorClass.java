@@ -108,6 +108,7 @@ public class SpectatorClass implements BeyonderClass {
         items.put(4, ItemInit.MANIPULATE_MOVEMENT.get());
         items.put(4, ItemInit.DRAGON_BREATH.get());
         items.put(4, ItemInit.MENTAL_PLAGUE.get());
+        items.remove(4, ItemInit.FRENZY.get());
         items.put(4, ItemInit.MIND_STORM.get());
         items.put(3, ItemInit.PLAGUE_STORM.get());
         items.put(3, ItemInit.CONSCIOUSNESS_STROLL.get());

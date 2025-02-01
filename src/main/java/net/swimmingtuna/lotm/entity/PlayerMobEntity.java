@@ -14,6 +14,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringUtil;
@@ -32,10 +33,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.util.GoalUtils;
 import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.monster.CrossbowAttackMob;
-import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.monster.RangedAttackMob;
-import net.minecraft.world.entity.monster.ZombifiedPiglin;
+import net.minecraft.world.entity.monster.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -667,6 +665,44 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
     public void setOwner(LivingEntity owner) {
         this.owner = owner;
     }
+    public static ItemStack getDrop(LivingEntity entity, DamageSource source, int looting) {
+        if (entity.level().isClientSide() || entity.getHealth() > 0)
+            return ItemStack.EMPTY;
+        if (entity.isBaby())
+            return ItemStack.EMPTY;
+        double baseChance = entity instanceof PlayerMobEntity ? Configs.COMMON.mobHeadDropChance.get() : Configs.COMMON.playerHeadDropChance.get();
+        if (baseChance <= 0)
+            return ItemStack.EMPTY;
 
+        if (poweredCreeper(source) || randomDrop(entity.level().getRandom(), baseChance, looting)) {
+            ItemStack stack = new ItemStack(Items.PLAYER_HEAD);
+            GameProfile profile = entity instanceof PlayerMobEntity ?
+                    ((PlayerMobEntity) entity).getProfile() :
+                    ((Player) entity).getGameProfile();
+            if (entity instanceof PlayerMobEntity playerMob) {
+                String skinName = playerMob.getUsername().getSkinName();
+                String displayName = playerMob.getUsername().getDisplayName();
+                if (playerMob.getCustomName() != null) {
+                    displayName = playerMob.getCustomName().getString();
+                }
+
+                if (!skinName.equals(displayName)) {
+                    stack.setHoverName(Component.translatable("block.minecraft.player_head.named", displayName));
+                }
+            }
+            if (profile != null)
+                stack.getOrCreateTag().put("SkullOwner", NbtUtils.writeGameProfile(new CompoundTag(), profile));
+            return stack;
+        }
+        return ItemStack.EMPTY;
+    }
+
+    private static boolean poweredCreeper(DamageSource source) {
+        return source.is(DamageTypeTags.IS_EXPLOSION) && source.getEntity() instanceof Creeper creeper && creeper.isPowered();
+    }
+
+    private static boolean randomDrop(RandomSource rand, double baseChance, int looting) {
+        return rand.nextDouble() <= Math.max(0, baseChance * Math.max(looting + 1, 1));
+    }
 }
 

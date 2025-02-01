@@ -7,6 +7,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -23,6 +25,7 @@ import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
+import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -85,6 +88,60 @@ public class ManipulateMovement extends SimpleAbilityItem {
     }
 
     private final Lazy<Multimap<Attribute, AttributeModifier>> lazyAttributeMap = Lazy.of(this::createAttributeMap);
+
+    public static void manipulateMovement(Player player, Level level) {
+        //MANIPULATE MOVEMENT
+        if (!player.getPersistentData().getBoolean("manipulateMovementBoolean")) {
+            return;
+        }
+        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
+            if (!entity.hasEffect(ModEffects.MANIPULATION.get())) {
+                continue;
+            }
+            int targetX = player.getPersistentData().getInt("manipulateMovementX");
+            int targetY = player.getPersistentData().getInt("manipulateMovementY");
+            int targetZ = player.getPersistentData().getInt("manipulateMovementZ");
+
+            if (entity.distanceToSqr(targetX, targetY, targetZ) <= 8) {
+                entity.removeEffect(ModEffects.MANIPULATION.get());
+                continue;
+            }
+
+            if (!(entity instanceof Player)) {
+                if (entity instanceof Mob mob) {
+                    mob.getNavigation().moveTo(targetX, targetY, targetZ, 1.7);
+                }
+                continue;
+            }
+            double entityX = entity.getX();
+            double entityY = entity.getY();
+            double entityZ = entity.getZ();
+
+            double dx = targetX - entityX;
+            double dy = targetY - entityY;
+            double dz = targetZ - entityZ;
+
+            double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            if (distance > 0) {
+                dx /= distance;
+                dy /= distance;
+                dz /= distance;
+            }
+
+            double speed = 3.0 / 20;
+
+            BlockPos frontBlockPos = new BlockPos((int) (entityX + dx), (int) (entityY + dy), (int) (entityZ + dz));
+            BlockPos frontBlockPos1 = new BlockPos((int) (entityX + dx * 2), (int) (entityY + dy * 2), (int) (entityZ + dz * 2));
+            boolean pathIsClear = level.getBlockState(frontBlockPos).isAir() && level.getBlockState(frontBlockPos1).isAir();
+            if (pathIsClear) {
+                entity.setDeltaMovement(dx * speed, Math.min(0, dy * speed), dz * speed);
+                entity.hurtMarked = true;
+            } else {
+                entity.setDeltaMovement(dx * speed, 0.25, dz * speed);
+                entity.hurtMarked = true;
+            }
+        }
+    }
 
     @SuppressWarnings("deprecation")
     @Override

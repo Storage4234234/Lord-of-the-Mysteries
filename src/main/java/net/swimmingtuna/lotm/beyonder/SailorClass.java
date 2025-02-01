@@ -9,10 +9,26 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.ProjectileImpactEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
+import net.swimmingtuna.lotm.caps.BeyonderHolder;
+import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 
 import java.util.List;
@@ -316,4 +332,47 @@ public class SailorClass implements BeyonderClass {
         }
     }
 
+    public static void sailorLightningPassive(AttackEntityEvent event) {
+        Player player = event.getEntity();
+        if (event.getTarget() instanceof LivingEntity livingEntity) {
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+            boolean sailorLightning = player.getPersistentData().getBoolean("SailorLightning");
+            if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 7 && event.getTarget() instanceof LivingEntity livingTarget && sailorLightning && livingTarget != player) {
+                double chanceOfDamage = (100.0 - (holder.getCurrentSequence() * 12.5)); // Decrease chance by 12.5% for each level below 9
+                if (Math.random() * 100 < chanceOfDamage) {
+                    LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, livingTarget.level());
+                    lightningBolt.moveTo(livingTarget.getX(), livingTarget.getY(), livingTarget.getZ());
+                    lightningBolt.setDamage(3);
+                    livingTarget.level().addFreshEntity(lightningBolt);
+                }
+            }
+        }
+    }
+    public static void sailorProjectileLightning(ProjectileImpactEvent event) {
+        Projectile projectile = event.getProjectile();
+        if (!projectile.level().isClientSide()) {
+            CompoundTag tag = projectile.getPersistentData();
+            int x = tag.getInt("sailorLightningProjectileCounter");
+            if (event.getRayTraceResult().getType() == HitResult.Type.ENTITY && x >= 1) {
+                EntityHitResult entityHit = (EntityHitResult) event.getRayTraceResult();
+                Entity entity = entityHit.getEntity();
+                if (!entity.level().isClientSide()) {
+                    if (entity instanceof LivingEntity) {
+                        entity.hurt(projectile.damageSources().lightningBolt(), (x * 5));
+                        LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, entity.level());
+                        lightningBolt.moveTo(entity.getX(), entity.getY(), entity.getZ());
+                        entity.level().addFreshEntity(lightningBolt);
+                        event.setResult(Event.Result.DENY);
+                    }
+                }
+            }
+            if (event.getRayTraceResult().getType() == HitResult.Type.BLOCK && x >= 1) {
+                Vec3 blockPos = event.getRayTraceResult().getLocation();
+                LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, projectile.level());
+                lightningBolt.moveTo(blockPos);
+                projectile.level().addFreshEntity(lightningBolt);
+                projectile.level().explode(null, blockPos.x(), blockPos.y(), blockPos.z(), 4, Level.ExplosionInteraction.BLOCK);
+            }
+        }
+    }
 }

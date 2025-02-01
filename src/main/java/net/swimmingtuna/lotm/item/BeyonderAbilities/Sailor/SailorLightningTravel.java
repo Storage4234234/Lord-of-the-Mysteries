@@ -4,6 +4,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -64,6 +66,16 @@ public class SailorLightningTravel extends SimpleAbilityItem {
             level.addFreshEntity(lightningEntity);
         }
     }
+
+    public static void sailorLightningTravel(Player player) {
+        //SAILOR LIGHTNING TRAVEL
+        if (player.getPersistentData().getInt("sailorLightningTravel") >= 1) {
+            player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 3, 1, false, false));
+            player.getPersistentData().putInt("sailorLightningTravel", player.getPersistentData().getInt("sailorLightningTravel") - 1);
+        }
+    }
+
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);

@@ -97,6 +97,43 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             return "None";
         }
     }
+    public static void calamityIncarnationTornado(CompoundTag playerPersistentData, Player player) {
+        //CALAMITY INCARNATION TORNADO
+        if (playerPersistentData.getInt("calamityIncarnationTornado") >= 1) {
+            playerPersistentData.putInt("calamityIncarnationTornado", player.getPersistentData().getInt("calamityIncarnationTornado") - 1);
+        }
+    }
+
+    public static void calamityLightningStorm(Player pPlayer) {
+        CompoundTag tag = pPlayer.getPersistentData();
+        int stormCounter = tag.getInt("calamityLightningStormSummon");
+        if (stormCounter >= 1) {
+            LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), pPlayer.level());
+            tag.putInt("calamityLightningStormSummon", stormCounter - 1);
+            lightningEntity.setSpeed(6);
+            lightningEntity.setDamage(5);
+            lightningEntity.setNoUp(true);
+            lightningEntity.setDeltaMovement((Math.random() * 0.4) - 0.2, -4, (Math.random() * 0.4) - 0.2);
+            int stormX = tag.getInt("calamityLightningStormX");
+            int stormY = tag.getInt("calamityLightningStormY");
+            int stormZ = tag.getInt("calamityLightningStormZ");
+            int subtractX = (int) (stormX - pPlayer.getX());
+            int subtractY = (int) (stormY - pPlayer.getY());
+            int subtractZ = (int) (stormZ - pPlayer.getZ());
+            for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(40))) {
+                if (entity instanceof Player player) {
+                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                    if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 3) {
+                        player.getPersistentData().putInt("calamityLightningStormImmunity", 20);
+                    }
+                }
+            }
+            double random = (Math.random() * 60) - 30;
+            lightningEntity.teleportTo(stormX + random, stormY + 60, stormZ + random);
+            lightningEntity.setMaxLength(60);
+            pPlayer.level().addFreshEntity(lightningEntity);
+        }
+    }
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {

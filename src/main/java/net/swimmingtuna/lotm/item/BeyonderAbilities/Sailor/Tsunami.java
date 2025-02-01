@@ -52,6 +52,31 @@ public class Tsunami extends SimpleAbilityItem {
         }
     }
 
+    public static void tsunami(CompoundTag playerPersistentData, Player player) {
+        //TSUNAMI
+        int tsunami = playerPersistentData.getInt("sailorTsunami");
+        if (tsunami >= 1) {
+            playerPersistentData.putInt("sailorTsunami", tsunami - 5);
+            Tsunami.summonTsunami(player);
+        } else {
+            playerPersistentData.remove("sailorTsunamiDirection");
+            playerPersistentData.remove("sailorTsunamiX");
+            playerPersistentData.remove("sailorTsunamiY");
+            playerPersistentData.remove("sailorTsunamiZ");
+        }
+
+        //TSUNAMI SEAL
+        int tsunamiSeal = playerPersistentData.getInt("sailorTsunamiSeal");
+        if (tsunamiSeal >= 1) {
+            playerPersistentData.putInt("sailorTsunamiSeal", tsunamiSeal - 5);
+            TsunamiSeal.summonTsunami(player);
+        } else {
+            playerPersistentData.remove("sailorTsunamiSealDirection");
+            playerPersistentData.remove("sailorTsunamiSealX");
+            playerPersistentData.remove("sailorTsunamiSealY");
+            playerPersistentData.remove("sailorTsunamiSealZ");
+        }
+    }
     public static String getDirectionFromYaw(float yaw) {
         if (yaw < 0) {
             yaw += 360;

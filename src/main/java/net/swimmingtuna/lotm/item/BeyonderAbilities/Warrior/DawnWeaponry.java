@@ -7,14 +7,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.ModArmorMaterials;
 
 public class DawnWeaponry extends SimpleAbilityItem {
 
@@ -124,6 +128,32 @@ public class DawnWeaponry extends SimpleAbilityItem {
             return "Spear of Dawn";
         }
         return "None";
+    }
+
+    public static boolean hasFullDawnArmor(LivingEntity entity) {
+        if (entity == null) return false;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+                ItemStack itemStack = entity.getItemBySlot(slot);
+                if (!(itemStack.getItem() instanceof ArmorItem armor) || armor.getMaterial() != ModArmorMaterials.DAWN) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean hasFullSilverArmor(LivingEntity entity) {
+        if (entity == null) return false;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+                ItemStack itemStack = entity.getItemBySlot(slot);
+                if (!(itemStack.getItem() instanceof ArmorItem armor) || armor.getMaterial() != ModArmorMaterials.DAWN) {
+                    return false; // If any slot is not diamond armor, return false
+                }
+            }
+        }
+        return true;
     }
 }
 

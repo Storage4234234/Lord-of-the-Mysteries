@@ -39,6 +39,17 @@ public class EnvisionLife extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
+    public static void envisionLife(Player player) {
+        //ENVISION LIFE
+        int waitMakeLifeCounter = player.getPersistentData().getInt("waitMakeLifeTimer");
+        if (waitMakeLifeCounter >= 1) {
+            waitMakeLifeCounter++;
+        }
+        if (waitMakeLifeCounter >= 600) {
+            waitMakeLifeCounter = 0;
+        }
+        player.getPersistentData().putInt("waitMakeLifeTimer", waitMakeLifeCounter);
+    }
 
     public static void spawnMob(Player player, String mobName) {
         if (!player.level().isClientSide() && player.level() instanceof ServerLevel serverLevel) {

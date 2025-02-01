@@ -2,15 +2,18 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior;
 
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
@@ -88,14 +91,38 @@ public class Gigantification extends SimpleAbilityItem {
 
     public static void gigantificationDestroyBlocks(LivingEvent.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!entity.level().isClientSide()) {
+        if (!entity.level().isClientSide() && entity.isShiftKeyDown()) {
             CompoundTag tag = entity.getPersistentData();
             boolean isGiant = tag.getBoolean("warriorGiant");
             boolean isHoGGiant = tag.getBoolean("handOfGodGiant");
             boolean isTwilightGiant = tag.getBoolean("twilightGiant");
+            boolean destroyBlocks = tag.getBoolean("warriorShouldDestroyBlock");
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(entity);
             float scale = scaleData.getScale();
-
+            if (destroyBlocks && (isGiant || isHoGGiant || isTwilightGiant)) {
+                int radius = (int) (scale + 2);
+                if (isHoGGiant) {
+                    radius *= 2;
+                } else if (isTwilightGiant) {
+                    radius *= 4;
+                }
+                BlockPos playerPos = entity.blockPosition();
+                Level level = entity.level();
+                float obsidianStrength = 1200.0F;
+                for (int x = -radius; x <= radius; x++) {
+                    for (int y = -radius; y <= radius; y++) {
+                        for (int z = -radius; z <= radius; z++) {
+                            BlockPos pos = playerPos.offset(x, y, z);
+                            if (pos.distSqr(playerPos) <= radius * radius) {
+                                BlockState state = level.getBlockState(pos);
+                                if (!state.isAir() && state.getBlock().getExplosionResistance() < obsidianStrength) {
+                                    level.destroyBlock(pos, true);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -147,6 +174,20 @@ public class Gigantification extends SimpleAbilityItem {
                     tag.putBoolean("handOfGodGiant", false);
 
                 }
+            }
+        }
+    }
+    public static void warriorGiant(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide() && livingEntity.tickCount % 20 == 0) {
+            boolean isGiant = livingEntity.getPersistentData().getBoolean("warriorGiant");
+            boolean isHoGGiant = livingEntity.getPersistentData().getBoolean("handOfGodGiant");
+            boolean isTwilightGiant = livingEntity.getPersistentData().getBoolean("twilightGiant");
+            if (isGiant || isHoGGiant || isTwilightGiant) {
+                int amp = 0;
+                if (livingEntity.hasEffect(MobEffects.DAMAGE_RESISTANCE)) {
+                    amp = livingEntity.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier();
+                }
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DAMAGE_RESISTANCE, 40, amp + 1, true, true);
             }
         }
     }

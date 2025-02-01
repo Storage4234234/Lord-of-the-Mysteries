@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.swimmingtuna.lotm.blocks.MonsterDomainBlockEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.BlockInit;
@@ -74,6 +75,18 @@ public class DomainOfProvidence extends SimpleAbilityItem {
             }
         }
     }
+
+    public static void domainDropsExperience(LivingExperienceDropEvent event) {
+        //MONSTER PROVIDENCE DOMAIN
+        if (!event.getEntity().level().isClientSide()) {
+            if (event.getEntity().getPersistentData().getInt("inMonsterProvidenceDomain") >= 1) {
+                int droppedExperience = event.getDroppedExperience();
+                event.setDroppedExperience((int) (droppedExperience * 1.5));
+            }
+        }
+    }
+
+
     private void removeDomainOfProvidence(UseOnContext pContext) {
         Level level = pContext.getLevel();
         BlockPos pos = pContext.getClickedPos();

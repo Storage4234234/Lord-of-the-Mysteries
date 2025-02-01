@@ -445,7 +445,7 @@ public class CorruptionAndLuckHandler {
                 }
                 if (livingEntity.tickCount % 41 == 0 && random.nextInt(50) <= (lotmMisfortuneValue * misfortuneEnhancement) && mcLightning <= 3) {
                     tag.putInt("luckLightningMC", mcLightning + calamityEnhancement);
-                    tag.putDouble("misfortune", lotmMisfortuneValue - 15);
+                    tag.putDouble("misfortune", lotmMisfortuneValue - 10);
                 }
                 if (livingEntity.tickCount % 199 == 0 && random.nextInt(150) <= (lotmMisfortuneValue * misfortuneEnhancement) && !livingEntity.hasEffect(MobEffects.POISON)) {
                     tag.putInt("luckPoison", 15);
@@ -463,9 +463,9 @@ public class CorruptionAndLuckHandler {
                     tag.putInt("cantUseAbility", cantUseAbility + calamityEnhancement);
                     tag.putDouble("misfortune", lotmMisfortuneValue - 15);
                 }
-                if (livingEntity.tickCount % 263 == 0 && random.nextInt(150) <= (lotmMisfortuneValue * misfortuneEnhancement) && doubleDamage <= 15) {
+                if (livingEntity.tickCount % 263 == 0 && random.nextInt(250) <= (lotmMisfortuneValue * misfortuneEnhancement) && doubleDamage <= 15) {
                     tag.putInt("luckDoubleDamage", doubleDamage + calamityEnhancement);
-                    tag.putDouble("misfortune", lotmMisfortuneValue - 5);
+                    tag.putDouble("misfortune", lotmMisfortuneValue - 15);
                 }
             }
             if (lotmLuckValue >= 1) {

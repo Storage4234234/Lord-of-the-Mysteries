@@ -8,6 +8,8 @@ import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
@@ -15,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
@@ -104,9 +107,41 @@ public class DreamIntoReality extends SimpleAbilityItem {
         }
     }
 
+    public static void dreamIntoReality(Player player, BeyonderHolder holder) {
+        //DREAM INTO REALITY
+        boolean canFly = player.getPersistentData().getBoolean("CanFly");
+        if (!canFly) {
+            return;
+        }
+        if (holder.getSpirituality() >= 15) {
+            if (player.tickCount % 2 == 0) {
+                holder.useSpirituality(10);
+            }
+        }
+        if (holder.getSpirituality() <= 15) {
+            DreamIntoReality.stopFlying(player);
+        }
+        if (holder.getCurrentSequence() == 2) {
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 2, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
+        }
+        if (holder.getCurrentSequence() == 1) {
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
+        }
+        if (holder.getCurrentSequence() == 0) {
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 4, false, false));
+            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 5, false, false));
+        }
+    }
+
+
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, turns your dreams into reality, making you a giant with strengthened abilities, quicker regeneration, and stronger melee hits"));
+        tooltipComponents.add(Component.literal("Upon use, turns your dreams into reality, turning you a giant with strengthened abilities, quicker regeneration, and stronger melee hits."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("40 per second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("30 seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));

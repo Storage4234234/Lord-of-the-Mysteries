@@ -11,9 +11,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
+
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.DawnWeaponry.hasFullDawnArmor;
 
 public class DawnArmory extends SimpleAbilityItem {
 
@@ -82,6 +86,27 @@ public class DawnArmory extends SimpleAbilityItem {
             }
         }
     }
+
+    private static void removeArmor(Player player) {
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+                ItemStack armorStack = player.getItemBySlot(slot);
+                if (!armorStack.isEmpty()) {
+                    player.setItemSlot(slot, ItemStack.EMPTY);
+                }
+            }
+        }
+    }
+
+    public static void dawnArmorTickEvent(LivingEvent.LivingTickEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (entity.tickCount % 20 == 0 && !entity.level().isClientSide() && BeyonderUtil.getPathway(entity) == BeyonderClassInit.WARRIOR.get() && BeyonderUtil.getSequence(entity) <= 6) {
+            if (hasFullDawnArmor(entity)) {
+                BeyonderUtil.useSpirituality(entity, 15);
+            }
+        }
+    }
+
     private static ItemStack createEnchantedArmor(ItemStack armor) {
         armor.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 1);
         armor.enchant(Enchantments.UNBREAKING, 3);

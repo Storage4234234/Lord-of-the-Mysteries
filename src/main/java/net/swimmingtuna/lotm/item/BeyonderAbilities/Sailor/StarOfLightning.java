@@ -3,8 +3,11 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -18,7 +21,10 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.entity.LightningEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +57,33 @@ public class StarOfLightning extends SimpleAbilityItem {
                 player.getPersistentData().putInt("sailorLightningStar", 50);
             } else {
                 player.getPersistentData().putInt("sailorLightningStar", 80);
+            }
+        }
+    }
+
+    public static void starOfLightning(Player player, CompoundTag playerPersistentData) {
+        //STAR OF LIGHTNING
+        int sailorLightningStar = playerPersistentData.getInt("sailorLightningStar");
+        if (sailorLightningStar >= 2) {
+            StarOfLightning.summonLightningParticles(player);
+            player.level().playSound(player, player.getOnPos(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 10, 1);
+            playerPersistentData.putInt("sailorLightningStar", sailorLightningStar - 1);
+        }
+        if (sailorLightningStar == 1) {
+            StarOfLightning.starOfLightningExplode(player, player.getOnPos(), 15);
+            playerPersistentData.putInt("sailorLightningStar", 0);
+            for (int i = 0; i < BeyonderUtil.getDamage(player).get(ItemInit.STAR_OF_LIGHTNING.get()); i++) {
+                LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());
+                lightningEntity.setSpeed(50);
+                lightningEntity.setDamage(15);
+                double sailorStarX = (Math.random() * 2 - 1);
+                double sailorStarY = (Math.random() * 2 - 1);
+                double sailorStarZ = (Math.random() * 2 - 1);
+                lightningEntity.setDeltaMovement(sailorStarX, sailorStarY, sailorStarZ);
+                lightningEntity.setMaxLength(10);
+                lightningEntity.setOwner(player);
+                lightningEntity.teleportTo(player.getX(), player.getY(), player.getZ());
+                player.level().addFreshEntity(lightningEntity);
             }
         }
     }

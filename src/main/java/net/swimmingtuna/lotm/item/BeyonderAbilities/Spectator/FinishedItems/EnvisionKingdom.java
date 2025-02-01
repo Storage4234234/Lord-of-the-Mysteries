@@ -1,20 +1,33 @@
 package net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -49,6 +62,73 @@ public class EnvisionKingdom extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
+    public static void envisionKingdom(CompoundTag playerPersistentData, Player player, BeyonderHolder holder, ServerLevel serverLevel) {
+        //ENVISION KINGDOM
+
+        AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
+        int mindScape = playerPersistentData.getInt("inMindscape");
+        if (mindScape < 1) return;
+        Abilities playerAbilities = player.getAbilities();
+        playerPersistentData.putInt("inMindscape", mindScape + 1);
+        if (mindScape >= 1200) {
+            playerPersistentData.putInt("inMindscape", 0);
+        }
+        int mindscapeAbilities = playerPersistentData.getInt("mindscapeAbilities");
+        if (mindscapeAbilities >= 1) {
+            holder.setSpirituality(holder.getMaxSpirituality());
+            if (!playerPersistentData.getBoolean("CAN_FLY")) {
+                if (dreamIntoReality != null) {
+                    dreamIntoReality.setBaseValue(3);
+                }
+                playerAbilities.setFlyingSpeed(0.1F);
+                playerAbilities.mayfly = true;
+                player.onUpdateAbilities();
+                playerPersistentData.putInt("mindscapeAbilities", mindscapeAbilities - 1);
+                if (player instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
+                }
+            }
+        }
+        if (mindscapeAbilities == 1 && !playerPersistentData.getBoolean("CAN_FLY")) {
+            if (dreamIntoReality != null) {
+                dreamIntoReality.setBaseValue(1);
+            }
+            playerAbilities.setFlyingSpeed(0.05F);
+            playerAbilities.mayfly = false;
+            player.onUpdateAbilities();
+            if (player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
+            }
+        }
+
+        int partIndex = mindScape - 2;
+        if (partIndex < 0) return;
+
+        int mindScape1 = playerPersistentData.getInt("inMindscape");
+        int x = playerPersistentData.getInt("mindscapePlayerLocationX");
+        int y = playerPersistentData.getInt("mindscapePlayerLocationY");
+        int z = playerPersistentData.getInt("mindscapePlayerLocationZ");
+        if (mindScape1 < 1) return;
+        if (mindScape1 == 11) {
+            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
+                if (entity != player) {
+                    if (entity instanceof Player) {
+                        entity.teleportTo(player.getX(), player.getY() + 1, player.getZ() - 10);
+                    } else if (entity.getMaxHealth() >= 50) {
+                        entity.teleportTo(player.getX(), player.getY() + 1, player.getZ() - 10);
+                    }
+                }
+            }
+        }
+        if (mindScape == 2 || mindScape == 4 || mindScape == 6 || mindScape == 8 || mindScape == 10) {
+            player.teleportTo(player.getX(), player.getY() + 4.5, player.getZ());
+        }
+        StructureTemplate part = serverLevel.getStructureManager().getOrCreate(new ResourceLocation(LOTM.MOD_ID, "corpse_cathedral_" + (partIndex + 1)));
+        BlockPos tagPos = new BlockPos(x, y + (partIndex * 2), z);
+        StructurePlaceSettings settings = BeyonderUtil.getStructurePlaceSettings(new BlockPos(x, y, z));
+        part.placeInWorld(serverLevel, tagPos, tagPos, settings, null, Block.UPDATE_ALL);
+        playerPersistentData.putInt("inMindscape", mindScape + 1);
     }
 
     private void generateCathedral(Player player) {

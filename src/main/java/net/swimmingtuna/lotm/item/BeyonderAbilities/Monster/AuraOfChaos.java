@@ -115,7 +115,7 @@ public class AuraOfChaos extends SimpleAbilityItem {
                         } else if (randomInt >= 80 && randomInt <= 88) {
                             persistentData.putInt("luckDoubleDamage", persistentData.getInt("luckDoubleDamage") + 1);
                         } else if (randomInt >= 75 && randomInt <= 87) {
-                            BeyonderUtil.applyMobEffect(livingEntity, MobEffects.POISON, 100, 3, false, false);
+                            BeyonderUtil.applyMobEffect(livingEntity, MobEffects.POISON, 200, 3, false, false);
                         } else if (randomInt >= 60 && randomInt <= 74) {
                             Zombie zombie = new Zombie(EntityType.ZOMBIE, player.level());
                             ItemStack netheriteHelmet = new ItemStack(Items.NETHERITE_HELMET);

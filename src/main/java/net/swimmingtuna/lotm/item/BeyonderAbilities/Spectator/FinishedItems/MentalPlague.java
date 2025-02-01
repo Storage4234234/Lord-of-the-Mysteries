@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -81,6 +82,32 @@ public class MentalPlague extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
+    public static void mentalPlague(LivingEntity entity) {
+        //MENTAL PLAGUE
+        int mentalPlagueTimer = entity.getPersistentData().getInt("MentalPlagueTimer");
+        if (entity.hasEffect(ModEffects.MENTALPLAGUE.get())) {
+            mentalPlagueTimer++;
+
+            if (mentalPlagueTimer >= 600) {
+                for (LivingEntity entity1 : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(50))) {
+                    applyEffectsAndDamage(entity1);
+
+                }
+                applyEffectsAndDamage(entity);
+                mentalPlagueTimer = 0;
+            }
+        }
+        entity.getPersistentData().putInt("MentalPlagueTimer", mentalPlagueTimer);
+    }
+
+    private static void applyEffectsAndDamage(LivingEntity entity) {
+        entity.addEffect(new MobEffectInstance(MobEffects.POISON, 400, 2, false, false));
+        entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 400, 1, false, false));
+        entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 400, 1, false, false));
+        BeyonderUtil.applyMentalDamage(entity, entity, 20);
+    }
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);

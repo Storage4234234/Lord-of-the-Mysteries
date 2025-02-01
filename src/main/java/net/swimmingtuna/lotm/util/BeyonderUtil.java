@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -38,18 +39,22 @@ import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.phys.*;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.commands.AbilityRegisterCommand;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
@@ -57,6 +62,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Ability;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.DawnWeaponry;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.Gigantification;
@@ -93,6 +99,70 @@ public class BeyonderUtil {
         }
         return null;
     }
+
+    public static void projectileEvent(Player player, BeyonderHolder holder) {
+        //PROJECTILE EVENT
+        Projectile projectile = BeyonderUtil.getProjectiles(player);
+        if (projectile == null) return;
+
+        //MATTER ACCELERATION ENTITIES
+        if (projectile.getPersistentData().getInt("matterAccelerationEntities") >= 10) {
+            double movementX = Math.abs(projectile.getDeltaMovement().x());
+            double movementY = Math.abs(projectile.getDeltaMovement().y());
+            double movementZ = Math.abs(projectile.getDeltaMovement().z());
+            if (movementX >= 6 || movementY >= 6 || movementZ >= 6) {
+                BlockPos entityPos = projectile.blockPosition();
+                for (int x = -2; x <= 2; x++) {
+                    for (int y = -2; y <= 2; y++) {
+                        for (int z = -2; z <= 2; z++) {
+                            BlockPos pos = entityPos.offset(x, y, z);
+
+                            // Remove the block (replace with air)
+                            projectile.level().setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+                        }
+                    }
+                }
+                for (LivingEntity entity1 : projectile.level().getEntitiesOfClass(LivingEntity.class, projectile.getBoundingBox().inflate(5))) {
+                    if (entity1 instanceof Player playerEntity) {
+                        if (!holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() == 0) {
+                            playerEntity.hurt(playerEntity.damageSources().lightningBolt(), 40);
+                        }
+                    } else {
+                        entity1.hurt(entity1.damageSources().lightningBolt(), 40);
+                    }
+                }
+            }
+        }
+
+
+        //SAILOR PASSIVE CHECK FROM HERE
+        LivingEntity target = BeyonderUtil.getTarget(projectile, 75, 0);
+        if (target != null) {
+            if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 8 && player.getPersistentData().getBoolean("sailorProjectileMovement")) {
+                double dx = target.getX() - projectile.getX();
+                double dy = target.getY() - projectile.getY();
+                double dz = target.getZ() - projectile.getZ();
+                double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                double speed = 1.2;
+                projectile.setDeltaMovement((dx / length) * speed, (dy / length) * speed, (dz / length) * speed);
+                projectile.hurtMarked = true;
+            }
+        }
+
+        //MONSTER CALCULATION PASSIVE
+        if (target != null) {
+            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 8 && player.getPersistentData().getBoolean("monsterProjectileControl")) {
+                double dx = target.getX() - projectile.getX();
+                double dy = target.getY() - projectile.getY();
+                double dz = target.getZ() - projectile.getZ();
+                double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                double speed = 1.2;
+                projectile.setDeltaMovement((dx / length) * speed, (dy / length) * speed, (dz / length) * speed);
+                projectile.hurtMarked = true;
+            }
+        }
+    }
+
 
     public static LivingEntity getTarget(Projectile projectile, double maxValue, double minValue) {
         Entity owner = null;
@@ -585,6 +655,58 @@ public class BeyonderUtil {
         BeyonderHolder hurtHolder = BeyonderHolderAttacher.getHolderUnwrap(hurtEntity);
         float x = Math.min(mentalInt, mentalInt * (hurtHolder.getMentalStrength() / sourceHolder.getMentalStrength()));
         return x;
+    }
+
+    public static void abilityCooldownsServerTick(TickEvent.PlayerTickEvent event) {
+        Player player = event.player;
+        if (!player.level().isClientSide()) {
+            if (player instanceof ServerPlayer serverPlayer) {
+                Map<String, Integer> cooldowns = new HashMap<>();
+                CompoundTag tag = serverPlayer.getPersistentData();
+                if (tag.contains(AbilityRegisterCommand.REGISTERED_ABILITIES_KEY, Tag.TAG_COMPOUND)) {
+                    CompoundTag registeredAbilities = tag.getCompound(AbilityRegisterCommand.REGISTERED_ABILITIES_KEY);
+                    for (String combinationNumber : registeredAbilities.getAllKeys()) {
+                        String abilityResourceLocationString = registeredAbilities.getString(combinationNumber);
+                        ResourceLocation resourceLocation = new ResourceLocation(abilityResourceLocationString);
+                        Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
+                        if (item instanceof SimpleAbilityItem simpleAbilityItem && player.getCooldowns().isOnCooldown(item)) {
+                            float cooldownPercent = player.getCooldowns().getCooldownPercent(item, 0.0F);
+                            if (cooldownPercent > 0) {
+                                int totalCooldown = simpleAbilityItem.getCooldown();
+                                int remainingCooldown = (int) (totalCooldown * cooldownPercent);
+                                if (remainingCooldown > 0) {
+                                    String combination = AbilityRegisterCommand.findCombinationForNumber(Integer.parseInt(combinationNumber));
+                                    if (!combination.isEmpty()) {
+                                        cooldowns.put(combination, remainingCooldown);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!cooldowns.isEmpty()) {
+                    SyncAbilityCooldownsS2C syncPacket = new SyncAbilityCooldownsS2C(cooldowns);
+                    LOTMNetworkHandler.sendToPlayer(syncPacket, serverPlayer);
+                }
+            }
+        }
+    }
+
+
+    public static int getCoordinateAtLeastAway(int centerCoord, int minDistance, int maxDistance) {
+        Random random = new Random();
+        int offset = random.nextInt(maxDistance - minDistance + 1) + minDistance;
+        return random.nextBoolean() ? centerCoord + offset : centerCoord - offset;
+    }
+
+    public static void setCooldown(ServerPlayer player, int cooldown) {
+        player.getPersistentData().putInt("leftClickCooldown", cooldown);
+        LOTMNetworkHandler.sendToPlayer(new SyncLeftClickCooldownS2C(cooldown), player);
+    }
+
+    public static int getCooldown(ServerPlayer player) {
+        return player.getPersistentData().getInt("leftClickCooldown");
     }
 
     public static void leftClickEmpty(Player pPlayer) {

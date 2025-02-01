@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -99,6 +100,24 @@ public class BeyonderAbilityUser extends SimpleAbilityItem {
             }
         }
         return InteractionResult.PASS;
+    }
+
+    public static void clickEvent(AttackEntityEvent event) {
+        Player player = event.getEntity();
+        if (player.getMainHandItem().getItem() instanceof BeyonderAbilityUser) {
+            event.setCanceled(true); // Cancel default attack interaction
+
+            // Add byte 'L' to keysClicked array
+            byte[] keysClicked = player.getPersistentData().getByteArray("keysClicked");
+            for (int i = 0; i < keysClicked.length; i++) {
+                if (keysClicked[i] == 0) {
+                    keysClicked[i] = 1;
+                    player.getPersistentData().putByteArray("keysClicked", keysClicked);
+                    BeyonderAbilityUser.clicked(player, InteractionHand.MAIN_HAND);
+                    break;
+                }
+            }
+        }
     }
 
     @Override

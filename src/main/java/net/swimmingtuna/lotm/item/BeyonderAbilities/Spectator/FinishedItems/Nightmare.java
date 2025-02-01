@@ -4,7 +4,9 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -51,6 +53,17 @@ public class Nightmare extends SimpleAbilityItem {
         addCooldown(player);
         useSpirituality(player);
         nightmare(player, pContext.getLevel(), pContext.getClickedPos());
+        return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public InteractionResult useAbilityOnEntity(ItemStack pStack, Player player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
+        if (!checkAll(player)) {
+            return InteractionResult.FAIL;
+        }
+        addCooldown(player);
+        useSpirituality(player);
+        nightmare(player, player.level(), pInteractionTarget.getOnPos());
         return InteractionResult.SUCCESS;
     }
 
@@ -111,6 +124,26 @@ public class Nightmare extends SimpleAbilityItem {
                 }
             });
         }
+    }
+
+    public static void nightmareTick(Player player, CompoundTag playerPersistentData) {
+        AttributeInstance nightmareAttribute = player.getAttribute(ModAttributes.NIGHTMARE.get());
+        int nightmareTimer = playerPersistentData.getInt("NightmareTimer");
+        int matterAccelerationBlockTimer = player.getPersistentData().getInt("matterAccelerationBlockTimer");
+        if (matterAccelerationBlockTimer >= 1) {
+            player.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
+        }
+
+        if (nightmareAttribute.getValue() >= 1) {
+            nightmareTimer++;
+            if (nightmareTimer >= 600) {
+                nightmareAttribute.setBaseValue(0);
+                nightmareTimer = 0;
+            }
+        } else {
+            nightmareTimer = 0;
+        }
+        playerPersistentData.putInt("NightmareTimer", nightmareTimer);
     }
 
     @Override

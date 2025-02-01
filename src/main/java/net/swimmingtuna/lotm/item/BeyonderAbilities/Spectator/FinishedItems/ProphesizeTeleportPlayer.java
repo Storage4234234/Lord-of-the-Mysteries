@@ -2,6 +2,7 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems;
 
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -65,6 +66,22 @@ public class ProphesizeTeleportPlayer extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
+    public static void prophesizeTeleportation(CompoundTag playerPersistentData, LivingEntity livingEntity) {
+        //PROPHESIZE TELEPORT BLOCK/PLAYER
+        if (playerPersistentData.getInt("prophesizeTeleportationCounter") >= 1) {
+            playerPersistentData.putInt("prophesizeTeleportationCounter", playerPersistentData.getInt("prophesizeTeleportationCounter") - 1);
+        }
+        if (playerPersistentData.getInt("prophesizeTeleportationCounter") == 1) {
+            playerPersistentData.putInt("prophesizeTeleportationCounter", playerPersistentData.getInt("prophesizeTeleportationCounter") - 1);
+            int x = playerPersistentData.getInt("prophesizeTeleportX");
+            int y = playerPersistentData.getInt("prophesizeTeleportY");
+            int z = playerPersistentData.getInt("prophesizeTeleportZ");
+            livingEntity.teleportTo(x, y, z);
+        }
+    }
+
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
