@@ -4,6 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import net.swimmingtuna.lotm.events.ModEvents;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 
 import java.util.function.Supplier;
 
@@ -23,7 +24,7 @@ public class RequestCooldownSetC2S {
             // On the server
             ServerPlayer player = context.getSender();
             if (player != null) {
-                ModEvents.setCooldown(player, 2);
+                BeyonderUtil.setCooldown(player, 2);
             }
         });
         context.setPacketHandled(true);

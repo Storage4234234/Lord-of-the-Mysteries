@@ -23,6 +23,7 @@ public class CommandInit {
         AbilityRegisterCommand.register(event.getDispatcher(), event.getBuildContext());
         PlayerMobsCommand.register(event.getDispatcher());
         FatedConnectionCommand.register(event.getDispatcher(), event.getBuildContext());
+        TransformCommand.register(event.getDispatcher());
         BeyonderRecipeCommand.register(event.getDispatcher(), event.getBuildContext());
         AllyCommand.register(event.getDispatcher());
     }
