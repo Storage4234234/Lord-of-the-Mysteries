@@ -101,7 +101,12 @@ public class SwordOfDawn extends SwordItem {
             Vec3 reachVector = eyePosition.add(lookVector.x * 5, lookVector.y * 5, lookVector.z * 5);
             BlockHitResult blockHit = pPlayer.level().clip(new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, pPlayer));
             if (blockHit.getType() == HitResult.Type.MISS) {
-                HurricaneOfLightEntity.summonHurricaneOfLightWarrior(pPlayer);
+                int sequence = BeyonderUtil.getSequence(pPlayer);
+                if (sequence >= 3) {
+                    HurricaneOfLightEntity.summonHurricaneOfLightWarrior(pPlayer);
+                } else {
+                    HurricaneOfLightEntity.summonHurricaneOfLightAngel(pPlayer);
+                }
                 pPlayer.getCooldowns().addCooldown(this, 400);
             }
         } else {

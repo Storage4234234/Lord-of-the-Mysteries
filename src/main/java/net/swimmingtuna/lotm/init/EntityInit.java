@@ -80,6 +80,9 @@ public class EntityInit {
     public static final RegistryObject<EntityType<MeteorNoLevelEntity>> METEOR_NO_LEVEL_ENTITY =
             ENTITIES.register("meteor_no_hurt", () -> EntityType.Builder.<MeteorNoLevelEntity>of(MeteorNoLevelEntity::new, MobCategory.MISC)
                     .sized(2.0f,2.0f).clientTrackingRange(300).build("meteor_no_hurt"));
+    public static final RegistryObject<EntityType<SilverBeamEntity>> SILVER_BEAM_ENTITY =
+            ENTITIES.register("silver_beam_entity", () -> EntityType.Builder.<SilverBeamEntity>of(SilverBeamEntity::new, MobCategory.MISC)
+                    .sized(2.0f,2.0f).clientTrackingRange(200).build(new ResourceLocation(LOTM.MOD_ID, "silver_beam_entity").toString()));
     public static final RegistryObject<EntityType<WindBladeEntity>> WIND_BLADE_ENTITY =
             ENTITIES.register("wind_blade", () -> EntityType.Builder.<WindBladeEntity>of(WindBladeEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).clientTrackingRange(100).clientTrackingRange(4).updateInterval(20).build("wind_blade"));

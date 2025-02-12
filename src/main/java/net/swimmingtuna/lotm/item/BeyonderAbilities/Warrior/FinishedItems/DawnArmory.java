@@ -1,4 +1,4 @@
-package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior;
+package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems;
 
 
 import net.minecraft.nbt.CompoundTag;
@@ -17,7 +17,7 @@ import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.DawnWeaponry.hasFullDawnArmor;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.DawnWeaponry.hasFullDawnArmor;
 
 public class DawnArmory extends SimpleAbilityItem {
 

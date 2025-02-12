@@ -1,9 +1,8 @@
-package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior;
+package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems;
 
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -17,8 +16,6 @@ import net.swimmingtuna.lotm.init.ParticleInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
-
-import java.util.List;
 
 import static net.swimmingtuna.lotm.networking.LOTMNetworkHandler.sendToPlayer;
 
@@ -62,7 +59,7 @@ public class LightConcealment extends SimpleAbilityItem {
                 int x = (int) ((int) livingEntity.getX() + ((Math.random() * 30) - 15));
                 int y = (int) ((int) livingEntity.getY() + ((Math.random() * 30) - 15));
                 int z = (int) ((int) livingEntity.getZ() + ((Math.random() * 30) - 15));
-                for (int i = 0; i < 5; i++) {
+                for (int i = 0; i < 50; i++) {
                     double velocityX = (Math.random() * 2.0) - 1.0;
                     double velocityY = (Math.random() * 2.0) - 1.0;
                     double velocityZ = (Math.random() * 2.0) - 1.0;

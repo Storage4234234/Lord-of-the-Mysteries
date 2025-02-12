@@ -1,4 +1,4 @@
-package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior;
+package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems;
 
 
 import net.minecraft.ChatFormatting;
@@ -116,7 +116,7 @@ public class Gigantification extends SimpleAbilityItem {
                             if (pos.distSqr(playerPos) <= radius * radius) {
                                 BlockState state = level.getBlockState(pos);
                                 if (!state.isAir() && state.getBlock().getExplosionResistance() < obsidianStrength) {
-                                    level.destroyBlock(pos, true);
+                                    level.destroyBlock(pos, false);
                                 }
                             }
                         }

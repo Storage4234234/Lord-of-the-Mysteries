@@ -15,6 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -28,10 +29,12 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
 
+    private static final EntityDataAccessor<Boolean> DESTROY_ARMOR = SynchedEntityData.defineId(HurricaneOfLightEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_DANGEROUS = SynchedEntityData.defineId(HurricaneOfLightEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_HURRICANE_RADIUS = SynchedEntityData.defineId(HurricaneOfLightEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_HURRICANE_HEIGHT = SynchedEntityData.defineId(HurricaneOfLightEntity.class, EntityDataSerializers.INT);
@@ -42,6 +45,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
     private static final int BLOCK_DESTROY_INTERVAL = 10;
     private static final int PARTICLE_UPDATE_INTERVAL = 2;
     private static final double PARTICLE_DENSITY_FACTOR = 0.75;
+
     public HurricaneOfLightEntity(EntityType<? extends HurricaneOfLightEntity> entityType, Level level) {
         super(entityType, level);
     }
@@ -65,6 +69,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
         this.entityData.define(DATA_HURRICANE_MOV, new Vector3f());
         this.entityData.define(RANDOM_MOVEMENT, false);
         this.entityData.define(DESTROY_BLOCKS, false);
+        this.entityData.define(DESTROY_ARMOR, false);
     }
 
     @Override
@@ -72,6 +77,9 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
         super.readAdditionalSaveData(compound);
         if (compound.contains("HurricaneRandomMovement")) {
             this.setHurricaneRandom(compound.getBoolean("HurricaneRandomMovement"));
+        }
+        if (compound.contains("DestroyArmor")) {
+            this.setDestroyArmor(compound.getBoolean("DestroyArmor"));
         }
         if (compound.contains("HurricanePickupBlocks")) {
             this.setHurricaneDestroy(compound.getBoolean("HurricanePickupBlocks"));
@@ -100,6 +108,21 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             hurricaneOfLightEntity.setHurricaneLifecount(300 - (sequence * 20));
             hurricaneOfLightEntity.setHurricaneDestroy(true);
             hurricaneOfLightEntity.setHurricaneMov(livingEntity.getLookAngle().scale(0.5f).toVector3f());
+
+            livingEntity.level().addFreshEntity(hurricaneOfLightEntity);
+        }
+    }
+
+    public static void summonHurricaneOfLightAngel(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide()) {
+            int sequence = BeyonderUtil.getSequence(livingEntity);
+            HurricaneOfLightEntity hurricaneOfLightEntity = new HurricaneOfLightEntity(livingEntity.level(), livingEntity, 0, 0, 0);
+            hurricaneOfLightEntity.setHurricaneRadius((int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.SWORDOFSILVER.get()));
+            hurricaneOfLightEntity.setHurricaneHeight((int) ((int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.SWORDOFSILVER.get()) * 0.5f));
+            hurricaneOfLightEntity.setHurricaneLifecount(300 - (sequence * 20));
+            hurricaneOfLightEntity.setHurricaneDestroy(true);
+            hurricaneOfLightEntity.setHurricaneMov(livingEntity.getLookAngle().scale(0.75f).toVector3f());
+            hurricaneOfLightEntity.setDestroyArmor(true);
             livingEntity.level().addFreshEntity(hurricaneOfLightEntity);
         }
     }
@@ -110,6 +133,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
         compound.putInt("HurricaneRadius", this.getHurricaneRadius());
         compound.putInt("HurricaneLifeCount", this.getHurricaneLifecount());
         compound.putInt("HurricaneHeight", this.getHurricaneHeight());
+        compound.putBoolean("DestroyArmor", this.getDestroyArmor());
         DataResult<Tag> tagDataResult = ExtraCodecs.VECTOR3F.encodeStart(NbtOps.INSTANCE, this.getHurricaneMov());
         tagDataResult.result().ifPresent(tag -> compound.put("HurricaneMov", tag));
     }
@@ -162,11 +186,12 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
         }
         updateMovementAndLifecycle(HurricaneMov);
     }
+
     private void destroyBlocksOptimized(int hurricaneRadius, int hurricaneHeight) {
         double minY = this.getY() - 10;
         double maxY = this.getY() + hurricaneHeight;
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
-        int currentY = (int)minY + (this.tickCount % 3);
+        int currentY = (int) minY + (this.tickCount % 3);
         while (currentY <= maxY) {
             double heightRatio = (currentY - minY) / (maxY - minY);
             double effectiveRadius = hurricaneRadius * (0.5 + heightRatio * 0.5);
@@ -174,8 +199,8 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             double radiusStep = 0.8;
             for (double angle = 0; angle < Math.PI * 2; angle += angleStep) {
                 for (double r = 0; r < effectiveRadius; r += radiusStep) {
-                    int x = (int)(this.getX() + Math.cos(angle) * r);
-                    int z = (int)(this.getZ() + Math.sin(angle) * r);
+                    int x = (int) (this.getX() + Math.cos(angle) * r);
+                    int z = (int) (this.getZ() + Math.sin(angle) * r);
                     mutablePos.set(x, currentY, z);
                     if (!this.level().getBlockState(mutablePos).isAir() &&
                             !this.level().getBlockState(mutablePos).liquid() &&
@@ -190,11 +215,11 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
 
     private void spawnOptimizedParticles(int hurricaneRadius, int hurricaneHeight) {
         double sizeFactor = (hurricaneRadius + 1) * (hurricaneHeight + 1) / 1000.0;
-        int particleCount = Math.max(20, (int)(100 * sizeFactor * PARTICLE_DENSITY_FACTOR));
+        int particleCount = Math.max(20, (int) (100 * sizeFactor * PARTICLE_DENSITY_FACTOR));
         double baseX = this.getX();
         double baseY = this.getY();
         double baseZ = this.getZ();
-        double radius1 = (double)hurricaneRadius / 8;
+        double radius1 = (double) hurricaneRadius / 8;
         double riseSpeed = 0.2;
         double spinSpeed = 0.1;
         Random random = new Random();
@@ -205,7 +230,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             double angle = this.random.nextDouble() * Math.PI * 2 + this.tickCount * spinSpeed;
             double offsetX = currentRadius * Math.cos(angle);
             double offsetZ = currentRadius * Math.sin(angle);
-            ParticleOptions particle = switch(random.nextInt(3)) {
+            ParticleOptions particle = switch (random.nextInt(3)) {
                 case 0 -> ParticleInit.HURRICANE_OF_LIGHT_PARTICLE_1.get();
                 case 1 -> ParticleInit.HURRICANE_OF_LIGHT_PARTICLE_2.get();
                 default -> ParticleInit.HURRICANE_OF_LIGHT_PARTICLE_3.get();
@@ -270,13 +295,22 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
                 amplifier = livingEntity.getEffect(ModEffects.ARMOR_WEAKNESS.get()).getAmplifier();
             }
             double distanceRatio = distance / effectiveRadius;
-            float damageMultiplier = (0.5f + (float)entityRelativeHeight * 0.5f) * (distanceRatio > 1.0 ? 0.7f : 1.0f);
+            float damageMultiplier = (0.5f + (float) entityRelativeHeight * 0.5f) * (distanceRatio > 1.0 ? 0.7f : 1.0f);
             livingEntity.hurt(BeyonderUtil.genericSource(owner), (float) getHurricaneRadius() * damageMultiplier / 2);
+
             if (this.tickCount % 15 == 0) {
-                livingEntity.addEffect(new MobEffectInstance(ModEffects.ARMOR_WEAKNESS.get(), 200, amplifier, true, true));
-            }
-            if (BeyonderUtil.isPurifiable(livingEntity)) {
-                livingEntity.hurt(BeyonderUtil.magicSource(owner), (float) getHurricaneRadius() * damageMultiplier / 2);
+                if (getDestroyArmor()) {
+                    for (ItemStack armor : livingEntity.getArmorSlots()) {
+                        if (!armor.isEmpty()) {
+                            armor.hurtAndBreak(30, livingEntity, (player) -> player.broadcastBreakEvent(Objects.requireNonNull(armor.getEquipmentSlot())));
+                        }
+                    }
+                    livingEntity.addEffect(new MobEffectInstance(ModEffects.ARMOR_WEAKNESS.get(), 200, amplifier, true, true));
+                }
+
+                if (BeyonderUtil.isPurifiable(livingEntity)) {
+                    livingEntity.hurt(BeyonderUtil.magicSource(owner), (float) getHurricaneRadius() * damageMultiplier / 2);
+                }
             }
         } else {
             int amplifier = 0;
@@ -284,7 +318,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
                 amplifier = livingEntity.getEffect(ModEffects.ARMOR_WEAKNESS.get()).getAmplifier();
             }
             double distanceRatio = distance / effectiveRadius;
-            float damageMultiplier = (0.5f + (float)entityRelativeHeight * 0.5f) * (distanceRatio > 1.0 ? 0.7f : 1.0f);
+            float damageMultiplier = (0.5f + (float) entityRelativeHeight * 0.5f) * (distanceRatio > 1.0 ? 0.7f : 1.0f);
             livingEntity.hurt(livingEntity.damageSources().generic(), (float) getHurricaneRadius() * damageMultiplier / 2);
             if (this.tickCount % 15 == 0) {
                 livingEntity.addEffect(new MobEffectInstance(ModEffects.ARMOR_WEAKNESS.get(), 200, amplifier, true, true));
@@ -294,6 +328,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             }
         }
     }
+
     @Override
     public boolean isOnFire() {
         return false;
@@ -345,6 +380,14 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
 
     public void setHurricaneDestroy(boolean destroy) {
         this.entityData.set(DESTROY_BLOCKS, destroy);
+    }
+
+    public boolean getDestroyArmor() {
+        return this.entityData.get(DESTROY_ARMOR);
+    }
+
+    public void setDestroyArmor(boolean destroy) {
+        this.entityData.set(DESTROY_ARMOR, destroy);
     }
 
 }

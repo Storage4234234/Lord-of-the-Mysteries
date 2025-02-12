@@ -303,6 +303,7 @@ public class LOTM {
             event.accept(ItemInit.WINTRYBLADE);
             event.accept(ItemInit.SWORDOFDAWN);
             event.accept(ItemInit.SPEAROFDAWN);
+            event.accept(ItemInit.SWORDOFSILVER);
             event.accept(ItemInit.PICKAXEOFDAWN);
             event.accept(ItemInit.GIGANTIFICATION);
             event.accept(ItemInit.LIGHTOFDAWN);
@@ -312,6 +313,7 @@ public class LOTM {
             event.accept(ItemInit.EYEOFDEMONHUNTING);
             event.accept(ItemInit.WARRIORDANGERSENSE);
             event.accept(ItemInit.MERCURYLIQUEFICATION);
+            event.accept(ItemInit.SILVERSWORDMANIFESTATION);
             event.accept(ItemInit.SILVERRAPIER);
             event.accept(ItemInit.SILVERARMORY);
             event.accept(ItemInit.LIGHTCONCEALMENT);
@@ -321,7 +323,6 @@ public class LOTM {
             event.accept(ItemInit.MERCURYCAGE);
             event.accept(ItemInit.DIVINEHANDRIGHT);
             event.accept(ItemInit.DIVINEHANDLEFT);
-            event.accept(ItemInit.TWILIGHTMANIFESTATION);
             event.accept(ItemInit.SILVERLIGHT);
             event.accept(ItemInit.AURAOFTWILIGHT);
             event.accept(ItemInit.GLOBEOFTWILIGHT);

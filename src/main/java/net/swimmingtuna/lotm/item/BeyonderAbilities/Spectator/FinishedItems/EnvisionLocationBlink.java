@@ -49,6 +49,7 @@ public class EnvisionLocationBlink extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Use in order to envision your location in the direction you're looking"));
+        tooltipComponents.add(Component.literal("Shift to increase distance"));
         tooltipComponents.add(Component.literal("Left Click for Envision Kingdom"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("Blinked Distance x 4").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));

@@ -22,8 +22,8 @@ import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.List;
 
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.DawnWeaponry.hasFullDawnArmor;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.DawnWeaponry.hasFullSilverArmor;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.DawnWeaponry.hasFullDawnArmor;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.DawnWeaponry.hasFullSilverArmor;
 import static net.swimmingtuna.lotm.util.BeyonderUtil.applyMobEffect;
 
 public class WarriorClass implements BeyonderClass {
@@ -238,6 +238,7 @@ public class WarriorClass implements BeyonderClass {
         items.put(4, ItemInit.EYEOFDEMONHUNTING.get());
         items.put(4, ItemInit.WARRIORDANGERSENSE.get());
         items.put(3, ItemInit.MERCURYLIQUEFICATION.get());
+        items.put(3, ItemInit.SILVERSWORDMANIFESTATION.get());
         items.put(3, ItemInit.SILVERRAPIER.get());
         items.put(3, ItemInit.SILVERARMORY.get());
         items.put(3, ItemInit.LIGHTCONCEALMENT.get());
@@ -247,7 +248,6 @@ public class WarriorClass implements BeyonderClass {
         items.put(2, ItemInit.MERCURYCAGE.get());
         items.put(1, ItemInit.DIVINEHANDLEFT.get());
         items.put(1, ItemInit.DIVINEHANDRIGHT.get());
-        items.put(1, ItemInit.TWILIGHTMANIFESTATION.get());
         items.put(1, ItemInit.SILVERLIGHT.get());
         items.put(0, ItemInit.AURAOFTWILIGHT.get());
         items.put(0, ItemInit.GLOBEOFTWILIGHT.get());

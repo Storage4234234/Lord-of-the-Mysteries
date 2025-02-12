@@ -145,6 +145,7 @@ public class CreativeTabInit {
                         event.accept(ItemInit.EYEOFDEMONHUNTING.get());
                         event.accept(ItemInit.WARRIORDANGERSENSE.get());
                         event.accept(ItemInit.MERCURYLIQUEFICATION.get());
+                        event.accept(ItemInit.SILVERSWORDMANIFESTATION.get());
                         event.accept(ItemInit.SILVERRAPIER.get());
                         event.accept(ItemInit.LIGHTCONCEALMENT.get());
                         event.accept(ItemInit.SILVERARMORY.get());
@@ -154,7 +155,6 @@ public class CreativeTabInit {
                         event.accept(ItemInit.MERCURYCAGE.get());
                         event.accept(ItemInit.DIVINEHANDRIGHT.get());
                         event.accept(ItemInit.DIVINEHANDLEFT.get());
-                        event.accept(ItemInit.TWILIGHTMANIFESTATION.get());
                         event.accept(ItemInit.SILVERLIGHT.get());
                         event.accept(ItemInit.AURAOFTWILIGHT.get());
                         event.accept(ItemInit.GLOBEOFTWILIGHT.get());

@@ -1,4 +1,4 @@
-package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior;
+package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems;
 
 
 import net.minecraft.ChatFormatting;
@@ -20,11 +20,11 @@ import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.ModArmorMaterials;
 
-public class DawnWeaponry extends SimpleAbilityItem {
+public class SilverSwordManifestation extends SimpleAbilityItem {
 
 
-    public DawnWeaponry(Properties properties) {
-        super(properties, BeyonderClassInit.WARRIOR, 6, 0, 20);
+    public SilverSwordManifestation(Properties properties) {
+        super(properties, BeyonderClassInit.WARRIOR, 3, 0, 20);
     }
 
     @Override
@@ -34,47 +34,37 @@ public class DawnWeaponry extends SimpleAbilityItem {
         }
         addCooldown(player);
         useSpirituality(player);
-        dawnWeaponry(player);
+        manifestSword(player);
         return InteractionResult.SUCCESS;
     }
 
-    public static void dawnWeaponry(Player player) {
+    public static void manifestSword(Player player) {
         if (!player.level().isClientSide()) {
-            CompoundTag tag = player.getPersistentData();
             int selectedSlot = findClosestEmptySlot(player);
-            int x = tag.getInt("dawnWeaponry");
             if (selectedSlot != -1) {
                 Inventory inventory = player.getInventory();
-                switch (x) {
-                    case 1 -> {
-                        ItemStack sword = createSword(ItemInit.SWORDOFDAWN.get().getDefaultInstance());
-                        inventory.setItem(selectedSlot, sword);
-                    }
-                    case 2 -> {
-                        ItemStack axe = createPickaxe(ItemInit.PICKAXEOFDAWN.get().getDefaultInstance());
-                        inventory.setItem(selectedSlot, axe);
-                    }
-                    case 3 -> {
-                        ItemStack trident = createSpear(ItemInit.SPEAROFDAWN.get().getDefaultInstance());
-                        inventory.setItem(selectedSlot, trident);
-                    }
-                }
+                ItemStack sword = createSword(ItemInit.SWORDOFSILVER.get().getDefaultInstance());
+                inventory.setItem(selectedSlot, sword);
             }
+            player.setHealth(player.getHealth() - 10.0f);
         }
     }
+
     private static ItemStack createSword(ItemStack armor) {
         armor.enchant(Enchantments.SHARPNESS, 5);
         armor.enchant(Enchantments.KNOCKBACK, 2);
         armor.enchant(Enchantments.UNBREAKING, 3);
-        armor.enchant(Enchantments.FIRE_ASPECT,2);
+        armor.enchant(Enchantments.FIRE_ASPECT, 2);
         return armor;
     }
+
     private static ItemStack createSpear(ItemStack armor) {
         armor.enchant(Enchantments.SHARPNESS, 3);
         armor.enchant(Enchantments.UNBREAKING, 3);
         armor.enchant(Enchantments.LOYALTY, 1);
         return armor;
     }
+
     private static ItemStack createPickaxe(ItemStack armor) {
         armor.enchant(Enchantments.BLOCK_EFFICIENCY, 5);
         armor.enchant(Enchantments.BLOCK_FORTUNE, 2);
@@ -109,7 +99,7 @@ public class DawnWeaponry extends SimpleAbilityItem {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
         if (entity instanceof Player player) {
             if (player.tickCount % 2 == 0 && !level.isClientSide()) {
-                if (player.getMainHandItem().getItem() instanceof DawnWeaponry) {
+                if (player.getMainHandItem().getItem() instanceof SilverSwordManifestation) {
                     player.displayClientMessage(Component.literal("Dawn Weaponry Choice is: " + dawnWeaponryString(player)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.YELLOW), true);
                 }
             }
@@ -117,7 +107,7 @@ public class DawnWeaponry extends SimpleAbilityItem {
         super.inventoryTick(stack, level, entity, itemSlot, isSelected);
     }
 
-    public static String dawnWeaponryString (Player pPlayer) {
+    public static String dawnWeaponryString(Player pPlayer) {
         CompoundTag tag = pPlayer.getPersistentData();
         int dawnWeaponry = tag.getInt("dawnWeaponry");
         if (dawnWeaponry == 1) {

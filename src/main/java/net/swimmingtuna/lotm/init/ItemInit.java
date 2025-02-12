@@ -14,6 +14,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderPotion;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderResetPotion;
 import net.swimmingtuna.lotm.item.OtherItems.*;
@@ -288,6 +289,8 @@ public class ItemInit {
             () -> new WarriorDangerSense(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> MERCURYLIQUEFICATION = ITEMS.register("mercuryliquefication",
             () -> new MercuryLiquefication(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> SILVERSWORDMANIFESTATION = ITEMS.register("silverswordmanifestation",
+            () -> new SilverSwordManifestation(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> SILVERRAPIER = ITEMS.register("silverrapier",
             () -> new SilverRapier(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> SILVERARMORY = ITEMS.register("silverarmory",
@@ -306,8 +309,6 @@ public class ItemInit {
             () -> new DivineHandRight(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> DIVINEHANDLEFT = ITEMS.register("divinehandleft",
             () -> new DivineHandLeft(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> TWILIGHTMANIFESTATION = ITEMS.register("twilightmanifestation",
-            () -> new TwilightManifestation(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> SILVERLIGHT = ITEMS.register("silverlight",
             () -> new SilverLight(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> AURAOFTWILIGHT = ITEMS.register("auraoftwilight",
@@ -433,6 +434,8 @@ public class ItemInit {
     //TOOLS
     public static final RegistryObject<Item> SWORDOFDAWN = ITEMS.register("swordofdawn",
             () -> new SwordOfDawn(Tiers.NETHERITE, 10,-2.8f,new Item.Properties()));
+    public static final RegistryObject<Item> SWORDOFSILVER = ITEMS.register("swordofsilver",
+            () -> new SwordOfSilver(Tiers.NETHERITE, 12,-2f,new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> PICKAXEOFDAWN = ITEMS.register("pickaxeofdawn",
             () -> new PickaxeOfDawn(Tiers.NETHERITE, 0,0,new Item.Properties()));
     public static final RegistryObject<Item> SPEAROFDAWN = ITEMS.register("spearofdawn",

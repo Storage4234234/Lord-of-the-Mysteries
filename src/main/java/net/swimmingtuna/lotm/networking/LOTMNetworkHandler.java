@@ -50,6 +50,11 @@ public class LOTMNetworkHandler {
                 .encoder(DeathKnellLeftClickC2S::toByte)
                 .consumerMainThread(DeathKnellLeftClickC2S::handle)
                 .add();
+        INSTANCE.messageBuilder(SwordOfSilverC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(SwordOfSilverC2S::new)
+                .encoder(SwordOfSilverC2S::toByte)
+                .consumerMainThread(SwordOfSilverC2S::handle)
+                .add();
         INSTANCE.messageBuilder(SyncAlliesPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SyncAlliesPacket::decode)
                 .encoder(SyncAlliesPacket::encode)

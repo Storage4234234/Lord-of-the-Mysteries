@@ -8,6 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -25,6 +26,7 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -48,6 +50,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.phys.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
@@ -64,8 +68,9 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.DawnWeaponry;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.Gigantification;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.DawnWeaponry;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.Gigantification;
+import net.swimmingtuna.lotm.item.OtherItems.SwordOfSilver;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.*;
@@ -466,6 +471,7 @@ public class BeyonderUtil {
                 }
                 if (sequence <= 3) {
                     abilityNames.add(ItemInit.MERCURYLIQUEFICATION.get());
+                    abilityNames.add(ItemInit.SILVERSWORDMANIFESTATION.get());
                     abilityNames.add(ItemInit.SILVERRAPIER.get());
                     abilityNames.add(ItemInit.SILVERARMORY.get());
                     abilityNames.add(ItemInit.LIGHTCONCEALMENT.get());
@@ -479,7 +485,6 @@ public class BeyonderUtil {
                 if (sequence <= 1) {
                     abilityNames.add(ItemInit.DIVINEHANDLEFT.get());
                     abilityNames.add(ItemInit.DIVINEHANDRIGHT.get());
-                    abilityNames.add(ItemInit.TWILIGHTMANIFESTATION.get());
                     abilityNames.add(ItemInit.SILVERLIGHT.get());
                 }
                 if (sequence <= 0) {
@@ -555,17 +560,20 @@ public class BeyonderUtil {
                     ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class);
             hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity",
                     ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class));
-        } catch (NoSuchMethodException ignored) {}
+        } catch (NoSuchMethodException ignored) {
+        }
 
         try {
             Method blockMethod = ability.getClass().getDeclaredMethod("useAbilityOnBlock", UseOnContext.class);
             hasBlockInteraction = !blockMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnBlock", UseOnContext.class));
-        } catch (NoSuchMethodException ignored) {}
+        } catch (NoSuchMethodException ignored) {
+        }
 
         try {
             Method generalMethod = ability.getClass().getDeclaredMethod("useAbility", Level.class, Player.class, InteractionHand.class);
             hasGeneralAbility = !generalMethod.equals(Ability.class.getDeclaredMethod("useAbility", Level.class, Player.class, InteractionHand.class));
-        } catch (NoSuchMethodException ignored) {}
+        } catch (NoSuchMethodException ignored) {
+        }
 
         // Check for entity interaction
         if (hasEntityInteraction) {
@@ -722,13 +730,14 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new DawnWeaponryLeftClickC2S());
             } else if (heldItem.getItem() instanceof Gigantification) {
                 LOTMNetworkHandler.sendToServer(new GigantificationC2S());
+            } else if (heldItem.getItem() instanceof SwordOfSilver) {
+                LOTMNetworkHandler.sendToServer(new SwordOfSilverC2S());
             } else if (heldItem.getItem() instanceof MonsterDomainTeleporation) {
                 LOTMNetworkHandler.sendToServer(new MonsterLeftClickC2S());
             } else if (heldItem.getItem() instanceof BeyonderAbilityUser) {
                 LOTMNetworkHandler.sendToServer(new LeftClickC2S()); //DIFFERENT FOR LEFT CLICK BLOCK
             } else if (heldItem.getItem() instanceof AqueousLightPush) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AQUEOUS_LIGHT_PULL.get())));
-
             } else if (heldItem.getItem() instanceof AqueousLightPull) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AQUEOUS_LIGHT_DROWN.get())));
 
@@ -947,6 +956,8 @@ public class BeyonderUtil {
                 heldItem.shrink(1);
             } else if (heldItem.getItem() instanceof LuckManipulation) {
                 LOTMNetworkHandler.sendToServer(new LuckManipulationLeftClickC2S());
+            } else if (heldItem.getItem() instanceof Gigantification) {
+                LOTMNetworkHandler.sendToServer(new GigantificationC2S());
             } else if (heldItem.getItem() instanceof MisfortuneManipulation) {
                 LOTMNetworkHandler.sendToServer(new MisfortuneManipulationLeftClickC2S());
             } else if (heldItem.getItem() instanceof MonsterCalamityIncarnation) {
@@ -1171,10 +1182,13 @@ public class BeyonderUtil {
         //WARRIOR
         damageMap.put(ItemInit.GIGANTIFICATION.get(), (9.0f - sequence) / abilityWeakness);
         damageMap.put(ItemInit.SWORDOFDAWN.get(), (150.0f - (sequence * 15)) / abilityWeakness);
+        damageMap.put(ItemInit.SWORDOFSILVER.get(), (200.0f - (sequence * 20)) / abilityWeakness);
         damageMap.put(ItemInit.DAWNARMORY.get(), (150.0f - (sequence * 15)) / abilityWeakness);
         damageMap.put(ItemInit.DAWNWEAPONRY.get(), (150.0f - (sequence * 15)) / abilityWeakness);
         damageMap.put(ItemInit.SILVERARMORY.get(), (150.0f - (sequence * 15)) / abilityWeakness);
         damageMap.put(ItemInit.LIGHTOFDAWN.get(), (100.0f - (sequence * 10)) / abilityWeakness);
+        damageMap.put(ItemInit.AURAOFGLORY.get(), (15.0f - (sequence)) / abilityWeakness);
+        damageMap.put(ItemInit.AURAOFTWILIGHT.get(), (30.0f - (sequence * 2)) / abilityWeakness);
         return damageMap;
     }
 
@@ -1282,7 +1296,7 @@ public class BeyonderUtil {
         executeCommand(server, "/beyonderrecipe add lotm:spectator_2_potion terramity:fortunes_favor soulsweapons:lord_soul_day_stalker soulsweapons:lord_soul_night_prowler");
     }
 
-    public static void registerAbilities(Player player,MinecraftServer server) {
+    public static void registerAbilities(Player player, MinecraftServer server) {
         int sequence = BeyonderUtil.getSequence(player);
         BeyonderClass beyonderClass = getPathway(player);
         System.out.println("Sequence: " + sequence);
@@ -1558,7 +1572,6 @@ public class BeyonderUtil {
     }
 
 
-
     public static boolean isPhysicalDamage(DamageSource source) {
         return source.is(DamageTypes.FALL) || source.is(DamageTypes.CACTUS) || source.is(DamageTypes.FLY_INTO_WALL) || source.is(DamageTypes.GENERIC) || source.is(DamageTypes.FALLING_BLOCK) || source.is(DamageTypes.FALLING_ANVIL) || source.is(DamageTypes.FALLING_STALACTITE) || source.is(DamageTypes.STING) ||
                 source.is(DamageTypes.MOB_ATTACK) || source.is(DamageTypes.MOB_ATTACK_NO_AGGRO) || source.is(DamageTypes.PLAYER_ATTACK) || source.is(DamageTypes.ARROW) || source.is(DamageTypes.TRIDENT) || source.is(DamageTypes.MOB_PROJECTILE) || source.is(DamageTypes.FIREBALL) || source.is(DamageTypes.UNATTRIBUTED_FIREBALL) ||
@@ -1607,6 +1620,30 @@ public class BeyonderUtil {
             }
         }
     }
+
+    public static void addSpirituality(LivingEntity living, int spirituality) {
+        if (!living.level().isClientSide()) {
+            if (living instanceof Player player) {
+                BeyonderHolderAttacher.getHolderUnwrap(player).setSpirituality(getSpirituality(living) + spirituality);
+            } else if (living instanceof PlayerMobEntity playerMobEntity) {
+                playerMobEntity.setSpirituality(getSpirituality(playerMobEntity) + spirituality);
+            }
+        }
+    }
+
+    public static int getSpirituality(LivingEntity living) {
+        if (!living.level().isClientSide()) {
+            if (living instanceof Player player) {
+               return (int) BeyonderHolderAttacher.getHolderUnwrap(player).getSpirituality();
+            } else if (living instanceof PlayerMobEntity playerMobEntity) {
+                return playerMobEntity.getSpirituality();
+            } else {
+                return 0;
+            }
+        }
+        return 0;
+    }
+
     public static final Map<Item, Potion> EFFECT_INGREDIENTS = new HashMap<>() {{
         put(Items.SUGAR, Potions.SWIFTNESS);
         put(Items.RABBIT_FOOT, Potions.LEAPING);
@@ -1627,5 +1664,177 @@ public class BeyonderUtil {
 
     public static boolean isValidPotionIngredient(Item ingredient) {
         return EFFECT_INGREDIENTS.containsKey(ingredient);
+    }
+
+    public static void createSphereOfParticles(ServerLevel level, Vec3 center, ParticleOptions particleOptions, int particleCount, double travelDistance) {
+        if (!(level instanceof ServerLevel)) {
+            return;
+        }
+
+        double goldenRatio = (1 + Math.sqrt(5)) / 2;
+        double angleIncrement = Math.PI * 2 * goldenRatio;
+
+        double velocityScale = travelDistance / 2.2;
+
+        for (int i = 0; i < particleCount; i++) {
+            double t = (double) i / particleCount;
+            double inclination = Math.acos(1 - 2 * t);
+            double azimuth = angleIncrement * i;
+
+            // Calculate direction vector
+            double x = Math.sin(inclination) * Math.cos(azimuth);
+            double y = Math.sin(inclination) * Math.sin(azimuth);
+            double z = Math.cos(inclination);
+
+            // Calculate velocities - these will determine the direction and speed
+            double velocityX = x * velocityScale;
+            double velocityY = y * velocityScale;
+            double velocityZ = z * velocityScale;
+
+            // The particles should start at the center position with zero offset
+            level.sendParticles(
+                    particleOptions,
+                    center.x, // spawn X
+                    center.y, // spawn Y
+                    center.z, // spawn Z
+                    1,  // count per particle location
+                    velocityX, // x velocity
+                    velocityY, // y velocity
+                    velocityZ, // z velocity
+                    1.0 // speed modifier - set to 1.0 to use our custom velocities
+            );
+        }
+    }
+
+    public static void createShphereParticlesPlayerCenter(LivingEntity livingEntity, ParticleOptions particle, int particleCount, double speed) {
+        double x = livingEntity.getX();
+        double y = livingEntity.getY();
+        double z = livingEntity.getZ();
+
+        // Calculate the step size for each particle in the cube
+        double step = 2.0 / (particleCount - 1);
+
+        for (int i = 0; i < particleCount; i++) {
+            // Calculate the position within the cube
+            double offsetX = -1.0 + i * step;
+            double offsetY = -1.0 + i * step;
+            double offsetZ = -1.0 + i * step;
+
+            // Calculate the velocity components to expand the cube
+            double velocityX = offsetX * speed;
+            double velocityY = offsetY * speed;
+            double velocityZ = offsetZ * speed;
+
+            // Create the particle packet
+            SendParticleS2C packet = new SendParticleS2C(
+                    particle,
+                    x + offsetX, y + offsetY, z + offsetZ,
+                    velocityX, velocityY, velocityZ
+            );
+
+            // Send the packet (assuming you have a method to send it)
+            LOTMNetworkHandler.sendToAllPlayers(packet);
+        }
+    }
+
+    public static LivingEntity checkEntitiesInLocation(LivingEntity livingEntity, int inflation, int X, int Y, int Z) {
+        AABB box = new AABB(X - inflation, Y - inflation, Z - inflation, X + inflation, Y + inflation, Z + inflation);
+        List<LivingEntity> nearbyEntities = livingEntity.level().getEntitiesOfClass(LivingEntity.class, box);
+        for (LivingEntity living : nearbyEntities) {
+            return living;
+        }
+        return null;
+    }
+
+    public static void ageHandlerTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        CompoundTag tag = livingEntity.getPersistentData();
+        int age = tag.getInt("age");
+        int maxAge = (int) (livingEntity.getMaxHealth() * 10);
+        boolean tenPercent = age >= maxAge * 0.1;
+        boolean twentyPercent = age >= maxAge * 0.2;
+        boolean thirtyPercent = age >= maxAge * 0.3;
+        boolean fortyPercent = age >= maxAge * 0.4;
+        boolean fiftyPercent = age >= maxAge * 0.5;
+        boolean sixtyPercent = age >= maxAge * 0.6;
+        boolean seventyPercent = age >= maxAge * 0.7;
+        boolean eightyPercent = age >= maxAge * 0.8;
+        boolean ninetyPercent = age >= maxAge * 0.9;
+        boolean oneHundredPercent = age >= maxAge;
+        int sequence = BeyonderUtil.getSequence(livingEntity);
+        if (!livingEntity.level().isClientSide() && age >= 1) {
+            if (livingEntity.tickCount % 1200 == 0) {
+                tag.putInt("age", Math.max(0, age - sequence));
+            }
+            if (oneHundredPercent) {
+                tag.putInt("age", 0);
+                livingEntity.kill();
+                if (livingEntity.level() instanceof ServerLevel serverLevel) {
+                    double random = 1 - (Math.random() * 2);
+                    serverLevel.sendParticles(ParticleTypes.CLOUD, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), 1,random, random,random, 1 );
+                }
+                livingEntity.sendSystemMessage(Component.literal("You died due to aging").withStyle(ChatFormatting.RED));
+            }
+            if (ninetyPercent) {
+                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 2, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 4, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 4, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 3, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 5, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
+            } else if (eightyPercent) {
+                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 2, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 3, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 4, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 3, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 4, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
+            } else if (seventyPercent) {
+                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 1, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 3, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 3, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 2, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 3, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
+            } else if (sixtyPercent) {
+                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 1, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 3, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 3, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 1, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 2, true, true);
+            } else if (fiftyPercent) {
+                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 1, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 2, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 2, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 1, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 1, true, true);
+
+            } else if (fortyPercent) {
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 0, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 0, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 1, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 2, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 0, true, true);
+            } else if (thirtyPercent) {
+                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 0, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 1, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 1, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 0, true, true);
+            } else if (twentyPercent) {
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 0, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 0, true, true);
+            } else if (tenPercent) {
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 0, true, true);
+            }
+        }
+    }
+
+    public static void ageHandlerHurt(LivingHurtEvent event) {
+        if (!event.getEntity().level().isClientSide() && event.getEntity().getPersistentData().getInt("age") >= event.getEntity().getMaxHealth() * 5) {
+            if (isPhysicalDamage(event.getSource())) {
+                event.setAmount(event.getAmount() * 1.5f);
+            }
+        }
     }
 }

@@ -7,6 +7,8 @@ import net.swimmingtuna.lotm.events.ModEvents;
 
 import java.util.function.Supplier;
 
+import static net.swimmingtuna.lotm.util.BeyonderUtil.setCooldown;
+
 public class RequestCooldownSetC2S {
     public RequestCooldownSetC2S() {
     }
@@ -20,10 +22,9 @@ public class RequestCooldownSetC2S {
     public static void handle(RequestCooldownSetC2S msg, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
-            // On the server
             ServerPlayer player = context.getSender();
             if (player != null) {
-                ModEvents.setCooldown(player, 2);
+                setCooldown(player, 2);
             }
         });
         context.setPacketHandled(true);

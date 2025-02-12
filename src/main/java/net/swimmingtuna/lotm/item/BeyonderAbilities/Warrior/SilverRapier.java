@@ -11,7 +11,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
-public class SilverRapier extends SimpleAbilityItem {
+public class  SilverRapier extends SimpleAbilityItem {
 
 
     public SilverRapier(Properties properties) {

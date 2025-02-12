@@ -38,6 +38,8 @@
   "item.lotm.swordofdawn": "Sword of Dawn",
   "item.lotm.pickaxeofdawn": "Pickaxe of Dawn",
   "item.lotm.spearofdawn": "Spear of Dawn",
+  "item.lotm.swordofsilver": "Sword of Silver",
+
   "lotm.effect.awe": "Awe",
   "lotm.effect.bleeding": "Bleeding",
   "lotm.effect.stun": "Stun",
@@ -266,6 +268,7 @@
   "item.lotm.eyeofdemonhunting": "Enable/Disable Eye of Demon Hunting",
   "item.lotm.warriordangersense": "Enable/Disable Danger Sense",
   "item.lotm.mercuryliquefication": "Mercury Liquefication",
+  "item.lotm.silverswordmanifestation": "Silver Sword Manifestation",
   "item.lotm.silverrapier": "Silver Rapier",
   "item.lotm.lightconcealment": "Light Concealment",
   "item.lotm.silverarmory": "Silver Armory",

@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public abstract class BeamEntity extends LOTMProjectile {
     public double endPosX;
@@ -50,6 +49,8 @@ public abstract class BeamEntity extends LOTMProjectile {
 
     public @Nullable Direction side = null;
 
+    private static final EntityDataAccessor<Boolean> TWILIGHT = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DESTROY_BLOCKS = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DRAGON_BREATH = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> SIZE = SynchedEntityData.defineId(BeamEntity.class, EntityDataSerializers.INT);
@@ -80,8 +81,6 @@ public abstract class BeamEntity extends LOTMProjectile {
 
     public abstract int getFrames();
 
-    public abstract float getScale();
-
     protected abstract double getRange();
 
     public float getDamage() {
@@ -108,7 +107,24 @@ public abstract class BeamEntity extends LOTMProjectile {
         this.entityData.set(DRAGON_BREATH, isDragonBreath);
     }
 
-    protected abstract int getDuration();
+    public boolean getIsTwilight() {
+        return this.entityData.get(TWILIGHT);
+    }
+
+    public void setIsTwilight(boolean isTwilight) {
+        this.entityData.set(TWILIGHT, isTwilight);
+    }
+
+    public boolean getDestroyBlocks() {
+        return this.entityData.get(DESTROY_BLOCKS);
+    }
+
+    public void setDestroyBlocks(boolean destroyBlocks) {
+        this.entityData.set(DESTROY_BLOCKS, destroyBlocks);
+    }
+
+    public abstract int getDuration();
+
 
     public abstract int getCharge();
 
@@ -126,23 +142,21 @@ public abstract class BeamEntity extends LOTMProjectile {
 
 
     protected Vec3 calculateSpawnPos(LivingEntity owner) {
-        return new Vec3(owner.getX(), owner.getEyeY() - (this.getBbHeight() / 2.0F) + 0.5, owner.getZ())
-                .add(RotationUtil.getTargetAdjustedLookAngle(owner));
+        return new Vec3(owner.getX(), owner.getEyeY() - (this.getBbHeight() / 2.0F) + 0.5, owner.getZ()).add(RotationUtil.getTargetAdjustedLookAngle(owner));
     }
 
     @Override
     public void onAddedToWorld() {
         super.onAddedToWorld();
-
         this.update();
         this.calculateEndPos();
-        this.checkCollisions(new Vec3(this.getX(), this.getY(), this.getZ()), new Vec3(this.endPosX, this.endPosY, this.endPosZ));
     }
 
     @Override
     public void tick() {
         super.tick();
 
+        // Update previous positions and rotations
         this.prevCollidePos = this.collidePos;
         this.prevYaw = this.renderYaw;
         this.prevPitch = this.renderPitch;
@@ -176,64 +190,45 @@ public abstract class BeamEntity extends LOTMProjectile {
                     this.calculateEndPos();
                 }
 
+                // Corrected collision detection start position
+                List<Entity> entities = this.checkCollisions(
+                        new Vec3(this.getX(), this.getY(), this.getZ()), // Corrected start position
+                        new Vec3(this.endPosX, this.endPosY, this.endPosZ)
+                );
 
-                List<Entity> entities = this.checkCollisions(new Vec3(this.getX() + 1, this.getY() + 1, this.getZ() + 1),
-                        new Vec3(this.endPosX, this.endPosY, this.endPosZ));
-
+                // Handle entity collisions and effects
                 for (Entity entity : entities) {
-                    if (entity == owner) {
-                        continue;
+                    if (entity == owner) continue;
+                    if (getIsDragonBreath() && this.getOwner() != null && entity instanceof LivingEntity livingEntity) {
+                        BeyonderUtil.applyMentalDamage((LivingEntity) this.getOwner(), livingEntity, this.getDamage());
+                    } else if (getIsDragonBreath() && this.getOwner() == null && entity instanceof LivingEntity livingEntity){
+                        livingEntity.hurt(livingEntity.damageSources().magic(), getDamage());
+                    } if (getIsTwilight() && entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity pOwner) {
+                        int age = livingEntity.getPersistentData().getInt("age");
+                        livingEntity.getPersistentData().putInt("age", (age + (10 - BeyonderUtil.getSequence(pOwner))) * 3);
                     }
-                    if (!getIsDragonBreath() && this.getOwner() != null) {
-                        entity.hurt(BeyonderUtil.lightningSource(this.getOwner()), this.getDamage());
-                    } else if (!getIsDragonBreath() && this.getOwner() == null) {
-                        entity.hurt(BeyonderUtil.lightningSource(this), this.getDamage());
-                    } else if (getIsDragonBreath() && (this.getOwner() != null && this.getOwner() instanceof LivingEntity pOwner) && (entity instanceof LivingEntity livingEntity)) {
-                       BeyonderUtil.applyMentalDamage(pOwner, livingEntity, this.getDamage());
-                    } else {
-                        entity.hurt(BeyonderUtil.lightningSource(this), this.getDamage());
-                    }
+
                     if (entity instanceof LivingEntity livingEntity && getIsDragonBreath()) {
                         livingEntity.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), getFrenzyTime(), 1, false, false));
                     }
+
                     if (this.causesFire()) {
                         entity.setSecondsOnFire(5);
                     }
                 }
 
+                // Handle block breaking and fire
                 if (!this.level().isClientSide) {
-                    double radius = this.getScale() * 2.0F;
+                    double radius = this.getSize();
+                    AABB bounds = new AABB(
+                            this.collidePosX - radius, this.collidePosY - radius, this.collidePosZ - radius,
+                            this.collidePosX + radius, this.collidePosY + radius, this.collidePosZ + radius
+                    );
 
-                    AABB bounds = new AABB(this.collidePosX - radius, this.collidePosY - radius, this.collidePosZ - radius,
-                            this.collidePosX + radius, this.collidePosY + radius, this.collidePosZ + radius);
-
-                    double centerX = bounds.getCenter().x;
-                    double centerY = bounds.getCenter().y;
-                    double centerZ = bounds.getCenter().z;
-
-                    for (int x = (int) bounds.minX; x <= bounds.maxX; x++) {
-                        for (int y = (int) bounds.minY; y <= bounds.maxY; y++) {
-                            for (int z = (int) bounds.minZ; z <= bounds.maxZ; z++) {
-                                BlockPos pos = new BlockPos(x, y, z);
-                                double distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2) + Math.pow(z - centerZ, 2));
-
-                                if (distance > radius) continue;
-
-                                if (this.breaksBlocks() && !EXCLUDED_BLOCKS.contains(this.level().getBlockState(pos).getBlock())) {
-                                    this.level().destroyBlock(pos, false);
-                                }
-
-                                if (!this.causesFire()) continue;
-
-                                if (this.random.nextInt(3) == 0 && this.level().getBlockState(pos).isAir() &&
-                                        this.level().getBlockState(pos.below()).isSolidRender(this.level(), pos.below())) {
-                                    this.level().setBlockAndUpdate(pos, BaseFireBlock.getState(this.level(), pos));
-                                }
-                            }
-                        }
-                    }
+                    // Block breaking and fire logic here...
                 }
             }
+
             if (this.getTime() - this.getCharge() >= this.getDuration()) {
                 this.on = false;
             }
@@ -251,6 +246,8 @@ public abstract class BeamEntity extends LOTMProjectile {
         this.entityData.define(DRAGON_BREATH, false);
         this.entityData.define(FRENZY_TIME, 1);
         this.entityData.define(SIZE, 1);
+        this.entityData.define(DESTROY_BLOCKS, true);
+        this.entityData.define(TWILIGHT, false);
     }
 
     @Override
@@ -274,6 +271,12 @@ public abstract class BeamEntity extends LOTMProjectile {
         if (compound.contains("size")) {
             this.setSize(compound.getInt("size"));
         }
+        if (compound.contains("destroy_blocks")) {
+            this.setSize(compound.getInt("destroy_blocks"));
+        }
+        if (compound.contains("twilight")) {
+            this.setSize(compound.getInt("twilight"));
+        }
     }
 
     @Override
@@ -285,6 +288,8 @@ public abstract class BeamEntity extends LOTMProjectile {
         compound.putBoolean("dragon_breath", this.getIsDragonBreath());
         compound.putInt("frenzy_time", this.getFrenzyTime());
         compound.putInt("size", this.getSize());
+        compound.putBoolean("destroy_blocks", this.getDestroyBlocks());
+        compound.putBoolean("twilight", this.getIsTwilight());
     }
 
 
@@ -313,53 +318,134 @@ public abstract class BeamEntity extends LOTMProjectile {
     }
 
     private void calculateEndPos() {
+        Vec3 direction;
         if (this.level().isClientSide) {
-            this.endPosX = this.getX() + this.getRange() * Math.cos(this.renderYaw) * Math.cos(this.renderPitch);
-            this.endPosZ = this.getZ() + this.getRange() * Math.sin(this.renderYaw) * Math.cos(this.renderPitch);
-            this.endPosY = this.getY() + this.getRange() * Math.sin(this.renderPitch);
+            direction = new Vec3(
+                    Math.cos(this.renderYaw) * Math.cos(this.renderPitch),
+                    Math.sin(this.renderPitch),
+                    Math.sin(this.renderYaw) * Math.cos(this.renderPitch)
+            ).normalize();
         } else {
-            this.endPosX = this.getX() + this.getRange() * Math.cos(this.getYaw()) * Math.cos(this.getPitch());
-            this.endPosZ = this.getZ() + this.getRange() * Math.sin(this.getYaw()) * Math.cos(this.getPitch());
-            this.endPosY = this.getY() + this.getRange() * Math.sin(this.getPitch());
+            direction = new Vec3(
+                    Math.cos(this.getYaw()) * Math.cos(this.getPitch()),
+                    Math.sin(this.getPitch()),
+                    Math.sin(this.getYaw()) * Math.cos(this.getPitch())
+            ).normalize();
         }
+
+        Vec3 end = new Vec3(this.getX(), this.getY(), this.getZ()).add(direction.scale(this.getRange()));
+        this.endPosX = end.x;
+        this.endPosY = end.y;
+        this.endPosZ = end.z;
+        this.endPos = end;
     }
+
 
     public List<Entity> checkCollisions(Vec3 from, Vec3 to) {
         if (!(this.getOwner() instanceof LivingEntity owner)) return List.of();
 
+        // Get the collision result
         BlockHitResult result = this.level().clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
 
-        if (result.getType() == HitResult.Type.MISS || result.getType() == HitResult.Type.ENTITY || result.getType() == HitResult.Type.BLOCK) {
+        // Update collision position
+        if (result.getType() != HitResult.Type.MISS) {
             Vec3 pos = result.getLocation();
             this.collidePosX = pos.x;
             this.collidePosY = pos.y;
             this.collidePosZ = pos.z;
             this.side = result.getDirection();
         } else {
-            this.collidePosX = this.endPosX;
-            this.collidePosY = this.endPosY;
-            this.collidePosZ = this.endPosZ;
+            this.collidePosX = to.x;
+            this.collidePosY = to.y;
+            this.collidePosZ = to.z;
             this.side = null;
         }
+
+        // Calculate the direction vector
+        Vec3 dir = to.subtract(from).normalize();
+
+        // Get size for radius
+        double radius = this.getSize();
+
+        // Create bounds centered on the beam path
+        AABB bounds = new AABB(
+                Math.min(from.x, this.collidePosX) - radius,
+                Math.min(from.y, this.collidePosY) - radius,
+                Math.min(from.z, this.collidePosZ) - radius,
+                Math.max(from.x, this.collidePosX) + radius,
+                Math.max(from.y, this.collidePosY) + radius,
+                Math.max(from.z, this.collidePosZ) + radius
+        );
+
+        // For block breaking and fire
+        if (!this.level().isClientSide) {
+            BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+
+            for (int x = (int) Math.floor(bounds.minX); x <= Math.ceil(bounds.maxX); x++) {
+                for (int y = (int) Math.floor(bounds.minY); y <= Math.ceil(bounds.maxY); y++) {
+                    for (int z = (int) Math.floor(bounds.minZ); z <= Math.ceil(bounds.maxZ); z++) {
+                        mutablePos.set(x, y, z);
+
+                        // Calculate distance from point to line (beam)
+                        Vec3 point = new Vec3(x + 0.5, y + 0.5, z + 0.5);
+                        Vec3 fromToPoint = point.subtract(from);
+                        double dot = fromToPoint.dot(dir);
+                        Vec3 projection = dir.scale(dot);
+                        Vec3 distanceVec = fromToPoint.subtract(projection);
+                        double distance = distanceVec.length();
+
+                        if (distance <= radius) {
+                            if (getDestroyBlocks()) {
+                                if (this.breaksBlocks() && !EXCLUDED_BLOCKS.contains(this.level().getBlockState(mutablePos).getBlock())) {
+                                    this.level().destroyBlock(mutablePos, false);
+                                }
+                            } else if (this.tickCount % 5 == 0 && getIsTwilight()) {
+                                if (this.level().getBlockState(mutablePos) != Blocks.DIRT.defaultBlockState() && this.level().getBlockState(mutablePos) != Blocks.AIR.defaultBlockState()) {
+                                    this.level().setBlock(mutablePos, Blocks.DIRT.defaultBlockState(), 11);
+                                } else {
+                                    this.level().destroyBlock(mutablePos, false);
+                                }
+                            }
+
+                            if (this.causesFire()) {
+                                if (this.random.nextInt(3) == 0 &&
+                                        this.level().getBlockState(mutablePos).isAir() &&
+                                        this.level().getBlockState(mutablePos.below()).isSolidRender(this.level(), mutablePos.below())) {
+                                    this.level().setBlockAndUpdate(mutablePos, BaseFireBlock.getState(this.level(), mutablePos));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Entity collision detection
         List<Entity> entities = new ArrayList<>();
-
-        AABB bounds = new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY),
-                Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX),
-                Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ))
-                .inflate(this.getScale());
-
         for (Entity entity : this.level().getEntitiesOfClass(Entity.class, bounds)) {
-            float pad = entity.getPickRadius() + 0.5F;
-            AABB padded = entity.getBoundingBox().inflate(pad, pad, pad);
-            Optional<Vec3> hit = padded.clip(from, to);
+            if (entity == this.getOwner()) continue;
 
-            if (padded.contains(from)) {
-                entities.add(entity);
-            } else if (hit.isPresent()) {
+            Vec3 nearestPoint = getNearestPointOnLine(from, to, entity.position());
+            double distance = entity.position().subtract(nearestPoint).length();
+
+            if (distance <= radius + entity.getBbWidth() / 2) {
                 entities.add(entity);
             }
         }
+
         return entities;
+    }
+
+    private Vec3 getNearestPointOnLine(Vec3 lineStart, Vec3 lineEnd, Vec3 point) {
+        Vec3 line = lineEnd.subtract(lineStart);
+        double len = line.length();
+        line = line.normalize();
+
+        Vec3 v = point.subtract(lineStart);
+        double d = v.dot(line);
+        d = Math.max(0, Math.min(len, d));
+
+        return lineStart.add(line.scale(d));
     }
 
     @Override
@@ -373,12 +459,12 @@ public abstract class BeamEntity extends LOTMProjectile {
             this.renderPitch = (float) (-RotationUtil.getTargetAdjustedXRot(owner) * Math.PI / 180.0D);
             this.setYaw((float) ((RotationUtil.getTargetAdjustedYRot(owner) + 90.0F) * Math.PI / 180.0D));
             this.setPitch((float) (-RotationUtil.getTargetAdjustedXRot(owner) * Math.PI / 180.0D));
-            Vec3 spawn = this.calculateSpawnPos(owner);
-            if (this.getFrames() <= this.getCharge()) {
-                this.setPos(spawn.x, spawn.y + 0.5, spawn.z);
-            }
-            this.setPos(spawn.x, spawn.y, spawn.z);
 
+            Vec3 spawn = this.calculateSpawnPos(owner);
+
+            // Corrected positioning logic
+            double yOffset = (this.getFrames() <= this.getCharge()) ? 0.5 : 0.0;
+            this.setPos(spawn.x, spawn.y + yOffset, spawn.z);
         }
     }
 }

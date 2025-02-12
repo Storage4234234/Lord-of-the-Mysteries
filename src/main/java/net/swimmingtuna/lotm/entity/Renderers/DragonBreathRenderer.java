@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.entity.DragonBreathEntity;
 import net.swimmingtuna.lotm.entity.Model.DragonBreathModel;
@@ -29,7 +30,7 @@ public class DragonBreathRenderer extends EntityRenderer<DragonBreathEntity> {
     private static final int TEXTURE_WIDTH = 16;
     private static final int TEXTURE_HEIGHT = 512;
     private static final float BEAM_RADIUS = 0.5F;
-    private boolean clearerView = false;
+    private boolean clearerView = true;
 
     private final DragonBreathModel model;
 
@@ -46,13 +47,24 @@ public class DragonBreathRenderer extends EntityRenderer<DragonBreathEntity> {
 
         float yaw = (pEntity.prevYaw + (pEntity.renderYaw - pEntity.prevYaw) * pPartialTick) * Mth.RAD_TO_DEG;
         float pitch = (pEntity.prevPitch + (pEntity.renderPitch - pEntity.prevPitch) * pPartialTick) * Mth.RAD_TO_DEG;
-
-        Vector3f color = ParticleColors.FIRE_YELLOW;
+        Vector3f color = null;
+        if (pEntity.causesFire()) {
+            color = ParticleColors.FIRE_YELLOW;
+        } else {
+            color = ParticleColors.FIRE_ORANGE;
+        }
 
         float age = pEntity.getTime() + pPartialTick;
 
+        // Main pose stack for entire entity
         pPoseStack.pushPose();
 
+        // Apply entity size at the root level
+        float entitySize = pEntity.getSize();
+        pPoseStack.scale(entitySize, entitySize, entitySize);
+
+        // Render charge effect
+        pPoseStack.pushPose();
         pPoseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yaw));
         pPoseStack.mulPose(Axis.ZN.rotationDegrees(pitch));
 
@@ -62,8 +74,8 @@ public class DragonBreathRenderer extends EntityRenderer<DragonBreathEntity> {
 
         pPoseStack.popPose();
 
-
-        if (pEntity.getTime() >= DragonBreathEntity.CHARGE) {
+        // Render beam
+        if (pEntity.getTime() >= pEntity.getCharge()) {
             double collidePosX = pEntity.prevCollidePosX + (pEntity.collidePosX - pEntity.prevCollidePosX) * pPartialTick;
             double collidePosY = pEntity.prevCollidePosY + (pEntity.collidePosY - pEntity.prevCollidePosY) * pPartialTick;
             double collidePosZ = pEntity.prevCollidePosZ + (pEntity.collidePosZ - pEntity.prevCollidePosZ) * pPartialTick;
@@ -79,18 +91,18 @@ public class DragonBreathRenderer extends EntityRenderer<DragonBreathEntity> {
             }
 
             pPoseStack.pushPose();
-            pPoseStack.scale(pEntity.getScale(), pEntity.getScale(), pEntity.getScale());
             pPoseStack.translate(0.0F, (pEntity.getBbHeight() / 2.0F) - 0.5F, 0.0F);
 
             VertexConsumer beam = pBuffer.getBuffer(LOTMRenderTypes.glow(TEXTURE));
 
             float brightness = 1.0F - ((float) pEntity.getTime() / (pEntity.getCharge() + pEntity.getDuration() + pEntity.getFrames()));
 
-            this.renderBeam(length, yaw, pitch, frame, pPoseStack, beam,
-                    brightness, pPackedLight);
-
+            this.renderBeam(length, yaw, pitch, frame, pPoseStack, beam, brightness, pPackedLight);
             pPoseStack.popPose();
         }
+
+        // Pop the main pose stack
+        pPoseStack.popPose();
     }
 
     private void drawCube(float length, int frame, PoseStack poseStack, VertexConsumer consumer, float brightness, int packedLight) {
