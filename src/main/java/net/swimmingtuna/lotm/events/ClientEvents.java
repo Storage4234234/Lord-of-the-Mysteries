@@ -1,11 +1,9 @@
 package net.swimmingtuna.lotm.events;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -24,6 +22,7 @@ import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.util.ClientData.ClientAbilityCooldownData;
 import net.swimmingtuna.lotm.util.ClientData.ClientAntiConcealmentData;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
+import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderTransformData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +30,35 @@ import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientEvents {
+
+    @SubscribeEvent
+    public static void onPlayerRender(RenderPlayerEvent.Pre event) {
+        if (ClientShouldntRenderTransformData.getInstance().isTransformed()) {
+            Mob mob = ClientShouldntRenderTransformData.getInstance().getCachedMob();
+            event.setCanceled(true);
+            Player player = event.getEntity();
+            float partialTick = event.getPartialTick();
+            double x = player.xo + (player.getX() - player.xo) * partialTick;
+            double y = player.yo + (player.getY() - player.yo) * partialTick;
+            double z = player.zo + (player.getZ() - player.zo) * partialTick;
+            float yRot = lerpAngle(partialTick, player.yRotO, player.getYRot());
+            float xRot = lerpAngle(partialTick, player.xRotO, player.getXRot());
+
+
+            mob.setPos(x, y, z);
+            mob.setYRot(yRot);
+            mob.setXRot(xRot);
+            mob.yHeadRot = player.yHeadRot;
+            mob.yBodyRot = player.yBodyRot;
+
+            EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+            dispatcher.render(mob, 0, 0, 0, 0, event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
+        }
+    }
+
+    private static float lerpAngle(float partialTick, float prev, float current) {
+        return prev + (current - prev) * partialTick;
+    }
 
     @SubscribeEvent
     public static void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
