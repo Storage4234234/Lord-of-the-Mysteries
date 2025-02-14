@@ -1,0 +1,113 @@
+package net.swimmingtuna.lotm.util;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+
+public class ScribeRegisteredAbilitiesMenu extends AbstractContainerMenu {
+    private final Container container;
+
+    public ScribeRegisteredAbilitiesMenu(int containerId, Inventory playerInventory, Container abilityContainer) {
+        super(MenuType.GENERIC_9x5, containerId);
+        this.container = abilityContainer;
+        for (int i = 0; i < this.container.getContainerSize(); i++) {
+            this.addSlot(new Slot(this.container, i, 8 + (i % 9) * 18, 18 + (i / 9) * 18) {
+                @Override
+                public boolean mayPickup(Player player) {
+                    return false;
+                }
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return false;
+                }
+            });
+        }
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 9; j++) {
+                this.addSlot(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 86 + i * 18));
+            }
+        }
+        for (int k = 0; k < 9; k++) {
+            this.addSlot(new Slot(playerInventory, k, 8 + k * 18, 144));
+        }
+    }
+
+    @Override
+    public void clicked(int slotId, int button, ClickType clickType, Player player) {
+        if (slotId >= 0 && slotId < this.container.getContainerSize()) {
+            Slot slot = this.slots.get(slotId);
+            if (slot != null && slot.hasItem()) {
+                ItemStack clickedItem = slot.getItem().copy();
+                if (!player.level().isClientSide) {
+                    handleItemClick(clickedItem, (ServerPlayer) player);
+                }
+                return;
+            }
+        }
+        super.clicked(slotId, button, clickType, player);
+    }
+
+    @Override
+    public ItemStack quickMoveStack(Player player, int index) {
+        Slot slot = this.slots.get(index);
+        if (slot != null && slot.hasItem()) {
+            ItemStack itemStack = slot.getItem();
+            ItemStack originalStack = itemStack.copy();
+            if (index < this.container.getContainerSize()) {
+                if (!this.moveItemStackTo(itemStack, this.container.getContainerSize(), this.slots.size(), true)) {
+                    return ItemStack.EMPTY;
+                }
+            } else {
+                return ItemStack.EMPTY;
+            }
+            if (itemStack.isEmpty()) {
+                slot.set(ItemStack.EMPTY);
+            } else {
+                slot.setChanged();
+            }
+            return originalStack;
+        }
+        return ItemStack.EMPTY;
+    }
+
+
+    private void handleItemClick(ItemStack clickedItem, ServerPlayer player) {
+        if (player != null) {
+            Inventory inventory = player.getInventory();
+            boolean placed = false;
+            for (int i = 0; i < Inventory.getSelectionSize(); i++) {
+                if (inventory.getItem(i).isEmpty()) {
+                    inventory.setItem(i, clickedItem);
+                    placed = true;
+                    break;
+                }
+            }
+            if (!placed) {
+                for (int i = Inventory.getSelectionSize(); i < inventory.getContainerSize(); i++) {
+                    if (inventory.getItem(i).isEmpty()) {
+                        inventory.setItem(i, clickedItem);
+                        placed = true;
+                        break;
+                    }
+                }
+            }
+            if (!placed) {
+                player.sendSystemMessage(Component.literal("No space in inventory!").withStyle(ChatFormatting.RED));
+            }
+            player.containerMenu.broadcastChanges();
+        }
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return true;
+    }
+}

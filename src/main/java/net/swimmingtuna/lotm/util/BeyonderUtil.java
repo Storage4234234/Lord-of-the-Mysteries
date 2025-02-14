@@ -5,6 +5,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
@@ -21,6 +22,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -39,6 +41,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -59,10 +62,13 @@ import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.commands.AbilityRegisterCommand;
+import net.swimmingtuna.lotm.entity.LowSequenceDoorEntity;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Ability;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.InvisibleHand;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoorWaypoint;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
@@ -88,16 +94,16 @@ import static net.swimmingtuna.lotm.init.DamageTypeInit.MENTAL_DAMAGE;
 
 public class BeyonderUtil {
 
-    public static Projectile getProjectiles(Player player) {
-        if (player.level().isClientSide()) {
+    public static Projectile getProjectiles(LivingEntity livingEntity) {
+        if (livingEntity.level().isClientSide()) {
             return null;
         }
-        List<Projectile> projectiles = player.level().getEntitiesOfClass(Projectile.class, player.getBoundingBox().inflate(50));
+        List<Projectile> projectiles = livingEntity.level().getEntitiesOfClass(Projectile.class, livingEntity.getBoundingBox().inflate(50));
         for (Projectile projectile : projectiles) {
             CompoundTag tag = projectile.getPersistentData();
             int x = tag.getInt("windDodgeProjectilesCounter");
             if (x == 0) {
-                if (projectile.getOwner() == player && projectile.tickCount > 6 && projectile.tickCount < 100) {
+                if (projectile.getOwner() == livingEntity && projectile.tickCount > 6 && projectile.tickCount < 100) {
                     return projectile;
                 }
             }
@@ -109,6 +115,7 @@ public class BeyonderUtil {
         //PROJECTILE EVENT
         Projectile projectile = BeyonderUtil.getProjectiles(player);
         if (projectile == null) return;
+
 
         //MATTER ACCELERATION ENTITIES
         if (projectile.getPersistentData().getInt("matterAccelerationEntities") >= 10) {
@@ -138,10 +145,31 @@ public class BeyonderUtil {
                 }
             }
         }
+        LivingEntity target = BeyonderUtil.getTarget(projectile, 75, 0);
+        if (target != null) {
+            if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 8 && player.getPersistentData().getBoolean("sailorProjectileMovement")) {
+                double dx = target.getX() - projectile.getX();
+                double dy = target.getY() - projectile.getY();
+                double dz = target.getZ() - projectile.getZ();
+                double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                double speed = 1.2;
+                projectile.setDeltaMovement((dx / length) * speed, (dy / length) * speed, (dz / length) * speed);
+                projectile.hurtMarked = true;
+            }
+            //APPRENTICE BOUNCE SHOT ARROWS
+            if (holder.currentClassMatches(BeyonderClassInit.APPRENTICE) && holder.getCurrentSequence() <= 8 && player.getPersistentData().getBoolean("ApprenticeBounceProjectileMovement")) {
+                double dx = target.getX() - projectile.getX();
+                double dy = target.getY() - projectile.getY();
+                double dz = target.getZ() - projectile.getZ();
+                double length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                double speed = 1.2;
+                projectile.setDeltaMovement((dx / length) * speed, (dy / length) * speed, (dz / length) * speed);
+                projectile.hurtMarked = true;
+            }
+        }
 
 
         //SAILOR PASSIVE CHECK FROM HERE
-        LivingEntity target = BeyonderUtil.getTarget(projectile, 75, 0);
         if (target != null) {
             if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 8 && player.getPersistentData().getBoolean("sailorProjectileMovement")) {
                 double dx = target.getX() - projectile.getX();
@@ -493,6 +521,28 @@ public class BeyonderUtil {
                     abilityNames.add(ItemInit.BEAMOFTWILIGHT.get());
                 }
             }
+            if (holder.currentClassMatches(BeyonderClassInit.APPRENTICE)) {
+                if (sequence <= 9) {
+                    abilityNames.add(ItemInit.CREATEDOOR.get());
+                }
+                if (sequence <= 8) {
+                    abilityNames.add(ItemInit.TRICKBURN.get());
+                    abilityNames.add(ItemInit.TRICKBOUNCE.get());
+                    abilityNames.add(ItemInit.TRICKFREEZE.get());
+                    abilityNames.add(ItemInit.TRICKTUMBLE.get());
+                    abilityNames.add(ItemInit.TRICKWINDPULL.get());
+                    abilityNames.add(ItemInit.TRICKWINDPUSH.get());
+                }
+                if (sequence <= 6) {
+                    abilityNames.add(ItemInit.RECORDSCRIBE.get());
+                }
+                if (sequence <= 5) {
+                    abilityNames.add(ItemInit.TRAVELDOOR.get());
+                    abilityNames.add(ItemInit.TRAVELDOORHOME.get());
+                    abilityNames.add(ItemInit.INVISIBLEHAND.get());
+                }
+
+            }
         }
         return abilityNames;
     }
@@ -826,7 +876,6 @@ public class BeyonderUtil {
 
             } else if (heldItem.getItem() instanceof SirenSongStun) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.SIREN_SONG_WEAKEN.get())));
-
             } else if (heldItem.getItem() instanceof SirenSongWeaken) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.SIREN_SONG_HARM.get())));
             } else if (heldItem.getItem() instanceof ProbabilityManipulationFortune) {
@@ -859,6 +908,10 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new DeathKnellLeftClickC2S());
             } else if (heldItem.getItem() instanceof DomainOfProvidence || heldItem.getItem() instanceof DomainOfDecay || heldItem.getItem() instanceof MonsterDomainTeleporation) {
                 LOTMNetworkHandler.sendToServer(new MonsterDomainLeftClickC2S());
+            } else if (heldItem.getItem() instanceof InvisibleHand) {
+                LOTMNetworkHandler.sendToServer(new ToggleDistanceC2S());
+            } else if (heldItem.getItem() instanceof TravelDoorWaypoint) {
+                LOTMNetworkHandler.sendToServer(new TravelerWaypointC2S());
             }
         }
     }
@@ -968,6 +1021,8 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new CalamityEnhancementLeftClickC2S());
             } else if (heldItem.getItem() instanceof DeathKnell) {
                 LOTMNetworkHandler.sendToServer(new DeathKnellLeftClickC2S());
+            } else if (heldItem.getItem() instanceof TravelDoorWaypoint) {
+                LOTMNetworkHandler.sendToServer(new TravelerWaypointC2S());
             } else if (heldItem.getItem() instanceof ProbabilityManipulationFortune) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYMISFORTUNE.get())));
             } else if (heldItem.getItem() instanceof ProbabilityManipulationMisfortune) {
@@ -984,6 +1039,8 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYEFFECT.get())));
             } else if (heldItem.getItem() instanceof ProbabilityManipulationImpulse) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYFORTUNE.get())));
+            } else if (heldItem.getItem() instanceof InvisibleHand) {
+                LOTMNetworkHandler.sendToServer(new ToggleDistanceC2S());
             }
         }
     }
@@ -1189,6 +1246,19 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.LIGHTOFDAWN.get(), (100.0f - (sequence * 10)) / abilityWeakness);
         damageMap.put(ItemInit.AURAOFGLORY.get(), (15.0f - (sequence)) / abilityWeakness);
         damageMap.put(ItemInit.AURAOFTWILIGHT.get(), (30.0f - (sequence * 2)) / abilityWeakness);
+
+        //APPRENTICE
+        damageMap.put(ItemInit.CREATEDOOR.get(), 0.0f);
+        damageMap.put(ItemInit.TRICKBOUNCE.get(), 1.0f / abilityWeakness);
+        damageMap.put(ItemInit.RECORDSCRIBE.get(), 0.0f);
+        damageMap.put(ItemInit.TRICKBURN.get(), (8.0f - sequence) / abilityWeakness);
+        damageMap.put(ItemInit.TRAVELDOOR.get(), 3.0f + abilityWeakness);
+        damageMap.put(ItemInit.TRAVELDOORHOME.get(), 0.0f);
+        damageMap.put(ItemInit.TRICKTUMBLE.get(), (float) ((50 - (sequence * 5)) / abilityWeakness));
+        damageMap.put(ItemInit.INVISIBLEHAND.get(), (float) ((50 - (sequence * 8)) / abilityWeakness));
+        damageMap.put(ItemInit.TRICKFREEZE.get(), (float) ((50 - (sequence * 5)) / abilityWeakness));
+        damageMap.put(ItemInit.TRICKWINDPULL.get(), (float) ((100 - (sequence * 10)) / abilityWeakness));
+        damageMap.put(ItemInit.TRICKWINDPUSH.get(), (float) ((100 - (sequence * 10)) / abilityWeakness));
         return damageMap;
     }
 
@@ -1737,13 +1807,9 @@ public class BeyonderUtil {
         }
     }
 
-    public static LivingEntity checkEntitiesInLocation(LivingEntity livingEntity, int inflation, int X, int Y, int Z) {
+    public static List<LivingEntity> checkEntitiesInLocation(LivingEntity livingEntity, float inflation, int X, int Y, int Z) {
         AABB box = new AABB(X - inflation, Y - inflation, Z - inflation, X + inflation, Y + inflation, Z + inflation);
-        List<LivingEntity> nearbyEntities = livingEntity.level().getEntitiesOfClass(LivingEntity.class, box);
-        for (LivingEntity living : nearbyEntities) {
-            return living;
-        }
-        return null;
+        return livingEntity.level().getEntitiesOfClass(LivingEntity.class, box);
     }
 
     public static void ageHandlerTick(LivingEvent.LivingTickEvent event) {
@@ -1836,5 +1902,99 @@ public class BeyonderUtil {
                 event.setAmount(event.getAmount() * 1.5f);
             }
         }
+    }
+
+    public static boolean scribeLookingAtYou(Player target, LivingEntity scribe){
+        double radius = 30.0;
+        double angleThreshold = 45.0;
+        if(BeyonderUtil.getPathway(scribe) == BeyonderClassInit.APPRENTICE.get() && BeyonderUtil.getSequence(scribe) <= 6){
+            Vec3 scribePos = scribe.position();
+            Vec3 targetPos = target.position();
+            double distanceQr = scribePos.distanceToSqr(targetPos);
+            if(distanceQr > radius*radius){
+                return false;
+            }
+            Vec3 lookVec = scribe.getLookAngle().normalize();
+            Vec3 toTargetVec = targetPos.subtract(scribePos).normalize();
+            double dotProduct = lookVec.dot(toTargetVec);
+            double angle = Math.toDegrees(Math.acos(dotProduct));
+
+            return angle < angleThreshold;
+        }
+        return false;
+    }
+
+    public static boolean isBeyonder(LivingEntity livingEntity){
+        return getSequence(livingEntity) != -1;
+    }
+    public static boolean isSmeltable(ItemStack itemStack, Level world) {
+        SimpleContainer container = new SimpleContainer(itemStack);
+        return world.getRecipeManager().getRecipeFor(RecipeType.SMELTING, container, world).isPresent();
+    }
+
+    public static ItemStack getSmeltingResult(ItemStack itemStack, Level world) {
+        SimpleContainer container = new SimpleContainer(itemStack);
+        return world.getRecipeManager().getRecipeFor(RecipeType.SMELTING, container, world).map(recipe -> recipe.getResultItem(world.registryAccess())).orElse(ItemStack.EMPTY);
+    }
+
+    public static Boolean isEntityColliding(Entity entity, Level level, Double radius){
+        AABB entityBoundingBox = entity.getBoundingBox();
+        for (Entity otherEntity : level.getEntitiesOfClass(Entity.class, entity.getBoundingBox().inflate(radius))) {
+            if (entityBoundingBox.intersects(otherEntity.getBoundingBox())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Entity checkEntityCollision(Entity entity, Level level, Double radius){
+        AABB entityBoundingBox = entity.getBoundingBox();
+        AABB searchArea = entityBoundingBox.inflate(radius);
+        for (Entity otherEntity : level.getEntities(entity, searchArea, otherEntity -> true)) {
+            if (entityBoundingBox.intersects(otherEntity.getBoundingBox())) {
+                return otherEntity;
+            }
+        }
+        return null;
+    }
+
+    public static void spawnLowSequenceDoorTeleportationOnly(Level level, BlockPos pos, double X, double Y, double Z, Entity canPassTrough, Direction direction, int life){
+        double x = pos.getX();
+        double y = pos.getY();
+        double z = pos.getZ();
+        float YAW = 0F;
+        if(direction == Direction.NORTH){
+            x = x + 0.5;
+            z = z + 0.25;
+            YAW = 0F;
+        }else if (direction == Direction.WEST){
+            x = x + 0.25;
+            z = z + 0.5;
+            YAW = 90F;
+        }else if (direction == Direction.SOUTH){
+            x = x + 0.5;
+            z = z + 0.75;
+            YAW = 180;
+        }else if (direction == Direction.EAST){
+            x = x + 0.75;
+            z = z + 0.5;
+            YAW = 270F;
+        }
+        LowSequenceDoorEntity door = new LowSequenceDoorEntity(canPassTrough, level, X, Y, Z, YAW, life);
+        door.setPos(x, y, z);
+
+        level.addFreshEntity(door);
+    }
+
+
+
+    public static LivingEntity getEntityFromUUID(Level level, UUID uuid) {
+        if (level instanceof ServerLevel serverLevel) {
+            Entity entity = serverLevel.getEntity(uuid);
+            if (entity instanceof LivingEntity livingEntity) {
+                return livingEntity;
+            }
+        }
+        return null;
     }
 }

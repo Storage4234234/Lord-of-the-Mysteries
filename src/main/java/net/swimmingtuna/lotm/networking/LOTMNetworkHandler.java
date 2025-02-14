@@ -200,6 +200,16 @@ public class LOTMNetworkHandler {
                 .encoder(ClearAbilitiesS2C::toByte)
                 .consumerMainThread(ClearAbilitiesS2C::handle)
                 .add();
+        INSTANCE.messageBuilder(ToggleDistanceC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ToggleDistanceC2S::new)
+                .encoder(ToggleDistanceC2S::toByte)
+                .consumerMainThread(ToggleDistanceC2S::handle)
+                .add();
+        INSTANCE.messageBuilder(TravelerWaypointC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(TravelerWaypointC2S::new)
+                .encoder(TravelerWaypointC2S::toByte)
+                .consumerMainThread(TravelerWaypointC2S::handle)
+                .add();
     }
 
 

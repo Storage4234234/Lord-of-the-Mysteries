@@ -16,13 +16,16 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
+
 public abstract class SimpleAbilityItem extends Item implements Ability {
 
     protected final Supplier<? extends BeyonderClass> requiredClass;
@@ -39,6 +42,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     protected SimpleAbilityItem(Properties properties, Supplier<? extends BeyonderClass> requiredClass, int requiredSequence, int requiredSpirituality, int cooldown) {
         this(properties, requiredClass, requiredSequence, requiredSpirituality, cooldown, 3.0, 4.5);
     }
+
     protected SimpleAbilityItem(Properties properties, BeyonderClass requiredClass, int requiredSequence, int requiredSpirituality, int cooldown, double entityReach, double blockReach) {
         this(properties, () -> requiredClass, requiredSequence, requiredSpirituality, cooldown, entityReach, blockReach);
     }
@@ -66,6 +70,13 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (!level.isClientSide() && checkIfCanUseAbility(player)) {
+            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
+                if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
+                    if (BeyonderUtil.scribeLookingAtYou(player, entity)) {
+                        //player.displayClientMessage(Component.literal("Detected a beyonder ability being used."), false);
+                    }
+                }
+            }
             InteractionResult interactionResult = useAbility(level, player, hand);
             return new InteractionResultHolder<>(interactionResult, player.getItemInHand(hand));
         }
@@ -73,8 +84,12 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     }
 
     protected boolean checkAll(Player player) {
+        if (BeyonderUtil.getPathway(player) == BeyonderClassInit.APPRENTICE.get() && BeyonderUtil.getSequence(player) <= 6) {
+
+        }
         return checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality);
     }
+
     public int getSpirituality() {
         return this.requiredSpirituality;
     }
@@ -82,7 +97,17 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
+        Player player = context.getPlayer();
         if (!level.isClientSide()) {
+            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
+                if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
+                    if (BeyonderUtil.scribeLookingAtYou(player, entity)) {
+                        if (entity instanceof Player) {
+                            //player.displayClientMessage(Component.literal("Detected a beyonder ability being used."), false);
+                        }
+                    }
+                }
+            }
             return useAbilityOnBlock(context);
         }
         return InteractionResult.PASS;
@@ -92,6 +117,16 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand usedHand) {
         if (!player.level().isClientSide()) {
+            Level level = player.level();
+            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
+                if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
+                    if (BeyonderUtil.scribeLookingAtYou(player, entity)) {
+                        if (entity instanceof Player) {
+                            //player.displayClientMessage(Component.literal("Detected a beyonder ability being used."), false);
+                        }
+                    }
+                }
+            }
             return interactLivingEntity(stack, player, interactionTarget, usedHand);
         }
         return InteractionResult.PASS;
@@ -132,6 +167,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     protected void addCooldown(Player player) {
         addCooldown(player, this, this.cooldown);
     }
+
     public int getCooldown() {
         return this.cooldown;
     }
@@ -169,7 +205,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
             player.displayClientMessage(
                     Component.literal("You are not of the ").withStyle(ChatFormatting.AQUA).append(
                             Component.literal(name).withStyle(requiredClass.getColorFormatting())).append(
-                                    Component.literal(" Pathway").withStyle(ChatFormatting.AQUA)), true);
+                            Component.literal(" Pathway").withStyle(ChatFormatting.AQUA)), true);
             return false;
         }
         return true;
@@ -180,7 +216,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
             player.displayClientMessage(
                     Component.literal("You need to be sequence ").withStyle(ChatFormatting.AQUA).append(
                             Component.literal(String.valueOf(requiredSequence)).withStyle(ChatFormatting.YELLOW)).append(
-                                    Component.literal(" or lower to use this").withStyle(ChatFormatting.AQUA)), true);
+                            Component.literal(" or lower to use this").withStyle(ChatFormatting.AQUA)), true);
             return false;
         }
         return true;

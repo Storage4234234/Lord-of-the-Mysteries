@@ -20,6 +20,7 @@ import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ItemInit;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoor;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ConsciousnessStroll;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLife;
@@ -28,6 +29,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.Envi
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoor.coordsTravel;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLife.spawnMob;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocation.isThreeIntegers;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionWeather.*;
@@ -225,6 +227,52 @@ public class ServerEvents {
                 player.teleportTo(x, y, z);
                 holder.useSpirituality((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LOCATION.get()));
                 event.getPlayer().displayClientMessage(Component.literal("Teleported to " + targetPlayer.getName().getString()).withStyle(BeyonderUtil.getStyle(player)), true);
+            } else {
+                event.getPlayer().displayClientMessage(Component.literal("Invalid coordinates or player name: " + message).withStyle(BeyonderUtil.getStyle(player)), true);
+            }
+            event.setCanceled(true);
+        }
+        if (holder.currentClassMatches(BeyonderClassInit.APPRENTICE) && !player.level().isClientSide && player.getMainHandItem().getItem() instanceof TravelDoor && holder.getCurrentSequence() <= 5) {
+            if (!holder.currentClassMatches(BeyonderClassInit.APPRENTICE)) {
+                player.displayClientMessage(Component.literal("You are not of the Apprentice pathway").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
+                event.setCanceled(true);
+                return;
+            }
+            if (holder.getSpirituality() < 300) {
+                player.displayClientMessage(Component.literal("You need 300 spirituality in order to use this").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
+                event.setCanceled(true);
+                return;
+            }
+            if (coordsTravel(message)) {
+                String[] coordinates = message.replace(",", " ").trim().split("\\s+");
+                int x = Integer.parseInt(coordinates[0]);
+                int y = Integer.parseInt(coordinates[1]);
+                int z = Integer.parseInt(coordinates[2]);
+
+                player.teleportTo(x, y, z);
+                event.getPlayer().displayClientMessage(Component.literal("Teleported to " + x + ", " + y + ", " + z).withStyle(BeyonderUtil.getStyle(player)), true);
+                holder.useSpirituality(300);
+                event.setCanceled(true);
+                return;
+            }
+            Player targetPlayer = null;
+            for (Player serverPlayer : level.players()) {
+                if (serverPlayer.getName().getString().toLowerCase().equals(message.toLowerCase())) {
+                    targetPlayer = serverPlayer;
+                    break;
+                }
+            }
+            if (targetPlayer != null) {
+                if(BeyonderUtil.isAllyOf(targetPlayer, event.getPlayer())){
+                    int x = (int)targetPlayer.getX();
+                    int y = (int)targetPlayer.getY();
+                    int z = (int)targetPlayer.getZ();
+                    player.teleportTo(x, y, z);
+                    holder.useSpirituality(300);
+                    event.getPlayer().displayClientMessage(Component.literal("Teleported to " + targetPlayer.getName().getString()).withStyle(BeyonderUtil.getStyle(player)), true);
+                }else{
+                    event.getPlayer().displayClientMessage(Component.literal("Player is not your ally").withStyle(BeyonderUtil.getStyle(player)), true);
+                }
             } else {
                 event.getPlayer().displayClientMessage(Component.literal("Invalid coordinates or player name: " + message).withStyle(BeyonderUtil.getStyle(player)), true);
             }

@@ -159,7 +159,16 @@ public class CreativeTabInit {
                         event.accept(ItemInit.AURAOFTWILIGHT.get());
                         event.accept(ItemInit.GLOBEOFTWILIGHT.get());
                         event.accept(ItemInit.BEAMOFTWILIGHT.get());
-
+                        event.accept(ItemInit.TRICKBURN.get());
+                        event.accept(ItemInit.TRICKBOUNCE.get());
+                        event.accept(ItemInit.TRICKFREEZE.get());
+                        event.accept(ItemInit.TRICKTUMBLE.get());
+                        event.accept(ItemInit.TRICKWINDPULL.get());
+                        event.accept(ItemInit.TRICKWINDPUSH.get());
+                        event.accept(ItemInit.RECORDSCRIBE.get());
+                        event.accept(ItemInit.TRAVELDOOR.get());
+                        event.accept(ItemInit.TRAVELDOORHOME.get());
+                        event.accept(ItemInit.INVISIBLEHAND.get());
                     })
                     .build());
 

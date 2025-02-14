@@ -39,6 +39,9 @@ public class ModEffects {
             () -> new NoRegenerationEffect(MobEffectCategory.HARMFUL, 3124687));
     public static final RegistryObject<MobEffect> ARMOR_WEAKNESS = MOB_EFFECTS.register("armor_weakness",
             ArmorWeaknessEffect::new);
+    public static final RegistryObject<MobEffect> TUMBLE = MOB_EFFECTS.register("tumble",
+            () -> new TumbleEffect(MobEffectCategory.HARMFUL, 3124687));
+
 
     public static void register(IEventBus eventBus) {
         MOB_EFFECTS.register(eventBus);

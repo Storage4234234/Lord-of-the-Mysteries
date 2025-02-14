@@ -38,6 +38,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.swimmingtuna.lotm.LOTM;
+import net.swimmingtuna.lotm.beyonder.ApprenticeClass;
 import net.swimmingtuna.lotm.beyonder.SailorClass;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
@@ -46,6 +47,9 @@ import net.swimmingtuna.lotm.client.Configs;
 import net.swimmingtuna.lotm.commands.AbilityRegisterCommand;
 import net.swimmingtuna.lotm.entity.*;
 import net.swimmingtuna.lotm.init.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.Burn;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.BounceProjectiles;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.InvisibleHand;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
@@ -69,6 +73,8 @@ import net.swimmingtuna.lotm.world.worldgen.MirrorWorldChunkGenerator;
 
 import java.util.*;
 
+import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.apprenticeWindSlowFall;
+import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.trickmasterBounceHitProjectiles;
 import static net.swimmingtuna.lotm.beyonder.MonsterClass.*;
 import static net.swimmingtuna.lotm.beyonder.WarriorClass.warriorDamageNegation;
 import static net.swimmingtuna.lotm.blocks.MonsterDomainBlockEntity.domainDrops;
@@ -348,56 +354,65 @@ public class ModEvents {
 
     @SubscribeEvent
     public static void handleLivingTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity entity = event.getEntity();
-        CompoundTag tag = entity.getPersistentData();
-        Level level = entity.level();
-        if (!entity.level().isClientSide) {
-            if (entity.level() instanceof ServerLevel serverLevel) {
-                CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
+        LivingEntity livingEntity = event.getEntity();
+        CompoundTag tag = livingEntity.getPersistentData();
+        Level level = livingEntity.level();
+        if (!livingEntity.level().isClientSide) {
+            if (livingEntity.level() instanceof ServerLevel serverLevel) {
+                CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
             }
             BeyonderUtil.ageHandlerTick(event);
+            InvisibleHand.invisibleHandTick(event);
+            Burn.smeltItem(event);
+            BounceProjectiles.decrementBounceArrows(livingEntity);
             Gigantification.gigantificationScale(event);
             EnableOrDisableProtection.warriorProtectionTick(event);
-            GuardianBoxEntity.decrementGuardianTimer(entity);
+            GuardianBoxEntity.decrementGuardianTimer(livingEntity);
             EyeOfDemonHunting.eyeTick(event);
             EyeOfDemonHunting.demonHunterAntiConcealment(event);
+            apprenticeWindSlowFall(event);
             livingNoMoveEffect(event);
-            psychologicalInvisibilityHurtTick(entity);
+            psychologicalInvisibilityHurtTick(livingEntity);
             //windManipulationCushion(entity);
             //sendSpiritWorldPackets(entity);
             WintryBlade.wintryBladeTick(event);
-            warriorGiant(entity);
-            DeathKnell.deathKnellNegativeTick(entity);
+            warriorGiant(livingEntity);
+            DeathKnell.deathKnellNegativeTick(livingEntity);
             BattleHypnotism.untargetMobs(event);
             ProbabilityManipulationInfiniteMisfortune.testEvent(event);
-            probabilityManipulationWorld(entity);
+            probabilityManipulationWorld(livingEntity);
             CycleOfFate.tickEvent(event);
-            dodgeProjectiles(entity);
+            dodgeProjectiles(livingEntity);
             MisfortuneManipulation.livingTickMisfortuneManipulation(event);
-            FalseProphecy.falseProphecyTick(entity);
+            FalseProphecy.falseProphecyTick(livingEntity);
             AuraOfChaos.auraOfChaos(event);
-            NoRegenerationEffect.preventRegeneration(entity);
+            NoRegenerationEffect.preventRegeneration(livingEntity);
             MisfortuneRedirection.misfortuneLivingTickEvent(event);
             AuraOfGlory.auraOfGloryAndTwilightTick(event);
-            livingLightningStorm(entity);
+            livingLightningStorm(livingEntity);
             Gigantification.gigantificationDestroyBlocks(event);
             LightOfDawn.sunriseGleamTick(event);
             doubleProphecyDamageHelper(event);
-            showMonsterParticles(entity);
-            LuckDenial.luckDenial(entity);
+            showMonsterParticles(livingEntity);
+            LuckDenial.luckDenial(livingEntity);
             MonsterCalamityIncarnation.calamityTickEvent(event);
-            dreamWeaving(entity);
+            dreamWeaving(livingEntity);
             LightConcealment.lightConcealmentTick(event);
             ProphesizeDemise.demiseTick(event);
-            prophesizeTeleportation(tag, entity);
+            prophesizeTeleportation(tag, livingEntity);
             AqueousLightDrown.aqueousLightDrownTick(event);
-            matterAccelerationEntities(entity);
+            matterAccelerationEntities(livingEntity);
             ExtremeColdness.extremeColdnessTick(event);
-            mentalPlague(entity);
+            mentalPlague(livingEntity);
             StormSeal.sealTick(event);
-            AqueousLightDrown.lightTickEvent(entity);
+            AqueousLightDrown.lightTickEvent(livingEntity);
             TsunamiSeal.sealTick(event);
         }
+    }
+
+    @SubscribeEvent
+    public static void blockRightClickEvent(PlayerInteractEvent.RightClickBlock event) {
+        ApprenticeClass.doorRightClick(event);
     }
 
     @SubscribeEvent
@@ -414,6 +429,7 @@ public class ModEvents {
     public static void projectileImpactEvent(ProjectileImpactEvent event) {
         Entity projectile = event.getProjectile();
         if (!projectile.level().isClientSide()) {
+            trickmasterBounceHitProjectiles(event);
             SailorClass.sailorProjectileLightning(event);
         }
     }
@@ -495,102 +511,103 @@ public class ModEvents {
                 if (entityInSpiritWorld != sourceInSpiritWorld) {
                     event.setCanceled(true);
                 }
-            }
-            if (entity instanceof LivingEntity living) {
-                monsterDodgeAttack(event);
-                int stoneImmunity = tag.getInt("luckStoneDamageImmunity");
-                int stoneDamage = tag.getInt("luckStoneDamage");
-                int meteorDamage = tag.getInt("luckMeteorDamage");
-                int meteorImmunity = tag.getInt("calamityMeteorImmunity");
-                int MCLightingDamage = tag.getInt("luckLightningMCDamage");
-                int mcLightningImmunity = tag.getInt("luckMCLightningImmunity");
-                int calamityExplosionOccurrenceDamage = tag.getInt("calamityExplosionOccurrence");
-                int lotmLightningDamage = tag.getInt("luckLightningLOTMDamage");
-                int lightningBoltResistance = tag.getInt("calamityLightningBoltMonsterResistance");
-                int lotmLightningDamageCalamity = tag.getInt("calamityLightningStormResistance");
-                int tornadoResistance = tag.getInt("luckTornadoResistance");
-                int tornadoImmunity = tag.getInt("luckTornadoImmunity");
-                int lotmLightningImmunity = tag.getInt("calamityLOTMLightningImmunity");
-                int lightningStormImmunity = tag.getInt("calamityLightningStormImmunity");
-                Level level = entity.level();
-                int enhancement = 1;
-                if (level instanceof ServerLevel serverLevel) {
-                    enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
-                }
-                if (enhancement >= 2) {
-                    event.setAmount((float) (event.getAmount() + (enhancement * 0.25)));
-                }
-                if (entitySource instanceof StoneEntity) {
-                    if (stoneImmunity >= 1) {
-                        event.setCanceled(true);
-                    } else if (stoneDamage >= 1) {
-                        event.setAmount(event.getAmount() / 2);
-                    }
-                }
-                if (entitySource instanceof MeteorEntity || entitySource instanceof MeteorNoLevelEntity) {
-                    if (meteorImmunity >= 1) {
-                        event.setCanceled(true);
-                    } else if (meteorDamage >= 1) {
-                        event.setAmount(event.getAmount() / 2);
-                    }
-                }
-                if (source.is(DamageTypes.LIGHTNING_BOLT)) {
-                    if (mcLightningImmunity >= 1) {
-                        event.setCanceled(true);
-                    } else if (MCLightingDamage >= 1) {
-                        event.setAmount(event.getAmount() / 2);
-                    }
-                }
-                if (source.is(DamageTypes.EXPLOSION)) {
-                    if (calamityExplosionOccurrenceDamage >= 1) {
-                        event.setAmount(event.getAmount() / 2);
-                    }
-                }
-                if (entitySource instanceof LightningEntity) {
-                    if (lotmLightningImmunity >= 1 || lightningStormImmunity >= 1) {
-                        event.setCanceled(true);
-                    } else if (lotmLightningDamage >= 1 || lightningBoltResistance >= 1 || lotmLightningDamageCalamity >= 1) {
-                        event.setAmount(event.getAmount() / 2);
-                    }
-                }
-            }
-            //SAILOR FLIGHT
-            if (entity instanceof Player player) {
-                psychologicalInvisibilityHurt(event);
-                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                int flightCancel = tag.getInt("sailorFlightDamageCancel");
-                if (!player.level().isClientSide()) {
 
-                    //SAILOR FLIGHT
-                    if (flightCancel != 0 && event.getSource() == player.damageSources().fall()) {
-                        event.setCanceled(true);
-                        tag.putInt("sailorFlightDamageCancel", 0);
+                if (entity instanceof LivingEntity living) {
+                    monsterDodgeAttack(event);
+                    int stoneImmunity = tag.getInt("luckStoneDamageImmunity");
+                    int stoneDamage = tag.getInt("luckStoneDamage");
+                    int meteorDamage = tag.getInt("luckMeteorDamage");
+                    int meteorImmunity = tag.getInt("calamityMeteorImmunity");
+                    int MCLightingDamage = tag.getInt("luckLightningMCDamage");
+                    int mcLightningImmunity = tag.getInt("luckMCLightningImmunity");
+                    int calamityExplosionOccurrenceDamage = tag.getInt("calamityExplosionOccurrence");
+                    int lotmLightningDamage = tag.getInt("luckLightningLOTMDamage");
+                    int lightningBoltResistance = tag.getInt("calamityLightningBoltMonsterResistance");
+                    int lotmLightningDamageCalamity = tag.getInt("calamityLightningStormResistance");
+                    int tornadoResistance = tag.getInt("luckTornadoResistance");
+                    int tornadoImmunity = tag.getInt("luckTornadoImmunity");
+                    int lotmLightningImmunity = tag.getInt("calamityLOTMLightningImmunity");
+                    int lightningStormImmunity = tag.getInt("calamityLightningStormImmunity");
+                    Level level = entity.level();
+                    int enhancement = 1;
+                    if (level instanceof ServerLevel serverLevel) {
+                        enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+                    }
+                    if (enhancement >= 2) {
+                        event.setAmount((float) (event.getAmount() + (enhancement * 0.25)));
+                    }
+                    if (entitySource instanceof StoneEntity) {
+                        if (stoneImmunity >= 1) {
+                            event.setCanceled(true);
+                        } else if (stoneDamage >= 1) {
+                            event.setAmount(event.getAmount() / 2);
+                        }
+                    }
+                    if (entitySource instanceof MeteorEntity || entitySource instanceof MeteorNoLevelEntity) {
+                        if (meteorImmunity >= 1) {
+                            event.setCanceled(true);
+                        } else if (meteorDamage >= 1) {
+                            event.setAmount(event.getAmount() / 2);
+                        }
+                    }
+                    if (source.is(DamageTypes.LIGHTNING_BOLT)) {
+                        if (mcLightningImmunity >= 1) {
+                            event.setCanceled(true);
+                        } else if (MCLightingDamage >= 1) {
+                            event.setAmount(event.getAmount() / 2);
+                        }
+                    }
+                    if (source.is(DamageTypes.EXPLOSION)) {
+                        if (calamityExplosionOccurrenceDamage >= 1) {
+                            event.setAmount(event.getAmount() / 2);
+                        }
+                    }
+                    if (entitySource instanceof LightningEntity) {
+                        if (lotmLightningImmunity >= 1 || lightningStormImmunity >= 1) {
+                            event.setCanceled(true);
+                        } else if (lotmLightningDamage >= 1 || lightningBoltResistance >= 1 || lotmLightningDamageCalamity >= 1) {
+                            event.setAmount(event.getAmount() / 2);
+                        }
                     }
                 }
-                rippleOfMisfortune(player);
+                //SAILOR FLIGHT
+                if (entity instanceof Player player) {
+                    psychologicalInvisibilityHurt(event);
+                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                    int flightCancel = tag.getInt("sailorFlightDamageCancel");
+                    if (!player.level().isClientSide()) {
 
-                //MONSTER LUCK
-                int doubleDamage = tag.getInt("luckDoubleDamage");
-                int ignoreDamage = tag.getInt("luckIgnoreDamage");
-                int halveDamage = tag.getInt("luckHalveDamage");
-                if (halveDamage >= 1) {
-                    event.setAmount(event.getAmount() / 2);
-                    tag.putInt("luckHalveDamage", halveDamage - 1);
+                        //SAILOR FLIGHT
+                        if (flightCancel != 0 && event.getSource() == player.damageSources().fall()) {
+                            event.setCanceled(true);
+                            tag.putInt("sailorFlightDamageCancel", 0);
+                        }
+                    }
+                    rippleOfMisfortune(player);
+
+                    //MONSTER LUCK
+                    int doubleDamage = tag.getInt("luckDoubleDamage");
+                    int ignoreDamage = tag.getInt("luckIgnoreDamage");
+                    int halveDamage = tag.getInt("luckHalveDamage");
+                    if (halveDamage >= 1) {
+                        event.setAmount(event.getAmount() / 2);
+                        tag.putInt("luckHalveDamage", halveDamage - 1);
+                    }
+                    if (ignoreDamage >= 1) {
+                        event.setCanceled(true);
+                        entity.getPersistentData().putInt("luckIgnoreDamage", entity.getPersistentData().getInt("luckIgnoreDamage") - 1);
+                    } else if (doubleDamage >= 1) {
+                        event.setAmount(event.getAmount() * 2);
+                        entity.getPersistentData().putInt("luckDoubleDamage", entity.getPersistentData().getInt("luckDoubleDamage") - 1);
+
+                    }
                 }
-                if (ignoreDamage >= 1) {
+
+
+                //STORM SEAL
+                if (entity.getPersistentData().getInt("inStormSeal") >= 1) {
                     event.setCanceled(true);
-                    entity.getPersistentData().putInt("luckIgnoreDamage", entity.getPersistentData().getInt("luckIgnoreDamage") - 1);
-                } else if (doubleDamage >= 1) {
-                    event.setAmount(event.getAmount() * 2);
-                    entity.getPersistentData().putInt("luckDoubleDamage", entity.getPersistentData().getInt("luckDoubleDamage") - 1);
-
                 }
-            }
-
-
-            //STORM SEAL
-            if (entity.getPersistentData().getInt("inStormSeal") >= 1) {
-                event.setCanceled(true);
             }
         }
     }

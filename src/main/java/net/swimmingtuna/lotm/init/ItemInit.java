@@ -9,6 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.item.AllyMaker;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
@@ -318,6 +319,29 @@ public class ItemInit {
     public static final RegistryObject<Item> BEAMOFTWILIGHT = ITEMS.register("beamoftwilight",
             () -> new BeamOfTwilight(new Item.Properties().stacksTo(1)));
 
+    //APPRENTICE
+    public static final RegistryObject<Item> CREATEDOOR = ITEMS.register("createdoor",
+            () -> new CreateDoor(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TRICKBURN = ITEMS.register("trickburn",
+            () -> new Burn(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TRICKBOUNCE = ITEMS.register("trickbounce",
+            () -> new BounceProjectiles(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TRICKFREEZE = ITEMS.register("trickfreeze",
+            () -> new Freeze(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TRICKTUMBLE = ITEMS.register("tricktumble",
+            () -> new Tumble(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TRICKWINDPULL = ITEMS.register("trickwindpull",
+            () -> new WindPullArea(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TRICKWINDPUSH = ITEMS.register("trickwindpush",
+            () -> new WindPushArea(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> RECORDSCRIBE = ITEMS.register("recordscribe",
+            () -> new ScribeRecord(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TRAVELDOOR= ITEMS.register("traveldoor",
+            () -> new TravelDoor(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TRAVELDOORHOME= ITEMS.register("traveldoorhome",
+            () -> new TravelDoorWaypoint(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> INVISIBLEHAND= ITEMS.register("invisiblehand",
+            () -> new InvisibleHand(new Item.Properties().stacksTo(1)));
 
     //INGREDIENTS
     public static final RegistryObject<Item> SPIRIT_EATER_STOMACH_POUCH = ITEMS.register("spirit_eater_stomach_pouch",

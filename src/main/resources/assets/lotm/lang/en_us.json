@@ -284,6 +284,17 @@
   "item.lotm.globeoftwilight": "Globe of Twilight",
   "item.lotm.beamoftwilight": "Beam of Twilight",
 
+  "item.lotm.createdoor": "Create Door",
+  "item.lotm.trickburn": "Trick: Burn",
+  "item.lotm.trickbounce": "Trick: Enable/Disable Bounce",
+  "item.lotm.trickfreeze": "Trick: Freeze",
+  "item.lotm.tricktumble": "Trick: Tumble",
+  "item.lotm.trickwindpull": "Trick: Wind Pull",
+  "item.lotm.trickwindpush": "Trick: Wind Push",
+  "item.lotm.recordscribe": "Record",
+  "item.lotm.traveldoor": "Travel: Door",
+  "item.lotm.traveldoorhome": "Travel: Waypoint",
+  "item.lotm.invisiblehand": "Invisible Hand",
 
 
   "item.lotm.monsterdangersense": "Monster Danger Sense",
@@ -358,6 +369,8 @@
   "effects.lotm.advancement0": "Advancement 0",
   "effects.lotm.mentalplague": "Mental Plague",
   "effects.lotm.awe": "Paralysis",
+  "effects.lotm.tumble": "Tumble",
+
 
   "attribute.lotm.spirituality": "Spirituality",
   "attribute.lotm.max_spirituality": "Max Spirituality",

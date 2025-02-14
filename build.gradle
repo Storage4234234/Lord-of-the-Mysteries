@@ -150,6 +150,7 @@ publishing {
         maven {
             url
         }
+
     }
 }
 

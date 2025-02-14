@@ -23,6 +23,7 @@ import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoor;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.LuckGifting;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocationBlink;
@@ -119,6 +120,7 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
         int matterAccelerationDistance = player.getPersistentData().getInt("tyrantSelfAcceleration");
         int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
         int luckGiftingAmount = player.getPersistentData().getInt("monsterLuckGifting");
+        int doorBlinkDistance = player.getPersistentData().getInt("travelBlinkDistance");
         if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof MatterAccelerationSelf && holder.currentClassMatches(BeyonderClassInit.SAILOR)) {
             matterAccelerationDistance += 50;
             player.getPersistentData().putInt("tyrantSelfAcceleration", matterAccelerationDistance);
@@ -145,6 +147,11 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
         if (luckGiftingAmount >= BeyonderUtil.getDamage(player).get(ItemInit.LUCKGIFTING.get())) {
             player.displayClientMessage(Component.literal("Luck Gifting Amount is 0").withStyle(style), true);
             player.getPersistentData().putInt("monsterLuckGifting", 0);
+        }
+        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof TravelDoor && holder.currentClassMatches(BeyonderClassInit.APPRENTICE)) {
+
+            player.getPersistentData().putInt("travelBlinkDistance", doorBlinkDistance + 2);
+            player.displayClientMessage(Component.literal("Blink Distance is " + doorBlinkDistance).withStyle(style), true);
         }
     }
 

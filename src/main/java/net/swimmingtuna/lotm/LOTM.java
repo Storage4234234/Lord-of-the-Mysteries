@@ -334,6 +334,17 @@ public class LOTM {
             event.accept(ItemInit.SILVER_CHESTPLATE);
             event.accept(ItemInit.SILVER_LEGGINGS);
             event.accept(ItemInit.SILVER_BOOTS);
+            event.accept(ItemInit.TRICKBURN);
+            event.accept(ItemInit.TRICKBOUNCE);
+            event.accept(ItemInit.TRICKFREEZE);
+            event.accept(ItemInit.TRICKTUMBLE);
+            event.accept(ItemInit.TRICKWINDPULL);
+            event.accept(ItemInit.TRICKWINDPUSH);
+            event.accept(ItemInit.RECORDSCRIBE);
+            event.accept(ItemInit.TRAVELDOOR);
+            event.accept(ItemInit.TRAVELDOORHOME);
+            event.accept(ItemInit.INVISIBLEHAND);
+
         }
         if (event.getTabKey() == CreativeModeTabs.OP_BLOCKS) {
             event.accept(BlockInit.VISIONARY_BARRIER_BLOCK);

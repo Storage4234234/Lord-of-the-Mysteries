@@ -86,6 +86,9 @@ public class EntityInit {
     public static final RegistryObject<EntityType<WindBladeEntity>> WIND_BLADE_ENTITY =
             ENTITIES.register("wind_blade", () -> EntityType.Builder.<WindBladeEntity>of(WindBladeEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).clientTrackingRange(100).clientTrackingRange(4).updateInterval(20).build("wind_blade"));
+    public static final RegistryObject<EntityType<LowSequenceDoorEntity>> LOW_SEQUENCE_DOOR_ENTITY =
+            ENTITIES.register("low_sequence_door_entity", () -> EntityType.Builder.<LowSequenceDoorEntity>of(LowSequenceDoorEntity::new, MobCategory.MISC)
+                    .sized(0.5f,2f).clientTrackingRange(100).build("low_sequence_door_entity"));
     public static final RegistryObject<EntityType<WindCushionEntity>> WIND_CUSHION_ENTITY =
             ENTITIES.register("wind_cushion", () -> EntityType.Builder.<WindCushionEntity>of(WindCushionEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).build("wind_cushion"));
