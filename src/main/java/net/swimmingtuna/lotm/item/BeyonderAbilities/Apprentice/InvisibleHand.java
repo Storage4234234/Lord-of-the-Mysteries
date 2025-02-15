@@ -150,6 +150,9 @@ public class InvisibleHand extends SimpleAbilityItem {
                         }
                     }
                 }
+                if (counter >= 1 && counter <= 3) {
+                    target.fallDistance = 0;
+                }
             }
         }
     }

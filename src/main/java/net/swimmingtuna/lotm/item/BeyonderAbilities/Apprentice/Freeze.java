@@ -88,12 +88,10 @@ public class Freeze extends SimpleAbilityItem {
 
     public static void freezeBlock(Level level, BlockPos pos) {
         BlockState currentState = level.getBlockState(pos);
-        if (currentState.getBlock() == Blocks.WATER) {
-            level.setBlock(pos, Blocks.ICE.defaultBlockState(), 3);
-        } else if (currentState.getBlock() == Blocks.LAVA) {
-            level.setBlock(pos, Blocks.OBSIDIAN.defaultBlockState(), 3);
-        } else if (currentState.isAir()) {
-            level.setBlock(pos, Blocks.PACKED_ICE.defaultBlockState(), 3);
+        if (isOnSurface(level, pos)) {
+             if (!currentState.isAir()) {
+                level.setBlock(pos, Blocks.ICE.defaultBlockState(), 3);
+            }
         }
     }
 

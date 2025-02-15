@@ -1250,14 +1250,14 @@ public class BeyonderUtil {
 
         //APPRENTICE
         damageMap.put(ItemInit.CREATEDOOR.get(), 0.0f);
-        damageMap.put(ItemInit.TRICKBOUNCE.get(), 1.0f / abilityWeakness);
+        damageMap.put(ItemInit.TRICKBOUNCE.get(), (300.0f - (sequence * 25)) / abilityWeakness);
         damageMap.put(ItemInit.RECORDSCRIBE.get(), 0.0f);
         damageMap.put(ItemInit.TRICKBURN.get(), (8.0f - sequence) / abilityWeakness);
         damageMap.put(ItemInit.TRAVELDOOR.get(), 3.0f + abilityWeakness);
         damageMap.put(ItemInit.TRAVELDOORHOME.get(), 0.0f);
         damageMap.put(ItemInit.TRICKTUMBLE.get(), (float) ((50 - (sequence * 5)) / abilityWeakness));
         damageMap.put(ItemInit.INVISIBLEHAND.get(), (float) ((50 - (sequence * 8)) / abilityWeakness));
-        damageMap.put(ItemInit.TRICKFREEZE.get(), (float) ((50 - (sequence * 5)) / abilityWeakness));
+        damageMap.put(ItemInit.TRICKFREEZE.get(), (float) ((50 - (sequence * 6)) / abilityWeakness));
         damageMap.put(ItemInit.TRICKWINDPULL.get(), (float) ((100 - (sequence * 10)) / abilityWeakness));
         damageMap.put(ItemInit.TRICKWINDPUSH.get(), (float) ((100 - (sequence * 10)) / abilityWeakness));
         return damageMap;
