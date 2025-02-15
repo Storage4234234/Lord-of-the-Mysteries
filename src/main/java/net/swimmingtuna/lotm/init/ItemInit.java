@@ -8,6 +8,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.swimmingtuna.lotm.LOTM;
+import net.swimmingtuna.lotm.armor.DawnArmorItem;
 import net.swimmingtuna.lotm.item.AllyMaker;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
@@ -439,13 +440,13 @@ public class ItemInit {
 
     //ARMOR
     public static final RegistryObject<Item> DAWN_HELMET = ITEMS.register("dawn_helmet",
-            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.HELMET,new Item.Properties()));
+            () -> new DawnArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.HELMET,new Item.Properties()));
     public static final RegistryObject<Item> DAWN_CHESTPLATE = ITEMS.register("dawn_chestplate",
-            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.CHESTPLATE,new Item.Properties()));
+            () -> new DawnArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.CHESTPLATE,new Item.Properties()));
     public static final RegistryObject<Item> DAWN_LEGGINGS = ITEMS.register("dawn_leggings",
-            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.LEGGINGS,new Item.Properties()));
+            () -> new DawnArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.LEGGINGS,new Item.Properties()));
     public static final RegistryObject<Item> DAWN_BOOTS = ITEMS.register("dawn_boots",
-            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.BOOTS,new Item.Properties()));
+            () -> new DawnArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.BOOTS,new Item.Properties()));
     public static final RegistryObject<Item> SILVER_HELMET = ITEMS.register("silver_helmet",
             () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.HELMET,new Item.Properties()));
     public static final RegistryObject<Item> SILVER_CHESTPLATE = ITEMS.register("silver_chestplate",
