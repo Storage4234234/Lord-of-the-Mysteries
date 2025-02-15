@@ -1959,7 +1959,8 @@ public class BeyonderUtil {
         return null;
     }
 
-    public static void spawnLowSequenceDoorTeleportationOnly(Level level, BlockPos pos, double X, double Y, double Z, Entity canPassTrough, Direction direction, int life){
+    public static void spawnDoorTeleportationOnly(Level level, BlockPos pos, double X, double Y, double Z, Entity canPassTrough, Direction direction, int life, LivingEntity user){
+        int sequence = getSequence(user);
         double x = pos.getX();
         double y = pos.getY();
         double z = pos.getZ();
@@ -1981,10 +1982,17 @@ public class BeyonderUtil {
             z = z + 0.5;
             YAW = 270F;
         }
-        LowSequenceDoorEntity door = new LowSequenceDoorEntity(canPassTrough, level, X, Y, Z, YAW, life);
-        door.setPos(x, y, z);
+        LowSequenceDoorEntity lowDoor = new LowSequenceDoorEntity(canPassTrough, level, X, Y, Z, YAW, life);
+        MidSequenceDoorEntity midDoor = new MidSequenceDoorEntity(level, X, Y, Z, YAW, life);
 
-        level.addFreshEntity(door);
+        if(sequence >= 8){
+            lowDoor.setPos(x, y, z);
+            level.addFreshEntity(lowDoor);
+        }else if(sequence >= 5){
+            midDoor.setPos(x, y, z);
+            level.addFreshEntity(midDoor);
+        }
+
     }
 
     public static void spawnDoorTeleportationOnly(Level level, BlockPos pos, double X, double Y, double Z, Entity canPassTrough, Direction direction, int life, LivingEntity user){
