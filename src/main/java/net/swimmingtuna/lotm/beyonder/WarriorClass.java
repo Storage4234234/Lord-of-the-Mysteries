@@ -230,6 +230,7 @@ public class WarriorClass implements BeyonderClass {
         HashMultimap<Integer, Item> items = HashMultimap.create();
         items.put(9, ItemInit.BEYONDER_ABILITY_USER.get());
         items.put(9, ItemInit.ALLY_MAKER.get());
+        items.put(9, ItemInit.WARRIORDANGERSENSE.get());
         items.put(6, ItemInit.GIGANTIFICATION.get());
         items.put(6, ItemInit.LIGHTOFDAWN.get());
         items.put(6, ItemInit.DAWNARMORY.get());
@@ -297,6 +298,9 @@ public class WarriorClass implements BeyonderClass {
                         }
                     }
                 } else if (hasFullDawnArmor(livingEntity)) {
+                    if (livingEntity.tickCount % 2 == 0) {
+                        BeyonderUtil.useSpirituality(livingEntity, 2);
+                    }
                     if (event.getAmount() <= 10) {
                         event.setAmount(0);
                     } else if (isSupernatural) {

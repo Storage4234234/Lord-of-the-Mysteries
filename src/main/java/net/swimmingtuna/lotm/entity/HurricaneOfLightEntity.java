@@ -108,7 +108,6 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             hurricaneOfLightEntity.setHurricaneLifecount(300 - (sequence * 20));
             hurricaneOfLightEntity.setHurricaneDestroy(true);
             hurricaneOfLightEntity.setHurricaneMov(livingEntity.getLookAngle().scale(0.5f).toVector3f());
-
             livingEntity.level().addFreshEntity(hurricaneOfLightEntity);
         }
     }

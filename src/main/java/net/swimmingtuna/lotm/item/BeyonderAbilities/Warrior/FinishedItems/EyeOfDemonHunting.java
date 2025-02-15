@@ -16,6 +16,7 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
@@ -38,16 +39,19 @@ import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
 import net.swimmingtuna.lotm.networking.packet.SyncAntiConcealmentPacketS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
+import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleTypes;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EyeOfDemonHunting extends SimpleAbilityItem {
 
 
     public EyeOfDemonHunting(Properties properties) {
-        super(properties, BeyonderClassInit.WARRIOR, 6, 0, 20);
+        super(properties, BeyonderClassInit.WARRIOR, 4, 0, 20);
     }
 
     @Override
@@ -259,6 +263,16 @@ public class EyeOfDemonHunting extends SimpleAbilityItem {
                 }
             }
         }
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.literal("Upon use, disable or enable your eye of demon hunting. If enabled, you will see trails of players/mobs, gain strengths dependent on the weakness of your opponent's pathway, and be able to see the health of entities around you."));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("0").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Seconds").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(getPathwayText(this.requiredClass.get()));
+        tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));
+        super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 }
 

@@ -12,6 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -21,8 +22,12 @@ import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
+import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class Gigantification extends SimpleAbilityItem {
 
@@ -46,9 +51,10 @@ public class Gigantification extends SimpleAbilityItem {
         if (entity instanceof Player player) {
             if (player.tickCount % 2 == 0 && !level.isClientSide()) {
                 int sequence = BeyonderUtil.getSequence(player);
-                if (sequence >= 4) {
-                    if (player.getMainHandItem().getItem() instanceof MisfortuneManipulation) {
-                        player.displayClientMessage(Component.literal("Block Destroying: " + player.getPersistentData().getBoolean("warriorShouldDestroyBlock")).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.YELLOW), true);
+                if (sequence <= 4) {
+                    boolean destroyBlocks = entity.getPersistentData().getBoolean("warriorShouldDestroyBlock");
+                    if (player.getMainHandItem().getItem() instanceof Gigantification) {
+                        player.displayClientMessage(Component.literal("Block Destroying: " + (destroyBlocks ? "off" : "on")).withStyle(ChatFormatting.YELLOW).withStyle(ChatFormatting.BOLD), true);
                     }
                 }
             }
@@ -91,7 +97,7 @@ public class Gigantification extends SimpleAbilityItem {
 
     public static void gigantificationDestroyBlocks(LivingEvent.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!entity.level().isClientSide() && entity.isShiftKeyDown()) {
+        if (!entity.level().isClientSide() && entity.isShiftKeyDown() && entity.tickCount % 20 == 0) {
             CompoundTag tag = entity.getPersistentData();
             boolean isGiant = tag.getBoolean("warriorGiant");
             boolean isHoGGiant = tag.getBoolean("handOfGodGiant");
@@ -99,6 +105,8 @@ public class Gigantification extends SimpleAbilityItem {
             boolean destroyBlocks = tag.getBoolean("warriorShouldDestroyBlock");
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(entity);
             float scale = scaleData.getScale();
+            entity.sendSystemMessage(Component.literal("Shifting"));
+            entity.sendSystemMessage(Component.literal("destroy blocks is " + destroyBlocks));
             if (destroyBlocks && (isGiant || isHoGGiant || isTwilightGiant)) {
                 int radius = (int) (scale + 2);
                 if (isHoGGiant) {
@@ -106,6 +114,7 @@ public class Gigantification extends SimpleAbilityItem {
                 } else if (isTwilightGiant) {
                     radius *= 4;
                 }
+                entity.sendSystemMessage(Component.literal("Shi"));
                 BlockPos playerPos = entity.blockPosition();
                 Level level = entity.level();
                 float obsidianStrength = 1200.0F;
@@ -191,7 +200,15 @@ public class Gigantification extends SimpleAbilityItem {
             }
         }
     }
-
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.literal("Upon use, transform into a giant, in this form, you take less damage, have small amounts negated. In addition, if your sequence is less than four, you can break the blocks around you by shifting."));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("0").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Seconds").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(getPathwayText(this.requiredClass.get()));
+        tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));
+        super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
 
 }
 

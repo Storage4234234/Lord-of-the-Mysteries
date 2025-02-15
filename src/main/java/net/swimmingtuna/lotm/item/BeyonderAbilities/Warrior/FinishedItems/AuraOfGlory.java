@@ -10,19 +10,25 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
+import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleTypes;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class AuraOfGlory extends SimpleAbilityItem {
 
 
     public AuraOfGlory(Properties properties) {
-        super(properties, BeyonderClassInit.WARRIOR, 6, 0, 20);
+        super(properties, BeyonderClassInit.WARRIOR, 2, 0, 20);
     }
 
     @Override
@@ -86,7 +92,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
                         projectile.discard();
                     }
                 }
-                BeyonderUtil.useSpirituality(livingEntity, 250);
+                BeyonderUtil.useSpirituality(livingEntity, 240);
             } else if (twilight && livingEntity.tickCount % 20 == 0) {
                 for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(200))) {
                     if (!BeyonderUtil.isAllyOf(livingEntity, living) && living != livingEntity) {
@@ -120,9 +126,19 @@ public class AuraOfGlory extends SimpleAbilityItem {
                         projectile.discard();
                     }
                 }
-                BeyonderUtil.useSpirituality(livingEntity, 250);
+                BeyonderUtil.useSpirituality(livingEntity, 350);
             }
         }
+    }
+
+    @Override
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.literal("Upon use, enable or disable your aura of glory. If enabled, all entities around you will be affected by glory. If they are an ally or yourself, they will age positively, gaining spirituality quickly, recovering fast, and have their item cooldowns reduced. If they aren't an ally, they will age rapidly, eventually turning to dust. This applies to projectiles too."));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("200 per second").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(getPathwayText(this.requiredClass.get()));
+        tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));
+        super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 }
 

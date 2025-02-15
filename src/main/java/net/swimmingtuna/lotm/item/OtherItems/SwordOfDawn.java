@@ -95,21 +95,24 @@ public class SwordOfDawn extends SwordItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-        if (!pPlayer.level().isClientSide() && !pPlayer.isShiftKeyDown()) {
-            Vec3 eyePosition = pPlayer.getEyePosition();
-            Vec3 lookVector = pPlayer.getLookAngle();
-            Vec3 reachVector = eyePosition.add(lookVector.x * 5, lookVector.y * 5, lookVector.z * 5);
-            BlockHitResult blockHit = pPlayer.level().clip(new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, pPlayer));
-            if (blockHit.getType() == HitResult.Type.MISS) {
-                int sequence = BeyonderUtil.getSequence(pPlayer);
-                if (sequence >= 3) {
-                    HurricaneOfLightEntity.summonHurricaneOfLightWarrior(pPlayer);
-                } else {
-                    HurricaneOfLightEntity.summonHurricaneOfLightAngel(pPlayer);
+        if (!pPlayer.level().isClientSide()) {
+            if (!pPlayer.isShiftKeyDown()) {
+                Vec3 eyePosition = pPlayer.getEyePosition();
+                Vec3 lookVector = pPlayer.getLookAngle();
+                Vec3 reachVector = eyePosition.add(lookVector.x * 5, lookVector.y * 5, lookVector.z * 5);
+                BlockHitResult blockHit = pPlayer.level().clip(new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, pPlayer));
+                if (blockHit.getType() == HitResult.Type.MISS) {
+                    int sequence = BeyonderUtil.getSequence(pPlayer);
+                    if (sequence >= 3) {
+                        HurricaneOfLightEntity.summonHurricaneOfLightWarrior(pPlayer);
+                    } else {
+                        HurricaneOfLightEntity.summonHurricaneOfLightAngel(pPlayer);
+                    }
+                    BeyonderUtil.useSpirituality(pPlayer, 200);
+                    pPlayer.getCooldowns().addCooldown(this, 400);
                 }
-                pPlayer.getCooldowns().addCooldown(this, 400);
             }
-        } else {
+        } else if (pPlayer.isShiftKeyDown() && BeyonderUtil.getSequence(pPlayer) <= 5) {
             if (!pPlayer.level().isClientSide()) {
                 if (!pPlayer.level().isClientSide()) {
                     int boxCount = 0;
@@ -129,6 +132,7 @@ public class SwordOfDawn extends SwordItem {
                         guardianBoxEntity.setMaxHealth(300 - (sequence * 20));
                         pPlayer.level().addFreshEntity(guardianBoxEntity);
                         pPlayer.getCooldowns().addCooldown(this, 400);
+                        BeyonderUtil.useSpirituality(pPlayer, 200);
                     }
                 }
             }
@@ -138,12 +142,16 @@ public class SwordOfDawn extends SwordItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-
-        super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
+        tooltipComponents.add(Component.literal("Upon use, create a hurricane of dawn, destroying everything in it's path. At sequence 2, this will fragment armor, causing it to rapidly break. If you're shifting, you can also createa box of light to protect you and your allies from enemies."));
+        tooltipComponents.add(Component.literal("On hit, if the creature is evil, it will deal additional damage, slow, and weaken them."));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("25 per second, 300 with each use of ability.").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("20 Seconds.").withStyle(ChatFormatting.YELLOW)));
     }
 
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("DAWN_ITEM", ChatFormatting.YELLOW);
     }
+
+
 }

@@ -132,14 +132,16 @@ public class SpearOfDawn extends SwordItem {
         return f;
     }
 
+
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-
-        super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
+        tooltipComponents.add(Component.literal("WORK IN PROGRESS").withStyle(ChatFormatting.RED));
     }
 
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("DAWN_ITEM", ChatFormatting.YELLOW);
     }
+
+
 }
