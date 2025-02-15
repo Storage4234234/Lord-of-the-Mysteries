@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static net.swimmingtuna.lotm.util.BeyonderUtil.spawnLowSequenceDoorTeleportationOnly;
+import static net.swimmingtuna.lotm.util.BeyonderUtil.spawnDoorTeleportationOnly;
 
 public class CreateDoor extends SimpleAbilityItem {
     public CreateDoor(Properties properties) {
@@ -115,7 +115,7 @@ public class CreateDoor extends SimpleAbilityItem {
                 if(level.isEmptyBlock(BlockPos.containing(posRelativeTo.getX(), posRelativeTo.getY() + yModifier, posRelativeTo.getZ()))
                         && level.isEmptyBlock(BlockPos.containing(posRelativeTo.getX(), posRelativeTo.getY() + yModifier + 1, posRelativeTo.getZ()))){
                     if(!level.isEmptyBlock(BlockPos.containing(pos.getX(), pos.getY() + yModifier, pos.getZ()))
-                    && !level.isEmptyBlock(BlockPos.containing(pos.getX(), pos.getY() + yModifier + 1, pos.getZ()))){
+                            && !level.isEmptyBlock(BlockPos.containing(pos.getX(), pos.getY() + yModifier + 1, pos.getZ()))){
                         if(direction == Direction.SOUTH || direction == Direction.NORTH){
                             while(maxBlocks > 0){
                                 loop ++;
@@ -123,18 +123,14 @@ public class CreateDoor extends SimpleAbilityItem {
                                     if(level.isEmptyBlock(BlockPos.containing(x, (y + yModifier) + 1, z + loop * cordModifier))){
                                         maxBlocks = 0;
                                         canCreate = false;
-                                        if(sequence >= 8){
-                                            spawnLowSequenceDoorTeleportationOnly(level, BlockPos.containing(posRelativeTo.getX(), posRelativeTo.getY()  + yModifier, posRelativeTo.getZ()), (x + 0.5), (y + yModifier), (z + loop * cordModifier + (0.5 * cordModifier - 0.2) * cordModifier), player, direction, 90);
-                                        }
+                                        spawnDoorTeleportationOnly(level, BlockPos.containing(posRelativeTo.getX(), posRelativeTo.getY()  + yModifier, posRelativeTo.getZ()), (x + 0.5), (y + yModifier), (z + loop * cordModifier + (0.5 * cordModifier - 0.2) * cordModifier), player, direction, 90, player);
                                     }
                                 }else{
                                     maxBlocks --;
                                 }
                                 if(maxBlocks == 0 && canCreate){
                                     canCreate = false;
-                                    if(sequence >= 8){
-                                        spawnLowSequenceDoorTeleportationOnly(level, BlockPos.containing(posRelativeTo.getX(), posRelativeTo.getY()  + yModifier, posRelativeTo.getZ()), (x + 0.5), (y + yModifier), (z + loop * cordModifier + (0.5 * cordModifier - 0.2) * cordModifier), player, direction, 90);
-                                    }
+                                    spawnDoorTeleportationOnly(level, BlockPos.containing(posRelativeTo.getX(), posRelativeTo.getY()  + yModifier, posRelativeTo.getZ()), (x + 0.5), (y + yModifier), (z + loop * cordModifier + (0.5 * cordModifier - 0.2) * cordModifier), player, direction, 90, player);
                                 }
                             }
                         }else {
@@ -144,18 +140,14 @@ public class CreateDoor extends SimpleAbilityItem {
                                     if(level.isEmptyBlock(BlockPos.containing(x + loop * cordModifier, (y + yModifier) + 1, z))){
                                         maxBlocks = 0;
                                         canCreate = false;
-                                        if(sequence >= 8){
-                                            spawnLowSequenceDoorTeleportationOnly(level, BlockPos.containing(posRelativeTo.getX(), posRelativeTo.getY()  + yModifier, posRelativeTo.getZ()), (x + loop * cordModifier + (0.5 * cordModifier - 0.2) * cordModifier), (y + yModifier), (z + 0.5), player, direction,90);
-                                        }
+                                        spawnDoorTeleportationOnly(level, BlockPos.containing(posRelativeTo.getX(), posRelativeTo.getY()  + yModifier, posRelativeTo.getZ()), (x + loop * cordModifier + (0.5 * cordModifier - 0.2) * cordModifier), (y + yModifier), (z + 0.5), player, direction,90, player);
                                     }
                                 }else{
                                     maxBlocks --;
                                 }
                                 if(maxBlocks == 0 && canCreate){
                                     canCreate = false;
-                                    if(sequence >= 8){
-                                        spawnLowSequenceDoorTeleportationOnly(level, BlockPos.containing(posRelativeTo.getX(), posRelativeTo.getY()  + yModifier, posRelativeTo.getZ()), (x + loop * cordModifier + (0.5 * cordModifier - 0.2) * cordModifier), (y + yModifier), (z + 0.5), player, direction,90);
-                                    }
+                                    spawnDoorTeleportationOnly(level, BlockPos.containing(posRelativeTo.getX(), posRelativeTo.getY()  + yModifier, posRelativeTo.getZ()), (x + loop * cordModifier + (0.5 * cordModifier - 0.2) * cordModifier), (y + yModifier), (z + 0.5), player, direction,90, player);
                                 }
                             }
                         }

@@ -63,6 +63,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.commands.AbilityRegisterCommand;
 import net.swimmingtuna.lotm.entity.LowSequenceDoorEntity;
+import net.swimmingtuna.lotm.entity.MidSequenceDoorEntity;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
@@ -1985,6 +1986,43 @@ public class BeyonderUtil {
 
         level.addFreshEntity(door);
     }
+
+    public static void spawnDoorTeleportationOnly(Level level, BlockPos pos, double X, double Y, double Z, Entity canPassTrough, Direction direction, int life, LivingEntity user){
+        int sequence = getSequence(user);
+        double x = pos.getX();
+        double y = pos.getY();
+        double z = pos.getZ();
+        float YAW = 0F;
+        if(direction == Direction.NORTH){
+            x = x + 0.5;
+            z = z + 0.25;
+            YAW = 0F;
+        }else if (direction == Direction.WEST){
+            x = x + 0.25;
+            z = z + 0.5;
+            YAW = 90F;
+        }else if (direction == Direction.SOUTH){
+            x = x + 0.5;
+            z = z + 0.75;
+            YAW = 180;
+        }else if (direction == Direction.EAST){
+            x = x + 0.75;
+            z = z + 0.5;
+            YAW = 270F;
+        }
+        LowSequenceDoorEntity lowDoor = new LowSequenceDoorEntity(canPassTrough, level, X, Y, Z, YAW, life);
+        MidSequenceDoorEntity midDoor = new MidSequenceDoorEntity(level, X, Y, Z, YAW, life);
+
+        if(sequence >= 8){
+            lowDoor.setPos(x, y, z);
+            level.addFreshEntity(lowDoor);
+        }else if(sequence >= 5){
+            midDoor.setPos(x, y, z);
+            level.addFreshEntity(midDoor);
+        }
+
+    }
+
 
 
 
