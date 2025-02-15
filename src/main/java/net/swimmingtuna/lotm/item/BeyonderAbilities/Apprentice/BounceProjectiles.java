@@ -87,7 +87,7 @@ public class BounceProjectiles extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, disable or enable the ability to make all projectiles that would hit you or the target entity bounce off. If your shift key is down while using this item, you arrows will bounce towards their targets."));
+        tooltipComponents.add(Component.literal("Upon use, disable or enable the ability to make all projectiles that would hit you or the target entity bounce off for some time. If your shift key is down while using this item, your projectiles will bounce towards their targets instead"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("0").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));

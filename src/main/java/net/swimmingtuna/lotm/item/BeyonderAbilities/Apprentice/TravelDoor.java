@@ -56,9 +56,8 @@ public class TravelDoor extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, blink in the direction you're looking."));
+        tooltipComponents.add(Component.literal("Upon use, blink in the direction you're looking. You can also type coordinates in chat in order to go to that location."));
         tooltipComponents.add(Component.literal("Hold shift to increase blink range."));
-        tooltipComponents.add(Component.literal("While holding this item, type in coordinates or a player's name to travel to them."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("300").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("None").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));

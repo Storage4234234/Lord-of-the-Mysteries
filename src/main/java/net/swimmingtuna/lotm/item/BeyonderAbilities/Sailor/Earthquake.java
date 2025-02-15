@@ -117,6 +117,7 @@ public class Earthquake extends SimpleAbilityItem {
     public static boolean isOnSurface(Level level, BlockPos pos) {
         return level.canSeeSky(pos.above()) || !level.getBlockState(pos.above()).isSolid();
     }
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
