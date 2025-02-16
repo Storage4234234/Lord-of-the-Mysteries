@@ -230,7 +230,6 @@ public class WarriorClass implements BeyonderClass {
         HashMultimap<Integer, Item> items = HashMultimap.create();
         items.put(9, ItemInit.BEYONDER_ABILITY_USER.get());
         items.put(9, ItemInit.ALLY_MAKER.get());
-        items.put(9, ItemInit.WARRIORDANGERSENSE.get());
         items.put(6, ItemInit.GIGANTIFICATION.get());
         items.put(6, ItemInit.LIGHTOFDAWN.get());
         items.put(6, ItemInit.DAWNARMORY.get());
@@ -249,7 +248,6 @@ public class WarriorClass implements BeyonderClass {
         items.put(2, ItemInit.MERCURYCAGE.get());
         items.put(1, ItemInit.DIVINEHANDLEFT.get());
         items.put(1, ItemInit.DIVINEHANDRIGHT.get());
-        items.put(1, ItemInit.SILVERLIGHT.get());
         items.put(0, ItemInit.AURAOFTWILIGHT.get());
         items.put(0, ItemInit.GLOBEOFTWILIGHT.get());
         items.put(0, ItemInit.BEAMOFTWILIGHT.get());

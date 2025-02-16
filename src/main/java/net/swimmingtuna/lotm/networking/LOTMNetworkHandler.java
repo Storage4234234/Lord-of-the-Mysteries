@@ -40,6 +40,11 @@ public class LOTMNetworkHandler {
                 .encoder(LuckManipulationLeftClickC2S::toByte)
                 .consumerMainThread(LuckManipulationLeftClickC2S::handle)
                 .add();
+        INSTANCE.messageBuilder(MercuryLiqueficationC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(MercuryLiqueficationC2S::new)
+                .encoder(MercuryLiqueficationC2S::toByte)
+                .consumerMainThread(MercuryLiqueficationC2S::handle)
+                .add();
         INSTANCE.messageBuilder(MonsterDomainLeftClickC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(MonsterDomainLeftClickC2S::new)
                 .encoder(MonsterDomainLeftClickC2S::toByte)

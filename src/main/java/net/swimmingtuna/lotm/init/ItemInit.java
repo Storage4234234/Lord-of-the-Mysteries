@@ -311,8 +311,6 @@ public class ItemInit {
             () -> new DivineHandRight(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> DIVINEHANDLEFT = ITEMS.register("divinehandleft",
             () -> new DivineHandLeft(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> SILVERLIGHT = ITEMS.register("silverlight",
-            () -> new SilverLight(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> AURAOFTWILIGHT = ITEMS.register("auraoftwilight",
             () -> new AuraOfTwilight(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> GLOBEOFTWILIGHT = ITEMS.register("globeoftwilight",

@@ -54,7 +54,7 @@ public class Gigantification extends SimpleAbilityItem {
                 if (sequence <= 4) {
                     boolean destroyBlocks = entity.getPersistentData().getBoolean("warriorShouldDestroyBlock");
                     if (player.getMainHandItem().getItem() instanceof Gigantification) {
-                        player.displayClientMessage(Component.literal("Block Destroying: " + (destroyBlocks ? "off" : "on")).withStyle(ChatFormatting.YELLOW).withStyle(ChatFormatting.BOLD), true);
+                        player.displayClientMessage(Component.literal("Block Destroying: " + (destroyBlocks ? "On" : "Off")).withStyle(ChatFormatting.YELLOW).withStyle(ChatFormatting.BOLD), true);
                     }
                 }
             }
@@ -105,8 +105,6 @@ public class Gigantification extends SimpleAbilityItem {
             boolean destroyBlocks = tag.getBoolean("warriorShouldDestroyBlock");
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(entity);
             float scale = scaleData.getScale();
-            entity.sendSystemMessage(Component.literal("Shifting"));
-            entity.sendSystemMessage(Component.literal("destroy blocks is " + destroyBlocks));
             if (destroyBlocks && (isGiant || isHoGGiant || isTwilightGiant)) {
                 int radius = (int) (scale + 2);
                 if (isHoGGiant) {
@@ -114,7 +112,6 @@ public class Gigantification extends SimpleAbilityItem {
                 } else if (isTwilightGiant) {
                     radius *= 4;
                 }
-                entity.sendSystemMessage(Component.literal("Shi"));
                 BlockPos playerPos = entity.blockPosition();
                 Level level = entity.level();
                 float obsidianStrength = 1200.0F;

@@ -56,6 +56,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.MercuryLiquefication;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
@@ -353,6 +354,11 @@ public class ModEvents {
     }
 
     @SubscribeEvent
+    public static void rightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
+        MercuryLiquefication.mercuryRightClick(event);
+    }
+
+    @SubscribeEvent
     public static void handleLivingTick(LivingEvent.LivingTickEvent event) {
         LivingEntity livingEntity = event.getEntity();
         CompoundTag tag = livingEntity.getPersistentData();
@@ -361,6 +367,7 @@ public class ModEvents {
             if (livingEntity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
             }
+            MercuryLiquefication.mercuryLiqueficationTick(event);
             BeyonderUtil.ageHandlerTick(event);
             InvisibleHand.invisibleHandTick(event);
             Burn.smeltItem(event);

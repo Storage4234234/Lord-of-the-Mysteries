@@ -17,6 +17,9 @@ public class EntityInit {
     public static final RegistryObject<EntityType<AqueousLightEntity>> AQUEOUS_LIGHT_ENTITY =
             ENTITIES.register("aqueous_light", () -> EntityType.Builder.<AqueousLightEntity>of(AqueousLightEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).clientTrackingRange(100).build(new ResourceLocation(LOTM.MOD_ID, "aqueous_light").toString()));
+    public static final RegistryObject<EntityType<MercuryEntity>> MERCURY_ENTITY =
+            ENTITIES.register("mercury_entity", () -> EntityType.Builder.<MercuryEntity>of(MercuryEntity::new, MobCategory.MISC)
+                    .sized(0.5f,0.5f).clientTrackingRange(100).build(new ResourceLocation(LOTM.MOD_ID, "mercury_entity").toString()));
     public static final RegistryObject<EntityType<DawnRayEntity>> DAWN_RAY_ENTITY =
             ENTITIES.register("dawn_ray_entity", () -> EntityType.Builder.<DawnRayEntity>of(DawnRayEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).clientTrackingRange(400).build(new ResourceLocation(LOTM.MOD_ID, "dawn_ray_entity").toString()));

@@ -514,7 +514,6 @@ public class BeyonderUtil {
                 if (sequence <= 1) {
                     abilityNames.add(ItemInit.DIVINEHANDLEFT.get());
                     abilityNames.add(ItemInit.DIVINEHANDRIGHT.get());
-                    abilityNames.add(ItemInit.SILVERLIGHT.get());
                 }
                 if (sequence <= 0) {
                     abilityNames.add(ItemInit.AURAOFTWILIGHT.get());
@@ -1247,6 +1246,7 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.LIGHTOFDAWN.get(), (100.0f - (sequence * 10)) / abilityWeakness);
         damageMap.put(ItemInit.AURAOFGLORY.get(), (15.0f - (sequence)) / abilityWeakness);
         damageMap.put(ItemInit.AURAOFTWILIGHT.get(), (30.0f - (sequence * 2)) / abilityWeakness);
+        damageMap.put(ItemInit.MERCURYLIQUEFICATION.get(), (15.0f - (sequence * 2)) / abilityWeakness);
 
         //APPRENTICE
         damageMap.put(ItemInit.CREATEDOOR.get(), 0.0f);

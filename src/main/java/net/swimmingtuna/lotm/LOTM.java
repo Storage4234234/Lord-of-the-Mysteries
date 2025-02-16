@@ -323,7 +323,6 @@ public class LOTM {
             event.accept(ItemInit.MERCURYCAGE);
             event.accept(ItemInit.DIVINEHANDRIGHT);
             event.accept(ItemInit.DIVINEHANDLEFT);
-            event.accept(ItemInit.SILVERLIGHT);
             event.accept(ItemInit.AURAOFTWILIGHT);
             event.accept(ItemInit.GLOBEOFTWILIGHT);
             event.accept(ItemInit.DAWN_HELMET);
