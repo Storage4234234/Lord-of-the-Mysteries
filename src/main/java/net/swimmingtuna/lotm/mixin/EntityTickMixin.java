@@ -15,33 +15,35 @@ public class EntityTickMixin {
         Entity entity = (Entity)(Object)this;
         CompoundTag tag = entity.getPersistentData();
         int timer = tag.getInt("twilightManifestationTimer");
-        if (timer > 1) {
-            tag.putInt("twilightManifestationTimer", timer - 1);
-            if (tag.getInt("unableToUseAbility") == 0) {
-                tag.putInt("unableToUseAbility", 1);
+        if (!entity.level().isClientSide()) {
+            if (timer > 1) {
+                tag.putInt("twilightManifestationTimer", timer - 1);
+                if (tag.getInt("unableToUseAbility") == 0) {
+                    tag.putInt("unableToUseAbility", 1);
+                }
+            } else if (timer == 1) {
+                tag.putInt("unableToUseAbility", 0);
+                tag.putInt("twilightManifestationTimer", 0);
+                tag.putDouble("twilightManifestationX", 0);
+                tag.putDouble("twilightManifestationY", 0);
+                tag.putDouble("twilightManifestationZ", 0);
             }
-        } else if (timer == 1) {
-            tag.putInt("unableToUseAbility", 0);
-            tag.putInt("twilightManifestationTimer", 0);
-            tag.putDouble("twilightManifestationX", 0);
-            tag.putDouble("twilightManifestationY", 0);
-            tag.putDouble("twilightManifestationZ", 0);
-        }
-        double twilightX = tag.getDouble("twilightManifestationX");
-        double twilightY = tag.getDouble("twilightManifestationY");
-        double twilightZ = tag.getDouble("twilightManifestationZ");
-        if (twilightX != 0 || twilightY != 0 || twilightZ != 0) {
-            if (entity instanceof LivingEntity living) {
-                living.getDeltaMovement().multiply(0, 0, 0);
-                living.setDeltaMovement(0, 0, 0);
-                living.xo = living.getX();
-                living.yo = living.getY();
-                living.zo = living.getZ();
-                living.xOld = living.getX();
-                living.yOld = living.getY();
-                living.zOld = living.getZ();
+            double twilightX = tag.getDouble("twilightManifestationX");
+            double twilightY = tag.getDouble("twilightManifestationY");
+            double twilightZ = tag.getDouble("twilightManifestationZ");
+            if (twilightX != 0 || twilightY != 0 || twilightZ != 0) {
+                if (entity instanceof LivingEntity living) {
+                    living.getDeltaMovement().multiply(0, 0, 0);
+                    living.setDeltaMovement(0, 0, 0);
+                    living.xo = living.getX();
+                    living.yo = living.getY();
+                    living.zo = living.getZ();
+                    living.xOld = living.getX();
+                    living.yOld = living.getY();
+                    living.zOld = living.getZ();
+                }
+                ci.cancel();
             }
-            ci.cancel();
         }
     }
 }

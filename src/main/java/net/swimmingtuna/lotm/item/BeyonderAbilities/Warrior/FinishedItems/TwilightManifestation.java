@@ -102,21 +102,23 @@ public class TwilightManifestation extends SimpleAbilityItem {
                 }
             }
         }
-        double movementX = livingEntity.getPersistentData().getDouble("twilightManifestationX");
-        double movementY = livingEntity.getPersistentData().getDouble("twilightManifestationY");
-        double movementZ = livingEntity.getPersistentData().getDouble("twilightManifestationZ");
-        if (movementX != 0 || movementY != 0 || movementZ != 0) {
-            if (livingEntity.invulnerableTime > 5) {
-                livingEntity.invulnerableTime = 5;
+        if (!livingEntity.level().isClientSide()) {
+            double movementX = livingEntity.getPersistentData().getDouble("twilightManifestationX");
+            double movementY = livingEntity.getPersistentData().getDouble("twilightManifestationY");
+            double movementZ = livingEntity.getPersistentData().getDouble("twilightManifestationZ");
+            if (movementX != 0 || movementY != 0 || movementZ != 0) {
+                if (livingEntity.invulnerableTime > 5) {
+                    livingEntity.invulnerableTime = 5;
+                }
+                if (livingEntity.hurtTime > 5) {
+                    livingEntity.hurtTime = 5;
+                }
+                livingEntity.hurtMarked = false;
+                event.setCanceled(true);
             }
-            if (livingEntity.hurtTime > 5) {
-                livingEntity.hurtTime = 5;
+            if (livingEntity.getPersistentData().getInt("unableToUseAbility") >= 1 && livingEntity.tickCount % 10 == 0) {
+                livingEntity.getPersistentData().putInt("unableToUseAbility", 0);
             }
-            livingEntity.hurtMarked = false;
-            event.setCanceled(true);
-        }
-        if (livingEntity.getPersistentData().getInt("unableToUseAbility") >= 1 && livingEntity.tickCount % 10 == 0) {
-            livingEntity.getPersistentData().putInt("unableToUseAbility", 0);
         }
     }
 
