@@ -334,23 +334,20 @@ public class ModEvents {
     public static void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
         Player player = event.getEntity();
         ItemStack itemStack = player.getItemInHand(event.getHand());
-
-        // Check if the player is holding your SimpleAbilityItem
         if (itemStack.getItem() instanceof SimpleAbilityItem) {
             if (event.getTarget() instanceof LivingEntity livingEntity) {
-
-
-                // Execute custom interaction logic
-                InteractionResult result = ((SimpleAbilityItem) itemStack.getItem())
-                        .useAbilityOnEntity(itemStack, player, livingEntity, event.getHand());
-
-                // Cancel the default interaction if your item interaction is successful
+                InteractionResult result = ((SimpleAbilityItem) itemStack.getItem()).useAbilityOnEntity(itemStack, player, livingEntity, event.getHand());
                 if (result == InteractionResult.SUCCESS) {
-                    event.setCanceled(true);  // Cancels the event, preventing default interaction
+                    event.setCanceled(true);
                     event.setCancellationResult(InteractionResult.SUCCESS);
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void entityInteractEvent(PlayerInteractEvent.EntityInteract event) {
+        MercuryLiquefication.mercuryArmorRightClick(event);
     }
 
     @SubscribeEvent
@@ -367,6 +364,7 @@ public class ModEvents {
             if (livingEntity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
             }
+            MercuryLiquefication.mercuryArmorTick(event);
             MercuryLiquefication.mercuryLiqueficationTick(event);
             BeyonderUtil.ageHandlerTick(event);
             InvisibleHand.invisibleHandTick(event);
@@ -511,6 +509,7 @@ public class ModEvents {
             BeyonderUtil.ageHandlerHurt(event);
             GuardianBoxEntity.guardianHurtEvent(event);
             warriorDamageNegation(event);
+            MercuryLiquefication.mercuryArmorHurt(event);
             boolean entityInSpiritWorld = tag.getBoolean("inSpiritWorld");
             if (entitySource != null) {
                 CompoundTag sourceTag = entitySource.getPersistentData();

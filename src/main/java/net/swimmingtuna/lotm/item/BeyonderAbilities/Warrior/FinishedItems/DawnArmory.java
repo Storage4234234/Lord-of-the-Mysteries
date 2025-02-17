@@ -65,7 +65,7 @@ public class DawnArmory extends SimpleAbilityItem {
                 player.setItemSlot(EquipmentSlot.CHEST, createEnchantedArmor(ItemInit.DAWN_CHESTPLATE.get().getDefaultInstance()));
                 player.setItemSlot(EquipmentSlot.LEGS,  createEnchantedArmor(ItemInit.DAWN_LEGGINGS.get().getDefaultInstance()));
                 player.setItemSlot(EquipmentSlot.FEET, createEnchantedArmor(ItemInit.DAWN_BOOTS.get().getDefaultInstance()));
-                armorData.put("Items", armorItems);
+                armorData.put("dawnArmorItems", armorItems);
                 persistentData.put("dawnStoredArmorData", armorData);
                 persistentData.putBoolean("dawnArmorOn", true);
             } else {
@@ -77,7 +77,7 @@ public class DawnArmory extends SimpleAbilityItem {
                 }
                 if (persistentData.contains("dawnStoredArmorData")) {
                     CompoundTag armorData = persistentData.getCompound("dawnStoredArmorData");
-                    ListTag armorItems = armorData.getList("Items", 10);
+                    ListTag armorItems = armorData.getList("dawnArmorItems", 10);
                     for (int i = 0; i < armorItems.size(); i++) {
                         CompoundTag slotTag = armorItems.getCompound(i);
                         int slotIndex = slotTag.getInt("dawnArmorSlot");

@@ -49,7 +49,6 @@ public class MercuryLiqueficationC2S {
                         player.setHealth(Math.max(1, player.getHealth() - 0.5f));
                     }
                 }
-                player.sendSystemMessage(Component.literal("worked"));
             }
         });
         return true;

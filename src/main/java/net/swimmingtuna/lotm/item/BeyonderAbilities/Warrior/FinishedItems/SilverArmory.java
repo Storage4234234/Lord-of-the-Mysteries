@@ -56,12 +56,20 @@ public class SilverArmory extends SimpleAbilityItem {
         }
     }
 
-    private static ItemStack createEnchantedArmor(ItemStack armor) {
+    public static ItemStack createEnchantedArmor(ItemStack armor) {
         armor.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 4);
         armor.enchant(Enchantments.UNBREAKING, 3);
         armor.enchant(Enchantments.FALL_PROTECTION, 3);
         return armor;
     }
+
+    public static ItemStack createEnchantedArmorMercury(ItemStack armor) {
+        armor.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 6);
+        armor.enchant(Enchantments.UNBREAKING, 7);
+        armor.enchant(Enchantments.FALL_PROTECTION, 5);
+        return armor;
+    }
+
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use, conjure a set of armor made of mercury and silver which can be worn by allies. While worn, all damage under 20 will be negated, and supernatural damage heavily reduced."));
