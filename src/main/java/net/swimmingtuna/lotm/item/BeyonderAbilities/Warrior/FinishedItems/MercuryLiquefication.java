@@ -82,7 +82,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
         int y = tag.getInt("mercuryArmorForm");
         if (!level.isClientSide() && currentState) {
             if (y == 0) {
-                BeyonderUtil.useSpirituality(livingEntity, 3);
+                BeyonderUtil.useSpirituality(livingEntity, 10);
             }
             UUID playerId = livingEntity.getUUID();
             Boolean lastState = lastSentStates.get(playerId);
