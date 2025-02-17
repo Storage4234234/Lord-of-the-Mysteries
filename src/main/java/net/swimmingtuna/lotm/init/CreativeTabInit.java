@@ -151,6 +151,7 @@ public class CreativeTabInit {
                         event.accept(ItemInit.SILVERARMORY.get());
                         event.accept(ItemInit.BEAMOFGLORY.get());
                         event.accept(ItemInit.AURAOFGLORY.get());
+                        event.accept(ItemInit.GLOBEOFTWILIGHT.get());
                         event.accept(ItemInit.TWILIGHTSWORD.get());
                         event.accept(ItemInit.MERCURYCAGE.get());
                         event.accept(ItemInit.DIVINEHANDRIGHT.get());

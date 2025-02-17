@@ -303,6 +303,8 @@ public class ItemInit {
             () -> new BeamOfGlory(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> AURAOFGLORY = ITEMS.register("auraofglory",
             () -> new AuraOfGlory(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TWILIGHTMANIFESTATION = ITEMS.register("twilightmanifestation",
+            () -> new TwilightManifestation(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> TWILIGHTSWORD = ITEMS.register("twilightsword",
             () -> new TwilightSword(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> MERCURYCAGE = ITEMS.register("mercurycage",

@@ -515,6 +515,7 @@ public class BeyonderUtil {
                 if (sequence <= 1) {
                     abilityNames.add(ItemInit.DIVINEHANDLEFT.get());
                     abilityNames.add(ItemInit.DIVINEHANDRIGHT.get());
+                    abilityNames.add(ItemInit.TWILIGHTMANIFESTATION.get());
                 }
                 if (sequence <= 0) {
                     abilityNames.add(ItemInit.AURAOFTWILIGHT.get());
@@ -1160,7 +1161,7 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.WIND_MANIPULATION_FLIGHT.get(), (0.0f));
         damageMap.put(ItemInit.WIND_MANIPULATION_SENSE.get(), (0.0f));
 
-//SPECTATOR
+        //SPECTATOR
         damageMap.put(ItemInit.APPLY_MANIPULATION.get(), (0.0f) / abilityWeakness);
         damageMap.put(ItemInit.AWE.get(), (190.0f - (sequence * 15)) / abilityWeakness);
         damageMap.put(ItemInit.BATTLE_HYPNOTISM.get(), (400.0f - (sequence * 20)) / abilityWeakness);
@@ -1246,6 +1247,7 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.SILVERARMORY.get(), (150.0f - (sequence * 15)) / abilityWeakness);
         damageMap.put(ItemInit.LIGHTOFDAWN.get(), (100.0f - (sequence * 10)) / abilityWeakness);
         damageMap.put(ItemInit.AURAOFGLORY.get(), (15.0f - (sequence)) / abilityWeakness);
+        damageMap.put(ItemInit.TWILIGHTMANIFESTATION.get(), (200.0f - (sequence * 100)) / abilityWeakness);
         damageMap.put(ItemInit.AURAOFTWILIGHT.get(), (30.0f - (sequence * 2)) / abilityWeakness);
         damageMap.put(ItemInit.MERCURYLIQUEFICATION.get(), (15.0f - (sequence * 2)) / abilityWeakness);
 
@@ -2007,5 +2009,13 @@ public class BeyonderUtil {
             }
         }
         return null;
+    }
+
+    public static boolean currentPathwayMatches(LivingEntity livingEntity, BeyonderClass matchingPathway) {
+        if (getPathway(livingEntity) == matchingPathway) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

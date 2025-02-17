@@ -267,6 +267,11 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
                         livingEntity.sendSystemMessage(Component.literal("How unlucky! You messed up and couldn't use your ability!").withStyle(ChatFormatting.RED));
                     }
                     return false;
+                } else if (tag.getInt("unableToUseAbility") >= 1) {
+                    tag.putInt("unableToUseAbility", tag.getInt("unableToUseAbility") - 1);
+                    if (livingEntity instanceof Player player) {
+                        player.displayClientMessage(Component.literal("You are unable to use your ability").withStyle(ChatFormatting.RED), true);
+                    }
                 }
             }
         }

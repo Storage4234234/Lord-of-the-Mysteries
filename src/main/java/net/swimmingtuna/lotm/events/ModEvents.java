@@ -364,6 +364,7 @@ public class ModEvents {
             if (livingEntity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
             }
+            TwilightManifestation.twilightManifestationTick(event);
             MercuryLiquefication.mercuryArmorTick(event);
             MercuryLiquefication.mercuryLiqueficationTick(event);
             BeyonderUtil.ageHandlerTick(event);

@@ -65,7 +65,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
             boolean x = livingEntity.getPersistentData().getBoolean("mercuryLiquefication");
             livingEntity.getPersistentData().putBoolean("mercuryLiquefication", !x);
             if (livingEntity instanceof Player player) {
-                player.displayClientMessage(Component.literal("Liquefied: " + (x ? "off" : "on")).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.BOLD), true);
+                player.displayClientMessage(Component.literal("Liquefied: " + (x ? "Off" : "On")).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.BOLD), true);
 
             }
         }
@@ -125,7 +125,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
             if (tag.getInt("mercuryLiqueficationCooldown") >= 1) {
                 tag.putInt("mercuryLiqueficationCooldown", tag.getInt("mercuryLiqueficationCooldown") - 1);
             }
-            if (livingEntity instanceof Player player && !currentState) {
+            if (livingEntity instanceof Player player && !currentState && !player.isCreative() && !player.isSpectator() && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.WARRIOR.get())) {
                 Abilities playerAbilites = player.getAbilities();
                 playerAbilites.setFlyingSpeed(0.05F);
                 playerAbilites.mayfly = false;
@@ -345,7 +345,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, disable or enable your liquefied state. If enabled, you will transform into a liquid mercury, able to fly around at high speeds and right click the air to separate parts of yourself to restrain nearby enemies"));
+        tooltipComponents.add(Component.literal("Upon use, manifest twilight in order to freeze time around you temporarily."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("0").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(getPathwayText(this.requiredClass.get()));

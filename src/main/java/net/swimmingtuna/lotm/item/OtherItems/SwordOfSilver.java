@@ -109,11 +109,8 @@ public class SwordOfSilver extends SwordItem {
         if (!pLevel.isClientSide) {
             Arrow arrow = new Arrow(pLevel, player);
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, powerScale * 3.0F, 1.0F);
-
             arrow.setCritArrow(powerScale > 0.5F);
             arrow.setBaseDamage(arrow.getBaseDamage() * 2.0);
-
-            // Spawn the arrow in the world
             pLevel.addFreshEntity(arrow);
         }
     }
