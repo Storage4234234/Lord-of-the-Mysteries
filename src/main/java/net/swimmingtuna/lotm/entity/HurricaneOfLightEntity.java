@@ -42,7 +42,8 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
     private static final EntityDataAccessor<Vector3f> DATA_HURRICANE_MOV = SynchedEntityData.defineId(HurricaneOfLightEntity.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Boolean> RANDOM_MOVEMENT = SynchedEntityData.defineId(HurricaneOfLightEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DESTROY_BLOCKS = SynchedEntityData.defineId(HurricaneOfLightEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final int BLOCK_DESTROY_INTERVAL = 10;
+    private static final EntityDataAccessor<Boolean> AGE = SynchedEntityData.defineId(HurricaneOfLightEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> BLOCK_DESTROY_INTERVAL = SynchedEntityData.defineId(HurricaneOfLightEntity.class, EntityDataSerializers.INT);
     private static final int PARTICLE_UPDATE_INTERVAL = 2;
     private static final double PARTICLE_DENSITY_FACTOR = 0.75;
 
@@ -70,6 +71,8 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
         this.entityData.define(RANDOM_MOVEMENT, false);
         this.entityData.define(DESTROY_BLOCKS, false);
         this.entityData.define(DESTROY_ARMOR, false);
+        this.entityData.define(AGE, false);
+        this.entityData.define(BLOCK_DESTROY_INTERVAL, 10);
     }
 
     @Override
@@ -77,6 +80,12 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
         super.readAdditionalSaveData(compound);
         if (compound.contains("HurricaneRandomMovement")) {
             this.setHurricaneRandom(compound.getBoolean("HurricaneRandomMovement"));
+        }
+        if (compound.contains("Age")) {
+            this.setAge(compound.getBoolean("Age"));
+        }
+        if (compound.contains("BlockDestroyIntervial")) {
+            this.setBlockDestroyInterval(compound.getInt("BlockDestroyIntervial"));
         }
         if (compound.contains("DestroyArmor")) {
             this.setDestroyArmor(compound.getBoolean("DestroyArmor"));
@@ -122,6 +131,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             hurricaneOfLightEntity.setHurricaneDestroy(true);
             hurricaneOfLightEntity.setHurricaneMov(livingEntity.getLookAngle().scale(0.75f).toVector3f());
             hurricaneOfLightEntity.setDestroyArmor(true);
+            hurricaneOfLightEntity.setBlockDestroyInterval(5);
             livingEntity.level().addFreshEntity(hurricaneOfLightEntity);
         }
     }
@@ -133,6 +143,8 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
         compound.putInt("HurricaneLifeCount", this.getHurricaneLifecount());
         compound.putInt("HurricaneHeight", this.getHurricaneHeight());
         compound.putBoolean("DestroyArmor", this.getDestroyArmor());
+        compound.putBoolean("Age", this.getAge());
+        compound.putInt("BlockDestroyIntervial", this.getBlockDestroyInterval());
         DataResult<Tag> tagDataResult = ExtraCodecs.VECTOR3F.encodeStart(NbtOps.INSTANCE, this.getHurricaneMov());
         tagDataResult.result().ifPresent(tag -> compound.put("HurricaneMov", tag));
     }
@@ -174,7 +186,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             this.setYRot(this.getYRot() + 2);
             this.setOldPosAndRot();
         }
-        if (!this.level().isClientSide && getHurricaneDestroy() && this.tickCount % BLOCK_DESTROY_INTERVAL == 0) {
+        if (!this.level().isClientSide && getHurricaneDestroy() && this.tickCount % this.getBlockDestroyInterval() == 0) {
             destroyBlocksOptimized(hurricaneRadius, hurricaneHeight);
         }
         if (this.level().isClientSide && this.tickCount % PARTICLE_UPDATE_INTERVAL == 0) {
@@ -320,6 +332,11 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             float damageMultiplier = (0.5f + (float) entityRelativeHeight * 0.5f) * (distanceRatio > 1.0 ? 0.7f : 1.0f);
             livingEntity.hurt(livingEntity.damageSources().generic(), (float) getHurricaneRadius() * damageMultiplier / 2);
             if (this.tickCount % 15 == 0) {
+                if (this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
+                    if (!BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                        livingEntity.getPersistentData().putInt("age", livingEntity.getPersistentData().getInt("age") + 5);
+                    }
+                }
                 livingEntity.addEffect(new MobEffectInstance(ModEffects.ARMOR_WEAKNESS.get(), 200, amplifier, true, true));
             }
             if (BeyonderUtil.isPurifiable(livingEntity)) {
@@ -339,6 +356,14 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
 
     public void setHurricaneRadius(int radius) {
         this.entityData.set(DATA_HURRICANE_RADIUS, radius);
+    }
+
+    public int getBlockDestroyInterval() {
+        return this.entityData.get(BLOCK_DESTROY_INTERVAL);
+    }
+
+    public void setBlockDestroyInterval(int destroyInterval) {
+        this.entityData.set(BLOCK_DESTROY_INTERVAL, destroyInterval);
     }
 
     public int getHurricaneHeight() {
@@ -379,6 +404,14 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
 
     public void setHurricaneDestroy(boolean destroy) {
         this.entityData.set(DESTROY_BLOCKS, destroy);
+    }
+
+    public boolean getAge() {
+        return this.entityData.get(AGE);
+    }
+
+    public void setAge(boolean age) {
+        this.entityData.set(AGE, age);
     }
 
     public boolean getDestroyArmor() {

@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.util;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.HotbarManager;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
