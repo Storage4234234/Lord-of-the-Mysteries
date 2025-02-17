@@ -30,7 +30,7 @@ public class TwilightManifestation extends SimpleAbilityItem {
 
 
     public TwilightManifestation(Properties properties) {
-        super(properties, BeyonderClassInit.WARRIOR, 0, 0, 20);
+        super(properties, BeyonderClassInit.WARRIOR, 1, 2500, 1200);
     }
 
     @Override
@@ -125,9 +125,9 @@ public class TwilightManifestation extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, enable or disable your aura of twilight. If enabled, all entities around you will approach their twilight. If they are an ally or yourself, they will age positively, gaining spirituality rapidly, recovering health quickly, and have their item cooldowns be heavily reduced. If they aren't an ally, they will age to the point of dust in seconds. This applies to projectiles too."));
-        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("350 per second").withStyle(ChatFormatting.YELLOW)));
-        tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Upon use, use the authority of twilight to freeze all around you in place, leaving them unable to do anything temporarily."));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("2500").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Minute").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);

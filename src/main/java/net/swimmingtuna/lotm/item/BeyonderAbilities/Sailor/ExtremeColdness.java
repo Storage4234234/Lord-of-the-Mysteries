@@ -113,8 +113,6 @@ public class ExtremeColdness extends SimpleAbilityItem {
         int radius = extremeColdness; // Adjust the division factor as needed
         int blocksToProcessPerTick = 2000;  // Adjust as needed
         int processedBlocks = 0;
-
-        // Cache for heightmap lookups
         Map<BlockPos, Integer> heightMapCache = new HashMap<>();
 
         for (int dx = -radius; dx <= radius && processedBlocks < blocksToProcessPerTick; dx++) {
