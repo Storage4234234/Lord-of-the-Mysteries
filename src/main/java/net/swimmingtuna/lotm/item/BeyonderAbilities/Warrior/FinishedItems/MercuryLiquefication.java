@@ -182,31 +182,33 @@ public class MercuryLiquefication extends SimpleAbilityItem {
     public static void equipSilverArmor(LivingEntity user, LivingEntity targetEntity) {
         if (targetEntity.level().isClientSide()) return;
         if (user.getPersistentData().getBoolean("mercuryLiquefication")) {
-            if (user != targetEntity) {
-                long currentTime = System.currentTimeMillis();
-                if (currentTime - lastActivationTime >= COOLDOWN_MS) {
-                    CompoundTag tag = targetEntity.getPersistentData();
-                    user.getPersistentData().putUUID("mercuryArmor", targetEntity.getUUID());
-                    user.getPersistentData().putInt("mercuryArmorForm", 10);
-                    targetEntity.getPersistentData().putInt("mercuryArmorEquipped", 10);
-                    CompoundTag armorData = new CompoundTag();
-                    ListTag armorItems = new ListTag();
-                    for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
-                        ItemStack armorStack = targetEntity.getItemBySlot(slot);
-                        if (!armorStack.isEmpty()) {
-                            CompoundTag slotTag = new CompoundTag();
-                            slotTag.putInt("mercurySlot", slot.getIndex());
-                            armorStack.save(slotTag);
-                            armorItems.add(slotTag);
+            if (BeyonderUtil.isAllyOf(user, targetEntity)) {
+                if (user != targetEntity) {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastActivationTime >= COOLDOWN_MS) {
+                        CompoundTag tag = targetEntity.getPersistentData();
+                        user.getPersistentData().putUUID("mercuryArmor", targetEntity.getUUID());
+                        user.getPersistentData().putInt("mercuryArmorForm", 10);
+                        targetEntity.getPersistentData().putInt("mercuryArmorEquipped", 10);
+                        CompoundTag armorData = new CompoundTag();
+                        ListTag armorItems = new ListTag();
+                        for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
+                            ItemStack armorStack = targetEntity.getItemBySlot(slot);
+                            if (!armorStack.isEmpty()) {
+                                CompoundTag slotTag = new CompoundTag();
+                                slotTag.putInt("mercurySlot", slot.getIndex());
+                                armorStack.save(slotTag);
+                                armorItems.add(slotTag);
+                            }
+                            targetEntity.setItemSlot(slot, ItemStack.EMPTY);
                         }
-                        targetEntity.setItemSlot(slot, ItemStack.EMPTY);
+                        armorData.put("mercuryStoredArmor", armorItems);
+                        tag.put("mercuryArmorStorage", armorData);
+                        targetEntity.setItemSlot(EquipmentSlot.HEAD, createEnchantedArmor(ItemInit.SILVER_HELMET.get().getDefaultInstance()));
+                        targetEntity.setItemSlot(EquipmentSlot.CHEST, createEnchantedArmor(ItemInit.SILVER_CHESTPLATE.get().getDefaultInstance()));
+                        targetEntity.setItemSlot(EquipmentSlot.LEGS, createEnchantedArmor(ItemInit.SILVER_LEGGINGS.get().getDefaultInstance()));
+                        targetEntity.setItemSlot(EquipmentSlot.FEET, createEnchantedArmor(ItemInit.SILVER_BOOTS.get().getDefaultInstance()));
                     }
-                    armorData.put("mercuryStoredArmor", armorItems);
-                    tag.put("mercuryArmorStorage", armorData);
-                    targetEntity.setItemSlot(EquipmentSlot.HEAD, createEnchantedArmor(ItemInit.SILVER_HELMET.get().getDefaultInstance()));
-                    targetEntity.setItemSlot(EquipmentSlot.CHEST, createEnchantedArmor(ItemInit.SILVER_CHESTPLATE.get().getDefaultInstance()));
-                    targetEntity.setItemSlot(EquipmentSlot.LEGS, createEnchantedArmor(ItemInit.SILVER_LEGGINGS.get().getDefaultInstance()));
-                    targetEntity.setItemSlot(EquipmentSlot.FEET, createEnchantedArmor(ItemInit.SILVER_BOOTS.get().getDefaultInstance()));
                 }
             }
             long currentTime = System.currentTimeMillis();
