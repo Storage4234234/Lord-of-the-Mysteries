@@ -21,8 +21,10 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulati
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.Nullable;
+import net.swimmingtuna.lotm.util.ScribeRecording.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -69,11 +71,17 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        Item ability = player.getItemInHand(hand).getItem();
         if (!level.isClientSide() && checkIfCanUseAbility(player)) {
             for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
                 if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
                     if (BeyonderUtil.scribeLookingAtYou(player, entity)) {
-                        //player.displayClientMessage(Component.literal("Detected a beyonder ability being used."), false);
+                        if (entity instanceof Player pPlayer) {
+                            pPlayer.displayClientMessage(Component.literal("Scribed Ability: ").append(Component.literal(player.getItemInHand(hand).getItem().toString())), true);
+                            pPlayer.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage -> {
+                                storage.copyScribeAbility(ability);
+                            });
+                        }
                     }
                 }
             }
@@ -102,9 +110,11 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
             for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
                 if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
                     if (BeyonderUtil.scribeLookingAtYou(player, entity)) {
-                        if (entity instanceof Player) {
-                            //player.displayClientMessage(Component.literal("Detected a beyonder ability being used."), false);
-                        }
+                        entity.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage -> {
+                            if (storage.hasScribedAbility(player.getItemInHand(context.getHand()).getItem())) {
+                                storage.copyScribeAbility(player.getItemInHand(context.getHand()).getItem());
+                            }
+                        });
                     }
                 }
             }
@@ -121,9 +131,11 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
             for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
                 if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
                     if (BeyonderUtil.scribeLookingAtYou(player, entity)) {
-                        if (entity instanceof Player) {
-                            //player.displayClientMessage(Component.literal("Detected a beyonder ability being used."), false);
-                        }
+                        entity.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage -> {
+                            if (storage.hasScribedAbility(player.getItemInHand(usedHand).getItem())) {
+                                storage.copyScribeAbility(player.getItemInHand(usedHand).getItem());
+                            }
+                        });
                     }
                 }
             }
@@ -276,5 +288,15 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
             }
         }
         return true;
+    }
+
+    public interface scribeAbilitiesStorage {
+        Map<Item, Integer> getScribedAbilities();
+
+        void copyScribeAbility(Item ability);
+
+        boolean hasScribedAbility(Item ability);
+
+        void useScribeAbility(Item ability);
     }
 }

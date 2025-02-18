@@ -9,8 +9,11 @@ import net.swimmingtuna.lotm.entity.Model.*;
 import net.swimmingtuna.lotm.entity.Renderers.*;
 import net.swimmingtuna.lotm.entity.Renderers.PlayerMobRenderer.PlayerMobRenderer;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
+import net.swimmingtuna.lotm.item.Renderer.SwordOfDawnRenderer;
 import net.swimmingtuna.lotm.particle.*;
+import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientEventsEntity {
@@ -58,6 +61,8 @@ public class ClientEventsEntity {
         event.registerEntityRenderer(EntityInit.WIND_BLADE_ENTITY.get(), WindBladeRenderer::new);
         event.registerEntityRenderer(EntityInit.WIND_CUSHION_ENTITY.get(), WindCushionRenderer::new);
     }
+
+
     @SubscribeEvent
     public static void registerParticleProvidersEvent(final RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ParticleInit.ACIDRAIN_PARTICLE.get(), AcidRainParticle.Provider::new);

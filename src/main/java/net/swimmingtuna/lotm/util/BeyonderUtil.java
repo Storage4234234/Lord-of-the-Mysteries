@@ -1094,8 +1094,32 @@ public class BeyonderUtil {
             return holder.getCurrentSequence();
         } else if (living instanceof PlayerMobEntity playerMobEntity) {
             return playerMobEntity.getCurrentSequence();
+        } else {
+            float maxHp = living.getMaxHealth();
+            if (maxHp <= 20) {
+                return 9;
+            } else if (maxHp <= 35) {
+                return 8;
+            } else if (maxHp <= 70) {
+                return 7;
+            } else if (maxHp <= 120) {
+                return 6;
+            } else if (maxHp <= 190) {
+                return 5;
+            } else if (maxHp <= 300) {
+                return 4;
+            } else if (maxHp <= 450) {
+                return 3;
+            } else if (maxHp <= 700) {
+                return 2;
+            } else if (maxHp <= 999) {
+                return 1;
+            } else if (maxHp >= 1000) {
+                return 0;
+            } else {
+                return -1;
+            }
         }
-        return -1;
     }
 
     public static Map<Item, Float> getDamage(LivingEntity livingEntity) {

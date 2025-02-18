@@ -56,14 +56,7 @@ public class GuardianBoxEntity extends Entity {
 
     @Override
     public @NotNull AABB getBoundingBoxForCulling() {
-        return new AABB(
-                this.getX() - 600,
-                this.getY() - 600,
-                this.getZ() - 600,
-                this.getX() + 600,
-                this.getY() + 600,
-                this.getZ() + 600
-        );
+        return new AABB(this.getX() - 600, this.getY() - 600, this.getZ() - 600, this.getX() + 600, this.getY() + 600, this.getZ() + 600);
     }
 
     public int getMaxHealth() {
@@ -136,17 +129,16 @@ public class GuardianBoxEntity extends Entity {
                             //possible logic in the future
                         } else {
                             if (livingEntity != owner && this.tickCount % 10 == 0) {
-                                int sequence = BeyonderUtil.getSequence(livingEntity);
+                                int entitySequence = BeyonderUtil.getSequence(livingEntity);
                                 int ownerSequence = BeyonderUtil.getSequence(owner);
-                                if (sequence >= ownerSequence + 2) {
+                                if (entitySequence >= ownerSequence) {
                                     double x = livingEntity.getX() - this.getX();
                                     double y = livingEntity.getY() - this.getY();
                                     double z = livingEntity.getZ() - this.getZ();
                                     double magnitude = Math.sqrt(x * x + y * y + z * z);
                                     livingEntity.setDeltaMovement(x / magnitude * 4, y / magnitude * 4, z / magnitude * 4);
                                     livingEntity.hurtMarked = true;
-                                    int additionalDamage = (10 - sequence) * 2;
-                                    this.setDamage((int) (damage + additionalDamage));
+                                    int additionalDamage = (10 - entitySequence) * 2;
                                 }
                             }
                         }

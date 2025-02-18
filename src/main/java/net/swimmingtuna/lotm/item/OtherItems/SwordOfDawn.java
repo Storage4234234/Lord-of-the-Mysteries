@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.item.OtherItems;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.GuardianBoxEntity;
@@ -23,8 +25,15 @@ import net.swimmingtuna.lotm.entity.HurricaneOfLightEntity;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.item.Renderer.SwordOfDawnRenderer;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
@@ -33,8 +42,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 
-public class SwordOfDawn extends SwordItem {
+public class SwordOfDawn extends SwordItem implements GeoItem {
 
 
     public SwordOfDawn(Tier pTier, int pAttackDamageModifier, float pAttackSpeedModifier, Properties pProperties) {
@@ -111,29 +121,25 @@ public class SwordOfDawn extends SwordItem {
                     BeyonderUtil.useSpirituality(pPlayer, 200);
                     pPlayer.getCooldowns().addCooldown(this, 400);
                 }
-            }
-        } else if (pPlayer.isShiftKeyDown() && BeyonderUtil.getSequence(pPlayer) <= 5) {
-            if (!pPlayer.level().isClientSide()) {
-                if (!pPlayer.level().isClientSide()) {
-                    int boxCount = 0;
-                    for (GuardianBoxEntity guardianBox : pPlayer.level().getEntitiesOfClass(GuardianBoxEntity.class, pPlayer.getBoundingBox().inflate(200))) {
-                        Optional<UUID> ownerUUID = Optional.of(pPlayer.getUUID());
-                        if (Objects.equals(guardianBox.getOwnerUUID(), ownerUUID)) {
-                            boxCount++;
-                        }
+            } else if (pPlayer.isShiftKeyDown() && BeyonderUtil.getSequence(pPlayer) <= 5) {
+                int boxCount = 0;
+                for (GuardianBoxEntity guardianBox : pPlayer.level().getEntitiesOfClass(GuardianBoxEntity.class, pPlayer.getBoundingBox().inflate(200))) {
+                    Optional<UUID> ownerUUID = Optional.of(pPlayer.getUUID());
+                    if (Objects.equals(guardianBox.getOwnerUUID(), ownerUUID)) {
+                        boxCount++;
                     }
-                    if (boxCount == 0) {
-                        GuardianBoxEntity guardianBoxEntity = new GuardianBoxEntity(EntityInit.GUARDIAN_BOX_ENTITY.get(), pPlayer.level());
-                        int sequence = BeyonderUtil.getSequence(pPlayer);
-                        ScaleData scaleData = ScaleTypes.BASE.getScaleData(guardianBoxEntity);
-                        scaleData.setTargetScale(18 - (sequence));
-                        guardianBoxEntity.setOwnerUUID(pPlayer.getUUID());
-                        guardianBoxEntity.teleportTo(pPlayer.getX(), pPlayer.getY(), pPlayer.getZ());
-                        guardianBoxEntity.setMaxHealth(300 - (sequence * 20));
-                        pPlayer.level().addFreshEntity(guardianBoxEntity);
-                        pPlayer.getCooldowns().addCooldown(this, 400);
-                        BeyonderUtil.useSpirituality(pPlayer, 200);
-                    }
+                }
+                if (boxCount == 0) {
+                    GuardianBoxEntity guardianBoxEntity = new GuardianBoxEntity(EntityInit.GUARDIAN_BOX_ENTITY.get(), pPlayer.level());
+                    int sequence = BeyonderUtil.getSequence(pPlayer);
+                    ScaleData scaleData = ScaleTypes.BASE.getScaleData(guardianBoxEntity);
+                    scaleData.setTargetScale(18 - (sequence));
+                    guardianBoxEntity.setOwnerUUID(pPlayer.getUUID());
+                    guardianBoxEntity.teleportTo(pPlayer.getX(), pPlayer.getY(), pPlayer.getZ());
+                    guardianBoxEntity.setMaxHealth(300 - (sequence * 20));
+                    pPlayer.level().addFreshEntity(guardianBoxEntity);
+                    pPlayer.getCooldowns().addCooldown(this, 400);
+                    BeyonderUtil.useSpirituality(pPlayer, 200);
                 }
             }
         }
@@ -151,6 +157,34 @@ public class SwordOfDawn extends SwordItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("DAWN_ITEM", ChatFormatting.YELLOW);
+    }
+
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "Activation", 0, state -> PlayState.STOP));
+    }
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(new IClientItemExtensions() {
+            private SwordOfDawnRenderer renderer;
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (this.renderer == null)
+                    this.renderer = new SwordOfDawnRenderer();
+
+                return this.renderer;
+            }
+        });
     }
 
 
