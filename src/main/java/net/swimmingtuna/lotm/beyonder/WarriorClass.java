@@ -250,6 +250,9 @@ public class WarriorClass implements BeyonderClass {
         items.put(1, ItemInit.DIVINEHANDRIGHT.get());
         items.put(1, ItemInit.TWILIGHTMANIFESTATION.get());
         items.put(0, ItemInit.AURAOFTWILIGHT.get());
+        items.put(0, ItemInit.TWILIGHTFREEZE.get());
+        items.put(0, ItemInit.TWILIGHTACCELERATE.get());
+        items.put(0, ItemInit.TWILIGHTLIGHT.get());
         items.put(0, ItemInit.GLOBEOFTWILIGHT.get());
         items.put(0, ItemInit.BEAMOFTWILIGHT.get());
         return items;

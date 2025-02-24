@@ -1,6 +1,8 @@
 package net.swimmingtuna.lotm.entity;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -9,8 +11,10 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.swimmingtuna.lotm.init.EntityInit;
@@ -72,7 +76,7 @@ public class GuardianBoxEntity extends Entity {
     }
 
     public void setDamage(int damage) {
-        this.entityData.set(MAX_HEALTH, damage);
+        this.entityData.set(DAMAGE, damage);
     }
 
     public Optional<UUID> getOwnerUUID() {
@@ -122,15 +126,25 @@ public class GuardianBoxEntity extends Entity {
             this.setMaxSize((int) scaleData.getScale());
             UUID ownerUUID = this.getOwnerUUID().orElse(null);
             if (ownerUUID != null) {
-                LivingEntity owner = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getMaxSize() + 3 ), entity -> entity.getUUID().equals(ownerUUID)).stream().findFirst().orElse(null);
+                LivingEntity owner = this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getMaxSize() + 3), entity -> entity.getUUID().equals(ownerUUID)).stream().findFirst().orElse(null);
                 if (owner != null) {
+                    if (owner.tickCount % 5 == 0 && owner instanceof Player pPlayer) {
+                        pPlayer.displayClientMessage(Component.literal(this.getDamage() + " / " + this.getMaxHealth()).withStyle(ChatFormatting.YELLOW), true);
+                    }
                     for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getMaxSize() + 3))) {
                         if (BeyonderUtil.isAllyOf(owner, livingEntity)) {
                             //possible logic in the future
                         } else {
                             if (livingEntity != owner && this.tickCount % 10 == 0) {
                                 int entitySequence = BeyonderUtil.getSequence(livingEntity);
+                                if (entitySequence == -1) {
+                                    entitySequence = 9;
+                                }
                                 int ownerSequence = BeyonderUtil.getSequence(owner);
+                                int amountToSubtract = 50 - (entitySequence * 5);
+                                if (this.tickCount >= 60 && this.tickCount % 20 == 0) {
+                                    this.setDamage((this.getDamage() + amountToSubtract));
+                                }
                                 if (entitySequence >= ownerSequence) {
                                     double x = livingEntity.getX() - this.getX();
                                     double y = livingEntity.getY() - this.getY();
@@ -138,16 +152,15 @@ public class GuardianBoxEntity extends Entity {
                                     double magnitude = Math.sqrt(x * x + y * y + z * z);
                                     livingEntity.setDeltaMovement(x / magnitude * 4, y / magnitude * 4, z / magnitude * 4);
                                     livingEntity.hurtMarked = true;
-                                    int additionalDamage = (10 - entitySequence) * 2;
                                 }
                             }
                         }
                         if (livingEntity == owner) {
                             if (owner.hasEffect(MobEffects.DAMAGE_RESISTANCE)) {
-                                owner.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 10, Math.min(4,owner.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1), true, true));
+                                owner.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 10, Math.min(4, owner.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1), true, true));
                             }
                             if (owner.hasEffect(MobEffects.REGENERATION)) {
-                                owner.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 10, Math.min(5,owner.getEffect(MobEffects.REGENERATION).getAmplifier() + 1), true, true));
+                                owner.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 10, Math.min(5, owner.getEffect(MobEffects.REGENERATION).getAmplifier() + 1), true, true));
                             }
                         }
                     }
@@ -160,13 +173,34 @@ public class GuardianBoxEntity extends Entity {
                             int ownerSequence = BeyonderUtil.getSequence(owner);
                             if (sequence >= ownerSequence + 2) {
                                 ScaleData pScaleData = ScaleTypes.BASE.getScaleData(projectile);
-                                this.setDamage((int) (damage + (int) ((pScaleData.getScale() * 10) + projectile.getDeltaMovement().y() + projectile.getDeltaMovement().x() + projectile.getDeltaMovement().z())));
+                                if (this.tickCount >= 60) {
+                                    this.setDamage((int) (damage + (int) ((pScaleData.getScale() * 10) + projectile.getDeltaMovement().y() + projectile.getDeltaMovement().x() + projectile.getDeltaMovement().z())));
+                                }
                                 double x = projectile.getX() - this.getX();
                                 double y = projectile.getY() - this.getY();
                                 double z = projectile.getZ() - this.getZ();// Reversed direction for pushing away
                                 double magnitude = Math.sqrt(x * x + y * y + z * z);
                                 projectile.setDeltaMovement(x / magnitude * 4, y / magnitude * 4, z / magnitude * 4);
                                 projectile.hurtMarked = true;
+                            }
+                        }
+                    }
+                    if (this.tickCount == 100) {
+                        double centerX = this.getX();
+                        double centerY = this.getY();
+                        double centerZ = this.getZ();
+                        double teleportDistance = getMaxSize() + 10;
+                        for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getMaxSize() + 3))) {
+                            if (!BeyonderUtil.isAllyOf(owner, livingEntity) && livingEntity != owner) {
+                                double dx = livingEntity.getX() - centerX;
+                                double dy = livingEntity.getY() - centerY;
+                                double dz = livingEntity.getZ() - centerZ;
+                                double magnitude = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                                double scale = (magnitude + teleportDistance) / magnitude;
+                                double newX = centerX + dx * scale;
+                                double newY = centerY + dy * scale;
+                                double newZ = centerZ + dz * scale;
+                                livingEntity.teleportTo(newX, newY, newZ);
                             }
                         }
                     }
@@ -182,21 +216,40 @@ public class GuardianBoxEntity extends Entity {
 
 
     public static void decrementGuardianTimer(LivingEntity entity) {
-        if (entity.getPersistentData().getInt("guardianProtectionTimer") >= 1) {
-            entity.getPersistentData().putInt("guardianProtectionTimer", entity.getPersistentData().getInt("guardianProtectionTimer") - 1);
+        if (!entity.level().isClientSide()) {
+            if (entity.getPersistentData().getInt("guardianProtectionTimer") >= 1) {
+                entity.getPersistentData().putInt("guardianProtectionTimer", entity.getPersistentData().getInt("guardianProtectionTimer") - 1);
+            }
+            if (entity.getPersistentData().getInt("divineHandGuarding") >= 1) {
+                entity.getPersistentData().putInt("divineHandGuarding", entity.getPersistentData().getInt("divineHandGuarding") - 1);
+            }
         }
     }
 
     public static void guardianHurtEvent(LivingHurtEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!entity.level().isClientSide()) {
-            if (entity.getPersistentData().getInt("guardianProtectionTimer") >= 1) {
+        if (event.isCanceled() || entity.level().isClientSide()) {
+            return;
+        }
+        if (entity.getPersistentData().getInt("guardianProtectionTimer") >= 1) {
+            if (entity.getPersistentData().contains("guardianProtection")) {
+                UUID guardianUUID = entity.getPersistentData().getUUID("guardianProtection");
                 for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(100))) {
-                    UUID uuid = entity.getPersistentData().getUUID("guardianProtection");
-                    if (livingEntity.getUUID() == uuid) {
+                    if (livingEntity.getUUID().equals(guardianUUID) && livingEntity != entity) {
                         livingEntity.hurt(event.getSource(), event.getAmount() / 2);
                         event.setAmount(event.getAmount() / 2);
+                        break;
                     }
+                }
+            }
+        }
+        if (entity.getPersistentData().getInt("divineHandGuarding") >= 1) {
+            if (entity.getPersistentData().contains("divineHandUUID")) {
+                UUID divineHandUUID = entity.getPersistentData().getUUID("divineHandUUID");
+                LivingEntity divineEntity = BeyonderUtil.getEntityFromUUID(entity.level(), divineHandUUID);
+                if (divineEntity != null && divineEntity.isAlive() && divineEntity != entity) {
+                    divineEntity.hurt(event.getSource(), event.getAmount());
+                    event.setAmount(0);
                 }
             }
         }

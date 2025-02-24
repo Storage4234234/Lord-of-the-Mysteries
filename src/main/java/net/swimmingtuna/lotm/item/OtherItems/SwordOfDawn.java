@@ -18,11 +18,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.GuardianBoxEntity;
 import net.swimmingtuna.lotm.entity.HurricaneOfLightEntity;
-import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.item.Renderer.SwordOfDawnRenderer;
@@ -56,29 +53,14 @@ public class SwordOfDawn extends SwordItem implements GeoItem {
         if (entity instanceof LivingEntity livingEntity && !level.isClientSide()) {
             if (livingEntity.tickCount % 20 == 0 && !livingEntity.level().isClientSide()) {
                 int sequence = BeyonderUtil.getSequence(livingEntity);
-                if (livingEntity instanceof Player player) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                    if (!holder.currentClassMatches(BeyonderClassInit.WARRIOR) || sequence >= 7) {
-                        player.getInventory().setItem(itemSlot, ItemStack.EMPTY);
-                    } else {
-                        if (holder.getSpirituality() >= 25) {
-                            holder.useSpirituality(25);
-                        } else {
-                            player.getInventory().setItem(itemSlot, ItemStack.EMPTY);
-                        }
-                    }
-                } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
-                    if (playerMobEntity.getCurrentPathway() != BeyonderClassInit.WARRIOR || playerMobEntity.getCurrentSequence() >= 7) {
-                        removeItemFromSlot(livingEntity, stack);
-                    } else {
-                        if (playerMobEntity.getSpirituality() >= 25) {
-                            playerMobEntity.useSpirituality(25);
-                        } else {
-                            removeItemFromSlot(livingEntity, stack);
-                        }
-                    }
-                } else {
+                if (!BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.WARRIOR.get()) && sequence >= 7) {
                     removeItemFromSlot(livingEntity, stack);
+                } else {
+                    if (BeyonderUtil.getSpirituality(livingEntity) >= 25) {
+                        BeyonderUtil.useSpirituality(livingEntity, 25);
+                    } else {
+                        removeItemFromSlot(livingEntity, stack);
+                    }
                 }
             }
         }
@@ -112,12 +94,7 @@ public class SwordOfDawn extends SwordItem implements GeoItem {
                 Vec3 reachVector = eyePosition.add(lookVector.x * 5, lookVector.y * 5, lookVector.z * 5);
                 BlockHitResult blockHit = pPlayer.level().clip(new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, pPlayer));
                 if (blockHit.getType() == HitResult.Type.MISS) {
-                    int sequence = BeyonderUtil.getSequence(pPlayer);
-                    if (sequence >= 3) {
-                        HurricaneOfLightEntity.summonHurricaneOfLightWarrior(pPlayer);
-                    } else {
-                        HurricaneOfLightEntity.summonHurricaneOfLightAngel(pPlayer);
-                    }
+                    HurricaneOfLightEntity.summonHurricaneOfLightDawn(pPlayer);
                     BeyonderUtil.useSpirituality(pPlayer, 200);
                     pPlayer.getCooldowns().addCooldown(this, 400);
                 }

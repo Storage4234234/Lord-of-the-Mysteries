@@ -23,6 +23,9 @@ public class EntityInit {
     public static final RegistryObject<EntityType<DawnRayEntity>> DAWN_RAY_ENTITY =
             ENTITIES.register("dawn_ray_entity", () -> EntityType.Builder.<DawnRayEntity>of(DawnRayEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).clientTrackingRange(400).build(new ResourceLocation(LOTM.MOD_ID, "dawn_ray_entity").toString()));
+    public static final RegistryObject<EntityType<TwilightLightEntity>> TWILIGHT_LIGHT =
+            ENTITIES.register("twilight_light_entity", () -> EntityType.Builder.<TwilightLightEntity>of(TwilightLightEntity::new, MobCategory.MISC)
+                    .sized(0.5f,0.5f).clientTrackingRange(400).build(new ResourceLocation(LOTM.MOD_ID, "twilight_light_entity").toString()));
     public static final RegistryObject<EntityType<GuardianBoxEntity>> GUARDIAN_BOX_ENTITY =
             ENTITIES.register("guardian_box_entity", () -> EntityType.Builder.<GuardianBoxEntity>of(GuardianBoxEntity::new, MobCategory.MISC)
                     .sized(5.0f,5.0f).clientTrackingRange(400).build(new ResourceLocation(LOTM.MOD_ID, "guardian_box_entity").toString()));
@@ -59,6 +62,12 @@ public class EntityInit {
     public static final RegistryObject<EntityType<CircleEntity>> CIRCLE_ENTITY =
             ENTITIES.register("circle", () -> EntityType.Builder.<CircleEntity>of(CircleEntity::new, MobCategory.MISC)
                     .sized(1.0f,1.0f).build("circle"));
+    public static final RegistryObject<EntityType<DivineHandRightEntity>> DIVINE_HAND_RIGHT_ENTITY =
+            ENTITIES.register("divine_hand_right_entity", () -> EntityType.Builder.<DivineHandRightEntity>of(DivineHandRightEntity::new, MobCategory.MISC)
+                    .sized(1.0f,1.0f).build("divine_hand_right_entity"));
+    public static final RegistryObject<EntityType<DivineHandLeftEntity>> DIVINE_HAND_LEFT_ENTITY =
+            ENTITIES.register("divine_hand_left_entity", () -> EntityType.Builder.<DivineHandLeftEntity>of(DivineHandLeftEntity::new, MobCategory.MISC)
+                    .sized(1.0f,1.0f).build("divine_hand_left_entity"));
     public static final RegistryObject<EntityType<MeteorTrailEntity>> METEOR_TRAIL_ENTITY =
             ENTITIES.register("meteortrailentity", () -> EntityType.Builder.<MeteorTrailEntity>of(MeteorTrailEntity::new, MobCategory.MISC)
                     .sized(1.0f,1.0f).clientTrackingRange(200).build("meteortrailentity"));

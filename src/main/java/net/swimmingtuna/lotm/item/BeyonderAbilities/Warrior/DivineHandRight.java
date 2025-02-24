@@ -6,7 +6,10 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.swimmingtuna.lotm.entity.DivineHandLeftEntity;
+import net.swimmingtuna.lotm.entity.DivineHandRightEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -31,8 +34,10 @@ public class DivineHandRight extends SimpleAbilityItem {
 
     public static void divineHandRight(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
-            ScaleData scaleData = ScaleTypes.BASE.getScaleData(livingEntity);
-            scaleData.setTargetScale(3.0f);
+            DivineHandRightEntity divineHandRight = new DivineHandRightEntity(EntityInit.DIVINE_HAND_RIGHT_ENTITY.get(), livingEntity.level());
+            divineHandRight.setDeltaMovement(livingEntity.getLookAngle().scale(3));
+            divineHandRight.hurtMarked = true;
+            livingEntity.level().addFreshEntity(divineHandRight);
             }
         }
     }

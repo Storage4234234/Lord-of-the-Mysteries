@@ -1,7 +1,6 @@
 package net.swimmingtuna.lotm.util;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.HotbarManager;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
@@ -88,6 +87,7 @@ import net.swimmingtuna.lotm.util.ClientData.ClientLeftclickCooldownData;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
 import org.jetbrains.annotations.Nullable;
+import virtuoel.pehkui.api.ScaleTypes;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -519,8 +519,11 @@ public class BeyonderUtil {
                 }
                 if (sequence <= 0) {
                     abilityNames.add(ItemInit.AURAOFTWILIGHT.get());
+                    abilityNames.add(ItemInit.TWILIGHTFREEZE.get());
+                    abilityNames.add(ItemInit.TWILIGHTACCELERATE.get());
                     abilityNames.add(ItemInit.GLOBEOFTWILIGHT.get());
                     abilityNames.add(ItemInit.BEAMOFTWILIGHT.get());
+                    abilityNames.add(ItemInit.TWILIGHTLIGHT.get());
                 }
             }
             if (holder.currentClassMatches(BeyonderClassInit.APPRENTICE)) {
@@ -1130,6 +1133,10 @@ public class BeyonderUtil {
             enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
         }
         double dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
+        float abilityStrengthened = 1;
+        if (livingEntity.getPersistentData().getInt("abilityStrengthened") >= 1) {
+            abilityStrengthened = 2;
+        }
         int sequence = 0;
         int abilityWeakness = 1;
         if (livingEntity.hasEffect(ModEffects.ABILITY_WEAKNESS.get())) {
@@ -1141,154 +1148,166 @@ public class BeyonderUtil {
             sequence = playerMobEntity.getCurrentSequence();
         }
         //SAILOR
-        damageMap.put(ItemInit.ACIDIC_RAIN.get(), (50.0f - (sequence * 7)) / abilityWeakness);
-        damageMap.put(ItemInit.AQUATIC_LIFE_MANIPULATION.get(), (50.0f - (sequence * 5)) / abilityWeakness);
-        damageMap.put(ItemInit.AQUEOUS_LIGHT_PUSH.get(), (8.0f - sequence) / abilityWeakness);
-        damageMap.put(ItemInit.AQUEOUS_LIGHT_PULL.get(), (8.0f - sequence) / abilityWeakness);
-        damageMap.put(ItemInit.AQUEOUS_LIGHT_DROWN.get(), (8.0f - sequence) / abilityWeakness);
-        damageMap.put(ItemInit.CALAMITY_INCARNATION_TORNADO.get(), (300.0f - (50 * sequence)) / abilityWeakness);
-        damageMap.put(ItemInit.CALAMITY_INCARNATION_TSUNAMI.get(), (200.0f - (30 * sequence)) / abilityWeakness);
-        damageMap.put(ItemInit.EARTHQUAKE.get(), (75.0f - (sequence * 6)) / abilityWeakness);
-        damageMap.put(ItemInit.ENABLE_OR_DISABLE_LIGHTNING.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.EXTREME_COLDNESS.get(), (150.0f - (sequence * 20)) / abilityWeakness);
-        damageMap.put(ItemInit.HURRICANE.get(), (600.0f - (sequence * 100)) / abilityWeakness);
-        damageMap.put(ItemInit.LIGHTNING_BALL.get(), (10.0f + (10 - sequence * 3)) / abilityWeakness);
-        damageMap.put(ItemInit.LIGHTNING_BALL_ABSORB.get(), (10.0f + (10 - sequence * 3)) / abilityWeakness);
-        damageMap.put(ItemInit.LIGHTNING_BRANCH.get(), (30.0f - (sequence * 3)) / abilityWeakness);
-        damageMap.put(ItemInit.LIGHTNING_REDIRECTION.get(), (200.0f - (sequence * 25)) / abilityWeakness);
-        damageMap.put(ItemInit.LIGHTNING_STORM.get(), (500.0f - (sequence * 80)) / abilityWeakness);
-        damageMap.put(ItemInit.MATTER_ACCELERATION_BLOCKS.get(), (10.0f - sequence) / abilityWeakness);
-        damageMap.put(ItemInit.MATTER_ACCELERATION_ENTITIES.get(), (300.0f - (sequence * 80)) / abilityWeakness);
-        damageMap.put(ItemInit.MATTER_ACCELERATION_SELF.get(), (120.0f - (sequence * 30)) / abilityWeakness);
-        damageMap.put(ItemInit.RAGING_BLOWS.get(), (10.0f - (sequence)) / abilityWeakness);
-        damageMap.put(ItemInit.RAIN_EYES.get(), (500.0f - (sequence * 50)) / abilityWeakness);
-        damageMap.put(ItemInit.ROAR.get(), (10.0f - sequence) / abilityWeakness);
-        damageMap.put(ItemInit.SAILOR_LIGHTNING.get(), (20.0f - (2 * sequence)) / abilityWeakness);
-        damageMap.put(ItemInit.SAILOR_LIGHTNING_TRAVEL.get(), (400.0f - (sequence * 150)) / abilityWeakness);
-        damageMap.put(ItemInit.SAILORPROJECTILECTONROL.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.SIREN_SONG_HARM.get(), (50.0f - (sequence * 6)) / abilityWeakness);
-        damageMap.put(ItemInit.SIREN_SONG_WEAKEN.get(), (50.0f - (sequence * 6)) / abilityWeakness);
-        damageMap.put(ItemInit.SIREN_SONG_STRENGTHEN.get(), (21.0f - sequence) / abilityWeakness);
-        damageMap.put(ItemInit.SIREN_SONG_STUN.get(), (50.0f - (sequence * 6)) / abilityWeakness);
-        damageMap.put(ItemInit.SONIC_BOOM.get(), (40.0f - (sequence * 5)) / abilityWeakness);
-        damageMap.put(ItemInit.STAR_OF_LIGHTNING.get(), (125.0f - sequence * 20) / abilityWeakness);
-        damageMap.put(ItemInit.STORM_SEAL.get(), (3.0f - sequence) / abilityWeakness);
-        damageMap.put(ItemInit.THUNDER_CLAP.get(), (300.0f - (sequence * 50)) / abilityWeakness);
-        damageMap.put(ItemInit.TORNADO.get(), (150.0f - (sequence * 30)) / abilityWeakness);
-        damageMap.put(ItemInit.TSUNAMI.get(), (600.0f - (sequence * 80)) / abilityWeakness);
-        damageMap.put(ItemInit.TSUNAMI_SEAL.get(), (600.0f - (sequence * 80)) / abilityWeakness);
-        damageMap.put(ItemInit.TYRANNY.get(), (250.0f - (sequence * 80)) / abilityWeakness);
-        damageMap.put(ItemInit.VOLCANIC_ERUPTION.get(), (120.0f - (sequence * 10)) / abilityWeakness);
-        damageMap.put(ItemInit.WATER_COLUMN.get(), (200.0f - (sequence * 60)) / abilityWeakness);
-        damageMap.put(ItemInit.WATER_SPHERE.get(), (200.0f - (sequence * 20)) / abilityWeakness);
-        damageMap.put(ItemInit.WIND_MANIPULATION_BLADE.get(), (7.0f - sequence) / abilityWeakness);
-        damageMap.put(ItemInit.WIND_MANIPULATION_FLIGHT.get(), (0.0f));
-        damageMap.put(ItemInit.WIND_MANIPULATION_SENSE.get(), (0.0f));
+        damageMap.put(ItemInit.ACIDIC_RAIN.get(), applyAbilityStrengthened((50.0f - (sequence * 7)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.AQUATIC_LIFE_MANIPULATION.get(), applyAbilityStrengthened((50.0f - (sequence * 5)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.AQUEOUS_LIGHT_PUSH.get(), applyAbilityStrengthened((8.0f - sequence) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.AQUEOUS_LIGHT_PULL.get(), applyAbilityStrengthened((8.0f - sequence) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.AQUEOUS_LIGHT_DROWN.get(), applyAbilityStrengthened((8.0f - sequence) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.CALAMITY_INCARNATION_TORNADO.get(), applyAbilityStrengthened((300.0f - (50 * sequence)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.CALAMITY_INCARNATION_TSUNAMI.get(), applyAbilityStrengthened((200.0f - (30 * sequence)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.EARTHQUAKE.get(), applyAbilityStrengthened((75.0f - (sequence * 6)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.ENABLE_OR_DISABLE_LIGHTNING.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.EXTREME_COLDNESS.get(), applyAbilityStrengthened((150.0f - (sequence * 20)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.HURRICANE.get(), applyAbilityStrengthened((600.0f - (sequence * 100)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LIGHTNING_BALL.get(), applyAbilityStrengthened((10.0f + (10 - sequence * 3)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LIGHTNING_BALL_ABSORB.get(), applyAbilityStrengthened((10.0f + (10 - sequence * 3)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LIGHTNING_BRANCH.get(), applyAbilityStrengthened((30.0f - (sequence * 3)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LIGHTNING_REDIRECTION.get(), applyAbilityStrengthened((200.0f - (sequence * 25)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LIGHTNING_STORM.get(), applyAbilityStrengthened((500.0f - (sequence * 80)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MATTER_ACCELERATION_BLOCKS.get(), applyAbilityStrengthened((10.0f - sequence) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MATTER_ACCELERATION_ENTITIES.get(), applyAbilityStrengthened((300.0f - (sequence * 80)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MATTER_ACCELERATION_SELF.get(), applyAbilityStrengthened((120.0f - (sequence * 30)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.RAGING_BLOWS.get(), applyAbilityStrengthened((10.0f - (sequence)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.RAIN_EYES.get(), applyAbilityStrengthened((500.0f - (sequence * 50)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.ROAR.get(), applyAbilityStrengthened((10.0f - sequence) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SAILOR_LIGHTNING.get(), applyAbilityStrengthened((20.0f - (2 * sequence)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SAILOR_LIGHTNING_TRAVEL.get(), applyAbilityStrengthened((400.0f - (sequence * 150)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SAILORPROJECTILECTONROL.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SIREN_SONG_HARM.get(), applyAbilityStrengthened((50.0f - (sequence * 6)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SIREN_SONG_WEAKEN.get(), applyAbilityStrengthened((50.0f - (sequence * 6)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SIREN_SONG_STRENGTHEN.get(), applyAbilityStrengthened((21.0f - sequence) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SIREN_SONG_STUN.get(), applyAbilityStrengthened((50.0f - (sequence * 6)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SONIC_BOOM.get(), applyAbilityStrengthened((40.0f - (sequence * 5)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.STAR_OF_LIGHTNING.get(), applyAbilityStrengthened((125.0f - sequence * 20) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.STORM_SEAL.get(), applyAbilityStrengthened((3.0f - sequence) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.THUNDER_CLAP.get(), applyAbilityStrengthened((300.0f - (sequence * 50)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TORNADO.get(), applyAbilityStrengthened((150.0f - (sequence * 30)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TSUNAMI.get(), applyAbilityStrengthened((600.0f - (sequence * 80)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TSUNAMI_SEAL.get(), applyAbilityStrengthened((600.0f - (sequence * 80)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TYRANNY.get(), applyAbilityStrengthened((250.0f - (sequence * 80)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.VOLCANIC_ERUPTION.get(), applyAbilityStrengthened((120.0f - (sequence * 10)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.WATER_COLUMN.get(), applyAbilityStrengthened((200.0f - (sequence * 60)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.WATER_SPHERE.get(), applyAbilityStrengthened((200.0f - (sequence * 20)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.WIND_MANIPULATION_BLADE.get(), applyAbilityStrengthened((7.0f - sequence) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.WIND_MANIPULATION_FLIGHT.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.WIND_MANIPULATION_SENSE.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
 
-        //SPECTATOR
-        damageMap.put(ItemInit.APPLY_MANIPULATION.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.AWE.get(), (190.0f - (sequence * 15)) / abilityWeakness);
-        damageMap.put(ItemInit.BATTLE_HYPNOTISM.get(), (400.0f - (sequence * 20)) / abilityWeakness);
-        damageMap.put(ItemInit.CONSCIOUSNESS_STROLL.get(), (0.0f));
-        damageMap.put(ItemInit.DISCERN.get(), (0.0f));
-        damageMap.put(ItemInit.DRAGON_BREATH.get(), (float) ((60.0f * dreamIntoReality) - (sequence * 4)) / abilityWeakness);
-        damageMap.put(ItemInit.DREAM_INTO_REALITY.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.DREAM_WALKING.get(), (0.0f));
-        damageMap.put(ItemInit.DREAM_WEAVING.get(), (20.0f - (sequence * 3)) / abilityWeakness);
-        damageMap.put(ItemInit.ENVISION_BARRIER.get(), (101.0f - (sequence * 20)) / abilityWeakness);
-        damageMap.put(ItemInit.ENVISION_DEATH.get(), (float) ((40.0f + (dreamIntoReality * 5)) - (sequence * 10)) / abilityWeakness);
-        damageMap.put(ItemInit.ENVISION_HEALTH.get(), (float) (0.66f - (sequence * 0.05) + (dreamIntoReality * 0.05f)) / abilityWeakness);
-        damageMap.put(ItemInit.ENVISION_KINGDOM.get(), (0.0f));
-        damageMap.put(ItemInit.ENVISION_LIFE.get(), (3.0f + (sequence)) * abilityWeakness);
-        damageMap.put(ItemInit.ENVISION_LOCATION.get(), (float) (500.0f / dreamIntoReality) / abilityWeakness);
-        damageMap.put(ItemInit.ENVISION_LOCATION_BLINK.get(), (float) (1000.0f - dreamIntoReality) / abilityWeakness);
-        damageMap.put(ItemInit.ENVISION_WEATHER.get(), (float) (500.0f / dreamIntoReality) / abilityWeakness);
-        damageMap.put(ItemInit.FRENZY.get(), (float) ((15.0f - sequence) * dreamIntoReality) / abilityWeakness);
-        damageMap.put(ItemInit.MANIPULATE_MOVEMENT.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.MANIPULATE_EMOTION.get(), (30.0f - (sequence * 3)) / abilityWeakness);
-        damageMap.put(ItemInit.MANIPULATE_FONDNESS.get(), (float) (600.0f * dreamIntoReality) / abilityWeakness);
-        damageMap.put(ItemInit.MENTAL_PLAGUE.get(), (float) (200.0f / dreamIntoReality) * abilityWeakness);
-        damageMap.put(ItemInit.METEOR_NO_LEVEL_SHOWER.get(), (float) ((10.0f + dreamIntoReality * 2) - (4 * sequence)) / abilityWeakness);
-        damageMap.put(ItemInit.METEOR_SHOWER.get(), (float) ((10.0f + dreamIntoReality * 2) - (4 * sequence)) / abilityWeakness);
-        damageMap.put(ItemInit.MIND_READING.get(), (0.0f));
-        damageMap.put(ItemInit.MIND_STORM.get(), (30.0f - (sequence * 2)) / abilityWeakness);
-        damageMap.put(ItemInit.NIGHTMARE.get(), (40.0f - (sequence * 2)) / abilityWeakness);
-        damageMap.put(ItemInit.PLACATE.get(), (0.0f));
-        damageMap.put(ItemInit.PLAGUE_STORM.get(), (float) ((12.0f * dreamIntoReality) - (sequence * 1.5)) / abilityWeakness);
-        damageMap.put(ItemInit.PROPHESIZE_DEMISE.get(), (0.0f));
-        damageMap.put(ItemInit.PROPHESIZE_TELEPORT_BLOCK.get(), (float) ((500.0f * dreamIntoReality) - (sequence * 100)) / abilityWeakness);
-        damageMap.put(ItemInit.PROPHESIZE_TELEPORT_PLAYER.get(), (float) ((500.0f * dreamIntoReality) - (sequence * 100)) / abilityWeakness);
-        damageMap.put(ItemInit.PSYCHOLOGICAL_INVISIBILITY.get(), (0.0f));
+        // SPECTATOR
+        damageMap.put(ItemInit.APPLY_MANIPULATION.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.AWE.get(), applyAbilityStrengthened((190.0f - (sequence * 15)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.BATTLE_HYPNOTISM.get(), applyAbilityStrengthened((400.0f - (sequence * 20)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.CONSCIOUSNESS_STROLL.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.DISCERN.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.DRAGON_BREATH.get(), applyAbilityStrengthened((float) ((60.0f * dreamIntoReality) - (sequence * 4)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.DREAM_INTO_REALITY.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.DREAM_WALKING.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.DREAM_WEAVING.get(), applyAbilityStrengthened((20.0f - (sequence * 3)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.ENVISION_BARRIER.get(), applyAbilityStrengthened((101.0f - (sequence * 20)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.ENVISION_DEATH.get(), applyAbilityStrengthened((float) ((40.0f + (dreamIntoReality * 5)) - (sequence * 10)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.ENVISION_HEALTH.get(), applyAbilityStrengthened((float) (0.66f - (sequence * 0.05) + (dreamIntoReality * 0.05f)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.ENVISION_KINGDOM.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.ENVISION_LIFE.get(), applyAbilityStrengthened((3.0f + (sequence)) * abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.ENVISION_LOCATION.get(), applyAbilityStrengthened((float) (500.0f / dreamIntoReality) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.ENVISION_LOCATION_BLINK.get(), applyAbilityStrengthened((float) (1000.0f - dreamIntoReality) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.ENVISION_WEATHER.get(), applyAbilityStrengthened((float) (500.0f / dreamIntoReality) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.FRENZY.get(), applyAbilityStrengthened((float) ((15.0f - sequence) * dreamIntoReality) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MANIPULATE_MOVEMENT.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MANIPULATE_EMOTION.get(), applyAbilityStrengthened((30.0f - (sequence * 3)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MANIPULATE_FONDNESS.get(), applyAbilityStrengthened((float) (600.0f * dreamIntoReality) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MENTAL_PLAGUE.get(), applyAbilityStrengthened((float) (200.0f / dreamIntoReality) * abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.METEOR_NO_LEVEL_SHOWER.get(), applyAbilityStrengthened((float) ((10.0f + dreamIntoReality * 2) - (4 * sequence)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.METEOR_SHOWER.get(), applyAbilityStrengthened((float) ((10.0f + dreamIntoReality * 2) - (4 * sequence)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MIND_READING.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.MIND_STORM.get(), applyAbilityStrengthened((30.0f - (sequence * 2)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.NIGHTMARE.get(), applyAbilityStrengthened((40.0f - (sequence * 2)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PLACATE.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.PLAGUE_STORM.get(), applyAbilityStrengthened((float) ((12.0f * dreamIntoReality) - (sequence * 1.5)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROPHESIZE_DEMISE.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.PROPHESIZE_TELEPORT_BLOCK.get(), applyAbilityStrengthened((float) ((500.0f * dreamIntoReality) - (sequence * 100)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROPHESIZE_TELEPORT_PLAYER.get(), applyAbilityStrengthened((float) ((500.0f * dreamIntoReality) - (sequence * 100)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PSYCHOLOGICAL_INVISIBILITY.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
 
-        //MONSTER
-        damageMap.put(ItemInit.AURAOFCHAOS.get(), (200.0f - (sequence * 50) + (enhancement * 50)) / abilityWeakness);
-        damageMap.put(ItemInit.CHAOSAMPLIFICATION.get(), (0.0f));
-        damageMap.put(ItemInit.CHAOSWALKERCOMBAT.get(), ((float) Math.max(50, 200 - (sequence * 35))) / abilityWeakness);
-        damageMap.put(ItemInit.CYCLEOFFATE.get(), (0.0f));
-        damageMap.put(ItemInit.DECAYDOMAIN.get(), (250.0f - (sequence * 45)) / abilityWeakness);
-        damageMap.put(ItemInit.PROVIDENCEDOMAIN.get(), (250.0f - (sequence * 45)) / abilityWeakness);
-        damageMap.put(ItemInit.ENABLEDISABLERIPPLE.get(), (150.0f - (sequence * 20)) / abilityWeakness);
-        damageMap.put(ItemInit.FALSEPROPHECY.get(), (0.0f));
-        damageMap.put(ItemInit.FATEDCONNECTION.get(), (0.0f));
-        damageMap.put(ItemInit.FATEREINCARNATION.get(), (0.0f));
-        damageMap.put(ItemInit.FORTUNEAPPROPIATION.get(), (200.0f - (sequence * 40)) / abilityWeakness);
-        damageMap.put(ItemInit.LUCKCHANNELING.get(), (100.0f - (sequence * 25)) / abilityWeakness);
-        damageMap.put(ItemInit.LUCKDENIAL.get(), (1800.0f - (sequence * 150)) / abilityWeakness);
-        damageMap.put(ItemInit.LUCKDEPRIVATION.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.LUCKFUTURETELLING.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.LUCKGIFTING.get(), (101.0f - (sequence * 5)) / abilityWeakness);
-        damageMap.put(ItemInit.LUCK_MANIPULATION.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.LUCKPERCEPTION.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.MISFORTUNEBESTOWAL.get(), (60.0f - (sequence * 7) + (enhancement * 10)) / abilityWeakness);
-        damageMap.put(ItemInit.MISFORTUNEIMPLOSION.get(), (250.0f - (sequence * 100) + (enhancement * 50)) / abilityWeakness);
-        damageMap.put(ItemInit.MISFORTUNEMANIPULATION.get(), (15.0f - sequence * 2) / abilityWeakness);
-        damageMap.put(ItemInit.MISFORTUNEREDIRECTION.get(), (300.0f - (sequence * 50)) / abilityWeakness);
-        damageMap.put(ItemInit.CALAMITYINCARNATION.get(), (8.0f - sequence) / abilityWeakness);
-        damageMap.put(ItemInit.MONSTERDANGERSENSE.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.MONSTERCALAMITYATTRACTION.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.MONSTERDOMAINTELEPORATION.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.MONSTERPROJECTILECONTROL.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.MONSTERREBOOT.get(), (30.0f - (sequence * 5)) / abilityWeakness);
-        damageMap.put(ItemInit.PROBABILITYFORTUNE.get(), (200.0f) / abilityWeakness);
-        damageMap.put(ItemInit.PROBABILITYEFFECT.get(), (200.0f) / abilityWeakness);
-        damageMap.put(ItemInit.PROBABILITYINFINITEFORTUNE.get(), (2000.0f) / abilityWeakness);
-        damageMap.put(ItemInit.PROBABILITYINFINITEMISFORTUNE.get(), (2000.0f) / abilityWeakness);
-        damageMap.put(ItemInit.PROBABILITYMISFORTUNE.get(), (200.0f) / abilityWeakness);
-        damageMap.put(ItemInit.PROBABILITYWIPE.get(), (200.0f) / abilityWeakness);
-        damageMap.put(ItemInit.PROBABILITYFORTUNEINCREASE.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.PROBABILITYMISFORTUNEINCREASE.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.PSYCHESTORM.get(), (30.0f - (sequence * 3)) / abilityWeakness);
-        damageMap.put(ItemInit.REBOOTSELF.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.SPIRITVISION.get(), (0.0f) / abilityWeakness);
-        damageMap.put(ItemInit.WHISPEROFCORRUPTION.get(), ((float) sequence) / abilityWeakness);
+        // MONSTER
+        damageMap.put(ItemInit.AURAOFCHAOS.get(), applyAbilityStrengthened((200.0f - (sequence * 50) + (enhancement * 50)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.CHAOSAMPLIFICATION.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.CHAOSWALKERCOMBAT.get(), applyAbilityStrengthened(((float) Math.max(50, 200 - (sequence * 35))) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.CYCLEOFFATE.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.DECAYDOMAIN.get(), applyAbilityStrengthened((250.0f - (sequence * 45)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROVIDENCEDOMAIN.get(), applyAbilityStrengthened((250.0f - (sequence * 45)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.ENABLEDISABLERIPPLE.get(), applyAbilityStrengthened((150.0f - (sequence * 20)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.FALSEPROPHECY.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.FATEDCONNECTION.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.FATEREINCARNATION.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
+        damageMap.put(ItemInit.FORTUNEAPPROPIATION.get(), applyAbilityStrengthened((200.0f - (sequence * 40)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LUCKCHANNELING.get(), applyAbilityStrengthened((100.0f - (sequence * 25)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LUCKDENIAL.get(), applyAbilityStrengthened((1800.0f - (sequence * 150)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LUCKDEPRIVATION.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LUCKFUTURETELLING.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LUCKGIFTING.get(), applyAbilityStrengthened((101.0f - (sequence * 5)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LUCK_MANIPULATION.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LUCKPERCEPTION.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MISFORTUNEBESTOWAL.get(), applyAbilityStrengthened((60.0f - (sequence * 7) + (enhancement * 10)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MISFORTUNEIMPLOSION.get(), applyAbilityStrengthened((250.0f - (sequence * 100) + (enhancement * 50)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MISFORTUNEMANIPULATION.get(), applyAbilityStrengthened((15.0f - sequence * 2) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MISFORTUNEREDIRECTION.get(), applyAbilityStrengthened((300.0f - (sequence * 50)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.CALAMITYINCARNATION.get(), applyAbilityStrengthened((8.0f - sequence) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MONSTERDANGERSENSE.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MONSTERCALAMITYATTRACTION.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MONSTERDOMAINTELEPORATION.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MONSTERPROJECTILECONTROL.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MONSTERREBOOT.get(), applyAbilityStrengthened((30.0f - (sequence * 5)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROBABILITYFORTUNE.get(), applyAbilityStrengthened((200.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROBABILITYEFFECT.get(), applyAbilityStrengthened((200.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROBABILITYINFINITEFORTUNE.get(), applyAbilityStrengthened((2000.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROBABILITYINFINITEMISFORTUNE.get(), applyAbilityStrengthened((2000.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROBABILITYMISFORTUNE.get(), applyAbilityStrengthened((200.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROBABILITYWIPE.get(), applyAbilityStrengthened((200.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROBABILITYFORTUNEINCREASE.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROBABILITYMISFORTUNEINCREASE.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PSYCHESTORM.get(), applyAbilityStrengthened((30.0f - (sequence * 3)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.REBOOTSELF.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SPIRITVISION.get(), applyAbilityStrengthened((0.0f) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.WHISPEROFCORRUPTION.get(), applyAbilityStrengthened(((float) sequence) / abilityWeakness, abilityStrengthened));
 
-        //WARRIOR
-        damageMap.put(ItemInit.GIGANTIFICATION.get(), (9.0f - sequence) / abilityWeakness);
-        damageMap.put(ItemInit.SWORDOFDAWN.get(), (150.0f - (sequence * 15)) / abilityWeakness);
-        damageMap.put(ItemInit.SWORDOFSILVER.get(), (200.0f - (sequence * 20)) / abilityWeakness);
-        damageMap.put(ItemInit.DAWNARMORY.get(), (150.0f - (sequence * 15)) / abilityWeakness);
-        damageMap.put(ItemInit.DAWNWEAPONRY.get(), (150.0f - (sequence * 15)) / abilityWeakness);
-        damageMap.put(ItemInit.SILVERARMORY.get(), (150.0f - (sequence * 15)) / abilityWeakness);
-        damageMap.put(ItemInit.LIGHTOFDAWN.get(), (100.0f - (sequence * 10)) / abilityWeakness);
-        damageMap.put(ItemInit.AURAOFGLORY.get(), (15.0f - (sequence)) / abilityWeakness);
-        damageMap.put(ItemInit.TWILIGHTMANIFESTATION.get(), (200.0f - (sequence * 100)) / abilityWeakness);
-        damageMap.put(ItemInit.AURAOFTWILIGHT.get(), (30.0f - (sequence * 2)) / abilityWeakness);
-        damageMap.put(ItemInit.MERCURYLIQUEFICATION.get(), (15.0f - (sequence * 2)) / abilityWeakness);
+        // WARRIOR
+        damageMap.put(ItemInit.GIGANTIFICATION.get(), applyAbilityStrengthened((9.0f - sequence) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SWORDOFDAWN.get(), applyAbilityStrengthened((150.0f - (sequence * 15)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SWORDOFSILVER.get(), applyAbilityStrengthened((200.0f - (sequence * 20)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TWILIGHTSWORD.get(), applyAbilityStrengthened((400.0f - (sequence * 100)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.DAWNARMORY.get(), applyAbilityStrengthened((150.0f - (sequence * 15)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.DAWNWEAPONRY.get(), applyAbilityStrengthened((150.0f - (sequence * 15)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SILVERARMORY.get(), applyAbilityStrengthened((150.0f - (sequence * 15)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.LIGHTOFDAWN.get(), applyAbilityStrengthened((100.0f - (sequence * 10)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.AURAOFGLORY.get(), applyAbilityStrengthened((15.0f - (sequence)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TWILIGHTMANIFESTATION.get(), applyAbilityStrengthened((200.0f - (sequence * 100)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TWILIGHTFREEZE.get(), applyAbilityStrengthened((600.0f - (sequence * 100)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TWILIGHTACCELERATE.get(), applyAbilityStrengthened((1800.0f - (sequence * 300)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.AURAOFTWILIGHT.get(), applyAbilityStrengthened((30.0f - (sequence * 2)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MERCURYLIQUEFICATION.get(), applyAbilityStrengthened((15.0f - (sequence * 2)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TWILIGHTLIGHT.get(), applyAbilityStrengthened((600.0f - (sequence * 100)) / abilityWeakness, abilityStrengthened));
 
-        //APPRENTICE
-        damageMap.put(ItemInit.CREATEDOOR.get(), 0.0f);
-        damageMap.put(ItemInit.TRICKBOUNCE.get(), (300.0f - (sequence * 25)) / abilityWeakness);
-        damageMap.put(ItemInit.RECORDSCRIBE.get(), 0.0f);
-        damageMap.put(ItemInit.TRICKBURN.get(), (8.0f - sequence) / abilityWeakness);
-        damageMap.put(ItemInit.TRAVELDOOR.get(), 3.0f + abilityWeakness);
-        damageMap.put(ItemInit.TRAVELDOORHOME.get(), 0.0f);
-        damageMap.put(ItemInit.TRICKTUMBLE.get(), (float) ((50 - (sequence * 5)) / abilityWeakness));
-        damageMap.put(ItemInit.INVISIBLEHAND.get(), (float) ((50 - (sequence * 8)) / abilityWeakness));
-        damageMap.put(ItemInit.TRICKFREEZE.get(), (float) ((50 - (sequence * 6)) / abilityWeakness));
-        damageMap.put(ItemInit.TRICKWINDPULL.get(), (float) ((100 - (sequence * 10)) / abilityWeakness));
-        damageMap.put(ItemInit.TRICKWINDPUSH.get(), (float) ((100 - (sequence * 10)) / abilityWeakness));
+        // APPRENTICE
+        damageMap.put(ItemInit.CREATEDOOR.get(), applyAbilityStrengthened(0.0f, abilityStrengthened));
+        damageMap.put(ItemInit.TRICKBOUNCE.get(), applyAbilityStrengthened((300.0f - (sequence * 25)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.RECORDSCRIBE.get(), applyAbilityStrengthened(0.0f, abilityStrengthened));
+        damageMap.put(ItemInit.TRICKBURN.get(), applyAbilityStrengthened((8.0f - sequence) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TRAVELDOOR.get(), applyAbilityStrengthened(3.0f + abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TRAVELDOORHOME.get(), applyAbilityStrengthened(0.0f, abilityStrengthened));
+        damageMap.put(ItemInit.TRICKTUMBLE.get(), applyAbilityStrengthened((float) (50 - (sequence * 5)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.INVISIBLEHAND.get(), applyAbilityStrengthened((float) (50 - (sequence * 8)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TRICKFREEZE.get(), applyAbilityStrengthened((float) (50 - (sequence * 6)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TRICKWINDPULL.get(), applyAbilityStrengthened((float) (100 - (sequence * 10)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TRICKWINDPUSH.get(), applyAbilityStrengthened((float) (100 - (sequence * 10)) / abilityWeakness, abilityStrengthened));
         return damageMap;
     }
+
+    public static float applyAbilityStrengthened(float damage, float abilityStrengthened) {
+        if (abilityStrengthened >= 1) {
+            return damage * 1.5f; // Increase damage by 50%
+        }
+        return damage;
+    }
+
 
 
     public static boolean isLivingEntityMoving(LivingEntity entity) {
@@ -1732,7 +1751,7 @@ public class BeyonderUtil {
     public static int getSpirituality(LivingEntity living) {
         if (!living.level().isClientSide()) {
             if (living instanceof Player player) {
-               return (int) BeyonderHolderAttacher.getHolderUnwrap(player).getSpirituality();
+                return (int) BeyonderHolderAttacher.getHolderUnwrap(player).getSpirituality();
             } else if (living instanceof PlayerMobEntity playerMobEntity) {
                 return playerMobEntity.getSpirituality();
             } else {
@@ -1844,7 +1863,7 @@ public class BeyonderUtil {
         LivingEntity livingEntity = event.getEntity();
         CompoundTag tag = livingEntity.getPersistentData();
         int age = tag.getInt("age");
-        int maxAge = (int) (livingEntity.getMaxHealth() * 10);
+        int maxAge = (int) (livingEntity.getMaxHealth() * 5);
         boolean tenPercent = age >= maxAge * 0.1;
         boolean twentyPercent = age >= maxAge * 0.2;
         boolean thirtyPercent = age >= maxAge * 0.3;
@@ -1856,70 +1875,94 @@ public class BeyonderUtil {
         boolean ninetyPercent = age >= maxAge * 0.9;
         boolean oneHundredPercent = age >= maxAge;
         int sequence = BeyonderUtil.getSequence(livingEntity);
-        if (!livingEntity.level().isClientSide() && age >= 1) {
-            if (livingEntity.tickCount % 1200 == 0) {
-                tag.putInt("age", Math.max(0, age - sequence));
-            }
-            if (oneHundredPercent) {
-                tag.putInt("age", 0);
-                livingEntity.kill();
-                if (livingEntity.level() instanceof ServerLevel serverLevel) {
-                    double random = 1 - (Math.random() * 2);
-                    serverLevel.sendParticles(ParticleTypes.CLOUD, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), 1,random, random,random, 1 );
+        if (!livingEntity.level().isClientSide()) {
+            int ageDecay = tag.getInt("ageDecay");
+            if (ageDecay >= 1) {
+                tag.putInt("ageDecay", ageDecay - 1);
+                for (int i = 0; i <= 20; i++) {
+                    double random = (Math.random() * 4) - 2;
+                    double scaleAmount = Math.max(2 , ScaleTypes.BASE.getScaleData(livingEntity).getScale() * Math.random() * 2);
+                    double x = livingEntity.getX() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
+                    double y = livingEntity.getY() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
+                    double z = livingEntity.getZ() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
+                    LOTMNetworkHandler.sendToAllPlayers(new SendParticleS2C(ParticleTypes.WHITE_ASH, x, y, z, random, random, random));
                 }
-                livingEntity.sendSystemMessage(Component.literal("You died due to aging").withStyle(ChatFormatting.RED));
+                if (ageDecay == 1) {
+                    for (int i = 0; i <= 150; i++) {
+                        double random = (Math.random() * 4) - 2;
+                        double scaleAmount = Math.max(2 , ScaleTypes.BASE.getScaleData(livingEntity).getScale() * Math.random() * 2);
+                        double x = livingEntity.getX() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
+                        double y = livingEntity.getY() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
+                        double z = livingEntity.getZ() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
+                        LOTMNetworkHandler.sendToAllPlayers(new SendParticleS2C(ParticleTypes.WHITE_ASH, x, y, z, random, random, random));
+                    }
+                    tag.putInt("age", 0);
+                    tag.putInt("ageDecay", 0);
+                    livingEntity.kill();
+                    livingEntity.sendSystemMessage(Component.literal("You died due to aging."));
+                }
             }
-            if (ninetyPercent) {
-                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 2, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 4, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 4, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 3, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 5, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
-            } else if (eightyPercent) {
-                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 2, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 3, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 4, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 3, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 4, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
-            } else if (seventyPercent) {
-                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 1, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 3, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 3, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 2, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 3, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
-            } else if (sixtyPercent) {
-                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 1, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 3, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 3, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 1, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 2, true, true);
-            } else if (fiftyPercent) {
-                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 1, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 2, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 2, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 1, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 1, true, true);
+            if (age >= 1) {
+                if (livingEntity.tickCount % 1200 == 0) {
+                    tag.putInt("age", Math.max(0, age - sequence));
+                }
+                if (oneHundredPercent) {
+                    tag.putInt("age", 0);
+                    tag.putInt("ageDecay", 100);
+                }
 
-            } else if (fortyPercent) {
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 0, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 0, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 1, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 2, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 0, true, true);
-            } else if (thirtyPercent) {
-                BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 0, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 1, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 1, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 0, true, true);
-            } else if (twentyPercent) {
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 0, true, true);
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 0, true, true);
-            } else if (tenPercent) {
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 0, true, true);
+                if (ninetyPercent) {
+                    BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 2, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 4, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 4, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 3, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 5, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
+                } else if (eightyPercent) {
+                    BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 2, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 3, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 4, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 3, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 4, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
+                } else if (seventyPercent) {
+                    BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 1, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 3, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 3, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 2, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 3, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
+                } else if (sixtyPercent) {
+                    BeyonderUtil.applyMobEffect(livingEntity, ModEffects.NOREGENERATION.get(), 20, 1, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 1, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 3, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 3, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 1, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 2, true, true);
+                } else if (fiftyPercent) {
+                    BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 1, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 2, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 2, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 1, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 1, true, true);
+
+                } else if (fortyPercent) {
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WITHER, 20, 0, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 0, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 1, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 2, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 0, true, true);
+                } else if (thirtyPercent) {
+                    BeyonderUtil.applyMobEffect(livingEntity, ModEffects.ABILITY_WEAKNESS.get(), 20, 0, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 1, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 1, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DIG_SLOWDOWN, 20, 0, true, true);
+                } else if (twentyPercent) {
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 0, true, true);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 20, 0, true, true);
+                } else if (tenPercent) {
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 20, 0, true, true);
+                }
             }
         }
     }
@@ -1932,14 +1975,14 @@ public class BeyonderUtil {
         }
     }
 
-    public static boolean scribeLookingAtYou(Player target, LivingEntity scribe){
+    public static boolean scribeLookingAtYou(Player target, LivingEntity scribe) {
         double radius = 30.0;
         double angleThreshold = 45.0;
-        if(BeyonderUtil.getPathway(scribe) == BeyonderClassInit.APPRENTICE.get() && BeyonderUtil.getSequence(scribe) <= 6){
+        if (BeyonderUtil.getPathway(scribe) == BeyonderClassInit.APPRENTICE.get() && BeyonderUtil.getSequence(scribe) <= 6) {
             Vec3 scribePos = scribe.position();
             Vec3 targetPos = target.position();
             double distanceQr = scribePos.distanceToSqr(targetPos);
-            if(distanceQr > radius*radius){
+            if (distanceQr > radius * radius) {
                 return false;
             }
             Vec3 lookVec = scribe.getLookAngle().normalize();
@@ -1952,9 +1995,10 @@ public class BeyonderUtil {
         return false;
     }
 
-    public static boolean isBeyonder(LivingEntity livingEntity){
+    public static boolean isBeyonder(LivingEntity livingEntity) {
         return getSequence(livingEntity) != -1;
     }
+
     public static boolean isSmeltable(ItemStack itemStack, Level world) {
         SimpleContainer container = new SimpleContainer(itemStack);
         return world.getRecipeManager().getRecipeFor(RecipeType.SMELTING, container, world).isPresent();
@@ -1965,7 +2009,7 @@ public class BeyonderUtil {
         return world.getRecipeManager().getRecipeFor(RecipeType.SMELTING, container, world).map(recipe -> recipe.getResultItem(world.registryAccess())).orElse(ItemStack.EMPTY);
     }
 
-    public static Boolean isEntityColliding(Entity entity, Level level, Double radius){
+    public static Boolean isEntityColliding(Entity entity, Level level, Double radius) {
         AABB entityBoundingBox = entity.getBoundingBox();
         for (Entity otherEntity : level.getEntitiesOfClass(Entity.class, entity.getBoundingBox().inflate(radius))) {
             if (entityBoundingBox.intersects(otherEntity.getBoundingBox())) {
@@ -1975,7 +2019,7 @@ public class BeyonderUtil {
         return false;
     }
 
-    public static Entity checkEntityCollision(Entity entity, Level level, Double radius){
+    public static Entity checkEntityCollision(Entity entity, Level level, Double radius) {
         AABB entityBoundingBox = entity.getBoundingBox();
         AABB searchArea = entityBoundingBox.inflate(radius);
         for (Entity otherEntity : level.getEntities(entity, searchArea, otherEntity -> true)) {
@@ -1986,25 +2030,25 @@ public class BeyonderUtil {
         return null;
     }
 
-    public static void spawnDoorTeleportationOnly(Level level, BlockPos pos, double X, double Y, double Z, Entity canPassTrough, Direction direction, int life, LivingEntity user){
+    public static void spawnDoorTeleportationOnly(Level level, BlockPos pos, double X, double Y, double Z, Entity canPassTrough, Direction direction, int life, LivingEntity user) {
         int sequence = getSequence(user);
         double x = pos.getX();
         double y = pos.getY();
         double z = pos.getZ();
         float YAW = 0F;
-        if(direction == Direction.NORTH){
+        if (direction == Direction.NORTH) {
             x = x + 0.5;
             z = z + 0.25;
             YAW = 0F;
-        }else if (direction == Direction.WEST){
+        } else if (direction == Direction.WEST) {
             x = x + 0.25;
             z = z + 0.5;
             YAW = 90F;
-        }else if (direction == Direction.SOUTH){
+        } else if (direction == Direction.SOUTH) {
             x = x + 0.5;
             z = z + 0.75;
             YAW = 180;
-        }else if (direction == Direction.EAST){
+        } else if (direction == Direction.EAST) {
             x = x + 0.75;
             z = z + 0.5;
             YAW = 270F;
@@ -2012,17 +2056,15 @@ public class BeyonderUtil {
         LowSequenceDoorEntity lowDoor = new LowSequenceDoorEntity(canPassTrough, level, X, Y, Z, YAW, life);
         MidSequenceDoorEntity midDoor = new MidSequenceDoorEntity(level, X, Y, Z, YAW, life);
 
-        if(sequence >= 8){
+        if (sequence >= 8) {
             lowDoor.setPos(x, y, z);
             level.addFreshEntity(lowDoor);
-        }else if(sequence >= 5){
+        } else if (sequence >= 5) {
             midDoor.setPos(x, y, z);
             level.addFreshEntity(midDoor);
         }
 
     }
-
-
 
 
     public static LivingEntity getEntityFromUUID(Level level, UUID uuid) {
@@ -2040,6 +2082,16 @@ public class BeyonderUtil {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public static void setSpirituality(LivingEntity livingEntity, int spirituality) {
+        if (!livingEntity.level().isClientSide()) {
+            if (livingEntity instanceof Player player) {
+                BeyonderHolderAttacher.getHolderUnwrap(player).setSpirituality(spirituality);
+            } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
+                playerMobEntity.setSpirituality(spirituality);
+            }
         }
     }
 }

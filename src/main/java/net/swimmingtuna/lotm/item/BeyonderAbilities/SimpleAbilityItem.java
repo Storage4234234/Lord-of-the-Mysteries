@@ -19,9 +19,9 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
+import net.swimmingtuna.lotm.util.ScribeRecording.CapabilityScribeAbilities;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.Nullable;
-import net.swimmingtuna.lotm.util.ScribeRecording.*;
 
 import java.util.List;
 import java.util.Map;
@@ -73,6 +73,9 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         Item ability = player.getItemInHand(hand).getItem();
         if (!level.isClientSide() && checkIfCanUseAbility(player)) {
+            if (player.getPersistentData().getInt("abilityStrengthened") >= 1) {
+                player.getPersistentData().putInt("abilityStrengthened", player.getPersistentData().getInt("abilityStrengthened") - 1);
+            }
             for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
                 if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
                     if (BeyonderUtil.scribeLookingAtYou(player, entity)) {
@@ -92,11 +95,37 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     }
 
     protected boolean checkAll(Player player) {
-        if (BeyonderUtil.getPathway(player) == BeyonderClassInit.APPRENTICE.get() && BeyonderUtil.getSequence(player) <= 6) {
+        if (BeyonderUtil.getPathway(player) == BeyonderClassInit.APPRENTICE.get() && BeyonderUtil.getSequence(player) <= 6 && this.requiredClass != BeyonderClassInit.APPRENTICE.get()) {
+            final SimpleAbilityItem ability;
+            if (player.getMainHandItem().getItem() instanceof SimpleAbilityItem) {
+                ability = (SimpleAbilityItem) player.getMainHandItem().getItem();
+            } else if (player.getOffhandItem().getItem() instanceof SimpleAbilityItem) {
+                ability = (SimpleAbilityItem) player.getOffhandItem().getItem();
+            } else {
+                ability = null;
+            }
 
+            if (ability != null) {
+                return player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null)
+                        .map(storage -> {
+                            if (storage.hasScribedAbility(ability)) {
+                                storage.useScribeAbility(ability);
+                                return true;
+                            } else {
+                                return checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality);
+                            }
+                        })
+                        .orElse(false);
+            }
+        }
+        if (player.getPersistentData().getInt("inTwilight") >= 1) {
+            int x = (int) player.getPersistentData().getInt("inTwilight") / 20;
+            player.displayClientMessage(Component.literal("You are frozen by twilight for " + x + " seconds." ).withStyle(ChatFormatting.RED), true);
+            return false;
         }
         return checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality);
     }
+
 
     public int getSpirituality() {
         return this.requiredSpirituality;
@@ -107,6 +136,9 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         Level level = context.getLevel();
         Player player = context.getPlayer();
         if (!level.isClientSide()) {
+            if (player.getPersistentData().getInt("abilityStrengthened") >= 1) {
+                player.getPersistentData().putInt("abilityStrengthened", player.getPersistentData().getInt("abilityStrengthened") - 1);
+            }
             for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
                 if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
                     if (BeyonderUtil.scribeLookingAtYou(player, entity)) {
@@ -128,6 +160,9 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand usedHand) {
         if (!player.level().isClientSide()) {
             Level level = player.level();
+            if (player.getPersistentData().getInt("abilityStrengthened") >= 1) {
+                player.getPersistentData().putInt("abilityStrengthened", player.getPersistentData().getInt("abilityStrengthened") - 1);
+            }
             for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
                 if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
                     if (BeyonderUtil.scribeLookingAtYou(player, entity)) {

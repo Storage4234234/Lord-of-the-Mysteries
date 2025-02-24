@@ -1,5 +1,6 @@
 package net.swimmingtuna.lotm.events;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,12 +21,13 @@ import net.swimmingtuna.lotm.client.AbilityOverlay;
 import net.swimmingtuna.lotm.client.SpiritualityBarOverlay;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.util.ClientData.ClientAbilityCooldownData;
-import net.swimmingtuna.lotm.util.ClientData.ClientAntiConcealmentData;
+import net.swimmingtuna.lotm.util.ClientData.ClientAgeDecayData;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderTransformData;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -43,8 +45,6 @@ public class ClientEvents {
             double z = player.zo + (player.getZ() - player.zo) * partialTick;
             float yRot = lerpAngle(partialTick, player.yRotO, player.getYRot());
             float xRot = lerpAngle(partialTick, player.xRotO, player.getXRot());
-
-
             mob.setPos(x, y, z);
             mob.setYRot(yRot);
             mob.setXRot(xRot);
@@ -93,14 +93,11 @@ public class ClientEvents {
     @OnlyIn(Dist.CLIENT)
     public static void livingRender(RenderLivingEvent.Pre<?, ?> event) {
         LivingEntity entity = event.getEntity();
-        if (!ClientAntiConcealmentData.getAntiConceal()) {
-            if (ClientShouldntRenderInvisibilityData.getShouldntRender() && entity.getUUID().equals(ClientShouldntRenderInvisibilityData.getLivingUUID())) {
-                event.setCanceled(true);
-            }
+        if (ClientShouldntRenderInvisibilityData.getShouldntRender() && entity.getUUID().equals(ClientShouldntRenderInvisibilityData.getLivingUUID())) {
+            event.setCanceled(true);
+            return; // Skip further processing
         }
-        //    if (ClientShouldntRenderSpiritWorldData.getShouldntRender(entity.getUUID())) {
-        //        event.setCanceled(true);
-        //    }
+
     }
 
 

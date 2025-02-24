@@ -155,6 +155,11 @@ public class LOTMNetworkHandler {
                 .encoder(UpdateEntityLocationS2C::encode)
                 .consumerMainThread(UpdateEntityLocationS2C::handle)
                 .add();
+        INSTANCE.messageBuilder(UpdateDragonBreathS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(UpdateDragonBreathS2C::decode)
+                .encoder(UpdateDragonBreathS2C::encode)
+                .consumerMainThread(UpdateDragonBreathS2C::handle)
+                .add();
         INSTANCE.messageBuilder(SyncSequencePacketS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SyncSequencePacketS2C::new)
                 .encoder(SyncSequencePacketS2C::encode)

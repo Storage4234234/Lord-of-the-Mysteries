@@ -39,6 +39,8 @@
   "item.lotm.pickaxeofdawn": "Pickaxe of Dawn",
   "item.lotm.spearofdawn": "Spear of Dawn",
   "item.lotm.swordofsilver": "Sword of Silver",
+  "item.lotm.swordoftwilight": "Sword of Twilight",
+
 
   "lotm.effect.awe": "Awe",
   "lotm.effect.bleeding": "Bleeding",
@@ -280,9 +282,13 @@
   "item.lotm.divinehandleft": "Divine Hand (Left)",
   "item.lotm.twilightmanifestation": "Twilight Manifestation",
   "item.lotm.silverlight": "Silver Light",
-  "item.lotm.auraoftwilight": "Aura of Twilight",
-  "item.lotm.globeoftwilight": "Globe of Twilight",
-  "item.lotm.beamoftwilight": "Beam of Twilight",
+  "item.lotm.twilightfreeze": "Twilight: Freeze",
+  "item.lotm.twilightaccelerate": "Twilight: Accelerate",
+
+  "item.lotm.auraoftwilight": "Twilight: Aura",
+  "item.lotm.twilightlight": "Twilight: Light",
+  "item.lotm.globeoftwilight": "Twilight: Globe",
+  "item.lotm.beamoftwilight": "Twilight: Beam",
 
   "item.lotm.createdoor": "Create Door",
   "item.lotm.trickburn": "Trick: Burn",

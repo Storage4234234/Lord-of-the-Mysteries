@@ -108,7 +108,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
         }
     }
 
-    public static void summonHurricaneOfLightWarrior(LivingEntity livingEntity) {
+    public static void summonHurricaneOfLightDawn(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             int sequence = BeyonderUtil.getSequence(livingEntity);
             HurricaneOfLightEntity hurricaneOfLightEntity = new HurricaneOfLightEntity(livingEntity.level(), livingEntity, 0, 0, 0);
@@ -121,7 +121,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
         }
     }
 
-    public static void summonHurricaneOfLightAngel(LivingEntity livingEntity) {
+    public static void summonHurricaneOfLightGlory(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             int sequence = BeyonderUtil.getSequence(livingEntity);
             HurricaneOfLightEntity hurricaneOfLightEntity = new HurricaneOfLightEntity(livingEntity.level(), livingEntity, 0, 0, 0);
@@ -135,6 +135,23 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             livingEntity.level().addFreshEntity(hurricaneOfLightEntity);
         }
     }
+
+    public static void summonHurricaneOfLightDeity(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide()) {
+            int sequence = BeyonderUtil.getSequence(livingEntity);
+            HurricaneOfLightEntity hurricaneOfLightEntity = new HurricaneOfLightEntity(livingEntity.level(), livingEntity, 0, 0, 0);
+            hurricaneOfLightEntity.setHurricaneRadius((int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TWILIGHTSWORD.get()));
+            hurricaneOfLightEntity.setHurricaneHeight((int) ((int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TWILIGHTSWORD.get()) * 0.5f));
+            hurricaneOfLightEntity.setHurricaneLifecount(500 - (sequence * 100));
+            hurricaneOfLightEntity.setHurricaneDestroy(true);
+            hurricaneOfLightEntity.setHurricaneMov(livingEntity.getLookAngle().scale(0.75f).toVector3f());
+            hurricaneOfLightEntity.setDestroyArmor(true);
+            hurricaneOfLightEntity.setBlockDestroyInterval(3);
+            hurricaneOfLightEntity.setAge(true);
+            livingEntity.level().addFreshEntity(hurricaneOfLightEntity);
+        }
+    }
+
 
     @Override
     public void addAdditionalSaveData(CompoundTag compound) {
@@ -333,7 +350,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             livingEntity.hurt(livingEntity.damageSources().generic(), (float) getHurricaneRadius() * damageMultiplier / 2);
             if (this.tickCount % 15 == 0) {
                 if (this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
-                    if (!BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                    if (!BeyonderUtil.isAllyOf(owner, livingEntity) && getAge()) {
                         livingEntity.getPersistentData().putInt("age", livingEntity.getPersistentData().getInt("age") + 5);
                     }
                 }

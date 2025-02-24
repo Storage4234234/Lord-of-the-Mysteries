@@ -9,11 +9,8 @@ import net.swimmingtuna.lotm.entity.Model.*;
 import net.swimmingtuna.lotm.entity.Renderers.*;
 import net.swimmingtuna.lotm.entity.Renderers.PlayerMobRenderer.PlayerMobRenderer;
 import net.swimmingtuna.lotm.init.EntityInit;
-import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
-import net.swimmingtuna.lotm.item.Renderer.SwordOfDawnRenderer;
 import net.swimmingtuna.lotm.particle.*;
-import software.bernie.geckolib.renderer.GeoItemRenderer;
 
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientEventsEntity {
@@ -38,6 +35,7 @@ public class ClientEventsEntity {
         event.registerEntityRenderer(EntityInit.MID_SEQUENCE_DOOR_ENTITY.get(), MidSequenceDoorRenderer::new);
         event.registerEntityRenderer(EntityInit.MERCURY_ENTITY.get(), MercuryEntityRenderer::new);
         event.registerEntityRenderer(EntityInit.DAWN_RAY_ENTITY.get(), DawnRayRenderer::new);
+        event.registerEntityRenderer(EntityInit.TWILIGHT_LIGHT.get(), TwilightLightRenderer::new);
         event.registerEntityRenderer(EntityInit.GUARDIAN_BOX_ENTITY.get(), GuardianBoxEntityRenderer::new);
         event.registerEntityRenderer(EntityInit.METEOR_ENTITY.get(), MeteorEntityRenderer::new);
         event.registerEntityRenderer(EntityInit.DEATH_KNELL_BULLET_ENTITY.get(), BulletEntityRenderer::new);
@@ -69,6 +67,7 @@ public class ClientEventsEntity {
         event.registerSpriteSet(ParticleInit.PLAYER_TRAIL_PARTICLE.get(), PlayerTrailParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.MOB_TRAIL_PARTICLE.get(), MobTrailParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.NULL_PARTICLE.get(), NullParticle.Provider::new);
+        event.registerSpriteSet(ParticleInit.VOID_BREAK_PARTICLE.get(), VoidBreakParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.METEOR_PARTICLE.get(), MeteorParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.TORNADO_PARTICLE.get(), NullParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.SONIC_BOOM_PARTICLE.get(), SonicBoomParticle.Provider::new);

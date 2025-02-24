@@ -55,8 +55,12 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.DivineHandLeft;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.MercuryLiquefication;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.TwilightAccelerate;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.TwilightFreeze;
+import net.swimmingtuna.lotm.item.OtherItems.SwordOfTwilight;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
@@ -364,7 +368,12 @@ public class ModEvents {
             if (livingEntity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
             }
+            DivineHandLeftEntity.divineHandTick(event);
+            TwilightAccelerate.twilightAccelerateTick(event);
+            TwilightFreeze.twilightFreezeTick(event);
+            TwilightLight.twilightLightTick(event);
             TwilightManifestation.twilightManifestationTick(event);
+            SwordOfTwilight.decrementTwilightSword(event);
             MercuryLiquefication.mercuryArmorTick(event);
             MercuryLiquefication.mercuryLiqueficationTick(event);
             BeyonderUtil.ageHandlerTick(event);

@@ -157,6 +157,8 @@ public class CreativeTabInit {
                         event.accept(ItemInit.DIVINEHANDRIGHT.get());
                         event.accept(ItemInit.DIVINEHANDLEFT.get());
                         event.accept(ItemInit.AURAOFTWILIGHT.get());
+                        event.accept(ItemInit.TWILIGHTFREEZE.get());
+                        event.accept(ItemInit.TWILIGHTLIGHT.get());
                         event.accept(ItemInit.GLOBEOFTWILIGHT.get());
                         event.accept(ItemInit.BEAMOFTWILIGHT.get());
                         event.accept(ItemInit.TRICKBURN.get());

@@ -31,7 +31,8 @@ public class EntityTickMixin {
             double twilightX = tag.getDouble("twilightManifestationX");
             double twilightY = tag.getDouble("twilightManifestationY");
             double twilightZ = tag.getDouble("twilightManifestationZ");
-            if (twilightX != 0 || twilightY != 0 || twilightZ != 0) {
+            int inTwilight = tag.getInt("inTwilight");
+            if (twilightX != 0 || twilightY != 0 || twilightZ != 0 || inTwilight >= 1) {
                 if (entity instanceof LivingEntity living) {
                     living.getDeltaMovement().multiply(0, 0, 0);
                     living.setDeltaMovement(0, 0, 0);

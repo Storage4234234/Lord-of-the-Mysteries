@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.entity;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 public class DawnRayEntity extends Entity {
+
     private static final EntityDataAccessor<Integer> MAX_LIFETIME = SynchedEntityData.defineId(DawnRayEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> CURRENT_X = SynchedEntityData.defineId(DawnRayEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> CURRENT_Z = SynchedEntityData.defineId(DawnRayEntity.class, EntityDataSerializers.FLOAT);
@@ -78,8 +80,8 @@ public class DawnRayEntity extends Entity {
 
         // Set random initial velocity
         double angle = random.nextDouble() * 2 * Math.PI;
-        float velocityX = (float)(Math.cos(angle) * SPEED);
-        float velocityZ = (float)(Math.sin(angle) * SPEED);
+        float velocityX = (float) (Math.cos(angle) * SPEED);
+        float velocityZ = (float) (Math.sin(angle) * SPEED);
         this.entityData.set(VELOCITY_X, velocityX);
         this.entityData.set(VELOCITY_Z, velocityZ);
     }
@@ -159,20 +161,11 @@ public class DawnRayEntity extends Entity {
 
             double width = 0.25;
             float bottomYOffset = this.entityData.get(BOTTOM_Y_OFFSET);
-            AABB hitBox = new AABB(
-                    Math.min(this.originX - width, this.originX + getCurrentX() - width),
-                    this.getY() + bottomYOffset,
-                    Math.min(this.originZ - width, this.originZ + getCurrentZ() - width),
-                    Math.max(this.originX + width, this.originX + getCurrentX() + width),
-                    this.getY(),
-                    Math.max(this.originZ + width, this.originZ + getCurrentZ() + width)
-            );
-
+            AABB hitBox = new AABB(Math.min(this.originX - width, this.originX + getCurrentX() - width), this.getY() + bottomYOffset, Math.min(this.originZ - width, this.originZ + getCurrentZ() - width), Math.max(this.originX + width, this.originX + getCurrentX() + width), this.getY(), Math.max(this.originZ + width, this.originZ + getCurrentZ() + width));
             List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, hitBox);
             Vec3 beamStart = this.position();
             Vec3 beamEnd = new Vec3(this.originX + getCurrentX(), this.getY() + bottomYOffset, this.originZ + getCurrentZ());
             Vec3 beamDir = beamEnd.subtract(beamStart).normalize();
-
             for (LivingEntity entity : entities) {
                 if (BeyonderUtil.isPurifiable(entity)) {
                     Vec3 toEntity = entity.position().subtract(beamStart);
@@ -241,6 +234,7 @@ public class DawnRayEntity extends Entity {
     public void setMaxLifetime(int lifetime) {
         this.entityData.set(MAX_LIFETIME, lifetime);
     }
+
     public int getDivisionAmount() {
         return this.entityData.get(DIVISION_AMOUNT);
     }
@@ -248,6 +242,8 @@ public class DawnRayEntity extends Entity {
     public void setDivisionAmount(int divisionAmount) {
         this.entityData.set(DIVISION_AMOUNT, divisionAmount);
     }
+
+
 
     @Override
     public void readAdditionalSaveData(CompoundTag compound) {

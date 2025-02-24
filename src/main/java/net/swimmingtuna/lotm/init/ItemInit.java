@@ -315,6 +315,12 @@ public class ItemInit {
             () -> new DivineHandLeft(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> AURAOFTWILIGHT = ITEMS.register("auraoftwilight",
             () -> new AuraOfTwilight(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TWILIGHTFREEZE = ITEMS.register("twilightfreeze",
+            () -> new TwilightFreeze(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TWILIGHTLIGHT = ITEMS.register("twilightlight",
+            () -> new TwilightLight(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> TWILIGHTACCELERATE = ITEMS.register("twilightaccelerate",
+            () -> new TwilightAccelerate(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> GLOBEOFTWILIGHT = ITEMS.register("globeoftwilight",
             () -> new GlobeOfTwilight(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> BEAMOFTWILIGHT = ITEMS.register("beamoftwilight",
@@ -459,6 +465,8 @@ public class ItemInit {
     //TOOLS
     public static final RegistryObject<Item> SWORDOFDAWN = ITEMS.register("swordofdawn",
             () -> new SwordOfDawn(Tiers.NETHERITE, 10,-2.8f,new Item.Properties()));
+    public static final RegistryObject<Item> SWORDOFTWILIGHT = ITEMS.register("swordoftwilight",
+            () -> new SwordOfTwilight(Tiers.NETHERITE, 50,-2.8f,new Item.Properties()));
     public static final RegistryObject<Item> SWORDOFSILVER = ITEMS.register("swordofsilver",
             () -> new SwordOfSilver(Tiers.NETHERITE, 12,-2f,new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> PICKAXEOFDAWN = ITEMS.register("pickaxeofdawn",

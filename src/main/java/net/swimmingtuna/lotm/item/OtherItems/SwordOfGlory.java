@@ -12,16 +12,28 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.entity.GuardianBoxEntity;
+import net.swimmingtuna.lotm.entity.HurricaneOfLightEntity;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
+import virtuoel.pehkui.api.ScaleData;
+import virtuoel.pehkui.api.ScaleTypes;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 public class SwordOfGlory extends SwordItem {
 
@@ -87,11 +99,40 @@ public class SwordOfGlory extends SwordItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-        ItemStack itemstack = pPlayer.getItemInHand(pUsedHand);
         if (!pPlayer.level().isClientSide()) {
-            pPlayer.startUsingItem(pUsedHand);
+            if (!pPlayer.isShiftKeyDown()) {
+                Vec3 eyePosition = pPlayer.getEyePosition();
+                Vec3 lookVector = pPlayer.getLookAngle();
+                Vec3 reachVector = eyePosition.add(lookVector.x * 5, lookVector.y * 5, lookVector.z * 5);
+                BlockHitResult blockHit = pPlayer.level().clip(new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, pPlayer));
+                if (blockHit.getType() == HitResult.Type.MISS) {
+                    HurricaneOfLightEntity.summonHurricaneOfLightGlory(pPlayer);
+                    BeyonderUtil.useSpirituality(pPlayer, 200);
+                    pPlayer.getCooldowns().addCooldown(this, 400);
+                }
+            } else if (pPlayer.isShiftKeyDown() && BeyonderUtil.getSequence(pPlayer) <= 5) {
+                int boxCount = 0;
+                for (GuardianBoxEntity guardianBox : pPlayer.level().getEntitiesOfClass(GuardianBoxEntity.class, pPlayer.getBoundingBox().inflate(200))) {
+                    Optional<UUID> ownerUUID = Optional.of(pPlayer.getUUID());
+                    if (Objects.equals(guardianBox.getOwnerUUID(), ownerUUID)) {
+                        boxCount++;
+                    }
+                }
+                if (boxCount == 0) {
+                    GuardianBoxEntity guardianBoxEntity = new GuardianBoxEntity(EntityInit.GUARDIAN_BOX_ENTITY.get(), pPlayer.level());
+                    int sequence = BeyonderUtil.getSequence(pPlayer);
+                    ScaleData scaleData = ScaleTypes.BASE.getScaleData(guardianBoxEntity);
+                    scaleData.setTargetScale(18 - (sequence));
+                    guardianBoxEntity.setOwnerUUID(pPlayer.getUUID());
+                    guardianBoxEntity.teleportTo(pPlayer.getX(), pPlayer.getY(), pPlayer.getZ());
+                    guardianBoxEntity.setMaxHealth(500 - (sequence * 30));
+                    pPlayer.level().addFreshEntity(guardianBoxEntity);
+                    pPlayer.getCooldowns().addCooldown(this, 400);
+                    BeyonderUtil.useSpirituality(pPlayer, 200);
+                }
+            }
         }
-        return InteractionResultHolder.consume(itemstack);
+        return super.use(pLevel, pPlayer, pUsedHand);
     }
 
     @Override

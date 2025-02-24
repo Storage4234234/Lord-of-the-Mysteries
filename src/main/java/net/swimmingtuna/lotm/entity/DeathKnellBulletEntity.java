@@ -133,7 +133,8 @@ public class DeathKnellBulletEntity extends AbstractHurtingProjectile {
         } else if (getLethal()) {
             return new DustParticleOptions(new Vector3f(1.0F, 0.0F, 0.0F), 1.0F);
         } else if (getSlaughter()) {
-            return new DustParticleOptions(new Vector3f(0.0F, 0.0F, 0.0F), 1.0F);        }
+            return new DustParticleOptions(new Vector3f(0.0F, 0.0F, 0.0F), 1.0F);
+        }
         return ParticleInit.NULL_PARTICLE.get();
     }
 

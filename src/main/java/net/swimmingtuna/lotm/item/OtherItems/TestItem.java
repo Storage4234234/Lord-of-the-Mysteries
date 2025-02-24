@@ -19,11 +19,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
+import net.swimmingtuna.lotm.entity.DawnRayEntity;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
+
+import java.util.List;
 
 public class TestItem extends SimpleAbilityItem {
 
@@ -61,7 +64,7 @@ public class TestItem extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
-
+            interactionTarget.getPersistentData().putInt("age", (int) interactionTarget.getMaxHealth() * 20);
         }
         return InteractionResult.SUCCESS;
     }
@@ -77,7 +80,7 @@ public class TestItem extends SimpleAbilityItem {
                     player.getCooldowns().removeCooldown(stack.getItem());
                 }
             }
-
+            player.getPersistentData().putInt("age", (int) player.getMaxHealth() * 20);
         }
 
         return InteractionResult.SUCCESS;

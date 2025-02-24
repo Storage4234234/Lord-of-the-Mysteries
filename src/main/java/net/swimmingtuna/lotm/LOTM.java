@@ -302,6 +302,7 @@ public class LOTM {
             event.accept(ItemInit.SYMPHONYOFHATRED);
             event.accept(ItemInit.WINTRYBLADE);
             event.accept(ItemInit.SWORDOFDAWN);
+            event.accept(ItemInit.SWORDOFTWILIGHT);
             event.accept(ItemInit.SPEAROFDAWN);
             event.accept(ItemInit.SWORDOFSILVER);
             event.accept(ItemInit.PICKAXEOFDAWN);
@@ -325,6 +326,9 @@ public class LOTM {
             event.accept(ItemInit.DIVINEHANDLEFT);
             event.accept(ItemInit.TWILIGHTMANIFESTATION);
             event.accept(ItemInit.AURAOFTWILIGHT);
+            event.accept(ItemInit.TWILIGHTFREEZE);
+            event.accept(ItemInit.TWILIGHTACCELERATE);
+            event.accept(ItemInit.TWILIGHTLIGHT);
             event.accept(ItemInit.GLOBEOFTWILIGHT);
             event.accept(ItemInit.DAWN_HELMET);
             event.accept(ItemInit.DAWN_CHESTPLATE);

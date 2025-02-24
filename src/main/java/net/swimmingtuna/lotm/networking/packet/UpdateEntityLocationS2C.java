@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.network.NetworkEvent;
-import net.swimmingtuna.lotm.entity.DeathKnellBulletEntity;
 
 import java.util.function.Supplier;
 
@@ -44,7 +43,7 @@ public class UpdateEntityLocationS2C {
             Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
             if (minecraft.level != null) {
                 Entity entity = minecraft.level.getEntity(msg.entityId);
-                if (entity instanceof DeathKnellBulletEntity) {
+                if (entity != null) {
                     entity.setPos(msg.x, msg.y, msg.z);
                 }
             }
