@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.ForgeMod;
@@ -141,9 +142,11 @@ public class InvisibleHand extends SimpleAbilityItem {
                         double x = blockHit.getLocation().x();
                         double y = blockHit.getLocation().y();
                         double z = blockHit.getLocation().z();
-                        target.moveTo(x, y, z);
+                        target.teleportTo(x, y, z);
                         if (BeyonderUtil.isAllyOf(livingEntity, target)) {
                             target.fallDistance = 0;
+                        } else {
+                            target.fallDistance = (float) (target.getY() - target.level().getHeight(Heightmap.Types.WORLD_SURFACE, (int) x, (int) y));
                         }
                         if (target.fallDistance >= maxDistance) {
                             target.fallDistance = maxDistance;

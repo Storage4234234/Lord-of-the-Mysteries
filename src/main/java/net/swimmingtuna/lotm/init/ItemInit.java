@@ -349,6 +349,8 @@ public class ItemInit {
             () -> new TravelDoorWaypoint(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> INVISIBLEHAND= ITEMS.register("invisiblehand",
             () -> new InvisibleHand(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> SCRIBEABILITIES= ITEMS.register("scribeabilities.json",
+            () -> new ScribeAbilities(new Item.Properties().stacksTo(1)));
 
     //INGREDIENTS
     public static final RegistryObject<Item> SPIRIT_EATER_STOMACH_POUCH = ITEMS.register("spirit_eater_stomach_pouch",

@@ -272,7 +272,7 @@ public class ModEvents {
                 setCooldown(serverPlayer, currentCooldown);
             }
         }
-
+        BeyonderUtil.copyAbilityTick(player);
         abilityCooldownsServerTick(event);
         FateReincarnation.monsterReincarnationChecker(player);
         monsterDangerSense(tag, holder, player);
@@ -368,6 +368,7 @@ public class ModEvents {
             if (livingEntity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
             }
+            DawnArmory.dawnArmorTickEvent(event);
             DivineHandLeftEntity.divineHandTick(event);
             TwilightAccelerate.twilightAccelerateTick(event);
             TwilightFreeze.twilightFreezeTick(event);

@@ -1,23 +1,28 @@
-package net.swimmingtuna.lotm.util;
+package net.swimmingtuna.lotm.util.ScribeRecording;
+
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-public class ScribeRegisteredAbilitiesMenu extends AbstractContainerMenu {
+import java.util.Map;
+
+public class ScribeMenu extends AbstractContainerMenu {
     private final Container container;
 
-    public ScribeRegisteredAbilitiesMenu(int containerId, Inventory playerInventory, Container abilityContainer) {
+    public ScribeMenu(int containerId, Inventory playerInventory, Map<Item, Integer> itemMap){
         super(MenuType.GENERIC_9x5, containerId);
-        this.container = abilityContainer;
+        this.container = createContainerFromMap(itemMap);
         for (int i = 0; i < this.container.getContainerSize(); i++) {
             this.addSlot(new Slot(this.container, i, 8 + (i % 9) * 18, 18 + (i / 9) * 18) {
                 @Override
@@ -40,6 +45,7 @@ public class ScribeRegisteredAbilitiesMenu extends AbstractContainerMenu {
         }
     }
 
+
     @Override
     public void clicked(int slotId, int button, ClickType clickType, Player player) {
         if (slotId >= 0 && slotId < this.container.getContainerSize()) {
@@ -53,6 +59,16 @@ public class ScribeRegisteredAbilitiesMenu extends AbstractContainerMenu {
             }
         }
         super.clicked(slotId, button, clickType, player);
+    }
+
+    private SimpleContainer createContainerFromMap(Map<Item, Integer> itemMap) {
+        SimpleContainer container = new SimpleContainer(45); // 9x5 grid
+        int index = 0;
+        for (Item item : itemMap.keySet()) {
+            if (index >= container.getContainerSize()) break;
+            container.setItem(index++, new ItemStack(item));
+        }
+        return container;
     }
 
     @Override
@@ -77,8 +93,6 @@ public class ScribeRegisteredAbilitiesMenu extends AbstractContainerMenu {
         }
         return ItemStack.EMPTY;
     }
-
-
     private void handleItemClick(ItemStack clickedItem, ServerPlayer player) {
         if (player != null) {
             Inventory inventory = player.getInventory();
@@ -105,7 +119,6 @@ public class ScribeRegisteredAbilitiesMenu extends AbstractContainerMenu {
             player.containerMenu.broadcastChanges();
         }
     }
-
     @Override
     public boolean stillValid(Player player) {
         return true;

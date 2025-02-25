@@ -84,21 +84,25 @@ public class ApprenticeClass implements BeyonderClass {
             if (sequenceLevel == 7) {
             }
             if (sequenceLevel == 6) {
+                tag.putInt("maxScribedAbilities", 20);
             }
             if (sequenceLevel == 5) {
-
+                tag.putInt("maxScribedAbilities", 25);
             }
             if (sequenceLevel == 4) {
+                tag.putInt("maxScribedAbilities", 30);
             }
             if (sequenceLevel == 3) {
+                tag.putInt("maxScribedAbilities", 35);
             }
             if (sequenceLevel == 2) {
+                tag.putInt("maxScribedAbilities", 40);
             }
             if (sequenceLevel == 1) {
-
+                tag.putInt("maxScribedAbilities", 45);
             }
             if (sequenceLevel == 0) {
-
+                tag.putInt("maxScribedAbilities", 50);
             }
         }
 
@@ -116,10 +120,11 @@ public class ApprenticeClass implements BeyonderClass {
         items.put(8, ItemInit.TRICKTUMBLE.get());
         items.put(8, ItemInit.TRICKWINDPULL.get());
         items.put(8, ItemInit.TRICKWINDPUSH.get());
-        items.put(6,ItemInit.RECORDSCRIBE.get());
-        items.put(5,ItemInit.TRAVELDOOR.get());
-        items.put(5,ItemInit.TRAVELDOORHOME.get());
-        items.put(5,ItemInit.INVISIBLEHAND.get());
+        items.put(6, ItemInit.RECORDSCRIBE.get());
+        items.put(6, ItemInit.SCRIBEABILITIES.get());
+        items.put(5, ItemInit.TRAVELDOOR.get());
+        items.put(5, ItemInit.TRAVELDOORHOME.get());
+        items.put(5, ItemInit.INVISIBLEHAND.get());
         return items;
     }
 

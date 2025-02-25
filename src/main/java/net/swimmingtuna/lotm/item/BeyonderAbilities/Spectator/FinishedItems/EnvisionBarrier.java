@@ -43,7 +43,7 @@ public class EnvisionBarrier extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 800 / dreamIntoReality)) {
+        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 800 / dreamIntoReality, true)) {
             return InteractionResult.FAIL;
         }
         useSpirituality(player, 800 / dreamIntoReality);

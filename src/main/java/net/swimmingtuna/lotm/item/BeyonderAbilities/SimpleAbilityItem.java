@@ -19,9 +19,9 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
-import net.swimmingtuna.lotm.util.ScribeRecording.CapabilityScribeAbilities;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.Nullable;
+import net.swimmingtuna.lotm.util.ScribeRecording.*;
 
 import java.util.List;
 import java.util.Map;
@@ -71,23 +71,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        Item ability = player.getItemInHand(hand).getItem();
         if (!level.isClientSide() && checkIfCanUseAbility(player)) {
-            if (player.getPersistentData().getInt("abilityStrengthened") >= 1) {
-                player.getPersistentData().putInt("abilityStrengthened", player.getPersistentData().getInt("abilityStrengthened") - 1);
-            }
-            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
-                if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
-                    if (BeyonderUtil.scribeLookingAtYou(player, entity)) {
-                        if (entity instanceof Player pPlayer) {
-                            pPlayer.displayClientMessage(Component.literal("Scribed Ability: ").append(Component.literal(player.getItemInHand(hand).getItem().toString())), true);
-                            pPlayer.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage -> {
-                                storage.copyScribeAbility(ability);
-                            });
-                        }
-                    }
-                }
-            }
             InteractionResult interactionResult = useAbility(level, player, hand);
             return new InteractionResultHolder<>(interactionResult, player.getItemInHand(hand));
         }
@@ -95,37 +79,22 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     }
 
     protected boolean checkAll(Player player) {
-        if (BeyonderUtil.getPathway(player) == BeyonderClassInit.APPRENTICE.get() && BeyonderUtil.getSequence(player) <= 6 && this.requiredClass != BeyonderClassInit.APPRENTICE.get()) {
-            final SimpleAbilityItem ability;
-            if (player.getMainHandItem().getItem() instanceof SimpleAbilityItem) {
-                ability = (SimpleAbilityItem) player.getMainHandItem().getItem();
-            } else if (player.getOffhandItem().getItem() instanceof SimpleAbilityItem) {
-                ability = (SimpleAbilityItem) player.getOffhandItem().getItem();
-            } else {
-                ability = null;
+        if(player.getItemInHand(InteractionHand.MAIN_HAND).is(this)) {
+            if(!checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, false)) {
+                if(BeyonderUtil.sequenceAbleCopy(player)) {
+                    if(BeyonderUtil.checkAbilityIsCopied(player, this)) {
+                        BeyonderUtil.useCopiedAbility(player, this);
+                        return checkSpirituality(BeyonderHolderAttacher.getHolderUnwrap(player), player, this.getSpirituality(), true);
+                    }
+                }
             }
-
-            if (ability != null) {
-                return player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null)
-                        .map(storage -> {
-                            if (storage.hasScribedAbility(ability)) {
-                                storage.useScribeAbility(ability);
-                                return true;
-                            } else {
-                                return checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality);
-                            }
-                        })
-                        .orElse(false);
+            if(checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, true)) {
+                BeyonderUtil.copyAbilities(player.level(), player, this);
+                return true;
             }
         }
-        if (player.getPersistentData().getInt("inTwilight") >= 1) {
-            int x = (int) player.getPersistentData().getInt("inTwilight") / 20;
-            player.displayClientMessage(Component.literal("You are frozen by twilight for " + x + " seconds." ).withStyle(ChatFormatting.RED), true);
-            return false;
-        }
-        return checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality);
+        return false;
     }
-
 
     public int getSpirituality() {
         return this.requiredSpirituality;
@@ -134,22 +103,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
-        Player player = context.getPlayer();
         if (!level.isClientSide()) {
-            if (player.getPersistentData().getInt("abilityStrengthened") >= 1) {
-                player.getPersistentData().putInt("abilityStrengthened", player.getPersistentData().getInt("abilityStrengthened") - 1);
-            }
-            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
-                if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
-                    if (BeyonderUtil.scribeLookingAtYou(player, entity)) {
-                        entity.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage -> {
-                            if (storage.hasScribedAbility(player.getItemInHand(context.getHand()).getItem())) {
-                                storage.copyScribeAbility(player.getItemInHand(context.getHand()).getItem());
-                            }
-                        });
-                    }
-                }
-            }
             return useAbilityOnBlock(context);
         }
         return InteractionResult.PASS;
@@ -159,21 +113,6 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand usedHand) {
         if (!player.level().isClientSide()) {
-            Level level = player.level();
-            if (player.getPersistentData().getInt("abilityStrengthened") >= 1) {
-                player.getPersistentData().putInt("abilityStrengthened", player.getPersistentData().getInt("abilityStrengthened") - 1);
-            }
-            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
-                if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
-                    if (BeyonderUtil.scribeLookingAtYou(player, entity)) {
-                        entity.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage -> {
-                            if (storage.hasScribedAbility(player.getItemInHand(usedHand).getItem())) {
-                                storage.copyScribeAbility(player.getItemInHand(usedHand).getItem());
-                            }
-                        });
-                    }
-                }
-            }
             return interactLivingEntity(stack, player, interactionTarget, usedHand);
         }
         return InteractionResult.PASS;
@@ -245,45 +184,52 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         return stringBuilder.toString();
     }
 
-    public static boolean checkRequiredClass(BeyonderHolder holder, Player player, BeyonderClass requiredClass) {
+    public static boolean checkRequiredClass(BeyonderHolder holder, Player player, BeyonderClass requiredClass, boolean message) {
         if (!holder.currentClassMatches(requiredClass)) {
             String name = requiredClass.sequenceNames().get(9);
 
-            player.displayClientMessage(
-                    Component.literal("You are not of the ").withStyle(ChatFormatting.AQUA).append(
-                            Component.literal(name).withStyle(requiredClass.getColorFormatting())).append(
-                            Component.literal(" Pathway").withStyle(ChatFormatting.AQUA)), true);
+            if(message)
+                player.displayClientMessage(
+                        Component.literal("You are not of the ").withStyle(ChatFormatting.AQUA).append(
+                                Component.literal(name).withStyle(requiredClass.getColorFormatting())).append(
+                                Component.literal(" Pathway").withStyle(ChatFormatting.AQUA)), true);
             return false;
         }
         return true;
     }
 
-    public static boolean checkRequiredSequence(BeyonderHolder holder, Player player, int requiredSequence) {
+    public static boolean checkRequiredSequence(BeyonderHolder holder, Player player, int requiredSequence, boolean message) {
         if (holder.getCurrentSequence() > requiredSequence) {
-            player.displayClientMessage(
-                    Component.literal("You need to be sequence ").withStyle(ChatFormatting.AQUA).append(
-                            Component.literal(String.valueOf(requiredSequence)).withStyle(ChatFormatting.YELLOW)).append(
-                            Component.literal(" or lower to use this").withStyle(ChatFormatting.AQUA)), true);
+            if(message)
+                player.displayClientMessage(
+                        Component.literal("You need to be sequence ").withStyle(ChatFormatting.AQUA).append(
+                                Component.literal(String.valueOf(requiredSequence)).withStyle(ChatFormatting.YELLOW)).append(
+                                Component.literal(" or lower to use this").withStyle(ChatFormatting.AQUA)), true);
             return false;
         }
         return true;
     }
 
-    public static boolean checkSpirituality(BeyonderHolder holder, Player player, int requiredSpirituality) {
+    public static boolean checkSpirituality(BeyonderHolder holder, Player player, int requiredSpirituality, boolean message) {
         if (holder.getSpirituality() < requiredSpirituality) {
-            player.displayClientMessage(
-                    Component.literal("You need ").withStyle(ChatFormatting.AQUA).append(
-                            Component.literal(String.valueOf(requiredSpirituality)).withStyle(ChatFormatting.YELLOW)).append(
-                            Component.literal(" spirituality to use this").withStyle(ChatFormatting.AQUA)), true);
+            if(message)
+                player.displayClientMessage(
+                        Component.literal("You need ").withStyle(ChatFormatting.AQUA).append(
+                                Component.literal(String.valueOf(requiredSpirituality)).withStyle(ChatFormatting.YELLOW)).append(
+                                Component.literal(" spirituality to use this").withStyle(ChatFormatting.AQUA)), true);
             return false;
         }
         return true;
     }
 
-    public static boolean checkAll(Player player, BeyonderClass requiredClass, int requiredSequence, int requiredSpirituality) {
+    public static boolean checkAll(Player player, BeyonderClass requiredClass, int requiredSequence, int requiredSpirituality, boolean message) {
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        return checkRequiredClass(holder, player, requiredClass) && checkRequiredSequence(holder, player, requiredSequence) && checkSpirituality(holder, player, requiredSpirituality);
+        return checkRequiredClass(holder, player, requiredClass, message) && checkRequiredSequence(holder, player, requiredSequence, message) && checkSpirituality(holder, player, requiredSpirituality, message);
     }
+
+
+
+
 
     public static boolean useSpirituality(Player player, int spirituality) {
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
@@ -327,11 +273,10 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
 
     public interface scribeAbilitiesStorage {
         Map<Item, Integer> getScribedAbilities();
-
         void copyScribeAbility(Item ability);
-
         boolean hasScribedAbility(Item ability);
-
         void useScribeAbility(Item ability);
+        int getRemainUses(Item ability);
+        int getScribedAbilitiesCount();
     }
 }

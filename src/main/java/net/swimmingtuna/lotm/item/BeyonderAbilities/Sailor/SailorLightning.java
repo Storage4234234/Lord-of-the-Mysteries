@@ -73,7 +73,7 @@ public class SailorLightning extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
-        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 120)) {
+        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 120, true)) {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
@@ -85,7 +85,7 @@ public class SailorLightning extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack pStack, Player player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
-        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 200)) {
+        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 200, true)) {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
@@ -99,7 +99,7 @@ public class SailorLightning extends SimpleAbilityItem {
     public InteractionResult useAbilityOnBlock(UseOnContext context) {
         Player player = context.getPlayer();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 200)) {
+        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 200, true)) {
             return InteractionResult.FAIL;
         }
         lightningblock(player, player.level(), context.getClickLocation());

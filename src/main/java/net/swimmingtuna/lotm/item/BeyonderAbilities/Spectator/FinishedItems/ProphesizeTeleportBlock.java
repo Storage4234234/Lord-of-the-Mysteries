@@ -36,7 +36,7 @@ import java.util.List;
 public class ProphesizeTeleportBlock extends SimpleAbilityItem {
 
     public ProphesizeTeleportBlock(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 1, 600, 2400,200,200);
+        super(properties, BeyonderClassInit.SPECTATOR, 1, 600, 2400, 200, 200);
     }
 
     @Override
@@ -79,9 +79,8 @@ public class ProphesizeTeleportBlock extends SimpleAbilityItem {
             BlockPos positionClicked = context.getClickedPos();
             if (!context.getLevel().isClientSide) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                if (holder.currentClassMatches(BeyonderClassInit.SPECTATOR) && holder.getCurrentSequence() <= 1 && BeyonderHolderAttacher.getHolderUnwrap(player).useSpirituality(600)) {
-                    teleportEntities(player, level, positionClicked, holder.getCurrentSequence(), (int) dreamIntoReality.getValue());
-                }
+                teleportEntities(player, level, positionClicked, holder.getCurrentSequence(), (int) dreamIntoReality.getValue());
+
             }
         }
     }
@@ -110,6 +109,7 @@ public class ProphesizeTeleportBlock extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);

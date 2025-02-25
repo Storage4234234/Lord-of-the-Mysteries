@@ -30,7 +30,7 @@ public class Discern extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 2, 1000 / dreamIntoReality)) {
+        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 2, 1000 / dreamIntoReality, true)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player);

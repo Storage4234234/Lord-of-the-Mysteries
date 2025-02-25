@@ -31,7 +31,7 @@ public class Placate extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 7, 125)) {
+        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 7, 125, true)) {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
@@ -50,7 +50,7 @@ public class Placate extends SimpleAbilityItem {
     }
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 7, 125)) {
+        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 7, 125, true)) {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);

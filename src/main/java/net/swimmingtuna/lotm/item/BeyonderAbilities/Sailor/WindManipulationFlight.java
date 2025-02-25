@@ -18,6 +18,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -104,8 +105,7 @@ public class WindManipulationFlight extends SimpleAbilityItem {
     public static void windManipulationGuide(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
         //WIND MANIPULATION GLIDE
         boolean enhancedFlight = playerPersistentData.getBoolean("sailorFlight1");
-        if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 6 && player.isShiftKeyDown() && player.fallDistance >= 3 && !player.getAbilities().instabuild && !enhancedFlight) {
-            Vec3 movement = player.getDeltaMovement();
+        if ((holder.currentClassMatches(BeyonderClassInit.SAILOR) || BeyonderUtil.sequenceAbleCopy(holder)) && holder.getCurrentSequence() <= 6 && player.isShiftKeyDown() && player.fallDistance >= 3 && !player.getAbilities().instabuild && !enhancedFlight) {            Vec3 movement = player.getDeltaMovement();
             double deltaX = Math.cos(Math.toRadians(player.getYRot() + 90)) * 0.06;
             double deltaZ = Math.sin(Math.toRadians(player.getYRot() + 90)) * 0.06;
             player.setDeltaMovement(movement.x + deltaX, -0.05, movement.z + deltaZ);

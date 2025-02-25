@@ -43,7 +43,7 @@ public class EnvisionKingdom extends SimpleAbilityItem {
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 6000 / dreamIntoReality)) {
+        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 6000 / dreamIntoReality, true)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player);

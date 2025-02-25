@@ -102,8 +102,7 @@ public class MatterAccelerationEntities extends SimpleAbilityItem {
             }
             if (entity1 instanceof Player player) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                if (!holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() == 0) {
-                    player.hurt(player.damageSources().lightningBolt(), 40);
+                if ((!holder.currentClassMatches(BeyonderClassInit.SAILOR) || BeyonderUtil.sequenceAbleCopy(holder)) && holder.getCurrentSequence() == 0) {                    player.hurt(player.damageSources().lightningBolt(), 40);
                 }
             } else {
                 entity1.hurt(entity1.damageSources().lightningBolt(), 40);

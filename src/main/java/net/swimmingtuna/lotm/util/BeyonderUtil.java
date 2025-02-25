@@ -69,6 +69,7 @@ import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Ability;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.InvisibleHand;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.ScribeAbilities;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoorWaypoint;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
@@ -84,6 +85,7 @@ import net.swimmingtuna.lotm.networking.packet.*;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.AllyInformation.PlayerAllyData;
 import net.swimmingtuna.lotm.util.ClientData.ClientLeftclickCooldownData;
+import net.swimmingtuna.lotm.util.ScribeRecording.CapabilityScribeAbilities;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
 import org.jetbrains.annotations.Nullable;
@@ -95,6 +97,8 @@ import java.util.*;
 import static net.swimmingtuna.lotm.init.DamageTypeInit.MENTAL_DAMAGE;
 
 public class BeyonderUtil {
+
+    private static final Map<UUID, SimpleAbilityItem> pendingAbilityCopies = new HashMap<>();
 
     public static Projectile getProjectiles(LivingEntity livingEntity) {
         if (livingEntity.level().isClientSide()) {
@@ -917,6 +921,8 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new ToggleDistanceC2S());
             } else if (heldItem.getItem() instanceof TravelDoorWaypoint) {
                 LOTMNetworkHandler.sendToServer(new TravelerWaypointC2S());
+            } else if (heldItem.getItem() instanceof ScribeAbilities){
+                LOTMNetworkHandler.sendToServer(new ScribeCopyAbilityC2S());
             }
         }
     }
@@ -1046,6 +1052,8 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYFORTUNE.get())));
             } else if (heldItem.getItem() instanceof InvisibleHand) {
                 LOTMNetworkHandler.sendToServer(new ToggleDistanceC2S());
+            } else if (heldItem.getItem() instanceof ScribeAbilities){
+                LOTMNetworkHandler.sendToServer(new ScribeCopyAbilityC2S());
             }
         }
     }
@@ -2093,5 +2101,122 @@ public class BeyonderUtil {
                 playerMobEntity.setSpirituality(spirituality);
             }
         }
+    }
+
+    public static boolean sequenceAbleCopy(LivingEntity entity){
+        int sequence = getSequence(entity);
+        if(getPathway(entity) == BeyonderClassInit.APPRENTICE.get() && sequence <= 6){
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean sequenceAbleCopy(BeyonderHolder holder){
+        int sequence = holder.getCurrentSequence();
+        if(holder.currentClassMatches(BeyonderClassInit.APPRENTICE.get()) && sequence <= 6){
+            return true;
+        }
+        return false;
+    }
+
+    public static void copyAbilities(Level level, Player player, SimpleAbilityItem ability){
+        int playerSequence = getSequence(player);
+        int abilitySequence = ability.getRequiredSequence();
+        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
+            if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
+                if(getPathway(entity) == BeyonderClassInit.APPRENTICE.get() && playerSequence <= 6){
+                    if(entity instanceof Player scribe){
+                        if (BeyonderUtil.scribeLookingAtYou(player, scribe)) {
+                            if(checkValidAbilityCopy(new ItemStack(ability))){
+                                if(player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).map(storage -> storage.getScribedAbilitiesCount()).orElse(0) < player.getPersistentData().getInt("maxScribedAbilities")){
+                                    if(copyAbilityTest(playerSequence, abilitySequence)){
+                                        if(!pendingAbilityCopies.containsKey(scribe.getUUID())){
+                                            pendingAbilityCopies.put(scribe.getUUID(), ability);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void confirmCopyAbility(Player player){
+        if(pendingAbilityCopies.containsKey(player.getUUID())){
+            if(!player.isShiftKeyDown()){
+                player.getPersistentData().putBoolean("acceptCopiedAbility", true);
+            }else{
+                player.getPersistentData().putBoolean("deleteCopiedAbility", true);
+            }
+
+        }
+    }
+
+    public static void copyAbilityTick(Player player) {
+        Iterator<Map.Entry<UUID, SimpleAbilityItem>> iterator = pendingAbilityCopies.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, SimpleAbilityItem> entry = iterator.next();
+            SimpleAbilityItem ability = entry.getValue();
+            ItemStack stack = new ItemStack(ability);
+            UUID uuid = entry.getKey();
+            if (player.getUUID().equals(uuid)) {
+                player.displayClientMessage(Component.literal("Trying to copy: ").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD).append(Component.literal(ability.getDefaultInstance().getHoverName().getString()).withStyle(ChatFormatting.WHITE).withStyle(ChatFormatting.BOLD)), true);
+                if (player.getPersistentData().getBoolean("acceptCopiedAbility")) {
+                    player.getPersistentData().putBoolean("acceptCopiedAbility", false);
+                    player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage -> {
+                        storage.copyScribeAbility(ability);
+                        player.displayClientMessage(Component.literal("Successfully copied: ").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD).append(Component.literal(ability.getDefaultInstance().getHoverName().getString()).withStyle(ChatFormatting.WHITE).withStyle(ChatFormatting.BOLD)), true);
+                    });
+                    iterator.remove();
+                } else if (player.getPersistentData().getBoolean("deleteCopiedAbility")) {
+                    player.getPersistentData().putBoolean("deleteCopiedAbility", false);
+                    player.displayClientMessage(Component.literal("You have given up on copying: ").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD).append(Component.literal(ability.getDefaultInstance().getHoverName().getString()).withStyle(ChatFormatting.WHITE).withStyle(ChatFormatting.BOLD)), true);
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+    public static void useCopiedAbility(Player player, Item ability){
+        int sequence = getSequence(player);
+        if(getPathway(player) == BeyonderClassInit.APPRENTICE.get()
+                && sequence <= 6){
+            player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage ->{
+                storage.useScribeAbility(ability);
+            });
+        }
+    }
+
+    public static boolean checkAbilityIsCopied(Player player, Item ability){
+        int sequence = BeyonderUtil.getSequence(player);
+        if(BeyonderUtil.getPathway(player) == BeyonderClassInit.APPRENTICE.get()
+                && sequence <= 6){
+            return player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null)
+                    .map(storage -> storage.hasScribedAbility(ability))
+                    .orElse(false);
+        }
+        return false;
+    }
+
+    public static boolean copyAbilityTest(int copierSequence, int targetAbilitySequence){
+        double chance = 0.3 + (0.7 / 9) * (targetAbilitySequence - copierSequence);
+        chance = Math.max(0.05, Math.min(chance, 1));
+
+        return Math.random() < chance;
+    }
+
+    public static boolean checkValidAbilityCopy(ItemStack ability){
+        List<ItemStack> invalidAbilities = new ArrayList<>();
+        invalidAbilities.add(new ItemStack(ItemInit.GIGANTIFICATION.get()));
+        invalidAbilities.add(new ItemStack(ItemInit.FATEDCONNECTION.get()));
+
+        for(ItemStack invalidAbility : invalidAbilities){
+            if(ItemStack.isSameItem(ability, invalidAbility)){
+                return false;
+            }
+        }
+        return true;
     }
 }

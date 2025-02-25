@@ -37,7 +37,7 @@ public class EnvisionLocationBlink extends SimpleAbilityItem {
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
         int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, blinkDistance * 4)) {
+        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, blinkDistance * 4, true)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player, this, 20 / dreamIntoReality);
@@ -63,8 +63,7 @@ public class EnvisionLocationBlink extends SimpleAbilityItem {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
             Level level = player.level();
-            if (holder.currentClassMatches(BeyonderClassInit.SPECTATOR) && !player.level().isClientSide() && holder.getCurrentSequence() == 0 && holder.useSpirituality(blinkDistance * 8)) {
-                Vec3 lookVector = player.getLookAngle();
+            if ((holder.currentClassMatches(BeyonderClassInit.SPECTATOR) || BeyonderUtil.sequenceAbleCopy(holder)) && !player.level().isClientSide() && holder.getCurrentSequence() == 0 && holder.useSpirituality(blinkDistance * 8)) {                Vec3 lookVector = player.getLookAngle();
                 double targetX = player.getX() + blinkDistance * lookVector.x();
                 double targetY = (player.getY() + 1) + blinkDistance * lookVector.y();
                 double targetZ = player.getZ() + blinkDistance * lookVector.z();

@@ -76,7 +76,7 @@ public class SirenSongHarm extends SimpleAbilityItem {
         int sirenSongWeaken = playerPersistentData.getInt("sirenSongWeaken");
         int sirenSongStun = playerPersistentData.getInt("sirenSongStun");
         int sirenSongStrengthen = playerPersistentData.getInt("sirenSongStrengthen");
-        if (!holder.currentClassMatches(BeyonderClassInit.SAILOR) || holder.getCurrentSequence() > 5) {
+        if ((!holder.currentClassMatches(BeyonderClassInit.SAILOR) || holder.getCurrentSequence() > 5) || BeyonderUtil.sequenceAbleCopy(holder)) {
             return;
         }
         if (sirenSongHarm % 20 == 0 && sirenSongHarm != 0) {

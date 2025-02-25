@@ -123,7 +123,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(40))) {
                 if (entity instanceof Player player) {
                     BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                    if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 3) {
+                    if ((holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 3) || (BeyonderUtil.sequenceAbleCopy(player) && BeyonderUtil.getSequence(player) <= 3)) {
                         player.getPersistentData().putInt("calamityLightningStormImmunity", 20);
                     }
                 }
@@ -209,7 +209,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             tag.putInt("calamityIncarnationInTornado", tornado - 1);
             if (entity instanceof Player player) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                if (holder.currentClassMatches(BeyonderClassInit.MONSTER)) {
+                if ((holder.currentClassMatches(BeyonderClassInit.MONSTER) || BeyonderUtil.sequenceAbleCopy(player))) {
                     tag.putInt("monsterCalamityImmunity", 5);
                 }
             }

@@ -45,7 +45,7 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         int matterAccelerationDistance = player.getPersistentData().getInt("tyrantSelfAcceleration");
-        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 0, matterAccelerationDistance * 10)) {
+        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 0, matterAccelerationDistance * 10, true)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player);
@@ -121,13 +121,11 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
         int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
         int luckGiftingAmount = player.getPersistentData().getInt("monsterLuckGifting");
         int doorBlinkDistance = player.getPersistentData().getInt("travelBlinkDistance");
-        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof MatterAccelerationSelf && holder.currentClassMatches(BeyonderClassInit.SAILOR)) {
-            matterAccelerationDistance += 50;
+        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof MatterAccelerationSelf && (holder.currentClassMatches(BeyonderClassInit.SAILOR) || BeyonderUtil.sequenceAbleCopy(holder))) {            matterAccelerationDistance += 50;
             player.getPersistentData().putInt("tyrantSelfAcceleration", matterAccelerationDistance);
             player.displayClientMessage(Component.literal("Matter Acceleration Distance is " + matterAccelerationDistance).withStyle(style), true);
         }
-        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof EnvisionLocationBlink && holder.currentClassMatches(BeyonderClassInit.SPECTATOR)) {
-            blinkDistance += 5;
+        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof EnvisionLocationBlink && (holder.currentClassMatches(BeyonderClassInit.SPECTATOR) || BeyonderUtil.sequenceAbleCopy(holder))) {            blinkDistance += 5;
             player.getPersistentData().putInt("BlinkDistance", blinkDistance);
             player.displayClientMessage(Component.literal("Blink Distance is " + blinkDistance).withStyle(style), true);
         }
@@ -140,16 +138,14 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
             player.getPersistentData().putInt("BlinkDistance", 0);
         }
         //LUCK GIFTING
-        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof LuckGifting && holder.currentClassMatches(BeyonderClassInit.MONSTER)) {
-            player.getPersistentData().putInt("monsterLuckGifting", luckGiftingAmount + 1);
+        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof LuckGifting && (holder.currentClassMatches(BeyonderClassInit.MONSTER) || BeyonderUtil.sequenceAbleCopy(holder))) {            player.getPersistentData().putInt("monsterLuckGifting", luckGiftingAmount + 1);
             player.displayClientMessage(Component.literal("Luck Gifting Amount is " + luckGiftingAmount).withStyle(style), true);
         }
         if (luckGiftingAmount >= BeyonderUtil.getDamage(player).get(ItemInit.LUCKGIFTING.get())) {
             player.displayClientMessage(Component.literal("Luck Gifting Amount is 0").withStyle(style), true);
             player.getPersistentData().putInt("monsterLuckGifting", 0);
         }
-        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof TravelDoor && holder.currentClassMatches(BeyonderClassInit.APPRENTICE)) {
-
+        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof TravelDoor && (holder.currentClassMatches(BeyonderClassInit.APPRENTICE) || BeyonderUtil.sequenceAbleCopy(holder))) {
             player.getPersistentData().putInt("travelBlinkDistance", doorBlinkDistance + 2);
             player.displayClientMessage(Component.literal("Blink Distance is " + doorBlinkDistance).withStyle(style), true);
         }

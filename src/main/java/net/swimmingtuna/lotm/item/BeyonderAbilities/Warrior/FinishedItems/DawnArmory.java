@@ -107,7 +107,7 @@ public class DawnArmory extends SimpleAbilityItem {
 
     public static void dawnArmorTickEvent(LivingEvent.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
-        if (entity.tickCount % 20 == 0 && !entity.level().isClientSide() && BeyonderUtil.getPathway(entity) == BeyonderClassInit.WARRIOR.get() && BeyonderUtil.getSequence(entity) <= 6) {
+        if (entity.tickCount % 20 == 0 && !entity.level().isClientSide() && (BeyonderUtil.getPathway(entity) == BeyonderClassInit.WARRIOR.get() || BeyonderUtil.sequenceAbleCopy(entity)) && BeyonderUtil.getSequence(entity) <= 6) {
             if (hasFullDawnArmor(entity)) {
                 BeyonderUtil.useSpirituality(entity, 15);
             }
