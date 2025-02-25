@@ -2086,9 +2086,10 @@ public class BeyonderUtil {
     }
 
     public static boolean currentPathwayMatches(LivingEntity livingEntity, BeyonderClass matchingPathway) {
-        if (getPathway(livingEntity) == matchingPathway) {
+        if (getPathway(livingEntity) == matchingPathway || (getPathway(livingEntity) == BeyonderClassInit.APPRENTICE.get() && getSequence(livingEntity) <= 6)) {
             return true;
-        } else {
+        }
+        else {
             return false;
         }
     }
@@ -2105,7 +2106,7 @@ public class BeyonderUtil {
 
     public static boolean sequenceAbleCopy(LivingEntity entity){
         int sequence = getSequence(entity);
-        if(getPathway(entity) == BeyonderClassInit.APPRENTICE.get() && sequence <= 6){
+        if (getPathway(entity) == BeyonderClassInit.APPRENTICE.get() && sequence <= 6){
             return true;
         }
         return false;
@@ -2113,7 +2114,7 @@ public class BeyonderUtil {
 
     public static boolean sequenceAbleCopy(BeyonderHolder holder){
         int sequence = holder.getCurrentSequence();
-        if(holder.currentClassMatches(BeyonderClassInit.APPRENTICE.get()) && sequence <= 6){
+        if (holder.currentClassMatches(BeyonderClassInit.APPRENTICE.get()) && sequence <= 6){
             return true;
         }
         return false;
@@ -2159,7 +2160,6 @@ public class BeyonderUtil {
         while (iterator.hasNext()) {
             Map.Entry<UUID, SimpleAbilityItem> entry = iterator.next();
             SimpleAbilityItem ability = entry.getValue();
-            ItemStack stack = new ItemStack(ability);
             UUID uuid = entry.getKey();
             if (player.getUUID().equals(uuid)) {
                 player.displayClientMessage(Component.literal("Trying to copy: ").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD).append(Component.literal(ability.getDefaultInstance().getHoverName().getString()).withStyle(ChatFormatting.WHITE).withStyle(ChatFormatting.BOLD)), true);
