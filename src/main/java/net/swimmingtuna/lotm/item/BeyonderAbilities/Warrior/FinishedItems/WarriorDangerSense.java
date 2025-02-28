@@ -52,7 +52,7 @@ public class WarriorDangerSense extends SimpleAbilityItem {
         if (!warriorDangerSense) {
             return;
         }
-        double radius = 200 - (holder.getCurrentSequence() * 20);
+        double radius = 200 - (holder.getSequence() * 20);
         for (Player otherPlayer : player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius))) {
             if (otherPlayer == player || BeyonderUtil.isAllyOf(player, otherPlayer)) {
                 continue;

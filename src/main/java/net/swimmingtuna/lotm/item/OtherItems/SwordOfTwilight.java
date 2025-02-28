@@ -42,8 +42,7 @@ public class SwordOfTwilight extends SwordItem {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
         if (entity instanceof LivingEntity livingEntity && !level.isClientSide()) {
             if (livingEntity.tickCount % 20 == 0 && !livingEntity.level().isClientSide()) {
-                int sequence = BeyonderUtil.getSequence(livingEntity);
-                if (!BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.WARRIOR.get()) && sequence >= 1) {
+                if (!BeyonderUtil.currentPathwayAndSequenceMatches(livingEntity, BeyonderClassInit.WARRIOR.get(), 1)) {
                     removeItemFromSlot(livingEntity, stack);
                 } else {
                     if (BeyonderUtil.getSpirituality(livingEntity) >= 150) {

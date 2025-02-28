@@ -157,7 +157,7 @@ public class ApprenticeClass implements BeyonderClass {
             if (event.getHand() != event.getEntity().getUsedItemHand()){
                 return;
             }
-            if(BeyonderUtil.getPathway(player) == BeyonderClassInit.APPRENTICE.get()) {
+            if(BeyonderUtil.currentPathwayMatchesNoException(player, BeyonderClassInit.APPRENTICE.get())) {
                 if (state.getBlock() instanceof DoorBlock) {
                     if (state.getBlock().getStateDefinition().getProperty("open") instanceof BooleanProperty open) {
                         boolean isCurrentlyOpen = state.getValue(open);
@@ -211,7 +211,7 @@ public class ApprenticeClass implements BeyonderClass {
         LivingEntity player = event.getEntity();
         if (!player.level().isClientSide()) {
             boolean x = player instanceof Player pPlayer && pPlayer.getAbilities().instabuild;
-            if (BeyonderUtil.getPathway(player) == BeyonderClassInit.APPRENTICE.get() && BeyonderUtil.getSequence(player) <= 8 && player.isShiftKeyDown() && player.fallDistance >= 3 && !x) {
+            if (BeyonderUtil.currentPathwayMatches(player, BeyonderClassInit.APPRENTICE.get()) && BeyonderUtil.getSequence(player) <= 8 && player.isShiftKeyDown() && player.fallDistance >= 3 && !x) {
                 Vec3 movement = player.getDeltaMovement();
                 double deltaX = Math.cos(Math.toRadians(player.getYRot() + 90)) * 0.06;
                 double deltaZ = Math.sin(Math.toRadians(player.getYRot() + 90)) * 0.06;

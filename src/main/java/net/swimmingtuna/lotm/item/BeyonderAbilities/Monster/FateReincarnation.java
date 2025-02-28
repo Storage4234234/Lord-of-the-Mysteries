@@ -49,7 +49,7 @@ public class FateReincarnation extends SimpleAbilityItem {
             int surfaceY = getNonAirSurfaceBlock(player.level(),x,z);
             player.teleportTo(x, surfaceY + 4, z);
             player.getPersistentData().putInt("monsterReincarnationCounter", 7200);
-            if (holder.getCurrentSequence() == 0) {
+            if (holder.getSequence() == 0) {
                 player.getPersistentData().putBoolean("monsterReincarnation", true);
             } else {
                 player.getPersistentData().putBoolean("monsterReincarnation", false);

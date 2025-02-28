@@ -41,7 +41,7 @@ public class Tornado extends SimpleAbilityItem {
     private static void tornado(Player pPlayer) {
         if (!pPlayer.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-            summonTornado(pPlayer, holder.getCurrentSequence());
+            summonTornado(pPlayer, holder.getSequence());
             holder.useSpirituality(500);
         }
     }

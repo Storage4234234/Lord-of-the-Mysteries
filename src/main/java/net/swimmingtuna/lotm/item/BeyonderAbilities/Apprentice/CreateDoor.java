@@ -6,16 +6,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.AABB;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
@@ -159,7 +155,7 @@ public class CreateDoor extends SimpleAbilityItem {
 
     public static void checkAmount(Player player, BeyonderHolder holder){
         if(player.isShiftKeyDown()){
-            player.displayClientMessage(Component.literal("Amount of blocks that can be opened: ").withStyle(ChatFormatting.WHITE).append(Component.literal(String.valueOf(100 - (97 * holder.getCurrentSequence() / 9))).withStyle(ChatFormatting.BLUE)), true);
+            player.displayClientMessage(Component.literal("Amount of blocks that can be opened: ").withStyle(ChatFormatting.WHITE).append(Component.literal(String.valueOf(100 - (97 * holder.getSequence() / 9))).withStyle(ChatFormatting.BLUE)), true);
         }
     }
 

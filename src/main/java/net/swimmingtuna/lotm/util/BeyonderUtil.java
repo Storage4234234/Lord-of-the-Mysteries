@@ -134,26 +134,20 @@ public class BeyonderUtil {
                     for (int y = -2; y <= 2; y++) {
                         for (int z = -2; z <= 2; z++) {
                             BlockPos pos = entityPos.offset(x, y, z);
-
-                            // Remove the block (replace with air)
                             projectile.level().setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
                         }
                     }
                 }
-                for (LivingEntity entity1 : projectile.level().getEntitiesOfClass(LivingEntity.class, projectile.getBoundingBox().inflate(5))) {
-                    if (entity1 instanceof Player playerEntity) {
-                        if (!holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() == 0) {
-                            playerEntity.hurt(playerEntity.damageSources().lightningBolt(), 40);
-                        }
-                    } else {
-                        entity1.hurt(entity1.damageSources().lightningBolt(), 40);
+                for (LivingEntity livingEntity : projectile.level().getEntitiesOfClass(LivingEntity.class, projectile.getBoundingBox().inflate(5))) {
+                    if (currentPathwayAndSequenceMatches(player, BeyonderClassInit.SAILOR.get(), 0)) {
+                        livingEntity.hurt(livingEntity.damageSources().lightningBolt(), 40);
                     }
                 }
             }
         }
         LivingEntity target = BeyonderUtil.getTarget(projectile, 75, 0);
         if (target != null) {
-            if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 8 && player.getPersistentData().getBoolean("sailorProjectileMovement")) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.SAILOR.get(), 8) && player.getPersistentData().getBoolean("sailorProjectileMovement")) {
                 double dx = target.getX() - projectile.getX();
                 double dy = target.getY() - projectile.getY();
                 double dz = target.getZ() - projectile.getZ();
@@ -163,7 +157,7 @@ public class BeyonderUtil {
                 projectile.hurtMarked = true;
             }
             //APPRENTICE BOUNCE SHOT ARROWS
-            if (holder.currentClassMatches(BeyonderClassInit.APPRENTICE) && holder.getCurrentSequence() <= 8 && player.getPersistentData().getBoolean("ApprenticeBounceProjectileMovement")) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.APPRENTICE.get(), 8) && player.getPersistentData().getBoolean("ApprenticeBounceProjectileMovement")) {
                 double dx = target.getX() - projectile.getX();
                 double dy = target.getY() - projectile.getY();
                 double dz = target.getZ() - projectile.getZ();
@@ -177,7 +171,7 @@ public class BeyonderUtil {
 
         //SAILOR PASSIVE CHECK FROM HERE
         if (target != null) {
-            if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 8 && player.getPersistentData().getBoolean("sailorProjectileMovement")) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.SAILOR.get(), 8) && player.getPersistentData().getBoolean("sailorProjectileMovement")) {
                 double dx = target.getX() - projectile.getX();
                 double dy = target.getY() - projectile.getY();
                 double dz = target.getZ() - projectile.getZ();
@@ -190,7 +184,7 @@ public class BeyonderUtil {
 
         //MONSTER CALCULATION PASSIVE
         if (target != null) {
-            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 8 && player.getPersistentData().getBoolean("monsterProjectileControl")) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.APPRENTICE.get(), 8) && player.getPersistentData().getBoolean("monsterProjectileControl")) {
                 double dx = target.getX() - projectile.getX();
                 double dy = target.getY() - projectile.getY();
                 double dz = target.getZ() - projectile.getZ();
@@ -307,8 +301,8 @@ public class BeyonderUtil {
             return abilityNames;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int sequence = holder.getCurrentSequence();
-        if (holder.currentClassMatches(BeyonderClassInit.SPECTATOR)) {
+        int sequence = holder.getSequence();
+        if (currentPathwayMatchesNoException(player, BeyonderClassInit.SPECTATOR.get())) {
             if (sequence <= 8) {
                 abilityNames.add(ItemInit.MIND_READING.get());
             }
@@ -365,7 +359,7 @@ public class BeyonderUtil {
             }
         }
 
-        if (holder.currentClassMatches(BeyonderClassInit.SAILOR)) {
+        if (currentPathwayMatchesNoException(player, BeyonderClassInit.SAILOR.get())) {
             if (sequence <= 8) {
                 abilityNames.add(ItemInit.RAGING_BLOWS.get());
             }
@@ -426,7 +420,7 @@ public class BeyonderUtil {
                 abilityNames.add(ItemInit.TYRANNY.get());
             }
         }
-        if (holder.currentClassMatches(BeyonderClassInit.MONSTER)) {
+        if (currentPathwayMatchesNoException(player, BeyonderClassInit.MONSTER.get())) {
             if (sequence <= 9) {
                 abilityNames.add(ItemInit.SPIRITVISION.get());
                 abilityNames.add(ItemInit.MONSTERDANGERSENSE.get());
@@ -489,7 +483,7 @@ public class BeyonderUtil {
                 abilityNames.add(ItemInit.PROBABILITYINFINITEFORTUNE.get());
                 abilityNames.add(ItemInit.PROBABILITYINFINITEMISFORTUNE.get());
             }
-            if (holder.currentClassMatches(BeyonderClassInit.WARRIOR)) {
+            if (currentPathwayMatchesNoException(player, BeyonderClassInit.WARRIOR.get())) {
                 if (sequence <= 6) {
                     abilityNames.add(ItemInit.GIGANTIFICATION.get());
                     abilityNames.add(ItemInit.LIGHTOFDAWN.get());
@@ -530,7 +524,7 @@ public class BeyonderUtil {
                     abilityNames.add(ItemInit.TWILIGHTLIGHT.get());
                 }
             }
-            if (holder.currentClassMatches(BeyonderClassInit.APPRENTICE)) {
+            if (currentPathwayMatchesNoException(player, BeyonderClassInit.APPRENTICE.get())) {
                 if (sequence <= 9) {
                     abilityNames.add(ItemInit.CREATEDOOR.get());
                 }
@@ -921,7 +915,7 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new ToggleDistanceC2S());
             } else if (heldItem.getItem() instanceof TravelDoorWaypoint) {
                 LOTMNetworkHandler.sendToServer(new TravelerWaypointC2S());
-            } else if (heldItem.getItem() instanceof ScribeAbilities){
+            } else if (heldItem.getItem() instanceof ScribeAbilities) {
                 LOTMNetworkHandler.sendToServer(new ScribeCopyAbilityC2S());
             }
         }
@@ -1052,7 +1046,7 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYFORTUNE.get())));
             } else if (heldItem.getItem() instanceof InvisibleHand) {
                 LOTMNetworkHandler.sendToServer(new ToggleDistanceC2S());
-            } else if (heldItem.getItem() instanceof ScribeAbilities){
+            } else if (heldItem.getItem() instanceof ScribeAbilities) {
                 LOTMNetworkHandler.sendToServer(new ScribeCopyAbilityC2S());
             }
         }
@@ -1102,7 +1096,7 @@ public class BeyonderUtil {
     public static int getSequence(LivingEntity living) {
         if (living instanceof Player player) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            return holder.getCurrentSequence();
+            return holder.getSequence();
         } else if (living instanceof PlayerMobEntity playerMobEntity) {
             return playerMobEntity.getCurrentSequence();
         } else {
@@ -1151,7 +1145,7 @@ public class BeyonderUtil {
             abilityWeakness = Math.max(1, (livingEntity.getEffect(ModEffects.ABILITY_WEAKNESS.get())).getAmplifier());
         }
         if (livingEntity instanceof Player player) {
-            sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
+            sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getSequence();
         } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
             sequence = playerMobEntity.getCurrentSequence();
         }
@@ -1317,7 +1311,6 @@ public class BeyonderUtil {
     }
 
 
-
     public static boolean isLivingEntityMoving(LivingEntity entity) {
         CompoundTag tag = entity.getPersistentData();
         updatePositions(entity, tag);
@@ -1424,9 +1417,14 @@ public class BeyonderUtil {
     public static void registerAbilities(Player player, MinecraftServer server) {
         int sequence = BeyonderUtil.getSequence(player);
         BeyonderClass beyonderClass = getPathway(player);
+        boolean isSpectator = currentPathwayMatchesNoException(player, BeyonderClassInit.SPECTATOR.get());
+        boolean isSailor = currentPathwayMatchesNoException(player, BeyonderClassInit.SAILOR.get());
+        boolean isMonster = currentPathwayMatchesNoException(player, BeyonderClassInit.MONSTER.get());
+        boolean isApprentice = currentPathwayMatchesNoException(player, BeyonderClassInit.APPRENTICE.get());
+        boolean isWarrior = currentPathwayMatchesNoException(player, BeyonderClassInit.WARRIOR.get());
         System.out.println("Sequence: " + sequence);
         System.out.println("Pathway: " + beyonderClass);
-        if (beyonderClass == BeyonderClassInit.SPECTATOR.get()) {
+        if (isSpectator) {
             player.sendSystemMessage(Component.literal("spectator"));
             if (sequence == 9) {
                 player.sendSystemMessage(Component.literal("No abilities to register"));
@@ -1513,7 +1511,7 @@ public class BeyonderUtil {
                 executeCommand(server, "/abilityput RLLRR lotm:envisionbarrier");
                 executeCommand(server, "/abilityput LLRRL lotm:envisionlocationblink");
             }
-        } else if (beyonderClass == BeyonderClassInit.MONSTER.get()) {
+        } else if (isMonster) {
             player.sendSystemMessage(Component.literal("monster"));
             if (sequence == 9) {
                 executeCommand(server, "/abilityput RLRRL lotm:monsterdangersense");
@@ -1601,7 +1599,7 @@ public class BeyonderUtil {
                 executeCommand(server, "/abilityput LRLRL lotm:probabilityfortune");
                 executeCommand(server, "/abilityput RLRLR lotm:probabilitymisfortune");
             }
-        } else if (beyonderClass == BeyonderClassInit.SAILOR.get()) {
+        } else if (isSailor) {
             player.sendSystemMessage(Component.literal("sailor"));
             if (sequence == 9) {
                 player.sendSystemMessage(Component.literal("No abilities to register"));
@@ -1889,7 +1887,7 @@ public class BeyonderUtil {
                 tag.putInt("ageDecay", ageDecay - 1);
                 for (int i = 0; i <= 20; i++) {
                     double random = (Math.random() * 4) - 2;
-                    double scaleAmount = Math.max(2 , ScaleTypes.BASE.getScaleData(livingEntity).getScale() * Math.random() * 2);
+                    double scaleAmount = Math.max(2, ScaleTypes.BASE.getScaleData(livingEntity).getScale() * Math.random() * 2);
                     double x = livingEntity.getX() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
                     double y = livingEntity.getY() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
                     double z = livingEntity.getZ() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
@@ -1898,7 +1896,7 @@ public class BeyonderUtil {
                 if (ageDecay == 1) {
                     for (int i = 0; i <= 150; i++) {
                         double random = (Math.random() * 4) - 2;
-                        double scaleAmount = Math.max(2 , ScaleTypes.BASE.getScaleData(livingEntity).getScale() * Math.random() * 2);
+                        double scaleAmount = Math.max(2, ScaleTypes.BASE.getScaleData(livingEntity).getScale() * Math.random() * 2);
                         double x = livingEntity.getX() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
                         double y = livingEntity.getY() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
                         double z = livingEntity.getZ() + ((scaleAmount * Math.random()) - (scaleAmount * Math.random()));
@@ -1986,7 +1984,7 @@ public class BeyonderUtil {
     public static boolean scribeLookingAtYou(Player target, LivingEntity scribe) {
         double radius = 30.0;
         double angleThreshold = 45.0;
-        if (BeyonderUtil.getPathway(scribe) == BeyonderClassInit.APPRENTICE.get() && BeyonderUtil.getSequence(scribe) <= 6) {
+        if (currentPathwayAndSequenceMatchesNoException(scribe,BeyonderClassInit.APPRENTICE.get(), 6)) {
             Vec3 scribePos = scribe.position();
             Vec3 targetPos = target.position();
             double distanceQr = scribePos.distanceToSqr(targetPos);
@@ -2088,8 +2086,31 @@ public class BeyonderUtil {
     public static boolean currentPathwayMatches(LivingEntity livingEntity, BeyonderClass matchingPathway) {
         if (getPathway(livingEntity) == matchingPathway || (getPathway(livingEntity) == BeyonderClassInit.APPRENTICE.get() && getSequence(livingEntity) <= 6)) {
             return true;
+        } else {
+            return false;
         }
-        else {
+    }
+
+    public static boolean currentPathwayMatchesNoException(LivingEntity livingEntity, BeyonderClass matchingPathway) {
+        if (getPathway(livingEntity) == matchingPathway) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean currentPathwayAndSequenceMatches(LivingEntity livingEntity, BeyonderClass matchingPathway, int sequence) {
+        if ((getPathway(livingEntity) == matchingPathway && getSequence(livingEntity) <= sequence) || (getPathway(livingEntity) == BeyonderClassInit.APPRENTICE.get() && getSequence(livingEntity) <= 6)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean currentPathwayAndSequenceMatchesNoException(LivingEntity livingEntity, BeyonderClass matchingPathway, int sequence) {
+        if (getPathway(livingEntity) == matchingPathway && getSequence(livingEntity) <= sequence) {
+            return true;
+        } else {
             return false;
         }
     }
@@ -2104,34 +2125,34 @@ public class BeyonderUtil {
         }
     }
 
-    public static boolean sequenceAbleCopy(LivingEntity entity){
+    public static boolean sequenceAbleCopy(LivingEntity entity) {
         int sequence = getSequence(entity);
-        if (getPathway(entity) == BeyonderClassInit.APPRENTICE.get() && sequence <= 6){
+        if (getPathway(entity) == BeyonderClassInit.APPRENTICE.get() && sequence <= 6) {
             return true;
         }
         return false;
     }
 
-    public static boolean sequenceAbleCopy(BeyonderHolder holder){
-        int sequence = holder.getCurrentSequence();
-        if (holder.currentClassMatches(BeyonderClassInit.APPRENTICE.get()) && sequence <= 6){
+    public static boolean sequenceAbleCopy(BeyonderHolder holder) {
+        int sequence = holder.getSequence();
+        if (holder.currentClassMatches(BeyonderClassInit.APPRENTICE.get()) && sequence <= 6) {
             return true;
         }
         return false;
     }
 
-    public static void copyAbilities(Level level, Player player, SimpleAbilityItem ability){
+    public static void copyAbilities(Level level, Player player, SimpleAbilityItem ability) {
         int playerSequence = getSequence(player);
         int abilitySequence = ability.getRequiredSequence();
         for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
             if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
-                if(getPathway(entity) == BeyonderClassInit.APPRENTICE.get() && playerSequence <= 6){
-                    if(entity instanceof Player scribe){
+                if (currentPathwayAndSequenceMatchesNoException(player, BeyonderClassInit.APPRENTICE.get(), 6)) {
+                    if (entity instanceof Player scribe) {
                         if (BeyonderUtil.scribeLookingAtYou(player, scribe)) {
-                            if(checkValidAbilityCopy(new ItemStack(ability))){
-                                if(player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).map(storage -> storage.getScribedAbilitiesCount()).orElse(0) < player.getPersistentData().getInt("maxScribedAbilities")){
-                                    if(copyAbilityTest(playerSequence, abilitySequence)){
-                                        if(!pendingAbilityCopies.containsKey(scribe.getUUID())){
+                            if (checkValidAbilityCopy(new ItemStack(ability))) {
+                                if (player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).map(storage -> storage.getScribedAbilitiesCount()).orElse(0) < player.getPersistentData().getInt("maxScribedAbilities")) {
+                                    if (copyAbilityTest(playerSequence, abilitySequence)) {
+                                        if (!pendingAbilityCopies.containsKey(scribe.getUUID())) {
                                             pendingAbilityCopies.put(scribe.getUUID(), ability);
                                         }
                                     }
@@ -2144,11 +2165,11 @@ public class BeyonderUtil {
         }
     }
 
-    public static void confirmCopyAbility(Player player){
-        if(pendingAbilityCopies.containsKey(player.getUUID())){
-            if(!player.isShiftKeyDown()){
+    public static void confirmCopyAbility(Player player) {
+        if (pendingAbilityCopies.containsKey(player.getUUID())) {
+            if (!player.isShiftKeyDown()) {
                 player.getPersistentData().putBoolean("acceptCopiedAbility", true);
-            }else{
+            } else {
                 player.getPersistentData().putBoolean("deleteCopiedAbility", true);
             }
 
@@ -2179,20 +2200,18 @@ public class BeyonderUtil {
         }
     }
 
-    public static void useCopiedAbility(Player player, Item ability){
-        int sequence = getSequence(player);
-        if(getPathway(player) == BeyonderClassInit.APPRENTICE.get()
-                && sequence <= 6){
-            player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage ->{
+    public static void useCopiedAbility(Player player, Item ability) {
+        if (currentPathwayAndSequenceMatchesNoException(player, BeyonderClassInit.APPRENTICE.get(), 6)) {
+            player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage -> {
                 storage.useScribeAbility(ability);
             });
         }
     }
 
-    public static boolean checkAbilityIsCopied(Player player, Item ability){
+    public static boolean checkAbilityIsCopied(Player player, Item ability) {
         int sequence = BeyonderUtil.getSequence(player);
-        if(BeyonderUtil.getPathway(player) == BeyonderClassInit.APPRENTICE.get()
-                && sequence <= 6){
+        if (BeyonderUtil.getPathway(player) == BeyonderClassInit.APPRENTICE.get()
+                && sequence <= 6) {
             return player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null)
                     .map(storage -> storage.hasScribedAbility(ability))
                     .orElse(false);
@@ -2200,20 +2219,20 @@ public class BeyonderUtil {
         return false;
     }
 
-    public static boolean copyAbilityTest(int copierSequence, int targetAbilitySequence){
+    public static boolean copyAbilityTest(int copierSequence, int targetAbilitySequence) {
         double chance = 0.3 + (0.7 / 9) * (targetAbilitySequence - copierSequence);
         chance = Math.max(0.05, Math.min(chance, 1));
 
         return Math.random() < chance;
     }
 
-    public static boolean checkValidAbilityCopy(ItemStack ability){
+    public static boolean checkValidAbilityCopy(ItemStack ability) {
         List<ItemStack> invalidAbilities = new ArrayList<>();
         invalidAbilities.add(new ItemStack(ItemInit.GIGANTIFICATION.get()));
         invalidAbilities.add(new ItemStack(ItemInit.FATEDCONNECTION.get()));
 
-        for(ItemStack invalidAbility : invalidAbilities){
-            if(ItemStack.isSameItem(ability, invalidAbility)){
+        for (ItemStack invalidAbility : invalidAbilities) {
+            if (ItemStack.isSameItem(ability, invalidAbility)) {
                 return false;
             }
         }

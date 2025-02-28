@@ -63,7 +63,8 @@ public class EnvisionLocationBlink extends SimpleAbilityItem {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
             Level level = player.level();
-            if ((holder.currentClassMatches(BeyonderClassInit.SPECTATOR) || BeyonderUtil.sequenceAbleCopy(holder)) && !player.level().isClientSide() && holder.getCurrentSequence() == 0 && holder.useSpirituality(blinkDistance * 8)) {                Vec3 lookVector = player.getLookAngle();
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.SPECTATOR.get(), 0) && !player.level().isClientSide()&& holder.useSpirituality(blinkDistance * 8)) {
+                Vec3 lookVector = player.getLookAngle();
                 double targetX = player.getX() + blinkDistance * lookVector.x();
                 double targetY = (player.getY() + 1) + blinkDistance * lookVector.y();
                 double targetZ = player.getZ() + blinkDistance * lookVector.z();

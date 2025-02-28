@@ -22,7 +22,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
@@ -30,6 +29,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 
 import java.util.List;
 
@@ -337,8 +337,8 @@ public class SailorClass implements BeyonderClass {
         if (event.getTarget() instanceof LivingEntity livingEntity) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             boolean sailorLightning = player.getPersistentData().getBoolean("SailorLightning");
-            if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 7 && event.getTarget() instanceof LivingEntity livingTarget && sailorLightning && livingTarget != player) {
-                double chanceOfDamage = (100.0 - (holder.getCurrentSequence() * 12.5)); // Decrease chance by 12.5% for each level below 9
+            if (BeyonderUtil.currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.SAILOR.get()) && BeyonderUtil.getSequence(livingEntity) <= 7 && event.getTarget() instanceof LivingEntity livingTarget && sailorLightning && livingTarget != player) {
+                double chanceOfDamage = (100.0 - (holder.getSequence() * 12.5)); // Decrease chance by 12.5% for each level below 9
                 if (Math.random() * 100 < chanceOfDamage) {
                     LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, livingTarget.level());
                     lightningBolt.moveTo(livingTarget.getX(), livingTarget.getY(), livingTarget.getZ());

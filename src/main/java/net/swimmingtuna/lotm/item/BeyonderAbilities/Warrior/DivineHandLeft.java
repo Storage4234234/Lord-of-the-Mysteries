@@ -10,8 +10,6 @@ import net.swimmingtuna.lotm.entity.DivineHandLeftEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import virtuoel.pehkui.api.ScaleData;
-import virtuoel.pehkui.api.ScaleTypes;
 
 public class DivineHandLeft extends SimpleAbilityItem {
 

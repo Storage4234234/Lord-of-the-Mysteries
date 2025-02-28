@@ -76,7 +76,7 @@ public class SirenSongHarm extends SimpleAbilityItem {
         int sirenSongWeaken = playerPersistentData.getInt("sirenSongWeaken");
         int sirenSongStun = playerPersistentData.getInt("sirenSongStun");
         int sirenSongStrengthen = playerPersistentData.getInt("sirenSongStrengthen");
-        if ((!holder.currentClassMatches(BeyonderClassInit.SAILOR) || holder.getCurrentSequence() > 5) || BeyonderUtil.sequenceAbleCopy(holder)) {
+        if (!BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.SAILOR.get(), 5)) {
             return;
         }
         if (sirenSongHarm % 20 == 0 && sirenSongHarm != 0) {
@@ -249,7 +249,7 @@ public class SirenSongHarm extends SimpleAbilityItem {
 
     public static void sirenSongs(Player player) {
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int sequence = holder.getCurrentSequence();
+        int sequence = holder.getSequence();
         CompoundTag playerPersistentData = player.getPersistentData();
         int harmCounter = 50 - (sequence * 6);
         int sirenSongWeaken = playerPersistentData.getInt("sirenSongWeaken");

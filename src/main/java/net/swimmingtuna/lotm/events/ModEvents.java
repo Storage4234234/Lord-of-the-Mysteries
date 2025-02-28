@@ -13,12 +13,14 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -46,20 +48,23 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.client.Configs;
 import net.swimmingtuna.lotm.commands.AbilityRegisterCommand;
 import net.swimmingtuna.lotm.entity.*;
-import net.swimmingtuna.lotm.init.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.Burn;
+import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.GameRuleInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.BounceProjectiles;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.Burn;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.InvisibleHand;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.AqueousLightDrown;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.ExtremeColdness;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.StormSeal;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.TsunamiSeal;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.DivineHandLeft;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.BattleHypnotism;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeDemise;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.MercuryLiquefication;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.TwilightAccelerate;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.TwilightFreeze;
 import net.swimmingtuna.lotm.item.OtherItems.SwordOfTwilight;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
@@ -76,7 +81,8 @@ import net.swimmingtuna.lotm.util.effect.NoRegenerationEffect;
 import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
 import net.swimmingtuna.lotm.world.worldgen.MirrorWorldChunkGenerator;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.apprenticeWindSlowFall;
 import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.trickmasterBounceHitProjectiles;
@@ -176,10 +182,10 @@ public class ModEvents {
     public static void craftEvent(PlayerEvent.ItemCraftedEvent event) {
         Player player = event.getEntity();
         if (!player.level().isClientSide()) {
-            if (BeyonderUtil.getPathway(player) != BeyonderClassInit.WARRIOR.get() && BeyonderUtil.getSequence(player) > 4) {
+            if (!(BeyonderUtil.currentPathwayAndSequenceMatchesNoException(player, BeyonderClassInit.WARRIOR.get(), 4))) {
                 if (event.getCrafting().getItem() == ItemInit.LIGHTNINGRUNE.get() || event.getCrafting().getItem() == ItemInit.CONFUSIONRUNE.get() || event.getCrafting().getItem() == ItemInit.FLAMERUNE.get() || event.getCrafting().getItem() == ItemInit.WITHERRUNE.get() || event.getCrafting().getItem() == ItemInit.FREEZERUNE.get()) {
                     event.setCanceled(true);
-                    player.sendSystemMessage(Component.literal("You aren't the right pathway and sequence to be able to craft this.").withStyle(ChatFormatting.RED));
+                    player.sendSystemMessage(Component.literal("You aren't the correct pathway and/or sequence to be able to craft this.").withStyle(ChatFormatting.RED));
                 }
             }
         }
@@ -231,7 +237,7 @@ public class ModEvents {
         Style style = BeyonderUtil.getStyle(player);
         CompoundTag playerPersistentData = player.getPersistentData();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int sequence = holder.getCurrentSequence();
+        int sequence = holder.getSequence();
     }
 
     @SubscribeEvent
@@ -241,7 +247,7 @@ public class ModEvents {
         CompoundTag tag = player.getPersistentData();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
-        int sequence = holder.getCurrentSequence();
+        int sequence = holder.getSequence();
         if (player.level().isClientSide() || event.phase != TickEvent.Phase.START) {
             return;
         }
@@ -261,7 +267,7 @@ public class ModEvents {
                     }
                 }
                 AbilityRegisterCommand.tickEvent(serverPlayer);
-                if (holder.getCurrentSequence() != 0 && ClientSequenceData.getCurrentSequence() == 0) {
+                if (holder.getSequence() != 0 && ClientSequenceData.getCurrentSequence() == 0) {
                     ClientSequenceData.setCurrentSequence(-1);
                 }
 
@@ -328,10 +334,6 @@ public class ModEvents {
             }
         }
     }
-
-
-
-
 
 
     @SubscribeEvent
@@ -461,19 +463,16 @@ public class ModEvents {
                     BeyonderClass pathway = BeyonderUtil.getPathway(livingEntity);
                     boolean x = attacked.getHealth() <= attacked.getMaxHealth() * 0.4f || attacked.hasEffect(MobEffects.WEAKNESS) || attacked.hasEffect(ModEffects.ABILITY_WEAKNESS.get()) || attacked.hasEffect(MobEffects.WITHER) || attacked.hasEffect(MobEffects.POISON);
                     if (pathway != null) {
-                        if (pathway == BeyonderClassInit.WARRIOR.get() && x) {
+                        if (BeyonderUtil.currentPathwayMatchesNoException(attacked, BeyonderClassInit.WARRIOR.get()) && x) {
                             DamageSource source = event.getSource();
                             float amount = event.getAmount();
                             attacked.hurt(attacked.damageSources().generic(), amount / 2);
                         }
                     }
                 }
-                if (attacked instanceof Player pPlayer) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                    if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 5) {
-                        if (attacker instanceof LivingEntity) {
-                            attacker.getPersistentData().putInt("attackedMonster", 100);
-                        }
+                if (BeyonderUtil.currentPathwayAndSequenceMatchesNoException(attacked, BeyonderClassInit.MONSTER.get(), 5)) {
+                    if (attacker instanceof LivingEntity) {
+                        attacker.getPersistentData().putInt("attackedMonster", 100);
                     }
                 }
                 if (attacker.getPersistentData().getInt("beneficialFalseProphecyAttack") >= 1) {
@@ -494,6 +493,7 @@ public class ModEvents {
             }
         }
     }
+
     @SubscribeEvent
     public static void livingJumpEvent(LivingEvent.LivingJumpEvent event) {
         LivingEntity entity = event.getEntity();
@@ -681,7 +681,6 @@ public class ModEvents {
     }
 
 
-
     @Mod.EventBusSubscriber(modid = LOTM.MOD_ID)
     public static class SpawnHandler {
 
@@ -695,7 +694,6 @@ public class ModEvents {
             }
         }
     }
-
 
 
     @SubscribeEvent
@@ -717,7 +715,7 @@ public class ModEvents {
         Player player = event.getEntity();
         CompoundTag persistentData = player.getPersistentData();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int sequence = holder.getCurrentSequence();
+        int sequence = holder.getSequence();
         if (holder.getCurrentClass() != null) {
             player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(holder.getCurrentClass().maxHealth().get(sequence));
             player.setHealth(player.getMaxHealth());

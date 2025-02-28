@@ -149,7 +149,7 @@ public class DeathKnell extends Item {
         CompoundTag tag = livingEntity.getPersistentData();
         int sequence = 0;
         if (livingEntity instanceof Player pPlayer) {
-            sequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getCurrentSequence();
+            sequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSequence();
         } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
             sequence = playerMobEntity.getCurrentSequence();
         }

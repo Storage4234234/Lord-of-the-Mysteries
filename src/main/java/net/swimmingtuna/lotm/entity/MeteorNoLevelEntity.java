@@ -167,7 +167,7 @@ public class MeteorNoLevelEntity extends AbstractHurtingProjectile {
             meteorEntity.noPhysics = true;
 
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int scalecheck = 10 - holder.getCurrentSequence() * 2;
+            int scalecheck = 10 - holder.getSequence() * 2;
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(meteorEntity);
             scaleData.setScale(scalecheck);
             scaleData.markForSync(true);

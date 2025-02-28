@@ -48,7 +48,7 @@ public class LuckChanneling extends SimpleAbilityItem {
             if (stack.getItem() == Items.GLASS_BOTTLE) {
                 double luck = player.getPersistentData().getDouble("luck");
                 ItemStack luckBottle = new ItemStack(ItemInit.LUCKBOTTLEITEM.get());
-                int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
+                int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getSequence();
                 if (sequence <= 2) {
                     double luckBottleAmount = 0;
                     for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.LUCKCHANNELING.get())))) {

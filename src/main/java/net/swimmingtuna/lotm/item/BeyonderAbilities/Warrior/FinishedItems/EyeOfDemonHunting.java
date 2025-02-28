@@ -123,7 +123,7 @@ public class EyeOfDemonHunting extends SimpleAbilityItem {
                     }
                 }
             }
-            if (entity.tickCount % 10 == 0 && BeyonderUtil.getSequence(entity) <= 4 && (BeyonderUtil.getPathway(entity) == BeyonderClassInit.WARRIOR.get() || BeyonderUtil.sequenceAbleCopy(entity))) {
+            if (entity.tickCount % 10 == 0 && BeyonderUtil.getSequence(entity) <= 4 && BeyonderUtil.currentPathwayMatches(entity, BeyonderClassInit.WARRIOR.get())) {
                 Vec3 eyePosition = entity.getEyePosition();
                 Vec3 lookVector = entity.getLookAngle();
                 Vec3 reachVector = eyePosition.add(lookVector.x * 35, lookVector.y * 35, lookVector.z * 35);
@@ -207,7 +207,7 @@ public class EyeOfDemonHunting extends SimpleAbilityItem {
         Level level = event.getLevel();
         if (!level.isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            if ((holder.currentClassMatches(BeyonderClassInit.WARRIOR) || BeyonderUtil.sequenceAbleCopy(holder)) && holder.getCurrentSequence() <= 4) {
+            if ((holder.currentClassMatches(BeyonderClassInit.WARRIOR) || BeyonderUtil.sequenceAbleCopy(holder)) && holder.getSequence() <= 4) {
                 if (player.isShiftKeyDown()) {
                     if (isValidPotionIngredient(heldItem.getItem())) {
                         Potion potion = getPotionForIngredient(heldItem.getItem());

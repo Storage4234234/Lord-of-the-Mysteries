@@ -49,7 +49,7 @@ public class LightningStorm extends SimpleAbilityItem {
             int sailorStormVec = player.getPersistentData().getInt("sailorStormVec");
             Vec3 lookVec = player.getLookAngle();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             double targetX = player.getX() + sailorStormVec * lookVec.x();
             double targetY = player.getY() + sailorStormVec * lookVec.y();
             double targetZ = player.getZ() + sailorStormVec * lookVec.z();
@@ -116,7 +116,7 @@ public class LightningStorm extends SimpleAbilityItem {
             }
             playerPersistentData.putInt("sailorLightningStorm", sailorLightningStorm - 1);
         }
-        if (((holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 3) || (BeyonderUtil.sequenceAbleCopy(holder) && holder.getCurrentSequence() <= 3)) && player.getMainHandItem().getItem() instanceof LightningStorm) {            if (player.isShiftKeyDown()) {
+        if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.SAILOR.get(), 3) && player.getMainHandItem().getItem() instanceof LightningStorm) {            if (player.isShiftKeyDown()) {
                 playerPersistentData.putInt("sailorStormVec", stormVec + 10);
                 player.displayClientMessage(Component.literal("Sailor Storm Spawn Distance is " + stormVec).withStyle(style), true);
             }

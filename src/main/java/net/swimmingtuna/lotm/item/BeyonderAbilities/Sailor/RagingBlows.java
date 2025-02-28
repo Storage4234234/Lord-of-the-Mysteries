@@ -61,7 +61,7 @@ public class RagingBlows extends SimpleAbilityItem {
         //RAGING BLOWS
         boolean sailorLightning = playerPersistentData.getBoolean("SailorLightning");
         int ragingBlows = playerPersistentData.getInt("ragingBlows");
-        int ragingBlowsRadius = (27 - (holder.getCurrentSequence() * 3));
+        int ragingBlowsRadius = (27 - (holder.getSequence() * 3));
         float damage = BeyonderUtil.getDamage(player).get(ItemInit.RAGING_BLOWS.get());
         if (ragingBlows >= 1) {
             RagingBlows.spawnRagingBlowsParticles(player);
@@ -77,8 +77,8 @@ public class RagingBlows extends SimpleAbilityItem {
                     double ragingBlowsX = player.getX() - entity.getX();
                     double ragingBlowsZ = player.getZ() - entity.getZ();
                     entity.knockback(0.25, ragingBlowsX, ragingBlowsZ);
-                    if (holder.getCurrentSequence() <= 7) {
-                        double chanceOfDamage = (100.0 - (holder.getCurrentSequence() * 12.5));
+                    if (holder.getSequence() <= 7) {
+                        double chanceOfDamage = (100.0 - (holder.getSequence() * 12.5));
                         if (Math.random() * 100 < chanceOfDamage && sailorLightning) {
                             LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, entity.level());
                             lightningBolt.moveTo(entity.getX(), entity.getY(), entity.getZ());
@@ -109,7 +109,7 @@ public class RagingBlows extends SimpleAbilityItem {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             Vec3 playerPos = player.position();
             Vec3 playerLookVector = player.getViewVector(1.0F);
-            int radius = (27 - (holder.getCurrentSequence() * 3));
+            int radius = (27 - (holder.getSequence() * 3));
             CompoundTag persistentData = player.getPersistentData();
             int particleCounter = persistentData.getInt("ragingBlowsParticleCounter");
 

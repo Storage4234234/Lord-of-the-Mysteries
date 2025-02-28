@@ -52,7 +52,7 @@ public class ScribeRecord extends SimpleAbilityItem {
                 @Nullable
                 @Override
                 public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
-                    return new BeyonderAbilitiesItemMenu(containerId, playerInventory, holder.getCurrentClass().getAbilityItemsContainer(holder.getCurrentSequence()));
+                    return new BeyonderAbilitiesItemMenu(containerId, playerInventory, holder.getCurrentClass().getAbilityItemsContainer(holder.getSequence()));
                 }
             });
         }

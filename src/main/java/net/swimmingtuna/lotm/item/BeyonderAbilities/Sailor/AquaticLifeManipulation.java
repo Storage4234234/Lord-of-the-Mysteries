@@ -43,7 +43,7 @@ public class AquaticLifeManipulation extends SimpleAbilityItem {
     public void aquaticLifeManipulation(Player player) {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             if (player.level().isClientSide()) {
                 return;
             }
@@ -60,7 +60,7 @@ public class AquaticLifeManipulation extends SimpleAbilityItem {
             if (sequence >= 2) {
                 player.sendSystemMessage(Component.literal("Nearest Player is " + nearestPlayer.getName().getString() + ". Pathway is " + holder.getCurrentClass()).withStyle(BeyonderUtil.getStyle(player)));
             } else {
-                player.sendSystemMessage(Component.literal("Nearest Player is " + nearestPlayer.getName().getString() + ". Pathway is " + holder.getCurrentClass().sequenceNames().get(holder.getCurrentSequence()) + " sequence " + holder.getCurrentSequence()).withStyle(BeyonderUtil.getStyle(player)));
+                player.sendSystemMessage(Component.literal("Nearest Player is " + nearestPlayer.getName().getString() + ". Pathway is " + holder.getCurrentClass().sequenceNames().get(holder.getSequence()) + " sequence " + holder.getSequence()).withStyle(BeyonderUtil.getStyle(player)));
             }
         }
     }

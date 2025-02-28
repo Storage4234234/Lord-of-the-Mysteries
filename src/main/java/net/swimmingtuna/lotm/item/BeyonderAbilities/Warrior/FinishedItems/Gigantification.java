@@ -19,7 +19,6 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -157,8 +156,7 @@ public class Gigantification extends SimpleAbilityItem {
             } else if (sequence == 0) {
                 scale = 2.5f;
             }
-            BeyonderClass pathway = BeyonderUtil.getPathway(livingEntity);
-            if (pathway == BeyonderClassInit.WARRIOR.get()) {
+            if (BeyonderUtil.currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.WARRIOR.get())) {
                 float scaleToSet = BeyonderUtil.getDamage(livingEntity).get(ItemInit.GIGANTIFICATION.get());
                 if (!isGiant && !isHoGGiant && !isTwilightGiant) {
                     scaleData.setTargetScale(scale);

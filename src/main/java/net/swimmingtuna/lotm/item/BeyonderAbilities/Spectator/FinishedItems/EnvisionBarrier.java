@@ -64,7 +64,7 @@ public class EnvisionBarrier extends SimpleAbilityItem {
 
     public static void envisionBarrier(BeyonderHolder holder, Player player, Style style) {
         //ENVISION BARRIER
-        if (holder.getCurrentSequence() != 0) {
+        if (holder.getSequence() != 0) {
             return;
         }
         int barrierRadius = player.getPersistentData().getInt("BarrierRadius");

@@ -53,7 +53,7 @@ public class StarOfLightning extends SimpleAbilityItem {
     private static void starOfLightning(Player player) {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            if (holder.getCurrentSequence() == 0) {
+            if (holder.getSequence() == 0) {
                 player.getPersistentData().putInt("sailorLightningStar", 50);
             } else {
                 player.getPersistentData().putInt("sailorLightningStar", 80);

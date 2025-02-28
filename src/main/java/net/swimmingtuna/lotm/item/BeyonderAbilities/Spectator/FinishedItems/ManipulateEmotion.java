@@ -39,7 +39,7 @@ public class ManipulateEmotion extends SimpleAbilityItem {
         }
         addCooldown(player, this, 1200 / dreamIntoReality);
         useSpirituality(player, 500);
-        manipulateEmotion(player, holder.getCurrentSequence());
+        manipulateEmotion(player, holder.getSequence());
         return InteractionResult.SUCCESS;
     }
 

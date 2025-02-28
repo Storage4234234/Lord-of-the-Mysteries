@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.entity.LowSequenceDoorEntity;
 import net.swimmingtuna.lotm.entity.Model.LowSequenceDoorModel;
-import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public class LowSequenceDoorRenderer extends GeoEntityRenderer<LowSequenceDoorEntity> {

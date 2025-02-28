@@ -92,7 +92,7 @@ public class Nightmare extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             int dir = (int) dreamIntoReality.getValue();
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.NIGHTMARE.get());
             float damagePlayer = ((float) (40.0 * dir) - (sequence * 2));

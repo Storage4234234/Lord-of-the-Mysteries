@@ -85,7 +85,7 @@ public class MindStorm extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             int duration = 300 - (sequence * 25);
             int damage =  (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MIND_STORM.get());
             if (dreamIntoReality.getValue() == 2) {

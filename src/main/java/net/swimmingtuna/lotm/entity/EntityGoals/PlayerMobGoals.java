@@ -5,6 +5,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.animal.Cow;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 
 public class PlayerMobGoals {
 
@@ -22,7 +23,7 @@ public class PlayerMobGoals {
             cooldown--;
             return false;
         }
-        return BeyonderClassInit.SPECTATOR.equals(playerMob.getCurrentPathway()) && playerMob.getCurrentSequence() == 0;
+        return BeyonderUtil.currentPathwayAndSequenceMatches(playerMob, BeyonderClassInit.SPECTATOR.get(), 0);
     }
 
     @Override

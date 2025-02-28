@@ -97,6 +97,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             return "None";
         }
     }
+
     public static void calamityIncarnationTornado(CompoundTag playerPersistentData, Player player) {
         //CALAMITY INCARNATION TORNADO
         if (playerPersistentData.getInt("calamityIncarnationTornado") >= 1) {
@@ -121,11 +122,8 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             int subtractY = (int) (stormY - pPlayer.getY());
             int subtractZ = (int) (stormZ - pPlayer.getZ());
             for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(40))) {
-                if (entity instanceof Player player) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                    if ((holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 3) || (BeyonderUtil.sequenceAbleCopy(player) && BeyonderUtil.getSequence(player) <= 3)) {
-                        player.getPersistentData().putInt("calamityLightningStormImmunity", 20);
-                    }
+                if (BeyonderUtil.currentPathwayAndSequenceMatches(entity, BeyonderClassInit.MONSTER.get(), 3)) {
+                    entity.getPersistentData().putInt("calamityLightningStormImmunity", 20);
                 }
             }
             double random = (Math.random() * 60) - 30;
@@ -191,7 +189,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
                 MeteorEntity meteorEntity = new MeteorEntity(EntityInit.METEOR_ENTITY.get(), entity.level());
                 ScaleData scaleData = ScaleTypes.BASE.getScaleData(meteorEntity);
                 if (entity instanceof Player player) {
-                    scaleData.setScale((enhancement + 11 - (BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence() * 2)));
+                    scaleData.setScale((enhancement + 11 - (BeyonderHolderAttacher.getHolderUnwrap(player).getSequence() * 2)));
                 } else {
                     scaleData.setScale(8);
                 }
@@ -207,12 +205,10 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
         }
         if (tornado >= 1) {
             tag.putInt("calamityIncarnationInTornado", tornado - 1);
-            if (entity instanceof Player player) {
-                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                if ((holder.currentClassMatches(BeyonderClassInit.MONSTER) || BeyonderUtil.sequenceAbleCopy(player))) {
-                    tag.putInt("monsterCalamityImmunity", 5);
-                }
+            if (BeyonderUtil.currentPathwayMatches(entity, BeyonderClassInit.MONSTER.get())) {
+                tag.putInt("monsterCalamityImmunity", 5);
             }
+
         }
         if (lightning >= 1) {
             tag.putInt("calamityIncarnationInLightning", lightning - 1);
@@ -228,7 +224,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             lightningEntity.setDeltaMovement(0, -3, 0);
             if (entity instanceof Player player) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                int sequence = holder.getCurrentSequence();
+                int sequence = holder.getSequence();
                 if (sequence >= 4) {
                     entity.level().addFreshEntity(lightningEntity);
                     entity.level().addFreshEntity(lightningEntity);
@@ -272,7 +268,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             tag.putInt("calamityIncarnationInPlague", plague - 1);
             tag.putInt("monsterCalamityImmunity", 5);
             if (entity instanceof Player player) {
-                int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
+                int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getSequence();
                 for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate((150 - (sequence * 20)) + (enhancement * 40)))) {
                     if (livingEntity != entity && !BeyonderUtil.isAllyOf(entity, livingEntity)) {
                         if (sequence >= 4) {

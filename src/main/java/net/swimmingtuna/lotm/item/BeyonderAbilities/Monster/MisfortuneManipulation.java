@@ -103,12 +103,12 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int misfortuneManipulation = playerTag.getInt("misfortuneManipulationItem");
             if (misfortuneManipulation == 1) {
-                if (holder.getCurrentSequence() > 2) {
+                if (holder.getSequence() > 2) {
                     summonMeteor(interactionTarget, player);
-                } else if (holder.getCurrentSequence() == 2 || holder.getCurrentSequence() == 1) {
+                } else if (holder.getSequence() == 2 || holder.getSequence() == 1) {
                     summonMeteor(interactionTarget, player);
                     summonMeteor(interactionTarget, player);
-                } else if (holder.getCurrentSequence() == 0) {
+                } else if (holder.getSequence() == 0) {
                     summonMeteor(interactionTarget, player);
                     summonMeteor(interactionTarget, player);
                     summonMeteor(interactionTarget, player);
@@ -118,7 +118,7 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
             }
             if (misfortuneManipulation == 2) {
                 TornadoEntity tornadoEntity = new TornadoEntity(EntityInit.TORNADO_ENTITY.get(), player.level());
-                tornadoEntity.setTornadoLifecount(300 - (holder.getCurrentSequence() * 50));
+                tornadoEntity.setTornadoLifecount(300 - (holder.getSequence() * 50));
                 tornadoEntity.setOwner(player);
                 tornadoEntity.setTornadoPickup(true);
                 tornadoEntity.setTornadoRadius((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) * 4);

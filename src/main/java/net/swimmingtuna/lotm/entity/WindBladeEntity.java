@@ -55,7 +55,7 @@ public class WindBladeEntity extends AbstractHurtingProjectile {
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         if (!windBladeEntity.level().isClientSide()) {
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(windBladeEntity);
-            scaleData.setTargetScale((7 - (holder.getCurrentSequence())));
+            scaleData.setTargetScale((7 - (holder.getSequence())));
             scaleData.markForSync(true);
         }
         player.level().addFreshEntity(windBladeEntity);
@@ -99,7 +99,7 @@ public class WindBladeEntity extends AbstractHurtingProjectile {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             if (!entity.level().isClientSide() && !player.level().isClientSide()) {
                 int currentLifeCount = this.entityData.get(DATA_LIFE_COUNT);
-                int decrease = (holder.getCurrentSequence() * 9) + 30;
+                int decrease = (holder.getSequence() * 9) + 30;
                 currentLifeCount = currentLifeCount - decrease;
                 entity.hurt(BeyonderUtil.genericSource(this), (float) currentLifeCount / 20);
                 this.entityData.set(DATA_LIFE_COUNT, currentLifeCount - decrease);
@@ -127,7 +127,7 @@ public class WindBladeEntity extends AbstractHurtingProjectile {
         if (result != EXCLUDED_BLOCKS) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int currentLifeCount = this.entityData.get(DATA_LIFE_COUNT);
-            int decrease = (holder.getCurrentSequence() * 4) + 10;
+            int decrease = (holder.getSequence() * 4) + 10;
             currentLifeCount = currentLifeCount - decrease;
             this.entityData.set(DATA_LIFE_COUNT, currentLifeCount - decrease);
             if (currentLifeCount <= 0) {

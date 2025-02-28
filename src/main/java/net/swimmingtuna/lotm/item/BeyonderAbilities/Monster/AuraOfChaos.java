@@ -82,7 +82,7 @@ public class AuraOfChaos extends SimpleAbilityItem {
         if (tag.getBoolean("monsterAuraOfChaos")) {
             if (entity instanceof Player player) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                int sequence = holder.getCurrentSequence();
+                int sequence = holder.getSequence();
                 if (player.tickCount % 20 == 0) {
                     if (holder.getSpirituality() >= 150) {
                         holder.useSpirituality(150);

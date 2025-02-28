@@ -85,7 +85,7 @@ public class ChaosWalkerDisableEnable extends SimpleAbilityItem {
         if (!livingEntity.level().isClientSide()) {
             if (livingEntity instanceof Player pPlayer) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                int sequence = holder.getCurrentSequence();
+                int sequence = holder.getSequence();
                 CompoundTag tag = pPlayer.getPersistentData();
                 int occursion = tag.getInt("chaosWalkerCalamityOccursion");
                 if (pPlayer.getHealth() <= pPlayer.getMaxHealth() * 0.75 && pPlayer.tickCount % 500 == 0 && tag.getInt("chaosWalkerCombat") == 0 && tag.getBoolean("monsterChaosWalkerCombat")) {

@@ -90,7 +90,7 @@ public class Frenzy extends SimpleAbilityItem {
     private void frenzy(Player player, Level level, BlockPos targetPos, int dreamIntoRealityValue) {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.FRENZY.get());
             float damage = (float) (17 - (sequence * 0.75));
             int duration = 250 - (sequence * 12) * dreamIntoRealityValue;

@@ -109,7 +109,7 @@ public class AcidicRain extends SimpleAbilityItem {
     public static void spawnAcidicRainParticles(Player player) {
         if (player.level() instanceof ServerLevel serverLevel) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             double x = player.getX();
             double y = player.getY() + 5;
             double z = player.getZ();

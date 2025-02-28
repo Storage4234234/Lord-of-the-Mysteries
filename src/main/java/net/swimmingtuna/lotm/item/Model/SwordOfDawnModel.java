@@ -1,12 +1,8 @@
 package net.swimmingtuna.lotm.item.Model;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.swimmingtuna.lotm.LOTM;
-import net.swimmingtuna.lotm.entity.LowSequenceDoorEntity;
 import net.swimmingtuna.lotm.item.OtherItems.SwordOfDawn;
-import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
-import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.model.GeoModel;
 
 public class SwordOfDawnModel extends GeoModel<SwordOfDawn> {

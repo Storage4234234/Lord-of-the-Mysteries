@@ -1,8 +1,8 @@
 package net.swimmingtuna.lotm.util.ScribeRecording;
 
-import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem.scribeAbilitiesStorage;
 import net.minecraft.world.item.Item;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem.scribeAbilitiesStorage;
+
 import java.util.HashMap;
 import java.util.Map;
 public class ScribeAbilityStorage implements scribeAbilitiesStorage {

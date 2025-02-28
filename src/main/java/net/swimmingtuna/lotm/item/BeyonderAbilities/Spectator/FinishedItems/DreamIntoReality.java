@@ -121,17 +121,17 @@ public class DreamIntoReality extends SimpleAbilityItem {
         if (holder.getSpirituality() <= 15) {
             DreamIntoReality.stopFlying(player);
         }
-        if (holder.getCurrentSequence() == 2) {
+        if (holder.getSequence() == 2) {
             player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 2, false, false));
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
             player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
         }
-        if (holder.getCurrentSequence() == 1) {
+        if (holder.getSequence() == 1) {
             player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
             player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
         }
-        if (holder.getCurrentSequence() == 0) {
+        if (holder.getSequence() == 0) {
             player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
             player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 4, false, false));
             player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 5, false, false));

@@ -35,7 +35,7 @@ public class Placate extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (holder.getCurrentSequence() >= 4) {
+        if (holder.getSequence() >= 4) {
             removeHarmfulEffects(interactionTarget);
             addCooldown(player);
             useSpirituality(player);
@@ -54,7 +54,7 @@ public class Placate extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (holder.getCurrentSequence() <= 4 || player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {
+        if (holder.getSequence() <= 4 || player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {
             removeHarmfulEffects(player);
             addCooldown(player);
             useSpirituality(player);

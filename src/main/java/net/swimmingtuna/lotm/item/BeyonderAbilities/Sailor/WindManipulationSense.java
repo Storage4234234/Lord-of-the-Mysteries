@@ -88,7 +88,7 @@ public class WindManipulationSense extends SimpleAbilityItem {
             return;
         }
         if (!holder.useSpirituality(1)) return;
-        double radius = 100 - (holder.getCurrentSequence() * 10);
+        double radius = 100 - (holder.getSequence() * 10);
         for (Player otherPlayer : player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius))) {
             if (otherPlayer == player || BeyonderUtil.isAllyOf(player, otherPlayer)) {
                 continue;

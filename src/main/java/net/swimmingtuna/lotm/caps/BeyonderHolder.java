@@ -50,7 +50,7 @@ public class BeyonderHolder extends PlayerCapability {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(event.player);
             holder.regenSpirituality(event.player);
             if (holder.getCurrentClass() != null) {
-                holder.getCurrentClass().tick(event.player, holder.getCurrentSequence());
+                holder.getCurrentClass().tick(event.player, holder.getSequence());
             }
         }
 
@@ -140,7 +140,7 @@ public class BeyonderHolder extends PlayerCapability {
         updateTracking();
     }
 
-    public int getCurrentSequence() {
+    public int getSequence() {
         return this.currentSequence;
     }
 

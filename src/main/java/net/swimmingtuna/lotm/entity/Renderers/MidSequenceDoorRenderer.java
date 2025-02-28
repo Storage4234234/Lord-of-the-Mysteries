@@ -5,9 +5,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.swimmingtuna.lotm.LOTM;
-import net.swimmingtuna.lotm.entity.LowSequenceDoorEntity;
 import net.swimmingtuna.lotm.entity.MidSequenceDoorEntity;
-import net.swimmingtuna.lotm.entity.Model.LowSequenceDoorModel;
 import net.swimmingtuna.lotm.entity.Model.MidSequenceDoorModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 

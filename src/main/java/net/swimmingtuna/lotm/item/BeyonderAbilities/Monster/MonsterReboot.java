@@ -60,7 +60,7 @@ public class MonsterReboot extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        monsterReboot(player, pContext.getLevel(), pContext.getClickedPos(), holder.getCurrentSequence());
+        monsterReboot(player, pContext.getLevel(), pContext.getClickedPos(), holder.getSequence());
         addCooldown(player);
         useSpirituality(player);
         return InteractionResult.SUCCESS;

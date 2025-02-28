@@ -52,7 +52,7 @@ public class SonicBoom extends SimpleAbilityItem {
             return;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int sequence = holder.getCurrentSequence();
+        int sequence = holder.getSequence();
         Vec3 lookVec = player.getLookAngle().scale(100);
         player.hurtMarked = true;
         player.setDeltaMovement(lookVec.x(), lookVec.y(), lookVec.z());
@@ -69,7 +69,7 @@ public class SonicBoom extends SimpleAbilityItem {
                 entity.hurt(entity.damageSources().generic(), damage);
             } else {
 
-                int sequence2 = holder.getCurrentSequence();
+                int sequence2 = holder.getSequence();
                 int duration2 = duration - (50 - (sequence2 * 5));
                 int damage2 = (int) (damage - (8 - (sequence2 * 0.5)));
                 entity.addEffect(new MobEffectInstance(ModEffects.AWE.get(), duration2, 1, false, false));

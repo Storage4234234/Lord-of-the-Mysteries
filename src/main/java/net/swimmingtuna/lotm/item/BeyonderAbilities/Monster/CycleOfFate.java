@@ -96,10 +96,10 @@ public class CycleOfFate extends SimpleAbilityItem {
             player.getPersistentData().putInt("monsterCycleOfFateUserY", (int) player.getY());
             player.getPersistentData().putInt("monsterCycleOfFateUserZ", (int) player.getZ());
             player.getPersistentData().putInt("monsterCycleOfFateUserHealth", (int) player.getHealth());
-            player.getPersistentData().putInt("monsterCycleOfFateUserSequence", holder.getCurrentSequence());
+            player.getPersistentData().putInt("monsterCycleOfFateUserSequence", holder.getSequence());
             if (interactionTarget instanceof Player pPlayer) {
                 spirituality = (int) BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSpirituality();
-                sequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getCurrentSequence();
+                sequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSequence();
             }
             if (interactionTarget instanceof PlayerMobEntity playerMobEntity) {
                 sequence = playerMobEntity.getCurrentSequence();
@@ -129,7 +129,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                         tag.putInt("monsterCycleOfFateEntityHealth", (int) entity.getHealth());
                         if (entity instanceof Player pPlayer) {
                             pSpirituality = (int) BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSpirituality();
-                            pSequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getCurrentSequence();
+                            pSequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSequence();
                             tag.putInt("monsterCycleOfFateEntitySpirituality", (int) pSpirituality);
                             tag.putInt("monsterCycleOfFateEntitySequence", (int) pSequence);
                         }

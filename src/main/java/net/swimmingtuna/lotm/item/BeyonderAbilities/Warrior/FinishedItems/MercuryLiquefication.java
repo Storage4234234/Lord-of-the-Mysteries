@@ -125,7 +125,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
             if (tag.getInt("mercuryLiqueficationCooldown") >= 1) {
                 tag.putInt("mercuryLiqueficationCooldown", tag.getInt("mercuryLiqueficationCooldown") - 1);
             }
-            if (livingEntity instanceof Player player && !currentState && !player.isCreative() && !player.isSpectator() && (BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.WARRIOR.get()) || BeyonderUtil.sequenceAbleCopy(livingEntity))) {
+            if (livingEntity instanceof Player player && !currentState && !player.isCreative() && !player.isSpectator() && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.WARRIOR.get())) {
                 Abilities playerAbilites = player.getAbilities();
                 playerAbilites.setFlyingSpeed(0.05F);
                 playerAbilites.mayfly = false;

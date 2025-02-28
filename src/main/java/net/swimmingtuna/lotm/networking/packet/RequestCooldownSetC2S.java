@@ -3,7 +3,6 @@ package net.swimmingtuna.lotm.networking.packet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import net.swimmingtuna.lotm.events.ModEvents;
 
 import java.util.function.Supplier;
 

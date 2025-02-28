@@ -83,7 +83,8 @@ public class Burn extends SimpleAbilityItem {
     public static void smeltItem(LivingEvent.LivingTickEvent event) {
         LivingEntity player = event.getEntity();
         Level level = player.level();
-        if (!player.level().isClientSide() && player.isShiftKeyDown() && player.tickCount % 20 == 0 && !player.getOffhandItem().isEmpty() && (BeyonderUtil.getPathway(player) == BeyonderClassInit.APPRENTICE.get() || BeyonderUtil.sequenceAbleCopy(player)) && BeyonderUtil.getSequence(player) <= 8 && player.getMainHandItem().getItem() == ItemInit.TRICKBURN.get()) {            int sequence = BeyonderUtil.getSequence(player);
+        if (!player.level().isClientSide() && player.isShiftKeyDown() && player.tickCount % 20 == 0 && !player.getOffhandItem().isEmpty() && BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.APPRENTICE.get(), 8) && player.getMainHandItem().getItem() == ItemInit.TRICKBURN.get()) {
+            int sequence = BeyonderUtil.getSequence(player);
             int smelt;
             ItemStack offHand = player.getOffhandItem();
             int amount = offHand.getCount();

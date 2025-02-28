@@ -11,6 +11,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.world.worldgen.dimension.DimensionInit;
 
 import java.util.function.Supplier;
@@ -32,12 +33,11 @@ public class SpiritWorldTraversalC2S {
         NetworkEvent.Context context = supplier.get();
         ServerPlayer pPlayer = context.getSender();
         context.enqueueWork(() -> {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
             MinecraftServer server = pPlayer.getServer();
             if (server != null) {
                 if (pPlayer.level().dimension() == Level.OVERWORLD) {
                     ServerLevel spiritWorld = server.getLevel(DimensionInit.SPIRIT_WORLD_LEVEL_KEY);
-                    if ((holder.currentClassMatches(BeyonderClassInit.SPECTATOR) && holder.getCurrentSequence() <= 4) || (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 3) || (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 5)) {
+                    if (BeyonderUtil.getSequence(pPlayer) == 0) {
                         if (spiritWorld != null) {
                             pPlayer.sendSystemMessage(Component.literal("Transporting to Spirit World...").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.BLUE));
                             pPlayer.teleportTo(spiritWorld,

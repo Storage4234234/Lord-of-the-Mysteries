@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -47,6 +48,14 @@ public class BeyonderAbilityUser extends SimpleAbilityItem {
         player.displayClientMessage(Component.empty(), true);
     }
 
+    @Override
+    public void inventoryTick(ItemStack pStack, Level pLevel, Entity livingEntity, int pSlotId, boolean pIsSelected) {
+        if (livingEntity instanceof Player player) {
+            if (player.tickCount % 4 == 0 && !livingEntity.level().isClientSide() && !(player.getMainHandItem().getItem() instanceof BeyonderAbilityUser)) {
+                resetClicks(player);
+            }
+        }
+    }
 
     public static void clicked(Player player, InteractionHand hand) {
 

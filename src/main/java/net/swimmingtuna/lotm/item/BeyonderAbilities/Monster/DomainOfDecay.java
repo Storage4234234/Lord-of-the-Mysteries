@@ -63,7 +63,7 @@ public class DomainOfDecay extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             int maxRadius = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.DECAYDOMAIN.get());
             int radius = tag.getInt("monsterDomainRadius");
             if (player.tickCount % 500 == 0) {

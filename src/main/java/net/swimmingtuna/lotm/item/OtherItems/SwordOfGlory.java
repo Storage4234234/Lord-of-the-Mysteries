@@ -43,34 +43,19 @@ public class SwordOfGlory extends SwordItem {
     }
 
 
+
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
         if (entity instanceof LivingEntity livingEntity && !level.isClientSide()) {
             if (livingEntity.tickCount % 20 == 0 && !livingEntity.level().isClientSide()) {
-                int sequence = BeyonderUtil.getSequence(livingEntity);
-                if (livingEntity instanceof Player player) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                    if (!holder.currentClassMatches(BeyonderClassInit.WARRIOR) || sequence >= 7) {
-                        player.getInventory().setItem(itemSlot, ItemStack.EMPTY);
-                    } else {
-                        if (holder.getSpirituality() >= 25) {
-                            holder.useSpirituality(25);
-                        } else {
-                            player.getInventory().setItem(itemSlot, ItemStack.EMPTY);
-                        }
-                    }
-                } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
-                    if (playerMobEntity.getCurrentPathway() != BeyonderClassInit.WARRIOR || playerMobEntity.getCurrentSequence() >= 7) {
-                        removeItemFromSlot(livingEntity, stack);
-                    } else {
-                        if (playerMobEntity.getSpirituality() >= 25) {
-                            playerMobEntity.useSpirituality(25);
-                        } else {
-                            removeItemFromSlot(livingEntity, stack);
-                        }
-                    }
-                } else {
+                if (!BeyonderUtil.currentPathwayAndSequenceMatches(livingEntity, BeyonderClassInit.WARRIOR.get(), 6)) {
                     removeItemFromSlot(livingEntity, stack);
+                } else {
+                    if (BeyonderUtil.getSpirituality(livingEntity) >= 25) {
+                        BeyonderUtil.useSpirituality(livingEntity, 25);
+                    } else {
+                        removeItemFromSlot(livingEntity, stack);
+                    }
                 }
             }
         }
@@ -80,8 +65,7 @@ public class SwordOfGlory extends SwordItem {
     private void removeItemFromSlot(LivingEntity entity, ItemStack stack) {
         if (entity.getItemBySlot(EquipmentSlot.MAINHAND) == stack) {
             entity.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
-        }
-        else if (entity.getItemBySlot(EquipmentSlot.OFFHAND) == stack) {
+        } else if (entity.getItemBySlot(EquipmentSlot.OFFHAND) == stack) {
             entity.setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
         }
     }
@@ -165,7 +149,7 @@ public class SwordOfGlory extends SwordItem {
     }
 
     private float getPowerForTime(int pCharge) {
-        float f = (float)pCharge / 20.0F;
+        float f = (float) pCharge / 20.0F;
         f = (f * f + f * 2.0F) / 3.0F;
         if (f > 1.0F) {
             f = 1.0F;

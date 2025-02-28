@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 public class DreamWeaving extends SimpleAbilityItem {
 
@@ -85,13 +86,14 @@ public class DreamWeaving extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    private static void spawnMobsAroundTarget(EntityType<? extends Mob> mobEntityType, LivingEntity entity, Level level, double x, double y, double z, int numberOfMobs) {
+    private static void spawnMobsAroundTarget(LivingEntity interactionTarget, EntityType<? extends Mob> mobEntityType, LivingEntity entity, Level level, double x, double y, double z, int numberOfMobs) {
         if (!level.isClientSide()) {
             for (int i = 0; i < numberOfMobs; i++) {
                 Mob mob = mobEntityType.create(level);
                 AttributeInstance maxHp = mob.getAttribute(Attributes.MAX_HEALTH);
                 spawnEntityInRadius(mob, level, x, y, z);
                 maxHp.setBaseValue(551);
+                mob.getPersistentData().putUUID("dreamWeavingUUID", interactionTarget.getUUID());
                 mob.setTarget(entity);
             }
         }
@@ -106,6 +108,13 @@ public class DreamWeaving extends SimpleAbilityItem {
         int deathTimer = entity.getPersistentData().getInt("DeathTimer");
         entity.getPersistentData().putInt("DeathTimer", deathTimer + 1);
         if (deathTimer >= 300) {
+            if (entity.getPersistentData().contains("dreamWeavingUUID")) {
+                UUID targetUUID = entity.getPersistentData().getUUID("dreamWeavingUUID");
+                LivingEntity livingEntity = BeyonderUtil.getEntityFromUUID(entity.level(), targetUUID);
+                if (livingEntity.isAlive() && entity instanceof Mob mob) {
+                    mob.setTarget(livingEntity);
+                }
+            }
             entity.remove(Entity.RemovalReason.KILLED);
         }
     }
@@ -135,7 +144,7 @@ public class DreamWeaving extends SimpleAbilityItem {
             for (int i = 0; i < times; i++) {
                 int randomNumber = random.nextInt(10);
                 EntityType<? extends Mob> entityType = MOB_TYPES.get(randomNumber);
-                spawnMobsAroundTarget(entityType, interactionTarget, level, x, y, z, dreamIntoReality.getValue() == 2 ? 2 : 1);
+                spawnMobsAroundTarget(interactionTarget, entityType, interactionTarget, level, x, y, z, dreamIntoReality.getValue() == 2 ? 2 : 1);
             }
         }
     }

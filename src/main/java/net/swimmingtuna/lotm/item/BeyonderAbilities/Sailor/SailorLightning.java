@@ -78,7 +78,7 @@ public class SailorLightning extends SimpleAbilityItem {
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         lightningDirection(player, level);
-        addCooldown(player, this, 10 + holder.getCurrentSequence());
+        addCooldown(player, this, 10 + holder.getSequence());
         useSpirituality(player, 200);
         return InteractionResult.SUCCESS;
     }
@@ -89,7 +89,7 @@ public class SailorLightning extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        addCooldown(player, this, 10 + (holder.getCurrentSequence() * 2));
+        addCooldown(player, this, 10 + (holder.getSequence() * 2));
         useSpirituality(player, 200);
         lightningTargetEntity(pInteractionTarget, player);
         return InteractionResult.SUCCESS;
@@ -103,7 +103,7 @@ public class SailorLightning extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         lightningblock(player, player.level(), context.getClickLocation());
-        addCooldown(player, this, 10 + holder.getCurrentSequence() * 2);
+        addCooldown(player, this, 10 + holder.getSequence() * 2);
         return InteractionResult.SUCCESS;
     }
 
@@ -133,7 +133,7 @@ public class SailorLightning extends SimpleAbilityItem {
             float speed = 10.0f;
             if (!player.isCreative()) {
                 ItemStack itemStack = player.getUseItem();
-                player.getCooldowns().addCooldown(itemStack.getItem(), 10 + (holder.getCurrentSequence() * 2));
+                player.getCooldowns().addCooldown(itemStack.getItem(), 10 + (holder.getSequence() * 2));
             }
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), level);
             lightningEntity.setSpeed(speed);

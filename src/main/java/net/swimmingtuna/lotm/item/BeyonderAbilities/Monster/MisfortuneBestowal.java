@@ -86,7 +86,7 @@ public class MisfortuneBestowal extends SimpleAbilityItem {
             if (level instanceof ServerLevel serverLevel) {
                 enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
             }
-            int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
+            int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getSequence();
             CompoundTag tag = player.getPersistentData();
             CompoundTag pTag = interactionTarget.getPersistentData();
             double misfortune = tag.getDouble("misfortune");

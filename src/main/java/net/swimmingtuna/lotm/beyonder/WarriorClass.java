@@ -278,12 +278,12 @@ public class WarriorClass implements BeyonderClass {
             int sequence = -1;
             if (livingEntity instanceof Player player) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                sequence = holder.getCurrentSequence();
+                sequence = holder.getSequence();
             } else if (livingEntity instanceof PlayerMobEntity player) {
                 sequence = player.getCurrentSequence();
             }
             //if wearing silver armor, if damage is under 25 HP, it's damage is reduced by 80%
-            boolean isWarrior = (livingEntity instanceof Player player && BeyonderHolderAttacher.getHolderUnwrap(player).currentClassMatches(BeyonderClassInit.WARRIOR) || (livingEntity instanceof PlayerMobEntity playerMobEntity && playerMobEntity.getCurrentPathway() == BeyonderClassInit.WARRIOR));
+            boolean isWarrior = BeyonderUtil.currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.WARRIOR.get());
             if (hasFullSilverArmor(livingEntity) || hasFullDawnArmor(livingEntity)) {
                 if (hasFullSilverArmor(livingEntity)) {
                     if (!(isWarrior && sequence > 3)) {
@@ -310,7 +310,6 @@ public class WarriorClass implements BeyonderClass {
                     }
                 }
             }
-            boolean x = hasFullDawnArmor(livingEntity);
             if (isWarrior) {
 
                 if (sequence == 8) {

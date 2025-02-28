@@ -48,7 +48,7 @@ public class VolcanicEruption extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             Level level = player.level();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             int spawnCount =(int) (float) BeyonderUtil.getDamage(player).get(ItemInit.VOLCANIC_ERUPTION.get());
             double randomX = (Math.random() * 1) - 0.5;
             double randomZ = (Math.random() * 1) - 0.5;

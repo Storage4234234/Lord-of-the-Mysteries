@@ -68,30 +68,14 @@ public class PickaxeOfDawn extends PickaxeItem {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
         if (entity instanceof LivingEntity livingEntity && !level.isClientSide()) {
             if (livingEntity.tickCount % 20 == 0 && !livingEntity.level().isClientSide()) {
-                int sequence = BeyonderUtil.getSequence(livingEntity);
-                if (livingEntity instanceof Player player) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                    if (!holder.currentClassMatches(BeyonderClassInit.WARRIOR) || sequence >= 7) {
-                        player.getInventory().setItem(itemSlot, ItemStack.EMPTY);
-                    } else {
-                        if (holder.getSpirituality() >= 25) {
-                            holder.useSpirituality(25);
-                        } else {
-                            player.getInventory().setItem(itemSlot, ItemStack.EMPTY);
-                        }
-                    }
-                } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
-                    if (playerMobEntity.getCurrentPathway() != BeyonderClassInit.WARRIOR || playerMobEntity.getCurrentSequence() >= 7) {
-                        removeItemFromSlot(livingEntity, stack);
-                    } else {
-                        if (playerMobEntity.getSpirituality() >= 25) {
-                            playerMobEntity.useSpirituality(25);
-                        } else {
-                            removeItemFromSlot(livingEntity, stack);
-                        }
-                    }
-                } else {
+                if (!BeyonderUtil.currentPathwayAndSequenceMatches(livingEntity, BeyonderClassInit.WARRIOR.get(), 6)) {
                     removeItemFromSlot(livingEntity, stack);
+                } else {
+                    if (BeyonderUtil.getSpirituality(livingEntity) >= 25) {
+                        BeyonderUtil.useSpirituality(livingEntity, 25);
+                    } else {
+                        removeItemFromSlot(livingEntity, stack);
+                    }
                 }
             }
         }

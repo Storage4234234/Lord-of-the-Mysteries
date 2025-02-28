@@ -8,34 +8,17 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
-import net.swimmingtuna.lotm.entity.GuardianBoxEntity;
-import net.swimmingtuna.lotm.entity.HurricaneOfLightEntity;
-import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
-import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
-import virtuoel.pehkui.api.ScaleData;
-import virtuoel.pehkui.api.ScaleTypes;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
 public class SwordOfSilver extends SwordItem {
 
@@ -46,12 +29,12 @@ public class SwordOfSilver extends SwordItem {
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
-        if (entity instanceof Player player && !level.isClientSide()) {
-            BeyonderClass pathway = BeyonderUtil.getPathway(player);
-            int sequence = BeyonderUtil.getSequence(player);
-            if (pathway == BeyonderClassInit.WARRIOR.get() && sequence <= 3) {
-                if (player.tickCount % 2 == 0) {
-                    player.displayClientMessage(Component.literal(silverSwordString(player)), true);
+        if (entity instanceof LivingEntity livingEntity && !level.isClientSide()) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatchesNoException(livingEntity, BeyonderClassInit.WARRIOR.get(), 3)) {
+                if (livingEntity instanceof Player player) {
+                    if (player.tickCount % 2 == 0) {
+                        player.displayClientMessage(Component.literal(silverSwordString(player)), true);
+                    }
                 }
             }
         }
@@ -126,7 +109,7 @@ public class SwordOfSilver extends SwordItem {
     }
 
     private float getPowerForTime(int pCharge) {
-        float f = (float)pCharge / 20.0F;
+        float f = (float) pCharge / 20.0F;
         f = (f * f + f * 2.0F) / 3.0F;
         if (f > 1.0F) {
             f = 1.0F;

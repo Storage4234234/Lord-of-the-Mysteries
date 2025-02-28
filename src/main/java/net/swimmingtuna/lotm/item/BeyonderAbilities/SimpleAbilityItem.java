@@ -16,12 +16,10 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
-import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.Nullable;
-import net.swimmingtuna.lotm.util.ScribeRecording.*;
 
 import java.util.List;
 import java.util.Map;
@@ -199,7 +197,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     }
 
     public static boolean checkRequiredSequence(BeyonderHolder holder, Player player, int requiredSequence, boolean message) {
-        if (holder.getCurrentSequence() > requiredSequence) {
+        if (holder.getSequence() > requiredSequence) {
             if(message)
                 player.displayClientMessage(
                         Component.literal("You need to be sequence ").withStyle(ChatFormatting.AQUA).append(

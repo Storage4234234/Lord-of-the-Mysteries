@@ -64,7 +64,7 @@ public class MonsterDangerSense extends SimpleAbilityItem {
             return;
         }
         if (!holder.useSpirituality(2)) return;
-        double radius = 150 - (holder.getCurrentSequence() * 15);
+        double radius = 150 - (holder.getSequence() * 15);
         for (Player otherPlayer : player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius))) {
             if (otherPlayer == player || BeyonderUtil.isAllyOf(player, otherPlayer)) {
                 continue;
