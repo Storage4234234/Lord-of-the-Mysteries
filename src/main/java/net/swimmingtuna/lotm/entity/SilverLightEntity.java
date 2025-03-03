@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
+import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
 import net.swimmingtuna.lotm.networking.packet.UpdateEntityLocationS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -47,10 +48,6 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
         super(entityType, level);
     }
 
-    public SilverLightEntity(Level level, LivingEntity shooter, double offsetX, double offsetY, double offsetZ) {
-        super(EntityInit.SILVER_LIGHT_ENTITY.get(), shooter, offsetX, offsetY, offsetZ, level);
-    }
-
 
     protected float getInertia() {
         return 1.0F;
@@ -70,7 +67,7 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
 
     @Override
     public @NotNull ParticleOptions getTrailParticle() {
-        return ParticleTypes.FLASH;
+        return ParticleInit.NULL_PARTICLE.get();
     }
 
     @Override
@@ -93,10 +90,10 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
 
 
     @Override
-    public void defineSynchedData() {
+    protected void defineSynchedData() {
+        super.defineSynchedData();
         this.entityData.define(YAW, 0.0f);
         this.entityData.define(PITCH, 0.0f);
-        this.entityData.define(DATA_DANGEROUS, true);
     }
 
     @Override
@@ -110,20 +107,10 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
     }
 
 
-    public float getYaw() {
-        return this.entityData.get(YAW);
-    }
-
-    public float getPitch() {
-        return this.entityData.get(PITCH);
-    }
-
-    public void setYaw(float yaw) {
-        this.entityData.set(YAW, yaw);
-    }
-    public void setPitch(float pitch) {
-        this.entityData.set(PITCH, pitch);
-    }
+    public float getYaw() { return this.entityData.get(YAW); }
+    public void setYaw(float yaw) { this.entityData.set(YAW, yaw); }
+    public float getPitch() { return this.entityData.get(PITCH); }
+    public void setPitch(float pitch) { this.entityData.set(PITCH, pitch); }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
@@ -145,49 +132,64 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
         if (!this.level().isClientSide() && this.getOwner() instanceof LivingEntity owner) {
             if (this.tickCount >= 100 && !this.getPersistentData().getBoolean("hasTeleported")) {
                 this.getPersistentData().putBoolean("hasTeleported", true);
-                Entity target = findTargetInSight(owner);
+                LivingEntity target = findTargetInSight(owner);
                 if (target != null) {
                     Vec3 teleportPos = getRandomPositionAroundTarget(target);
                     this.setPos(teleportPos.x, teleportPos.y, teleportPos.z);
                     Vec3 targetPos = target.position();
                     Vec3 direction = targetPos.subtract(this.position()).normalize();
                     this.setDeltaMovement(direction.scale(5.0));
-
                     destroyBlocksAroundEntity();
                 }
             }
-            if (this.tickCount >= 400) {
+            if (this.tickCount >= 200) {
                 this.discard();
             }
-            LOTMNetworkHandler.sendToAllPlayers(new UpdateEntityLocationS2C(this.getX(), this.getY(), this.getZ(), this.getId()));
+            LOTMNetworkHandler.sendToAllPlayers(new UpdateEntityLocationS2C(this.getX(), this.getY(), this.getZ(),this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z(), this.getId()));
         }
-        if (!this.level().isClientSide()) {
+        if (!level().isClientSide()) {
+            LOTMNetworkHandler.sendToAllPlayers(new SendParticleS2C(ParticleInit.FLASH_PARTICLE.get(), this.getX(), this.getY(), this.getZ(), 0,0,0));
             Vec3 motion = this.getDeltaMovement();
             double horizontalDist = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
-            float newYaw = (float) Math.toDegrees(Math.atan2(motion.x, motion.z));
+            float newYaw = (float) Math.toDegrees(Math.atan2(motion.z, motion.x));
             float newPitch = (float) Math.toDegrees(Math.atan2(motion.y, horizontalDist));
             this.setYaw(newYaw);
             this.setPitch(newPitch);
-            this.setYRot(newYaw);
-            this.setXRot(newPitch);
         }
-        this.xRotO = getXRot();
-        this.yRotO = this.getYRot();
     }
 
-    private Entity findTargetInSight(LivingEntity owner) {
-        AABB area = new AABB(owner.getX() - 20, owner.getY() - 20, owner.getZ() - 20, owner.getX() + 20, owner.getY() + 20, owner.getZ() + 20);
-        List<Entity> entities = owner.level().getEntities(owner, area);
-        for (Entity entity : entities) {
-            if (entity instanceof LivingEntity && owner.hasLineOfSight(entity)) {
-                return entity;
+    public static LivingEntity findTargetInSight(LivingEntity owner) {
+        List<LivingEntity> potentialTargets = owner.level().getEntitiesOfClass(LivingEntity.class, owner.getBoundingBox().inflate(80));
+
+        // Initialize variables for selecting the best target
+        LivingEntity bestTarget = null;
+        double bestScore = -1;
+
+        for (LivingEntity target : potentialTargets) {
+            if (target == owner || BeyonderUtil.isAllyOf(owner, target)) continue;
+            Vec3 ownerPos = owner.position();
+            Vec3 targetPos = target.position();
+            double distanceSq = ownerPos.distanceToSqr(targetPos);
+            if (distanceSq <= 80.0 * 80.0) {
+                Vec3 lookVec = owner.getLookAngle().normalize();
+                Vec3 toTargetVec = targetPos.subtract(ownerPos).normalize();
+                double dotProduct = lookVec.dot(toTargetVec);
+                double angle = Math.toDegrees(Math.acos(dotProduct));
+                if (angle < 45.0) {
+                    double score = 1.0 / distanceSq;
+                    score *= (1.0 - (angle / 45.0));
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestTarget = target;
+                    }
+                }
             }
         }
-
-        return null;
+        return bestTarget;
     }
 
-    private Vec3 getRandomPositionAroundTarget(Entity target) {
+
+    private Vec3 getRandomPositionAroundTarget(LivingEntity target) {
         double radius = 10.0;
         double theta = Math.random() * 2 * Math.PI;
         double phi = Math.random() * Math.PI;
@@ -199,7 +201,7 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
     }
 
     private void destroyBlocksAroundEntity() {
-        int radius = 3;
+        int radius = 5;
         BlockPos pos = this.blockPosition();
 
         for (int x = -radius; x <= radius; x++) {
@@ -207,7 +209,7 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
                 for (int z = -radius; z <= radius; z++) {
                     BlockPos blockPos = pos.offset(x, y, z);
                     if (this.level().getBlockState(blockPos).getBlock() != Blocks.AIR) {
-                        this.level().destroyBlock(blockPos, true);
+                        this.level().destroyBlock(blockPos, false);
                     }
                 }
             }

@@ -8,43 +8,54 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public class UpdateEntityLocationS2C {
-    private final double x;
-    private final double y;
-    private final double z;
-    private final int entityId;
+    public final double x;
+    public final double y;
+    public final double z;
+    public final double velocityX;
+    public final double velocityY;
+    public final double velocityZ;
+    public final int entityId;
 
-    public UpdateEntityLocationS2C(double x, double y, double z, int entityId) {
+    public UpdateEntityLocationS2C(double x, double y, double z, double velocityX, double velocityY, double velocityZ, int entityId) {
         this.x = x;
         this.y = y;
         this.z = z;
+        this.velocityX = velocityX;
+        this.velocityY = velocityY;
+        this.velocityZ = velocityZ;
         this.entityId = entityId;
     }
 
-    // Serializer
-    public static void encode(UpdateEntityLocationS2C msg, FriendlyByteBuf buf) {
-        buf.writeDouble(msg.x);
-        buf.writeDouble(msg.y);
-        buf.writeDouble(msg.z);
-        buf.writeInt(msg.entityId);
+    public static void encode(UpdateEntityLocationS2C message, FriendlyByteBuf buffer) {
+        buffer.writeDouble(message.x);
+        buffer.writeDouble(message.y);
+        buffer.writeDouble(message.z);
+        buffer.writeDouble(message.velocityX);
+        buffer.writeDouble(message.velocityY);
+        buffer.writeDouble(message.velocityZ);
+        buffer.writeInt(message.entityId);
     }
 
-    // Deserializer
-    public static UpdateEntityLocationS2C decode(FriendlyByteBuf buf) {
+    public static UpdateEntityLocationS2C decode(FriendlyByteBuf buffer) {
         return new UpdateEntityLocationS2C(
-                buf.readDouble(),
-                buf.readDouble(),
-                buf.readDouble(),
-                buf.readInt()
+                buffer.readDouble(),
+                buffer.readDouble(),
+                buffer.readDouble(),
+                buffer.readDouble(),
+                buffer.readDouble(),
+                buffer.readDouble(),
+                buffer.readInt()
         );
     }
 
     public static void handle(UpdateEntityLocationS2C msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+            Minecraft minecraft = Minecraft.getInstance();
             if (minecraft.level != null) {
                 Entity entity = minecraft.level.getEntity(msg.entityId);
                 if (entity != null) {
-                    entity.setPos(msg.x, msg.y, msg.z);
+                    entity.lerpTo(msg.x, msg.y, msg.z, (float) Math.toDegrees(Math.atan2(msg.velocityZ, msg.velocityX)), (float) Math.toDegrees(Math.atan2(-msg.velocityY, Math.sqrt(msg.velocityX * msg.velocityX + msg.velocityZ * msg.velocityZ))), 3, false);
+                    entity.setDeltaMovement(msg.velocityX, msg.velocityY, msg.velocityZ);
                 }
             }
         });

@@ -84,10 +84,8 @@ public class MatterAccelerationBlocks extends SimpleAbilityItem {
                         stoneEntity.setOwner(player);
                         stoneEntity.setRemoveAndHurt(true);
                         stoneEntity.setSent(false);
-                        stoneEntity.setPos(surfacePos.getX() + 0.5, surfacePos.getY() + 1, surfacePos.getZ() + 0.5);
+                        stoneEntity.teleportTo(surfacePos.getX() + 0.5, surfacePos.getY() + 1, surfacePos.getZ() + 0.5);
                         stoneEntity.setShouldntDamage(true);
-
-
                         player.level().addFreshEntity(stoneEntity);
                     }
                     if (level.dimension() == Level.NETHER) {

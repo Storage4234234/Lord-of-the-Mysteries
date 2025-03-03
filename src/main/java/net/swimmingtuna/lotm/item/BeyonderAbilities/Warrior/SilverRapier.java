@@ -1,20 +1,21 @@
 package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior;
 
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.entity.MercuryPortalEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
-import virtuoel.pehkui.api.ScaleData;
-import virtuoel.pehkui.api.ScaleTypes;
 
-public class  SilverRapier extends SimpleAbilityItem {
+public class SilverRapier extends SimpleAbilityItem {
 
 
     public SilverRapier(Properties properties) {
@@ -28,20 +29,33 @@ public class  SilverRapier extends SimpleAbilityItem {
         }
         addCooldown(player);
         useSpirituality(player);
-        startGigantification(player);
+        silverRapier(player);
         return InteractionResult.SUCCESS;
     }
 
-    public static void startGigantification(LivingEntity livingEntity) {
+    public static void silverRapier(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
-            MercuryPortalEntity mercuryPortal = new MercuryPortalEntity(EntityInit.MERCURY_PORTAL_ENTITY.get(), livingEntity.level());
-            mercuryPortal.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
-            mercuryPortal.getPersistentData().putUUID("mercuryPortalOwner", livingEntity.getUUID());
-            mercuryPortal.setYaw(livingEntity.getYRot());
-            mercuryPortal.setPitch(livingEntity.getXRot());
-            BeyonderUtil.setScale(mercuryPortal, 3.0f);
-            livingEntity.level().addFreshEntity(mercuryPortal);
-            }
+
+            livingEntity.getPersistentData().putInt("silverRapierSummoning", (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.SILVERRAPIER.get()));
         }
     }
+
+    public static void mercuryTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        CompoundTag tag = livingEntity.getPersistentData();
+        int x = tag.getInt("silverRapierSummoning");
+        if (!livingEntity.level().isClientSide() && x >= 1) {
+            tag.putInt("silverRapierSummoning", x -1);
+            MercuryPortalEntity mercuryPortal = new MercuryPortalEntity(EntityInit.MERCURY_PORTAL_ENTITY.get(), livingEntity.level());
+            BeyonderUtil.setScale(mercuryPortal, 3);
+            double angle = (Math.random() > 0.5 ? 90 : -90) * (Math.PI / 180);
+            double offsetX = Math.cos(angle) * (2 + Math.random() * 8);
+            double offsetZ = Math.sin(angle) * (2 + Math.random() * 8);
+            double offsetY = (Math.random() * 20) - 10;
+            mercuryPortal.teleportTo(livingEntity.getX() + offsetX, livingEntity.getY() + offsetY, livingEntity.getZ() + offsetZ);
+            mercuryPortal.getPersistentData().putUUID("mercuryPortalOwner", livingEntity.getUUID());
+            livingEntity.level().addFreshEntity(mercuryPortal);
+        }
+    }
+}
 

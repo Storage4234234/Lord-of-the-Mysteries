@@ -65,6 +65,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.BattleHypnotism;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeDemise;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.SilverRapier;
 import net.swimmingtuna.lotm.item.OtherItems.SwordOfTwilight;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
@@ -370,6 +371,7 @@ public class ModEvents {
             if (livingEntity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
             }
+            SilverRapier.mercuryTick(event);
             FateReincarnation.monsterReincarnationChecker(event);
             DawnArmory.dawnArmorTickEvent(event);
             DivineHandLeftEntity.divineHandTick(event);

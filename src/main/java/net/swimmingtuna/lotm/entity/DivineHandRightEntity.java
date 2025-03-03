@@ -158,7 +158,7 @@ public class DivineHandRightEntity extends AbstractHurtingProjectile implements 
             destroyBlocksAround((int) radius);
             Vec3 currentPos = this.position();
             for (ServerPlayer player : level().getEntitiesOfClass(ServerPlayer.class, this.getBoundingBox().inflate(100))) {
-                LOTMNetworkHandler.sendToPlayer(new UpdateEntityLocationS2C(currentPos.x(), currentPos.y(), currentPos.z(), this.getId()), player);
+                LOTMNetworkHandler.sendToPlayer(new UpdateEntityLocationS2C(currentPos.x(), currentPos.y(), currentPos.z(),this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z(), this.getId()), player);
             }
             if (this.tickCount >= 300) {
                 this.discard();
