@@ -1286,7 +1286,8 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.TWILIGHTACCELERATE.get(), applyAbilityStrengthened((1800.0f - (sequence * 300)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.AURAOFTWILIGHT.get(), applyAbilityStrengthened((30.0f - (sequence * 2)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.MERCURYLIQUEFICATION.get(), applyAbilityStrengthened((15.0f - (sequence * 2)) / abilityWeakness, abilityStrengthened));
-        damageMap.put(ItemInit.TWILIGHTLIGHT.get(), applyAbilityStrengthened((600.0f - (sequence * 100)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.DIVINEHANDRIGHT.get(), applyAbilityStrengthened((10.0f - (sequence * 4)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.DIVINEHANDLEFT.get(), applyAbilityStrengthened((10.0f - (sequence * 4)) / abilityWeakness, abilityStrengthened));
 
         // APPRENTICE
         damageMap.put(ItemInit.CREATEDOOR.get(), applyAbilityStrengthened(0.0f, abilityStrengthened));
@@ -2237,5 +2238,72 @@ public class BeyonderUtil {
             }
         }
         return true;
+    }
+
+    public static void setPathway(LivingEntity livingEntity, BeyonderClass pathway) {
+        if (!livingEntity.level().isClientSide()) {
+            if (livingEntity instanceof Player player) {
+                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                holder.setPathway(pathway);
+            } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
+                playerMobEntity.setPathway(pathway);
+            } else {
+                return;
+            }
+        }
+    }
+
+    public static void setSequence(LivingEntity livingEntity, int sequence) {
+        if (!livingEntity.level().isClientSide()) {
+            if (livingEntity instanceof Player player) {
+                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                holder.setSequence(sequence);
+            } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
+                playerMobEntity.setSequence(sequence);
+            } else {
+                return;
+            }
+        }
+    }
+
+    public static void setPathwayAndSequence(LivingEntity livingEntity, BeyonderClass pathway, int sequence) {
+        if (!livingEntity.level().isClientSide()) {
+            if (livingEntity instanceof Player player) {
+                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                holder.setSequence(sequence);
+                holder.setPathway(pathway);
+            } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
+                playerMobEntity.setSequence(sequence);
+                playerMobEntity.setPathway(pathway);
+            } else {
+                return;
+            }
+        }
+    }
+
+    public static void removePathway(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide()) {
+            if (livingEntity instanceof Player player) {
+                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                holder.removePathway();
+            } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
+                playerMobEntity.setPathway(null);
+                playerMobEntity.setSequence(-1);
+            } else {
+                return;
+            }
+        }
+    }
+
+    public static void setScale(Entity entity, float scale) {
+        if (!entity.level().isClientSide()) {
+            ScaleTypes.BASE.getScaleData(entity).setScale(scale);
+        }
+    }
+
+    public static void setTargetScale(Entity entity, float scale) {
+        if (!entity.level().isClientSide()) {
+            ScaleTypes.BASE.getScaleData(entity).setTargetScale(scale);
+        }
     }
 }

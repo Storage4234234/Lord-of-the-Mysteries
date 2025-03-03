@@ -3,6 +3,8 @@ package net.swimmingtuna.lotm.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -18,22 +20,35 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
+import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
+import net.swimmingtuna.lotm.networking.packet.UpdateEntityLocationS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.List;
 
-public class SilverBeamEntity extends AbstractHurtingProjectile {
-    private static final EntityDataAccessor<Boolean> DATA_DANGEROUS = SynchedEntityData.defineId(SilverBeamEntity.class, EntityDataSerializers.BOOLEAN);
+public class SilverLightEntity extends AbstractHurtingProjectile implements GeoEntity {
+    private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
-    public SilverBeamEntity(EntityType<? extends SilverBeamEntity> entityType, Level level) {
+    private static final EntityDataAccessor<Float> YAW = SynchedEntityData.defineId(SilverLightEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> PITCH = SynchedEntityData.defineId(SilverLightEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Boolean> DATA_DANGEROUS = SynchedEntityData.defineId(SilverLightEntity.class, EntityDataSerializers.BOOLEAN);
+
+    public SilverLightEntity(EntityType<? extends SilverLightEntity> entityType, Level level) {
         super(entityType, level);
     }
 
-    public SilverBeamEntity(Level level, LivingEntity shooter, double offsetX, double offsetY, double offsetZ) {
-        super(EntityInit.SILVER_BEAM_ENTITY.get(), shooter, offsetX, offsetY, offsetZ, level);
+    public SilverLightEntity(Level level, LivingEntity shooter, double offsetX, double offsetY, double offsetZ) {
+        super(EntityInit.SILVER_LIGHT_ENTITY.get(), shooter, offsetX, offsetY, offsetZ, level);
     }
 
 
@@ -43,7 +58,7 @@ public class SilverBeamEntity extends AbstractHurtingProjectile {
 
     @Override
     public boolean canHitEntity(Entity entity) {
-        if (entity instanceof SilverBeamEntity) {
+        if (entity instanceof SilverLightEntity) {
             return false;
         }
         return super.canHitEntity(entity);
@@ -55,7 +70,7 @@ public class SilverBeamEntity extends AbstractHurtingProjectile {
 
     @Override
     public @NotNull ParticleOptions getTrailParticle() {
-        return ParticleInit.NULL_PARTICLE.get();
+        return ParticleTypes.FLASH;
     }
 
     @Override
@@ -77,10 +92,44 @@ public class SilverBeamEntity extends AbstractHurtingProjectile {
     }
 
 
-    protected void defineSynchedData() {
-        this.entityData.define(DATA_DANGEROUS, false);
+    @Override
+    public void defineSynchedData() {
+        this.entityData.define(YAW, 0.0f);
+        this.entityData.define(PITCH, 0.0f);
+        this.entityData.define(DATA_DANGEROUS, true);
     }
 
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
+        if (tag.contains("yaw")) {
+            this.entityData.set(YAW, tag.getFloat("yaw"));
+        }
+        if (tag.contains("pitch")) {
+            this.entityData.set(PITCH, tag.getFloat("pitch"));
+        }
+    }
+
+
+    public float getYaw() {
+        return this.entityData.get(YAW);
+    }
+
+    public float getPitch() {
+        return this.entityData.get(PITCH);
+    }
+
+    public void setYaw(float yaw) {
+        this.entityData.set(YAW, yaw);
+    }
+    public void setPitch(float pitch) {
+        this.entityData.set(PITCH, pitch);
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        tag.putFloat("yaw", this.entityData.get(YAW));
+        tag.putFloat("pitch", this.entityData.get(PITCH));
+    }
     public boolean isDangerous() {
         return this.entityData.get(DATA_DANGEROUS);
     }
@@ -90,40 +139,40 @@ public class SilverBeamEntity extends AbstractHurtingProjectile {
         return false;
     }
 
-
-
-
-
     @Override
     public void tick() {
         super.tick();
-        ProjectileUtil.rotateTowardsMovement(this, 0.5f);
-        this.xRotO = getXRot();
-        this.yRotO = this.getYRot();
-
         if (!this.level().isClientSide() && this.getOwner() instanceof LivingEntity owner) {
-            if (this.tickCount >= 200 && !this.getPersistentData().getBoolean("hasTeleported")) {
-                // Set the hasTeleported tag to true
+            if (this.tickCount >= 100 && !this.getPersistentData().getBoolean("hasTeleported")) {
                 this.getPersistentData().putBoolean("hasTeleported", true);
-
-                // Find a target entity in the owner's sight
                 Entity target = findTargetInSight(owner);
-
                 if (target != null) {
                     Vec3 teleportPos = getRandomPositionAroundTarget(target);
                     this.setPos(teleportPos.x, teleportPos.y, teleportPos.z);
                     Vec3 targetPos = target.position();
                     Vec3 direction = targetPos.subtract(this.position()).normalize();
-                    this.setDeltaMovement(direction.scale(2.0));
+                    this.setDeltaMovement(direction.scale(5.0));
 
                     destroyBlocksAroundEntity();
                 }
             }
-
             if (this.tickCount >= 400) {
                 this.discard();
             }
+            LOTMNetworkHandler.sendToAllPlayers(new UpdateEntityLocationS2C(this.getX(), this.getY(), this.getZ(), this.getId()));
         }
+        if (!this.level().isClientSide()) {
+            Vec3 motion = this.getDeltaMovement();
+            double horizontalDist = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+            float newYaw = (float) Math.toDegrees(Math.atan2(motion.x, motion.z));
+            float newPitch = (float) Math.toDegrees(Math.atan2(motion.y, horizontalDist));
+            this.setYaw(newYaw);
+            this.setPitch(newPitch);
+            this.setYRot(newYaw);
+            this.setXRot(newPitch);
+        }
+        this.xRotO = getXRot();
+        this.yRotO = this.getYRot();
     }
 
     private Entity findTargetInSight(LivingEntity owner) {
@@ -163,5 +212,19 @@ public class SilverBeamEntity extends AbstractHurtingProjectile {
                 }
             }
         }
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState<SilverLightEntity> animationState) {
+        return PlayState.STOP;
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return geoCache;
     }
 }

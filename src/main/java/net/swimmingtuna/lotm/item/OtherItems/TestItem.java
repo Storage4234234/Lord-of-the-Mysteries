@@ -15,7 +15,9 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
+import net.swimmingtuna.lotm.entity.SilverLightEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 
@@ -71,7 +73,14 @@ public class TestItem extends SimpleAbilityItem {
                     player.getCooldowns().removeCooldown(stack.getItem());
                 }
             }
-            player.getPersistentData().putInt("age", (int) player.getMaxHealth() * 20);
+            SilverLightEntity silverLight = new SilverLightEntity(EntityInit.SILVER_LIGHT_ENTITY.get(), level);
+            silverLight.setOwner(player);
+            silverLight.setDeltaMovement(player.getLookAngle().scale(5.0f));
+            silverLight.hurtMarked = true;
+            silverLight.teleportTo(player.getX(), player.getY(), player.getZ());
+            silverLight.setYaw(player.getYRot());
+            silverLight.setPitch(player.getXRot());
+            player.level().addFreshEntity(silverLight);
         }
 
         return InteractionResult.SUCCESS;

@@ -3,6 +3,10 @@ package net.swimmingtuna.lotm.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -21,17 +25,25 @@ import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.UpdateEntityLocationS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.*;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import virtuoel.pehkui.api.ScaleTypes;
 
-public class DivineHandRightEntity extends AbstractHurtingProjectile {
+import java.util.ArrayList;
+import java.util.List;
+
+public class DivineHandRightEntity extends AbstractHurtingProjectile implements GeoEntity {
+    private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+
+    private static final EntityDataAccessor<Float> YAW = SynchedEntityData.defineId(DivineHandRightEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> PITCH = SynchedEntityData.defineId(DivineHandRightEntity.class, EntityDataSerializers.FLOAT);
 
 
     public DivineHandRightEntity(EntityType<? extends DivineHandRightEntity> entityType, Level level) {
         super(entityType, level);
-    }
-
-    public DivineHandRightEntity(Level level, LivingEntity shooter, double offsetX, double offsetY, double offsetZ) {
-        super(EntityInit.DIVINE_HAND_RIGHT_ENTITY.get(), shooter, offsetX, offsetY, offsetZ, level);
     }
 
 
@@ -70,6 +82,29 @@ public class DivineHandRightEntity extends AbstractHurtingProjectile {
         }
     }
 
+    @Override
+    public void defineSynchedData() {
+        this.entityData.define(YAW, 0.0f);
+        this.entityData.define(PITCH, 0.0f);
+
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
+        if (tag.contains("yaw")) {
+            this.entityData.set(YAW, tag.getFloat("yaw"));
+        }
+        if (tag.contains("pitch")) {
+            this.entityData.set(PITCH, tag.getFloat("pitch"));
+        }
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        tag.putFloat("yaw", this.entityData.get(YAW));
+        tag.putFloat("pitch", this.entityData.get(PITCH));
+    }
+
 
     @Override
     public boolean isOnFire() {
@@ -88,20 +123,37 @@ public class DivineHandRightEntity extends AbstractHurtingProjectile {
         return false;
     }
 
-    @Override
-    protected void defineSynchedData() {
-
-    }
 
     @Override
     protected boolean shouldBurn() {
         return false;
     }
 
+    public float getYaw() {
+        return this.entityData.get(YAW);
+    }
+
+    public float getPitch() {
+        return this.entityData.get(PITCH);
+    }
+
+
+
+
+
     @Override
     public void tick() {
         super.tick();
         if (!level().isClientSide()) {
+            if (this.getOwner() != null) {
+                Vec3 motion = this.getDeltaMovement();
+                double horizontalDist = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+                float newYaw = (float) Math.toDegrees(Math.atan2(motion.x, motion.z));
+                float newPitch = (float) Math.toDegrees(Math.atan2(motion.y, horizontalDist));
+                this.setYaw(newYaw);
+                this.setPitch(newPitch);
+            }
+
             float radius = ScaleTypes.BASE.getScaleData(this).getScale();
             destroyBlocksAround((int) radius);
             Vec3 currentPos = this.position();
@@ -116,6 +168,7 @@ public class DivineHandRightEntity extends AbstractHurtingProjectile {
         this.yRotO = this.getYRot();
     }
 
+
     public void destroyBlocksAround(int radius) {
         BlockPos centerPos = this.blockPosition();
         BlockState obsidianState = Blocks.OBSIDIAN.defaultBlockState();
@@ -125,11 +178,32 @@ public class DivineHandRightEntity extends AbstractHurtingProjectile {
                 for (int z = -radius; z <= radius; z++) {
                     BlockPos targetPos = centerPos.offset(x, y, z);
                     BlockState blockState = level().getBlockState(targetPos);
-                    if (blockState.getDestroySpeed(level(), targetPos) < obsidianHardness && !blockState.isAir()) {
-                        level().destroyBlock(targetPos, true);
+                    if (blockState.getDestroySpeed(level(), targetPos) < obsidianHardness && !blockState.isAir() && !(blockState.getBlock() == Blocks.BEDROCK)) {
+                        level().destroyBlock(targetPos, false);
                     }
                 }
             }
         }
+    }
+    public void setYaw(float yaw) {
+        this.entityData.set(YAW, yaw);
+    }
+    public void setPitch(float pitch) {
+        this.entityData.set(PITCH, pitch);
+    }
+
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState<DivineHandRightEntity> animationState) {
+        return PlayState.STOP;
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return geoCache;
     }
 }

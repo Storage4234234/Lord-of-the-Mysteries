@@ -92,8 +92,8 @@ public class EntityInit {
     public static final RegistryObject<EntityType<MeteorNoLevelEntity>> METEOR_NO_LEVEL_ENTITY =
             ENTITIES.register("meteor_no_hurt", () -> EntityType.Builder.<MeteorNoLevelEntity>of(MeteorNoLevelEntity::new, MobCategory.MISC)
                     .sized(2.0f,2.0f).clientTrackingRange(300).build("meteor_no_hurt"));
-    public static final RegistryObject<EntityType<SilverBeamEntity>> SILVER_BEAM_ENTITY =
-            ENTITIES.register("silver_beam_entity", () -> EntityType.Builder.<SilverBeamEntity>of(SilverBeamEntity::new, MobCategory.MISC)
+    public static final RegistryObject<EntityType<SilverLightEntity>> SILVER_LIGHT_ENTITY =
+            ENTITIES.register("silver_beam_entity", () -> EntityType.Builder.<SilverLightEntity>of(SilverLightEntity::new, MobCategory.MISC)
                     .sized(2.0f,2.0f).clientTrackingRange(200).build(new ResourceLocation(LOTM.MOD_ID, "silver_beam_entity").toString()));
     public static final RegistryObject<EntityType<WindBladeEntity>> WIND_BLADE_ENTITY =
             ENTITIES.register("wind_blade", () -> EntityType.Builder.<WindBladeEntity>of(WindBladeEntity::new, MobCategory.MISC)
@@ -101,6 +101,9 @@ public class EntityInit {
     public static final RegistryObject<EntityType<LowSequenceDoorEntity>> LOW_SEQUENCE_DOOR_ENTITY =
             ENTITIES.register("low_sequence_door_entity", () -> EntityType.Builder.<LowSequenceDoorEntity>of(LowSequenceDoorEntity::new, MobCategory.MISC)
                     .sized(0.5f,2f).clientTrackingRange(100).build("low_sequence_door_entity"));
+    public static final RegistryObject<EntityType<MercuryPortalEntity>> MERCURY_PORTAL_ENTITY =
+            ENTITIES.register("mercury_portal_entity", () -> EntityType.Builder.<MercuryPortalEntity>of(MercuryPortalEntity::new, MobCategory.MISC)
+                    .sized(0.5f,0.5f).clientTrackingRange(100).build("mercury_portal_entity"));
     public static final RegistryObject<EntityType<MidSequenceDoorEntity>> MID_SEQUENCE_DOOR_ENTITY =
             ENTITIES.register("mid_sequence_door_entity", () -> EntityType.Builder.<MidSequenceDoorEntity>of(MidSequenceDoorEntity::new, MobCategory.MISC)
                     .sized(0.5f,2f).clientTrackingRange(100).build("mid_sequence_door_entity"));

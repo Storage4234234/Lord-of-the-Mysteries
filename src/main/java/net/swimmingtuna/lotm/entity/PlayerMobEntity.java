@@ -74,7 +74,7 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
     private boolean skinAvailable;
     private boolean capeAvailable;
 
-    protected Supplier<? extends BeyonderClass> requiredClass;
+    protected BeyonderClass requiredClass;
 
 
     public double xCloakO;
@@ -101,11 +101,11 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
     private final RangedBowAttackGoal<PlayerMobEntity> bowAttackGoal = new RangedBowAttackGoal<>(this, 1.0D, 20, 15.0F);
     private final RangedCrossbowAttackGoal<PlayerMobEntity> crossbowAttackGoal = new RangedCrossbowAttackGoal<>(this, 1.0D, 15.0F);
 
-    public PlayerMobEntity(Level worldIn, Supplier<? extends BeyonderClass> requiredClass) {
+    public PlayerMobEntity(Level worldIn, BeyonderClass requiredClass) {
         this(EntityInit.PLAYER_MOB_ENTITY.get(), worldIn, requiredClass);
     }
 
-    public PlayerMobEntity(EntityType<? extends Monster> entityType, Level worldIn, Supplier<? extends BeyonderClass> requiredClass) {
+    public PlayerMobEntity(EntityType<? extends Monster> entityType, Level worldIn, BeyonderClass requiredClass) {
         super(entityType, worldIn);
         this.requiredClass = requiredClass;
         setCombatTask();
@@ -508,7 +508,7 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
     }
 
 
-    public void setPathway (Supplier<? extends BeyonderClass> classToBeSet) {
+    public void setPathway (BeyonderClass classToBeSet) {
         this.requiredClass = classToBeSet;
     }
     public void setSpirituality(int spirituality) {
@@ -523,7 +523,7 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
     public int getMaxSpirituality() {
         return this.entityData.get(MAXSPIRITUALITY);
     }
-    public Supplier<? extends BeyonderClass> getCurrentPathway() {
+    public BeyonderClass getCurrentPathway() {
         return this.requiredClass;
     }
 

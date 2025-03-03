@@ -26,7 +26,7 @@ public class BeyonderResetPotion extends Item {
             level.playSound(null, player.getOnPos(), SoundEvents.WITHER_DEATH, SoundSource.PLAYERS, 0.5f, level.random.nextFloat() * 0.1F + 0.9F);
             player.sendSystemMessage(Component.literal("You are no longer a Beyonder").withStyle(ChatFormatting.BLACK).withStyle(ChatFormatting.BOLD));
             player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(20.0);
-            BeyonderHolderAttacher.getHolderUnwrap(player).removeClass();
+            BeyonderHolderAttacher.getHolderUnwrap(player).removePathway();
             if (!player.getAbilities().instabuild) {
                 itemStack.shrink(1);
                 player.hurt(player.damageSources().magic(), 1.0f);

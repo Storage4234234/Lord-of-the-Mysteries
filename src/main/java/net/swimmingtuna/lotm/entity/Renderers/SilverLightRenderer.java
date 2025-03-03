@@ -1,0 +1,28 @@
+package net.swimmingtuna.lotm.entity.Renderers;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.swimmingtuna.lotm.LOTM;
+import net.swimmingtuna.lotm.entity.Model.SilverLightModel;
+import net.swimmingtuna.lotm.entity.SilverLightEntity;
+import software.bernie.geckolib.renderer.GeoEntityRenderer;
+
+public class SilverLightRenderer extends GeoEntityRenderer<SilverLightEntity> {
+    public SilverLightRenderer(EntityRendererProvider.Context context) {
+        super(context, new SilverLightModel());
+    }
+
+    @Override
+    public ResourceLocation getTextureLocation(SilverLightEntity animatable) {
+        return new ResourceLocation(LOTM.MOD_ID, "textures/entity/silver_sword_entity.png");
+    }
+
+    @Override
+    protected void applyRotations(SilverLightEntity entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
+        super.applyRotations(entity, poseStack, ageInTicks, rotationYaw, partialTicks);
+        poseStack.mulPose(Axis.YP.rotationDegrees(entity.getYaw()));
+        poseStack.mulPose(Axis.XP.rotationDegrees(entity.getPitch()));
+    }
+}

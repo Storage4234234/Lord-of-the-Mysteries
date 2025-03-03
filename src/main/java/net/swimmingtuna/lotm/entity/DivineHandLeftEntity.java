@@ -4,6 +4,9 @@ package net.swimmingtuna.lotm.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -21,18 +24,23 @@ import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.UpdateEntityLocationS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import virtuoel.pehkui.api.ScaleTypes;
 
-public class DivineHandLeftEntity extends AbstractHurtingProjectile {
-
+public class DivineHandLeftEntity extends AbstractHurtingProjectile implements GeoEntity {
+    private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
     public DivineHandLeftEntity(EntityType<? extends DivineHandLeftEntity> entityType, Level level) {
         super(entityType, level);
     }
 
-    public DivineHandLeftEntity(Level level, LivingEntity shooter, double offsetX, double offsetY, double offsetZ) {
-        super(EntityInit.DIVINE_HAND_LEFT_ENTITY.get(), shooter, offsetX, offsetY, offsetZ, level);
-    }
 
 
     @Override
@@ -71,7 +79,43 @@ public class DivineHandLeftEntity extends AbstractHurtingProjectile {
         return false;
     }
 
+    private static final EntityDataAccessor<Float> YAW = SynchedEntityData.defineId(DivineHandLeftEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> PITCH = SynchedEntityData.defineId(DivineHandLeftEntity.class, EntityDataSerializers.FLOAT);
 
+    @Override
+    public void defineSynchedData() {
+        this.entityData.define(YAW, 0.0f);
+        this.entityData.define(PITCH, 0.0f);
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
+        if (tag.contains("yaw")) {
+            this.entityData.set(YAW, tag.getFloat("yaw"));
+        }
+        if (tag.contains("pitch")) {
+            this.entityData.set(PITCH, tag.getFloat("pitch"));
+        }
+    }
+
+    public float getYaw() {
+        return this.entityData.get(YAW);
+    }
+
+    public void setPitch(float pitch) {
+        this.entityData.set(PITCH, pitch);
+    }
+
+    public float getPitch() {
+        return this.entityData.get(PITCH);
+    }
+
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        tag.putFloat("yaw", this.entityData.get(YAW));
+        tag.putFloat("pitch", this.entityData.get(PITCH));
+    }
 
     @Override
     public @NotNull ParticleOptions getTrailParticle() {
@@ -84,10 +128,6 @@ public class DivineHandLeftEntity extends AbstractHurtingProjectile {
         return false;
     }
 
-    @Override
-    protected void defineSynchedData() {
-
-    }
 
     @Override
     protected boolean shouldBurn() {
@@ -98,6 +138,14 @@ public class DivineHandLeftEntity extends AbstractHurtingProjectile {
     public void tick() {
         super.tick();
         if (!level().isClientSide()) {
+            if (this.getOwner() != null) {
+                Vec3 motion = this.getDeltaMovement();
+                double horizontalDist = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+                float newYaw = (float) Math.toDegrees(Math.atan2(motion.x, motion.z));
+                float newPitch = (float) Math.toDegrees(Math.atan2(motion.y, horizontalDist));
+                this.setYaw(newYaw);
+                this.setPitch(newPitch);
+            }
             float radius = ScaleTypes.BASE.getScaleData(this).getScale();
             destroyBlocksAround((int) radius);
             Vec3 currentPos = this.position();
@@ -121,11 +169,29 @@ public class DivineHandLeftEntity extends AbstractHurtingProjectile {
                 for (int z = -radius; z <= radius; z++) {
                     BlockPos targetPos = centerPos.offset(x, y, z);
                     BlockState blockState = level().getBlockState(targetPos);
-                    if (blockState.getDestroySpeed(level(), targetPos) < obsidianHardness && !blockState.isAir()) {
-                        level().destroyBlock(targetPos, true);
+                    if (blockState.getDestroySpeed(level(), targetPos) < obsidianHardness && !blockState.isAir() && !(blockState.getBlock() == Blocks.BEDROCK)) {
+                        level().destroyBlock(targetPos, false);
                     }
                 }
             }
         }
+    }
+
+    public void setYaw(float yaw) {
+        this.entityData.set(YAW, yaw);
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    private PlayState predicate(AnimationState<DivineHandLeftEntity> animationState) {
+        return PlayState.STOP;
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return geoCache;
     }
 }

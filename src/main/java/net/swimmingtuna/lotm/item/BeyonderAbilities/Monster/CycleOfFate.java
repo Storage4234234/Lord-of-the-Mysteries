@@ -170,7 +170,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                         entity.setHealth(cycleHealth);
                         if (entity instanceof Player player1) {
                             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player1);
-                            holder.setCurrentSequence(cycleSequence);
+                            holder.setSequence(cycleSequence);
                             holder.setSpirituality(cycleSpirituality);
                         }
                         if (entity instanceof PlayerMobEntity playerMobEntity) {
@@ -209,7 +209,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                         int livingSpirituaity = livingTag.getInt("monsterCycleOfFateSpirituality");
                         if (living instanceof Player player1) {
                             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player1);
-                            holder.setCurrentSequence(livingSequence);
+                            holder.setSequence(livingSequence);
                             holder.setSpirituality(livingSpirituaity);
                         }
                         if (living instanceof PlayerMobEntity playerMobEntity) {
@@ -225,7 +225,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                         restorePotionEffectsFromTag(pPlayer, tag);
                         pPlayer.setHealth(userHealth);
                         event.setCanceled(true);
-                        BeyonderHolderAttacher.getHolderUnwrap(pPlayer).setCurrentSequence(userSequence);
+                        BeyonderHolderAttacher.getHolderUnwrap(pPlayer).setSequence(userSequence);
                         for (LivingEntity pEntity : living.level().getEntitiesOfClass(LivingEntity.class, living.getBoundingBox().inflate(800))) {
                             if (pEntity != pPlayer && pEntity != living) {
                                 CompoundTag pTag = pEntity.getPersistentData();
@@ -243,7 +243,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                                     pEntity.setHealth(entityHealth);
                                     if (pEntity instanceof Player player1) {
                                         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player1);
-                                        holder.setCurrentSequence(entitySequence);
+                                        holder.setSequence(entitySequence);
                                         holder.setSpirituality(entitySpirituality);
                                     }
                                     if (pEntity instanceof PlayerMobEntity playerMobEntity) {
