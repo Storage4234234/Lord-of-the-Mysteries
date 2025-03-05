@@ -40,27 +40,31 @@ public class MercuryPortalEntity extends Entity implements GeoEntity {
             } else if (this.tickCount < 40 && this.getPersistentData().contains("mercuryPortalOwner")) {
                 UUID uuid = this.getPersistentData().getUUID("mercuryPortalOwner");
                 LivingEntity owner = BeyonderUtil.getEntityFromUUID(this.level(), uuid);
-                this.setYaw(owner.getYRot());
-                this.setPitch(owner.getXRot());
+                if (owner != null) {
+                    this.setYaw(owner.getYRot());
+                    this.setPitch(owner.getXRot());
+                }
             } else if (this.tickCount == 40  && this.getPersistentData().contains("mercuryPortalOwner")) {
                 if (this.tickCount == 40 && this.getPersistentData().contains("mercuryPortalOwner")) {
                     UUID uuid = this.getPersistentData().getUUID("mercuryPortalOwner");
                     LivingEntity owner = BeyonderUtil.getEntityFromUUID(this.level(), uuid);
-                    Vec3 lookVec = owner.getLookAngle().normalize();
-                    Vec3 targetPos = owner.position().add(lookVec.scale(80));
-                    Vec3 direction = targetPos.subtract(this.position()).normalize();
-                    SilverLightEntity silverLight = new SilverLightEntity(EntityInit.SILVER_LIGHT_ENTITY.get(), this.level());
-                    silverLight.setOwner(owner);
-                    silverLight.setDeltaMovement(direction.scale(5).scale(6.5));
-                    silverLight.hurtMarked = true;
-                    silverLight.teleportTo(this.getX(), this.getY(), this.getZ());
-                    double horizontalDist = Math.sqrt(direction.x * direction.x + direction.z * direction.z);
-                    float yaw = (float) Math.toDegrees(Math.atan2(direction.z, direction.x));
-                    float pitch = (float) Math.toDegrees(Math.atan2(direction.y, horizontalDist));
-                    BeyonderUtil.setScale(silverLight, 1.5f);
-                    silverLight.setYaw(yaw);
-                    silverLight.setPitch(pitch);
-                    this.level().addFreshEntity(silverLight);
+                    if (owner != null && owner.isAlive()) {
+                        Vec3 lookVec = owner.getLookAngle().normalize();
+                        Vec3 targetPos = owner.position().add(lookVec.scale(80));
+                        Vec3 direction = targetPos.subtract(this.position()).normalize();
+                        SilverLightEntity silverLight = new SilverLightEntity(EntityInit.SILVER_LIGHT_ENTITY.get(), this.level());
+                        silverLight.setOwner(owner);
+                        silverLight.setDeltaMovement(direction.scale(5).scale(6.5));
+                        silverLight.hurtMarked = true;
+                        silverLight.teleportTo(this.getX(), this.getY(), this.getZ());
+                        double horizontalDist = Math.sqrt(direction.x * direction.x + direction.z * direction.z);
+                        float yaw = (float) Math.toDegrees(Math.atan2(direction.z, direction.x));
+                        float pitch = (float) Math.toDegrees(Math.atan2(direction.y, horizontalDist));
+                        BeyonderUtil.setScale(silverLight, 1.5f);
+                        silverLight.setYaw(yaw);
+                        silverLight.setPitch(pitch);
+                        this.level().addFreshEntity(silverLight);
+                    }
                 }
 
                 this.discard();

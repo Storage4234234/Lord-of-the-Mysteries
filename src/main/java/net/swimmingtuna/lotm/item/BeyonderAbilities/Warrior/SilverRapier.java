@@ -45,12 +45,18 @@ public class SilverRapier extends SimpleAbilityItem {
         CompoundTag tag = livingEntity.getPersistentData();
         int x = tag.getInt("silverRapierSummoning");
         if (!livingEntity.level().isClientSide() && x >= 1) {
-            tag.putInt("silverRapierSummoning", x -1);
+            tag.putInt("silverRapierSummoning", x - 1);
             MercuryPortalEntity mercuryPortal = new MercuryPortalEntity(EntityInit.MERCURY_PORTAL_ENTITY.get(), livingEntity.level());
             BeyonderUtil.setScale(mercuryPortal, 3);
-            double angle = (Math.random() > 0.5 ? 90 : -90) * (Math.PI / 180);
-            double offsetX = Math.cos(angle) * (2 + Math.random() * 8);
-            double offsetZ = Math.sin(angle) * (2 + Math.random() * 8);
+            float yaw = livingEntity.getYRot() * (float) (Math.PI / 90.0);
+            double sideOffset = (2 + Math.random() * 8);
+            double offsetX, offsetZ;
+            offsetX = -Math.sin(yaw) * sideOffset;
+            offsetZ = Math.cos(yaw) * sideOffset;
+            if (Math.random() < 0.5) {
+                offsetX = -offsetX;
+                offsetZ = -offsetZ;
+            }
             double offsetY = (Math.random() * 20) - 10;
             mercuryPortal.teleportTo(livingEntity.getX() + offsetX, livingEntity.getY() + offsetY, livingEntity.getZ() + offsetZ);
             mercuryPortal.getPersistentData().putUUID("mercuryPortalOwner", livingEntity.getUUID());

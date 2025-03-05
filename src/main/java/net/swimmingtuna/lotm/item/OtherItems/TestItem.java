@@ -75,7 +75,7 @@ public class TestItem extends SimpleAbilityItem {
             }
             SilverLightEntity silverLight = new SilverLightEntity(EntityInit.SILVER_LIGHT_ENTITY.get(), level);
             silverLight.setOwner(player);
-            silverLight.setDeltaMovement(player.getLookAngle().scale(10.0f));
+            silverLight.setDeltaMovement(player.getLookAngle().scale(2.0f));
             silverLight.hurtMarked = true;
             silverLight.teleportTo(player.getX(), player.getY(), player.getZ());
             silverLight.setYaw(player.getYRot());

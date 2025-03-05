@@ -5,14 +5,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -130,20 +134,34 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
     public void tick() {
         super.tick();
         if (!this.level().isClientSide() && this.getOwner() instanceof LivingEntity owner) {
-            if (this.tickCount >= 100 && !this.getPersistentData().getBoolean("hasTeleported")) {
+            if (this.tickCount >= 80 && !this.getPersistentData().getBoolean("hasTeleported")) {
                 this.getPersistentData().putBoolean("hasTeleported", true);
                 LivingEntity target = findTargetInSight(owner);
                 if (target != null) {
+                    owner.sendSystemMessage(Component.literal("sent"));
                     Vec3 teleportPos = getRandomPositionAroundTarget(target);
                     this.setPos(teleportPos.x, teleportPos.y, teleportPos.z);
                     Vec3 targetPos = target.position();
                     Vec3 direction = targetPos.subtract(this.position()).normalize();
                     this.setDeltaMovement(direction.scale(5.0));
-                    destroyBlocksAroundEntity();
+                    destroyBlocksAroundEntity(2);
+                } else {
+                    owner.sendSystemMessage(Component.literal("null"));
                 }
             }
             if (this.tickCount >= 200) {
                 this.discard();
+            }
+            if (this.level() instanceof ServerLevel serverLevel) {
+                int chunkRadius = 5;
+                ChunkPos centerChunk = new ChunkPos(this.blockPosition());
+
+                for (int dx = -chunkRadius; dx <= chunkRadius; dx++) {
+                    for (int dz = -chunkRadius; dz <= chunkRadius; dz++) {
+                        ChunkPos chunkPos = new ChunkPos(centerChunk.x + dx, centerChunk.z + dz);
+                        serverLevel.getChunkSource().addRegionTicket(TicketType.PLAYER, chunkPos, 3, chunkPos);
+                    }
+                }
             }
             LOTMNetworkHandler.sendToAllPlayers(new UpdateEntityLocationS2C(this.getX(), this.getY(), this.getZ(),this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z(), this.getId()));
         }
@@ -200,8 +218,7 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
         return new Vec3(x, y, z);
     }
 
-    private void destroyBlocksAroundEntity() {
-        int radius = 5;
+    private void destroyBlocksAroundEntity(int radius) {
         BlockPos pos = this.blockPosition();
 
         for (int x = -radius; x <= radius; x++) {
