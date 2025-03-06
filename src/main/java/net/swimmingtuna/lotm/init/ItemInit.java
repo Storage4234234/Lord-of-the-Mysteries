@@ -9,6 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.armor.DawnArmorItem;
+import net.swimmingtuna.lotm.armor.SilverArmorItem;
 import net.swimmingtuna.lotm.item.AllyMaker;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
@@ -456,13 +457,13 @@ public class ItemInit {
     public static final RegistryObject<Item> DAWN_BOOTS = ITEMS.register("dawn_boots",
             () -> new DawnArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.BOOTS,new Item.Properties()));
     public static final RegistryObject<Item> SILVER_HELMET = ITEMS.register("silver_helmet",
-            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.HELMET,new Item.Properties()));
+            () -> new SilverArmorItem(ModArmorMaterials.SILVER, ArmorItem.Type.HELMET,new Item.Properties()));
     public static final RegistryObject<Item> SILVER_CHESTPLATE = ITEMS.register("silver_chestplate",
-            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.CHESTPLATE,new Item.Properties()));
+            () -> new SilverArmorItem(ModArmorMaterials.SILVER, ArmorItem.Type.CHESTPLATE,new Item.Properties()));
     public static final RegistryObject<Item> SILVER_LEGGINGS = ITEMS.register("silver_leggings",
-            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.LEGGINGS,new Item.Properties()));
+            () -> new SilverArmorItem(ModArmorMaterials.SILVER, ArmorItem.Type.LEGGINGS,new Item.Properties()));
     public static final RegistryObject<Item> SILVER_BOOTS = ITEMS.register("silver_boots",
-            () -> new ArmorItem(ModArmorMaterials.DAWN, ArmorItem.Type.BOOTS,new Item.Properties()));
+            () -> new SilverArmorItem(ModArmorMaterials.SILVER, ArmorItem.Type.BOOTS,new Item.Properties()));
 
     //TOOLS
     public static final RegistryObject<Item> SWORDOFDAWN = ITEMS.register("swordofdawn",
