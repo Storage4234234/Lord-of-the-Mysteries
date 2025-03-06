@@ -36,6 +36,7 @@ public class ClientEventsEntity {
         event.registerEntityRenderer(EntityInit.DIVINE_HAND_RIGHT_ENTITY.get(), DivineHandRightRenderer::new);
         event.registerEntityRenderer(EntityInit.DIVINE_HAND_LEFT_ENTITY.get(), DivineHandLeftRenderer::new);
         event.registerEntityRenderer(EntityInit.SILVER_LIGHT_ENTITY.get(), SilverLightRenderer::new);
+        event.registerEntityRenderer(EntityInit.GLOBE_OF_TWILIGHT_ENTITY.get(), GlobeOfTwilightRenderer::new);
         event.registerEntityRenderer(EntityInit.MID_SEQUENCE_DOOR_ENTITY.get(), MidSequenceDoorRenderer::new);
         event.registerEntityRenderer(EntityInit.MERCURY_ENTITY.get(), MercuryEntityRenderer::new);
         event.registerEntityRenderer(EntityInit.DAWN_RAY_ENTITY.get(), DawnRayRenderer::new);

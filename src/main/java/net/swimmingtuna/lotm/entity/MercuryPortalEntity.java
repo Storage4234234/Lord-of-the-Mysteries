@@ -50,7 +50,7 @@ public class MercuryPortalEntity extends Entity implements GeoEntity {
                     LivingEntity owner = BeyonderUtil.getEntityFromUUID(this.level(), uuid);
                     if (owner != null && owner.isAlive()) {
                         Vec3 lookVec = owner.getLookAngle().normalize();
-                        Vec3 targetPos = owner.position().add(lookVec.scale(80));
+                        Vec3 targetPos = owner.position().add(lookVec.scale(50));
                         Vec3 direction = targetPos.subtract(this.position()).normalize();
                         SilverLightEntity silverLight = new SilverLightEntity(EntityInit.SILVER_LIGHT_ENTITY.get(), this.level());
                         silverLight.setOwner(owner);

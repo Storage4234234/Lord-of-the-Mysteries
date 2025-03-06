@@ -94,7 +94,10 @@ public class EntityInit {
                     .sized(2.0f,2.0f).clientTrackingRange(300).build("meteor_no_hurt"));
     public static final RegistryObject<EntityType<SilverLightEntity>> SILVER_LIGHT_ENTITY =
             ENTITIES.register("silver_beam_entity", () -> EntityType.Builder.<SilverLightEntity>of(SilverLightEntity::new, MobCategory.MISC)
-                    .sized(2.0f,2.0f).clientTrackingRange(200).build(new ResourceLocation(LOTM.MOD_ID, "silver_beam_entity").toString()));
+                    .sized(2.5f,2.5f).clientTrackingRange(400).build(new ResourceLocation(LOTM.MOD_ID, "silver_beam_entity").toString()));
+    public static final RegistryObject<EntityType<GlobeOfTwilightEntity>> GLOBE_OF_TWILIGHT_ENTITY =
+            ENTITIES.register("globe_of_twilight_entity", () -> EntityType.Builder.<GlobeOfTwilightEntity>of(GlobeOfTwilightEntity::new, MobCategory.MISC)
+                    .sized(1.0f,1.0f).clientTrackingRange(200).build(new ResourceLocation(LOTM.MOD_ID, "globe_of_twilight_entity").toString()));
     public static final RegistryObject<EntityType<WindBladeEntity>> WIND_BLADE_ENTITY =
             ENTITIES.register("wind_blade", () -> EntityType.Builder.<WindBladeEntity>of(WindBladeEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).clientTrackingRange(100).clientTrackingRange(4).updateInterval(20).build("wind_blade"));

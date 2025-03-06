@@ -1,4 +1,4 @@
-package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior;
+package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems;
 
 
 import net.minecraft.nbt.CompoundTag;

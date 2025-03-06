@@ -1289,6 +1289,7 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.DIVINEHANDRIGHT.get(), applyAbilityStrengthened((10.0f - (sequence * 4)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.DIVINEHANDLEFT.get(), applyAbilityStrengthened((10.0f - (sequence * 4)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.SILVERRAPIER.get(), applyAbilityStrengthened((40.0f - (sequence * 6)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.GLOBEOFTWILIGHT.get(), applyAbilityStrengthened((20.0f - (sequence * 8)) / abilityWeakness, abilityStrengthened));
 
         // APPRENTICE
         damageMap.put(ItemInit.CREATEDOOR.get(), applyAbilityStrengthened(0.0f, abilityStrengthened));
@@ -2306,5 +2307,10 @@ public class BeyonderUtil {
         if (!entity.level().isClientSide()) {
             ScaleTypes.BASE.getScaleData(entity).setTargetScale(scale);
         }
+    }
+
+    public static float getRandomInRange(float range) {
+        float random = (float) Math.random();
+        return (random * 2 * range) - range;
     }
 }

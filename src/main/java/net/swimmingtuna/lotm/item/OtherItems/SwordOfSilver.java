@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.item.OtherItems;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -8,47 +9,37 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.swimmingtuna.lotm.entity.SilverLightEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.item.Renderer.SwordOfDawnRenderer;
+import net.swimmingtuna.lotm.item.Renderer.SwordOfSilverRenderer;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class SwordOfSilver extends SwordItem {
+public class SwordOfSilver extends SwordItem implements GeoItem {
 
 
     public SwordOfSilver(Tier pTier, int pAttackDamageModifier, float pAttackSpeedModifier, Properties pProperties) {
         super(pTier, pAttackDamageModifier, pAttackSpeedModifier, pProperties);
-    }
-
-    @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
-        if (entity instanceof LivingEntity livingEntity && !level.isClientSide()) {
-            if (BeyonderUtil.currentPathwayAndSequenceMatchesNoException(livingEntity, BeyonderClassInit.WARRIOR.get(), 3)) {
-                if (livingEntity instanceof Player player) {
-                    if (player.tickCount % 2 == 0) {
-                        player.displayClientMessage(Component.literal(silverSwordString(player)), true);
-                    }
-                }
-            }
-        }
-        super.inventoryTick(stack, level, entity, itemSlot, isSelected);
-    }
-
-    public static String silverSwordString(Player pPlayer) {
-        CompoundTag tag = pPlayer.getPersistentData();
-        boolean silverSword = tag.getBoolean("silverSword");
-        if (silverSword) {
-            return "Hurricane of Light/Protection";
-        } else {
-            return "Spear of Silver";
-        }
     }
 
 
@@ -83,29 +74,39 @@ public class SwordOfSilver extends SwordItem {
     }
 
     @Override
-    public void releaseUsing(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity, int pTimeCharged) {
-        if (!(pLivingEntity instanceof Player player)) {
-            return;
-        }
+    public void releaseUsing(ItemStack pStack, Level pLevel, LivingEntity livingEntity, int pTimeCharged) {
         int i = this.getUseDuration(pStack) - pTimeCharged;
         float powerScale = getPowerForTime(i);
         if (!pLevel.isClientSide) {
-            Arrow arrow = new Arrow(pLevel, player);
-            arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, powerScale * 3.0F, 1.0F);
-            arrow.setCritArrow(powerScale > 0.5F);
-            arrow.setBaseDamage(arrow.getBaseDamage() * 2.0);
-            pLevel.addFreshEntity(arrow);
+            SilverLightEntity silverLight = new SilverLightEntity(EntityInit.SILVER_LIGHT_ENTITY.get(), pLevel);
+            silverLight.setShouldTeleport(false);
+            Vec3 lookVec = livingEntity.getLookAngle().normalize().scale(10);
+            silverLight.setDeltaMovement(lookVec);
+            silverLight.setOwner(livingEntity);
+            silverLight.hurtMarked = true;
+            silverLight.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
+            BeyonderUtil.setScale(silverLight, 6);
+            livingEntity.level().addFreshEntity(silverLight);
+            removeItemFromSlot(livingEntity, pStack);
+        }
+    }
+
+    private void removeItemFromSlot(LivingEntity entity, ItemStack stack) {
+        if (entity.getItemBySlot(EquipmentSlot.MAINHAND) == stack) {
+            entity.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
+        } else if (entity.getItemBySlot(EquipmentSlot.OFFHAND) == stack) {
+            entity.setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
         }
     }
 
     @Override
     public int getUseDuration(ItemStack pStack) {
-        return 72000; // Same as bow
+        return 72000;
     }
 
     @Override
     public UseAnim getUseAnimation(ItemStack pStack) {
-        return UseAnim.SPEAR; // Or BOW if you prefer that animation
+        return UseAnim.SPEAR;
     }
 
     private float getPowerForTime(int pCharge) {
@@ -115,6 +116,33 @@ public class SwordOfSilver extends SwordItem {
             f = 1.0F;
         }
         return f;
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "Activation", 0, state -> PlayState.STOP));
+    }
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(new IClientItemExtensions() {
+            private SwordOfSilverRenderer renderer;
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (this.renderer == null)
+                    this.renderer = new SwordOfSilverRenderer();
+
+                return this.renderer;
+            }
+        });
     }
 
 }
