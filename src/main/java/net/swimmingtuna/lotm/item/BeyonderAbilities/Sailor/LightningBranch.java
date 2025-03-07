@@ -52,7 +52,7 @@ public class LightningBranch extends SimpleAbilityItem {
 
     private void lightningBranch(Player player) {
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int sequence = holder.getCurrentSequence();
+        int sequence = holder.getSequence();
         if (!player.level().isClientSide()) {
             Vec3 lookVec = player.getLookAngle();
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());

@@ -311,7 +311,7 @@ public class ProphesizeDemise extends SimpleAbilityItem {
         Player player = event.getEntity();
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            LOTMNetworkHandler.sendToPlayer(new SyncSequencePacketS2C(holder.getCurrentSequence()), (ServerPlayer) player);
+            LOTMNetworkHandler.sendToPlayer(new SyncSequencePacketS2C(holder.getSequence()), (ServerPlayer) player);
             CompoundTag persistentData = player.getPersistentData();
 
             if (persistentData.contains("DemiseCounter")) {
@@ -335,7 +335,7 @@ public class ProphesizeDemise extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             CompoundTag persistentData = player.getPersistentData();
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            LOTMNetworkHandler.sendToPlayer(new SyncSequencePacketS2C(holder.getCurrentSequence()), (ServerPlayer) player);
+            LOTMNetworkHandler.sendToPlayer(new SyncSequencePacketS2C(holder.getSequence()), (ServerPlayer) player);
             if (persistentData.contains("DemiseCounter")) {
                 int demiseCounter = persistentData.getInt("DemiseCounter");
                 if (!persistentData.contains("EntityDemise") || persistentData.getInt("EntityDemise") == 0) {

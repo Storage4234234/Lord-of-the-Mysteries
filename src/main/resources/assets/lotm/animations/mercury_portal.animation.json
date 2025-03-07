@@ -1,0 +1,52 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"portal.rotating": {
+			"loop": true,
+			"animation_length": 1.2579,
+			"bones": {
+				"portal": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0],
+							"easing": "linear"
+						},
+						"0.1572": {
+							"vector": [0, 0, 45],
+							"easing": "linear"
+						},
+						"0.3145": {
+							"vector": [0, 0, 90],
+							"easing": "linear"
+						},
+						"0.4717": {
+							"vector": [0, 0, 135],
+							"easing": "linear"
+						},
+						"0.6289": {
+							"vector": [0, 0, 180],
+							"easing": "linear"
+						},
+						"0.7862": {
+							"vector": [0, 0, 225],
+							"easing": "linear"
+						},
+						"0.9434": {
+							"vector": [0, 0, 270],
+							"easing": "linear"
+						},
+						"1.1006": {
+							"vector": [0, 0, 315],
+							"easing": "linear"
+						},
+						"1.2579": {
+							"vector": [0, 0, 360],
+							"easing": "linear"
+						}
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

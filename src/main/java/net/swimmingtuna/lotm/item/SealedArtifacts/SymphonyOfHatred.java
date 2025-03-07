@@ -83,7 +83,7 @@ public class SymphonyOfHatred extends Item {
                     int sequence = 10;
                     if (living instanceof Player player) {
                         BeyonderHolder pHolder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                        sequence = pHolder.getCurrentSequence();
+                        sequence = pHolder.getSequence();
                     } else if (living instanceof PlayerMobEntity playerMobEntity) {
                         sequence = playerMobEntity.getCurrentSequence();
                     }

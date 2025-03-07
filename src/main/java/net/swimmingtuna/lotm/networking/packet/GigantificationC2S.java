@@ -28,6 +28,7 @@ public class GigantificationC2S {
             CompoundTag tag = player.getPersistentData();
             boolean x = tag.getBoolean("warriorShouldDestroyBlock");
             tag.putBoolean("warriorShouldDestroyBlock", !x);
+
             });
         return true;
     }

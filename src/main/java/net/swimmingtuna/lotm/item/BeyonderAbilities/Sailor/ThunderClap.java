@@ -47,7 +47,7 @@ public class ThunderClap extends SimpleAbilityItem {
     private void thunderClap(Player player) {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.THUNDER_CLAP.get());
             int duration = 100 - (sequence * 20);
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {

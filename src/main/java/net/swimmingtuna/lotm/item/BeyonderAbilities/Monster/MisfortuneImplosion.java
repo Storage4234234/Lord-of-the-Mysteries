@@ -49,7 +49,7 @@ public class MisfortuneImplosion extends SimpleAbilityItem {
     public static void misfortuneImplosion(Player player) {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             Level level = player.level();
             int enhancement = 1;
             if (level instanceof ServerLevel serverLevel) {
@@ -87,7 +87,7 @@ public class MisfortuneImplosion extends SimpleAbilityItem {
     public static void misfortuneCurse(Player player) {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             Level level = player.level();
             int enhancement = 1;
             if (level instanceof ServerLevel serverLevel) {

@@ -3,7 +3,6 @@ package net.swimmingtuna.lotm.item.OtherItems;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -16,11 +15,11 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
-import net.swimmingtuna.lotm.entity.GuardianBoxEntity;
-import net.swimmingtuna.lotm.entity.PlayerMobEntity;
+import net.swimmingtuna.lotm.entity.SilverLightEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 
 public class TestItem extends SimpleAbilityItem {
@@ -59,10 +58,7 @@ public class TestItem extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
-            if (interactionTarget instanceof PlayerMobEntity playerMobEntity) {
-                playerMobEntity.setMentalStrength(200);
-                player.sendSystemMessage(Component.literal("mental strength is now " + playerMobEntity.getMentalStrength()));
-            }
+            interactionTarget.getPersistentData().putInt("age", (int) interactionTarget.getMaxHealth() * 20);
         }
         return InteractionResult.SUCCESS;
     }
@@ -78,10 +74,8 @@ public class TestItem extends SimpleAbilityItem {
                     player.getCooldowns().removeCooldown(stack.getItem());
                 }
             }
-            GuardianBoxEntity boxEntity = new GuardianBoxEntity(EntityInit.GUARDIAN_BOX_ENTITY.get(), level);
-            boxEntity.setMaxSize((int) (Math.random() * 20));
-            boxEntity.teleportTo(player.getX(), player.getY(), player.getZ());
-            player.level().addFreshEntity(boxEntity);
+            BeyonderUtil.disableAbilities(player);
+            tag.putInt("inTwilight", 60);
         }
 
         return InteractionResult.SUCCESS;

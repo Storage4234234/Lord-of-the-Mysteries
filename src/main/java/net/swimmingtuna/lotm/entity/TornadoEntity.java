@@ -127,7 +127,7 @@ public class TornadoEntity extends AbstractHurtingProjectile {
     public static void summonCalamityTornado(Player player) {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             TornadoEntity tornado = new TornadoEntity(player.level(), player, 0, 0, 0);
             tornado.setTornadoHeight(75 - (sequence * 10));
             tornado.setTornadoRadius(25 - (sequence * 3));

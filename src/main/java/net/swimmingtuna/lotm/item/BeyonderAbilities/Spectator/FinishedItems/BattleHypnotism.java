@@ -51,7 +51,7 @@ public class BattleHypnotism extends SimpleAbilityItem {
         useSpirituality(player);
         addCooldown(player);
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        makesEntitiesAttackEachOther(player, player.level(), pContext.getClickedPos(), holder.getCurrentSequence(), (int) player.getAttribute(ModAttributes.DIR.get()).getValue());
+        makesEntitiesAttackEachOther(player, player.level(), pContext.getClickedPos(), holder.getSequence(), (int) player.getAttribute(ModAttributes.DIR.get()).getValue());
         return InteractionResult.SUCCESS;
     }
 

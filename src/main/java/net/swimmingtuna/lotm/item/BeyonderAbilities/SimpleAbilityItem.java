@@ -17,12 +17,15 @@ import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
+
 public abstract class SimpleAbilityItem extends Item implements Ability {
 
     protected final Supplier<? extends BeyonderClass> requiredClass;
@@ -39,6 +42,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     protected SimpleAbilityItem(Properties properties, Supplier<? extends BeyonderClass> requiredClass, int requiredSequence, int requiredSpirituality, int cooldown) {
         this(properties, requiredClass, requiredSequence, requiredSpirituality, cooldown, 3.0, 4.5);
     }
+
     protected SimpleAbilityItem(Properties properties, BeyonderClass requiredClass, int requiredSequence, int requiredSpirituality, int cooldown, double entityReach, double blockReach) {
         this(properties, () -> requiredClass, requiredSequence, requiredSpirituality, cooldown, entityReach, blockReach);
     }
@@ -73,8 +77,23 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     }
 
     protected boolean checkAll(Player player) {
-        return checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality);
+        if(player.getItemInHand(InteractionHand.MAIN_HAND).is(this)) {
+            if(!checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, false)) {
+                if(BeyonderUtil.sequenceAbleCopy(player)) {
+                    if(BeyonderUtil.checkAbilityIsCopied(player, this)) {
+                        BeyonderUtil.useCopiedAbility(player, this);
+                        return checkSpirituality(BeyonderHolderAttacher.getHolderUnwrap(player), player, this.getSpirituality(), true);
+                    }
+                }
+            }
+            if(checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, true)) {
+                BeyonderUtil.copyAbilities(player.level(), player, this);
+                return true;
+            }
+        }
+        return false;
     }
+
     public int getSpirituality() {
         return this.requiredSpirituality;
     }
@@ -132,6 +151,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     protected void addCooldown(Player player) {
         addCooldown(player, this, this.cooldown);
     }
+
     public int getCooldown() {
         return this.cooldown;
     }
@@ -162,45 +182,52 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         return stringBuilder.toString();
     }
 
-    public static boolean checkRequiredClass(BeyonderHolder holder, Player player, BeyonderClass requiredClass) {
+    public static boolean checkRequiredClass(BeyonderHolder holder, Player player, BeyonderClass requiredClass, boolean message) {
         if (!holder.currentClassMatches(requiredClass)) {
             String name = requiredClass.sequenceNames().get(9);
 
-            player.displayClientMessage(
-                    Component.literal("You are not of the ").withStyle(ChatFormatting.AQUA).append(
-                            Component.literal(name).withStyle(requiredClass.getColorFormatting())).append(
-                                    Component.literal(" Pathway").withStyle(ChatFormatting.AQUA)), true);
+            if(message)
+                player.displayClientMessage(
+                        Component.literal("You are not of the ").withStyle(ChatFormatting.AQUA).append(
+                                Component.literal(name).withStyle(requiredClass.getColorFormatting())).append(
+                                Component.literal(" Pathway").withStyle(ChatFormatting.AQUA)), true);
             return false;
         }
         return true;
     }
 
-    public static boolean checkRequiredSequence(BeyonderHolder holder, Player player, int requiredSequence) {
-        if (holder.getCurrentSequence() > requiredSequence) {
-            player.displayClientMessage(
-                    Component.literal("You need to be sequence ").withStyle(ChatFormatting.AQUA).append(
-                            Component.literal(String.valueOf(requiredSequence)).withStyle(ChatFormatting.YELLOW)).append(
-                                    Component.literal(" or lower to use this").withStyle(ChatFormatting.AQUA)), true);
+    public static boolean checkRequiredSequence(BeyonderHolder holder, Player player, int requiredSequence, boolean message) {
+        if (holder.getSequence() > requiredSequence) {
+            if(message)
+                player.displayClientMessage(
+                        Component.literal("You need to be sequence ").withStyle(ChatFormatting.AQUA).append(
+                                Component.literal(String.valueOf(requiredSequence)).withStyle(ChatFormatting.YELLOW)).append(
+                                Component.literal(" or lower to use this").withStyle(ChatFormatting.AQUA)), true);
             return false;
         }
         return true;
     }
 
-    public static boolean checkSpirituality(BeyonderHolder holder, Player player, int requiredSpirituality) {
+    public static boolean checkSpirituality(BeyonderHolder holder, Player player, int requiredSpirituality, boolean message) {
         if (holder.getSpirituality() < requiredSpirituality) {
-            player.displayClientMessage(
-                    Component.literal("You need ").withStyle(ChatFormatting.AQUA).append(
-                            Component.literal(String.valueOf(requiredSpirituality)).withStyle(ChatFormatting.YELLOW)).append(
-                            Component.literal(" spirituality to use this").withStyle(ChatFormatting.AQUA)), true);
+            if(message)
+                player.displayClientMessage(
+                        Component.literal("You need ").withStyle(ChatFormatting.AQUA).append(
+                                Component.literal(String.valueOf(requiredSpirituality)).withStyle(ChatFormatting.YELLOW)).append(
+                                Component.literal(" spirituality to use this").withStyle(ChatFormatting.AQUA)), true);
             return false;
         }
         return true;
     }
 
-    public static boolean checkAll(Player player, BeyonderClass requiredClass, int requiredSequence, int requiredSpirituality) {
+    public static boolean checkAll(Player player, BeyonderClass requiredClass, int requiredSequence, int requiredSpirituality, boolean message) {
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        return checkRequiredClass(holder, player, requiredClass) && checkRequiredSequence(holder, player, requiredSequence) && checkSpirituality(holder, player, requiredSpirituality);
+        return checkRequiredClass(holder, player, requiredClass, message) && checkRequiredSequence(holder, player, requiredSequence, message) && checkSpirituality(holder, player, requiredSpirituality, message);
     }
+
+
+
+
 
     public static boolean useSpirituality(Player player, int spirituality) {
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
@@ -231,9 +258,23 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
                         livingEntity.sendSystemMessage(Component.literal("How unlucky! You messed up and couldn't use your ability!").withStyle(ChatFormatting.RED));
                     }
                     return false;
+                } else if (tag.getInt("unableToUseAbility") >= 1) {
+                    tag.putInt("unableToUseAbility", tag.getInt("unableToUseAbility") - 1);
+                    if (livingEntity instanceof Player player) {
+                        player.displayClientMessage(Component.literal("You are unable to use your ability").withStyle(ChatFormatting.RED), true);
+                    }
                 }
             }
         }
         return true;
+    }
+
+    public interface scribeAbilitiesStorage {
+        Map<Item, Integer> getScribedAbilities();
+        void copyScribeAbility(Item ability);
+        boolean hasScribedAbility(Item ability);
+        void useScribeAbility(Item ability);
+        int getRemainUses(Item ability);
+        int getScribedAbilitiesCount();
     }
 }

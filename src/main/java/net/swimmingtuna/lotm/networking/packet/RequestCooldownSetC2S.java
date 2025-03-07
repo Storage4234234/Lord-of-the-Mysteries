@@ -3,10 +3,10 @@ package net.swimmingtuna.lotm.networking.packet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import net.swimmingtuna.lotm.events.ModEvents;
-import net.swimmingtuna.lotm.util.BeyonderUtil;
 
 import java.util.function.Supplier;
+
+import static net.swimmingtuna.lotm.util.BeyonderUtil.setCooldown;
 
 public class RequestCooldownSetC2S {
     public RequestCooldownSetC2S() {
@@ -21,10 +21,9 @@ public class RequestCooldownSetC2S {
     public static void handle(RequestCooldownSetC2S msg, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
-            // On the server
             ServerPlayer player = context.getSender();
             if (player != null) {
-                BeyonderUtil.setCooldown(player, 2);
+                setCooldown(player, 2);
             }
         });
         context.setPacketHandled(true);

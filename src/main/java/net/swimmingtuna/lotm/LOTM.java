@@ -302,7 +302,9 @@ public class LOTM {
             event.accept(ItemInit.SYMPHONYOFHATRED);
             event.accept(ItemInit.WINTRYBLADE);
             event.accept(ItemInit.SWORDOFDAWN);
+            event.accept(ItemInit.SWORDOFTWILIGHT);
             event.accept(ItemInit.SPEAROFDAWN);
+            event.accept(ItemInit.SWORDOFSILVER);
             event.accept(ItemInit.PICKAXEOFDAWN);
             event.accept(ItemInit.GIGANTIFICATION);
             event.accept(ItemInit.LIGHTOFDAWN);
@@ -312,6 +314,7 @@ public class LOTM {
             event.accept(ItemInit.EYEOFDEMONHUNTING);
             event.accept(ItemInit.WARRIORDANGERSENSE);
             event.accept(ItemInit.MERCURYLIQUEFICATION);
+            event.accept(ItemInit.SILVERSWORDMANIFESTATION);
             event.accept(ItemInit.SILVERRAPIER);
             event.accept(ItemInit.SILVERARMORY);
             event.accept(ItemInit.LIGHTCONCEALMENT);
@@ -322,8 +325,10 @@ public class LOTM {
             event.accept(ItemInit.DIVINEHANDRIGHT);
             event.accept(ItemInit.DIVINEHANDLEFT);
             event.accept(ItemInit.TWILIGHTMANIFESTATION);
-            event.accept(ItemInit.SILVERLIGHT);
             event.accept(ItemInit.AURAOFTWILIGHT);
+            event.accept(ItemInit.TWILIGHTFREEZE);
+            event.accept(ItemInit.TWILIGHTACCELERATE);
+            event.accept(ItemInit.TWILIGHTLIGHT);
             event.accept(ItemInit.GLOBEOFTWILIGHT);
             event.accept(ItemInit.DAWN_HELMET);
             event.accept(ItemInit.DAWN_CHESTPLATE);
@@ -333,6 +338,17 @@ public class LOTM {
             event.accept(ItemInit.SILVER_CHESTPLATE);
             event.accept(ItemInit.SILVER_LEGGINGS);
             event.accept(ItemInit.SILVER_BOOTS);
+            event.accept(ItemInit.TRICKBURN);
+            event.accept(ItemInit.TRICKBOUNCE);
+            event.accept(ItemInit.TRICKFREEZE);
+            event.accept(ItemInit.TRICKTUMBLE);
+            event.accept(ItemInit.TRICKWINDPULL);
+            event.accept(ItemInit.TRICKWINDPUSH);
+            event.accept(ItemInit.RECORDSCRIBE);
+            event.accept(ItemInit.TRAVELDOOR);
+            event.accept(ItemInit.TRAVELDOORHOME);
+            event.accept(ItemInit.INVISIBLEHAND);
+
         }
         if (event.getTabKey() == CreativeModeTabs.OP_BLOCKS) {
             event.accept(BlockInit.VISIONARY_BARRIER_BLOCK);

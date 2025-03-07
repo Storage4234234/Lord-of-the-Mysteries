@@ -82,6 +82,8 @@ public class RebootSelf extends SimpleAbilityItem {
         double misfortune = tag.getDouble("misfortune");
         double sanity = tag.getDouble("sanity");
         double corruption = tag.getDouble("corruption");
+        int age = tag.getInt("age");
+        tag.putInt("monsterRebootAge", age);
         tag.putInt("monsterRebootLuck", (int) luck);
         tag.putInt("monsterRebootMisfortune", (int) misfortune);
         tag.putInt("monsterRebootSanity", (int) sanity);
@@ -102,6 +104,7 @@ public class RebootSelf extends SimpleAbilityItem {
         for (MobEffectInstance activeEffect : new ArrayList<>(player.getActiveEffects())) {
             player.removeEffect(activeEffect.getEffect());
         }
+        int age = tag.getInt("monsterRebootAge");
         int sanity = tag.getInt("monsterRebootSanity");
         int luck = tag.getInt("monsterRebootLuck");
         int misfortune = tag.getInt("monsterRebootMisfortune");
@@ -116,6 +119,7 @@ public class RebootSelf extends SimpleAbilityItem {
                 player.addEffect(effect);
             }
         }
+        tag.putInt("age", age);
         tag.putDouble("sanity", sanity);
         tag.putDouble("corruption", corruption);
         tag.putDouble("luck", luck);

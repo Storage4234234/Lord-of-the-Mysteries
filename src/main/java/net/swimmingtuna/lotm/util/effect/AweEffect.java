@@ -17,7 +17,7 @@ public class AweEffect extends MobEffect {
             double z = livingEntity.getZ();
             livingEntity.teleportTo(x, y, z);
             livingEntity.setDeltaMovement(0,0,0);
-
+            livingEntity.hurtMarked = true;
         }
         super.applyEffectTick(livingEntity, amplifier);
     }

@@ -96,10 +96,10 @@ public class CycleOfFate extends SimpleAbilityItem {
             player.getPersistentData().putInt("monsterCycleOfFateUserY", (int) player.getY());
             player.getPersistentData().putInt("monsterCycleOfFateUserZ", (int) player.getZ());
             player.getPersistentData().putInt("monsterCycleOfFateUserHealth", (int) player.getHealth());
-            player.getPersistentData().putInt("monsterCycleOfFateUserSequence", holder.getCurrentSequence());
+            player.getPersistentData().putInt("monsterCycleOfFateUserSequence", holder.getSequence());
             if (interactionTarget instanceof Player pPlayer) {
                 spirituality = (int) BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSpirituality();
-                sequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getCurrentSequence();
+                sequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSequence();
             }
             if (interactionTarget instanceof PlayerMobEntity playerMobEntity) {
                 sequence = playerMobEntity.getCurrentSequence();
@@ -129,7 +129,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                         tag.putInt("monsterCycleOfFateEntityHealth", (int) entity.getHealth());
                         if (entity instanceof Player pPlayer) {
                             pSpirituality = (int) BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSpirituality();
-                            pSequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getCurrentSequence();
+                            pSequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSequence();
                             tag.putInt("monsterCycleOfFateEntitySpirituality", (int) pSpirituality);
                             tag.putInt("monsterCycleOfFateEntitySequence", (int) pSequence);
                         }
@@ -170,7 +170,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                         entity.setHealth(cycleHealth);
                         if (entity instanceof Player player1) {
                             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player1);
-                            holder.setCurrentSequence(cycleSequence);
+                            holder.setSequence(cycleSequence);
                             holder.setSpirituality(cycleSpirituality);
                         }
                         if (entity instanceof PlayerMobEntity playerMobEntity) {
@@ -209,7 +209,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                         int livingSpirituaity = livingTag.getInt("monsterCycleOfFateSpirituality");
                         if (living instanceof Player player1) {
                             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player1);
-                            holder.setCurrentSequence(livingSequence);
+                            holder.setSequence(livingSequence);
                             holder.setSpirituality(livingSpirituaity);
                         }
                         if (living instanceof PlayerMobEntity playerMobEntity) {
@@ -225,7 +225,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                         restorePotionEffectsFromTag(pPlayer, tag);
                         pPlayer.setHealth(userHealth);
                         event.setCanceled(true);
-                        BeyonderHolderAttacher.getHolderUnwrap(pPlayer).setCurrentSequence(userSequence);
+                        BeyonderHolderAttacher.getHolderUnwrap(pPlayer).setSequence(userSequence);
                         for (LivingEntity pEntity : living.level().getEntitiesOfClass(LivingEntity.class, living.getBoundingBox().inflate(800))) {
                             if (pEntity != pPlayer && pEntity != living) {
                                 CompoundTag pTag = pEntity.getPersistentData();
@@ -243,7 +243,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                                     pEntity.setHealth(entityHealth);
                                     if (pEntity instanceof Player player1) {
                                         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player1);
-                                        holder.setCurrentSequence(entitySequence);
+                                        holder.setSequence(entitySequence);
                                         holder.setSpirituality(entitySpirituality);
                                     }
                                     if (pEntity instanceof PlayerMobEntity playerMobEntity) {

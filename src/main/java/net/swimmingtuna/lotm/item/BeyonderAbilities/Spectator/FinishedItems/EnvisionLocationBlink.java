@@ -37,7 +37,7 @@ public class EnvisionLocationBlink extends SimpleAbilityItem {
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
         int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, blinkDistance * 4)) {
+        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, blinkDistance * 4, true)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player, this, 20 / dreamIntoReality);
@@ -49,6 +49,7 @@ public class EnvisionLocationBlink extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Use in order to envision your location in the direction you're looking"));
+        tooltipComponents.add(Component.literal("Shift to increase distance"));
         tooltipComponents.add(Component.literal("Left Click for Envision Kingdom"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("Blinked Distance x 4").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));
@@ -62,7 +63,7 @@ public class EnvisionLocationBlink extends SimpleAbilityItem {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
             Level level = player.level();
-            if (holder.currentClassMatches(BeyonderClassInit.SPECTATOR) && !player.level().isClientSide() && holder.getCurrentSequence() == 0 && holder.useSpirituality(blinkDistance * 8)) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.SPECTATOR.get(), 0) && !player.level().isClientSide()&& holder.useSpirituality(blinkDistance * 8)) {
                 Vec3 lookVector = player.getLookAngle();
                 double targetX = player.getX() + blinkDistance * lookVector.x();
                 double targetY = (player.getY() + 1) + blinkDistance * lookVector.y();

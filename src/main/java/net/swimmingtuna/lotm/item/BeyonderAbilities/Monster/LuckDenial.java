@@ -84,7 +84,7 @@ public class LuckDenial extends SimpleAbilityItem {
             CompoundTag tag = interactionTarget.getPersistentData();
             double luck = tag.getDouble("luck");
             double misfortune = tag.getDouble("misfortune");
-            if (holder.getCurrentSequence() <= 2) {
+            if (holder.getSequence() <= 2) {
                 tag.putDouble("luckDenialTimer", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.LUCKDENIAL.get()));
                 tag.putDouble("luckDenialLuck", luck);
                 tag.putDouble("luckDenialMisfortune", misfortune);

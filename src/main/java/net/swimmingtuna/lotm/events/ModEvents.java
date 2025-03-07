@@ -1,62 +1,30 @@
 package net.swimmingtuna.lotm.events;
 
-import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.DustParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.Skeleton;
-import net.minecraft.world.entity.monster.Vex;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -68,11 +36,11 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.swimmingtuna.lotm.LOTM;
+import net.swimmingtuna.lotm.beyonder.ApprenticeClass;
 import net.swimmingtuna.lotm.beyonder.SailorClass;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
@@ -80,19 +48,30 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.client.Configs;
 import net.swimmingtuna.lotm.commands.AbilityRegisterCommand;
 import net.swimmingtuna.lotm.entity.*;
-import net.swimmingtuna.lotm.init.*;
+import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.GameRuleInit;
+import net.swimmingtuna.lotm.init.ItemInit;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.BounceProjectiles;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.Burn;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.InvisibleHand;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.AqueousLightDrown;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.ExtremeColdness;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.StormSeal;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.TsunamiSeal;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.BattleHypnotism;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeDemise;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.SilverRapier;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.GlobeOfTwilight;
+import net.swimmingtuna.lotm.item.OtherItems.SwordOfTwilight;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.RemoveInvisibiltyS2C;
-import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
-import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderInvisibilityPacketS2C;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.AllyInformation.PlayerAllyData;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
@@ -103,14 +82,15 @@ import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.util.effect.NoRegenerationEffect;
 import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
 import net.swimmingtuna.lotm.world.worldgen.MirrorWorldChunkGenerator;
-import virtuoel.pehkui.api.ScaleData;
-import virtuoel.pehkui.api.ScaleTypes;
 
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
+import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.apprenticeWindSlowFall;
+import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.trickmasterBounceHitProjectiles;
 import static net.swimmingtuna.lotm.beyonder.MonsterClass.*;
-import static net.swimmingtuna.lotm.beyonder.WarriorClass.warriorDamageNegation;
+import static net.swimmingtuna.lotm.beyonder.WarriorClass.newWarriorDamageNegation;
+import static net.swimmingtuna.lotm.beyonder.WarriorClass.twilightTick;
 import static net.swimmingtuna.lotm.blocks.MonsterDomainBlockEntity.domainDrops;
 import static net.swimmingtuna.lotm.entity.PlayerMobEntity.getDrop;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser.clickEvent;
@@ -124,20 +104,20 @@ import static net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MonsterCalami
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MonsterCalamityIncarnation.calamityLightningStorm;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MonsterDangerSense.monsterDangerSense;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.ProbabilityManipulationWorldFortune.probabilityManipulationWorld;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.AcidicRain.acidicRain;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.AcidicRain.acidicRainTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.CalamityIncarnationTsunami.calamityIncarnationTsunamiTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.Earthquake.earthquake;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.Earthquake.isOnSurface;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.ExtremeColdness.extremeColdness;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.ExtremeColdness.extremeColdnessTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.Hurricane.hurricane;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.LightningStorm.lightningStorm;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.MatterAccelerationEntities.matterAccelerationEntities;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.MatterAccelerationSelf.matterAccelerationSelf;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.RagingBlows.ragingBlows;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.RagingBlows.ragingBlowsTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.RainEyes.rainEyesTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.SailorLightningTravel.sailorLightningTravel;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.SirenSongHarm.sirenSongs;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.SirenSongHarm.sirenSongsTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.StarOfLightning.starOfLightning;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.Tsunami.tsunami;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.WaterSphere.waterSphereCheck;
@@ -155,8 +135,8 @@ import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedIte
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.Nightmare.nightmareTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeTeleportPlayer.prophesizeTeleportation;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.PsychologicalInvisibility.*;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.Gigantification.warriorGiant;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.WarriorDangerSense.warriorDangerSense;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.Gigantification.warriorGiant;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.WarriorDangerSense.warriorDangerSense;
 import static net.swimmingtuna.lotm.util.BeyonderUtil.*;
 import static net.swimmingtuna.lotm.util.effect.StunEffect.livingNoMoveEffect;
 import static net.swimmingtuna.lotm.world.worldgen.dimension.DimensionInit.SPIRIT_WORLD_LEVEL_KEY;
@@ -207,10 +187,10 @@ public class ModEvents {
     public static void craftEvent(PlayerEvent.ItemCraftedEvent event) {
         Player player = event.getEntity();
         if (!player.level().isClientSide()) {
-            if (BeyonderUtil.getPathway(player) != BeyonderClassInit.WARRIOR.get() && BeyonderUtil.getSequence(player) > 4) {
+            if (!(BeyonderUtil.currentPathwayAndSequenceMatchesNoException(player, BeyonderClassInit.WARRIOR.get(), 4))) {
                 if (event.getCrafting().getItem() == ItemInit.LIGHTNINGRUNE.get() || event.getCrafting().getItem() == ItemInit.CONFUSIONRUNE.get() || event.getCrafting().getItem() == ItemInit.FLAMERUNE.get() || event.getCrafting().getItem() == ItemInit.WITHERRUNE.get() || event.getCrafting().getItem() == ItemInit.FREEZERUNE.get()) {
                     event.setCanceled(true);
-                    player.sendSystemMessage(Component.literal("You aren't the right pathway and sequence to be able to craft this.").withStyle(ChatFormatting.RED));
+                    player.sendSystemMessage(Component.literal("You aren't the correct pathway and/or sequence to be able to craft this.").withStyle(ChatFormatting.RED));
                 }
             }
         }
@@ -262,7 +242,7 @@ public class ModEvents {
         Style style = BeyonderUtil.getStyle(player);
         CompoundTag playerPersistentData = player.getPersistentData();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int sequence = holder.getCurrentSequence();
+        int sequence = holder.getSequence();
     }
 
     @SubscribeEvent
@@ -272,7 +252,7 @@ public class ModEvents {
         CompoundTag tag = player.getPersistentData();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         if (!(player.level() instanceof ServerLevel serverLevel)) return;
-        int sequence = holder.getCurrentSequence();
+        int sequence = holder.getSequence();
         if (player.level().isClientSide() || event.phase != TickEvent.Phase.START) {
             return;
         }
@@ -292,7 +272,7 @@ public class ModEvents {
                     }
                 }
                 AbilityRegisterCommand.tickEvent(serverPlayer);
-                if (holder.getCurrentSequence() != 0 && ClientSequenceData.getCurrentSequence() == 0) {
+                if (holder.getSequence() != 0 && ClientSequenceData.getCurrentSequence() == 0) {
                     ClientSequenceData.setCurrentSequence(-1);
                 }
 
@@ -303,47 +283,9 @@ public class ModEvents {
                 setCooldown(serverPlayer, currentCooldown);
             }
         }
+        BeyonderUtil.copyAbilityTick(player);
         abilityCooldownsServerTick(event);
-        FateReincarnation.monsterReincarnationChecker(player);
-        monsterDangerSense(tag, holder, player);
-        decrementMonsterAttackEvent(player);
-        onChaosWalkerCombat(player);
-        monsterLuckIgnoreMobs(player);
-        monsterLuckPoisonAttacker(player);
-        calamityExplosion(player);
-        warriorDangerSense(tag, holder, player);
-        calamityLightningStorm(player);
-        calamityUndeadArmy(player);
-        nightmareTick(player, tag);
-        calamityIncarnationTornado(tag, player);
-        psychologicalInvisibility(player, tag, holder);
-        monsterDomainIntHandler(player);
-        windManipulationSense(tag, holder, player);
-        sailorLightningTravel(player);
-        windManipulationGuide(tag, holder, player);
-        dreamIntoReality(player, holder);
-        consciousnessStroll(tag, player);
-        prophesizeTeleportation(tag, player);
-        projectileEvent(player, holder);
-        envisionBarrier(holder, player, style);
-        envisionLife(player);
-        manipulateMovement(player, serverLevel);
-        envisionKingdom(tag, player, holder, serverLevel);
-        acidicRain(player, sequence);
-        calamityIncarnationTsunamiTick(tag, player, serverLevel);
-        earthquake(player, sequence);
-        extremeColdness(tag, holder, player);
-        hurricane(tag, player);
-        lightningStorm(player, tag, style, holder);
-        matterAccelerationSelf(player, holder, style);
-        ragingBlowsTick(tag, holder, player);
-        rainEyesTick(player);
-        sirenSongs(tag, holder, player, sequence);
-        sirenSongs(player);
-        starOfLightning(player, tag);
-        tsunami(tag, player);
-        waterSphereCheck(player, serverLevel);
-        windManipulationFlight(player, tag);
+
     }
 
     @SubscribeEvent
@@ -360,27 +302,15 @@ public class ModEvents {
     }
 
 
-
-
-
-
     @SubscribeEvent
     public static void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
         Player player = event.getEntity();
         ItemStack itemStack = player.getItemInHand(event.getHand());
-
-        // Check if the player is holding your SimpleAbilityItem
         if (itemStack.getItem() instanceof SimpleAbilityItem) {
             if (event.getTarget() instanceof LivingEntity livingEntity) {
-
-
-                // Execute custom interaction logic
-                InteractionResult result = ((SimpleAbilityItem) itemStack.getItem())
-                        .useAbilityOnEntity(itemStack, player, livingEntity, event.getHand());
-
-                // Cancel the default interaction if your item interaction is successful
+                InteractionResult result = ((SimpleAbilityItem) itemStack.getItem()).useAbilityOnEntity(itemStack, player, livingEntity, event.getHand());
                 if (result == InteractionResult.SUCCESS) {
-                    event.setCanceled(true);  // Cancels the event, preventing default interaction
+                    event.setCanceled(true);
                     event.setCancellationResult(InteractionResult.SUCCESS);
                 }
             }
@@ -388,56 +318,133 @@ public class ModEvents {
     }
 
     @SubscribeEvent
-    public static void handleLivingTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity entity = event.getEntity();
-        CompoundTag tag = entity.getPersistentData();
-        Level level = entity.level();
-        if (!entity.level().isClientSide) {
-            if (entity.level() instanceof ServerLevel serverLevel) {
-                CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, entity);
-            }
+    public static void entityInteractEvent(PlayerInteractEvent.EntityInteract event) {
+        MercuryLiquefication.mercuryArmorRightClick(event);
+    }
 
-            Gigantification.gigantificationScale(event);
-            EnableOrDisableProtection.warriorProtectionTick(event);
-            GuardianBoxEntity.decrementGuardianTimer(entity);
-            EyeOfDemonHunting.eyeTick(event);
-            EyeOfDemonHunting.demonHunterAntiConcealment(event);
-            livingNoMoveEffect(event);
-            psychologicalInvisibilityHurtTick(entity);
-            //windManipulationCushion(entity);
-            //sendSpiritWorldPackets(entity);
-            WintryBlade.wintryBladeTick(event);
-            warriorGiant(entity);
-            DeathKnell.deathKnellNegativeTick(entity);
-            BattleHypnotism.untargetMobs(event);
-            ProbabilityManipulationInfiniteMisfortune.testEvent(event);
-            probabilityManipulationWorld(entity);
-            CycleOfFate.tickEvent(event);
-            dodgeProjectiles(entity);
-            MisfortuneManipulation.livingTickMisfortuneManipulation(event);
-            FalseProphecy.falseProphecyTick(entity);
-            AuraOfChaos.auraOfChaos(event);
-            NoRegenerationEffect.preventRegeneration(entity);
-            MisfortuneRedirection.misfortuneLivingTickEvent(event);
-            livingLightningStorm(entity);
-            Gigantification.gigantificationDestroyBlocks(event);
-            LightOfDawn.sunriseGleamTick(event);
-            doubleProphecyDamageHelper(event);
-            showMonsterParticles(entity);
-            LuckDenial.luckDenial(entity);
-            MonsterCalamityIncarnation.calamityTickEvent(event);
-            dreamWeaving(entity);
-            LightConcealment.lightConcealmentTick(event);
-            ProphesizeDemise.demiseTick(event);
-            prophesizeTeleportation(tag, entity);
-            AqueousLightDrown.aqueousLightDrownTick(event);
-            matterAccelerationEntities(entity);
-            ExtremeColdness.extremeColdnessTick(event);
-            mentalPlague(entity);
-            StormSeal.sealTick(event);
-            AqueousLightDrown.lightTickEvent(entity);
-            TsunamiSeal.sealTick(event);
+    @SubscribeEvent
+    public static void rightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
+        MercuryLiquefication.mercuryRightClick(event);
+    }
+
+
+
+    @SubscribeEvent
+    public static void handleLivingTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        CompoundTag tag = livingEntity.getPersistentData();
+        Level level = livingEntity.level();
+        if (!livingEntity.level().isClientSide()) {
+            if (livingEntity.level() instanceof ServerLevel serverLevel) {
+                CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
+            }
+            if (tag.getInt("inTwilight") == 0) {
+                dreamIntoReality(livingEntity);
+                acidicRainTick(livingEntity);
+                lightningStorm(livingEntity);
+                tsunami(livingEntity);
+                ragingBlowsTick(livingEntity);
+                waterSphereCheck(livingEntity);
+                windManipulationFlight(livingEntity);
+                sirenSongs(livingEntity);
+                starOfLightning(livingEntity);
+                sirenSongsTick(livingEntity);
+                matterAccelerationSelf(livingEntity);
+                rainEyesTick(livingEntity);
+                earthquake(livingEntity);
+                hurricane(livingEntity);
+                extremeColdness(livingEntity);
+                calamityIncarnationTsunamiTick(livingEntity);
+                envisionKingdom(livingEntity, level);
+                envisionBarrier(livingEntity);
+                manipulateMovement(livingEntity);
+                envisionBarrier(livingEntity);
+                consciousnessStroll(livingEntity);
+                projectileEvent(livingEntity);
+                prophesizeTeleportation(livingEntity);
+                calamityIncarnationTornado(livingEntity);
+                windManipulationGuide(livingEntity);
+                windManipulationSense(livingEntity);
+                sailorLightningTravel(livingEntity);
+                psychologicalInvisibility(livingEntity);
+                monsterDomainIntHandler(livingEntity);
+                livingEntity.sendSystemMessage(Component.literal("not working"));
+                twilightTick(event);
+                nightmareTick(livingEntity);
+                calamityUndeadArmy(livingEntity);
+                calamityLightningStorm(livingEntity);
+                warriorDangerSense(livingEntity);
+                calamityExplosion(livingEntity);
+                decrementMonsterAttackEvent(livingEntity);
+                onChaosWalkerCombat(livingEntity);
+                monsterLuckPoisonAttacker(livingEntity);
+                monsterLuckIgnoreMobs(livingEntity);
+                monsterDangerSense(event);
+                GlobeOfTwilight.globeOfTwilightTick(event);
+                SilverRapier.mercuryTick(event);
+                FateReincarnation.monsterReincarnationChecker(event);
+                DawnArmory.dawnArmorTickEvent(event);
+                DivineHandLeftEntity.divineHandTick(event);
+                TwilightAccelerate.twilightAccelerateTick(event);
+                TwilightFreeze.twilightFreezeTick(event);
+                TwilightLight.twilightLightTick(event);
+                TwilightManifestation.twilightManifestationTick(event);
+                SwordOfTwilight.decrementTwilightSword(event);
+                MercuryLiquefication.mercuryArmorTick(event);
+                MercuryLiquefication.mercuryLiqueficationTick(event);
+                BeyonderUtil.ageHandlerTick(event);
+                InvisibleHand.invisibleHandTick(event);
+                Burn.smeltItem(event);
+                BounceProjectiles.decrementBounceArrows(livingEntity);
+                Gigantification.gigantificationScale(event);
+                EnableOrDisableProtection.warriorProtectionTick(event);
+                GuardianBoxEntity.decrementGuardianTimer(livingEntity);
+                EyeOfDemonHunting.eyeTick(event);
+                EyeOfDemonHunting.demonHunterAntiConcealment(event);
+                apprenticeWindSlowFall(event);
+                livingNoMoveEffect(event);
+                psychologicalInvisibilityHurtTick(livingEntity);
+                //sendSpiritWorldPackets(entity);
+                WintryBlade.wintryBladeTick(event);
+                warriorGiant(livingEntity);
+                DeathKnell.deathKnellNegativeTick(livingEntity);
+                BattleHypnotism.untargetMobs(event);
+                ProbabilityManipulationInfiniteMisfortune.testEvent(event);
+                probabilityManipulationWorld(livingEntity);
+                CycleOfFate.tickEvent(event);
+                dodgeProjectiles(livingEntity);
+                MisfortuneManipulation.livingTickMisfortuneManipulation(event);
+                FalseProphecy.falseProphecyTick(livingEntity);
+                AuraOfChaos.auraOfChaos(event);
+                NoRegenerationEffect.preventRegeneration(livingEntity);
+                MisfortuneRedirection.misfortuneLivingTickEvent(event);
+                AuraOfGlory.auraOfGloryAndTwilightTick(event);
+                livingLightningStorm(livingEntity);
+                Gigantification.gigantificationDestroyBlocks(event);
+                LightOfDawn.sunriseGleamTick(event);
+                doubleProphecyDamageHelper(event);
+                showMonsterParticles(livingEntity);
+                LuckDenial.luckDenial(livingEntity);
+                MonsterCalamityIncarnation.calamityTickEvent(event);
+                dreamWeaving(livingEntity);
+                LightConcealment.lightConcealmentTick(event);
+                ProphesizeDemise.demiseTick(event);
+                AqueousLightDrown.aqueousLightDrownTick(event);
+                matterAccelerationEntities(livingEntity);
+                ExtremeColdness.extremeColdnessTick(event);
+                mentalPlague(livingEntity);
+                StormSeal.sealTick(event);
+                AqueousLightDrown.lightTickEvent(livingEntity);
+                TsunamiSeal.sealTick(event);
+            } else {
+                livingEntity.sendSystemMessage(Component.literal("twilight value is " + tag.getInt("inTwilight")));
+            }
         }
+    }
+
+    @SubscribeEvent
+    public static void blockRightClickEvent(PlayerInteractEvent.RightClickBlock event) {
+        ApprenticeClass.doorRightClick(event);
     }
 
     @SubscribeEvent
@@ -454,6 +461,7 @@ public class ModEvents {
     public static void projectileImpactEvent(ProjectileImpactEvent event) {
         Entity projectile = event.getProjectile();
         if (!projectile.level().isClientSide()) {
+            trickmasterBounceHitProjectiles(event);
             SailorClass.sailorProjectileLightning(event);
         }
     }
@@ -469,19 +477,16 @@ public class ModEvents {
                     BeyonderClass pathway = BeyonderUtil.getPathway(livingEntity);
                     boolean x = attacked.getHealth() <= attacked.getMaxHealth() * 0.4f || attacked.hasEffect(MobEffects.WEAKNESS) || attacked.hasEffect(ModEffects.ABILITY_WEAKNESS.get()) || attacked.hasEffect(MobEffects.WITHER) || attacked.hasEffect(MobEffects.POISON);
                     if (pathway != null) {
-                        if (pathway == BeyonderClassInit.WARRIOR.get() && x) {
+                        if (BeyonderUtil.currentPathwayMatchesNoException(attacked, BeyonderClassInit.WARRIOR.get()) && x) {
                             DamageSource source = event.getSource();
                             float amount = event.getAmount();
                             attacked.hurt(attacked.damageSources().generic(), amount / 2);
                         }
                     }
                 }
-                if (attacked instanceof Player pPlayer) {
-                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                    if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 5) {
-                        if (attacker instanceof LivingEntity) {
-                            attacker.getPersistentData().putInt("attackedMonster", 100);
-                        }
+                if (BeyonderUtil.currentPathwayAndSequenceMatchesNoException(attacked, BeyonderClassInit.MONSTER.get(), 5)) {
+                    if (attacker instanceof LivingEntity) {
+                        attacker.getPersistentData().putInt("attackedMonster", 100);
                     }
                 }
                 if (attacker.getPersistentData().getInt("beneficialFalseProphecyAttack") >= 1) {
@@ -502,6 +507,7 @@ public class ModEvents {
             }
         }
     }
+
     @SubscribeEvent
     public static void livingJumpEvent(LivingEvent.LivingJumpEvent event) {
         LivingEntity entity = event.getEntity();
@@ -525,8 +531,10 @@ public class ModEvents {
         DamageSource source = event.getSource();
         Entity entitySource = source.getEntity();
         if (!event.getEntity().level().isClientSide()) {
+            BeyonderUtil.ageHandlerHurt(event);
             GuardianBoxEntity.guardianHurtEvent(event);
-            warriorDamageNegation(event);
+            newWarriorDamageNegation(event);
+            MercuryLiquefication.mercuryArmorHurt(event);
             boolean entityInSpiritWorld = tag.getBoolean("inSpiritWorld");
             if (entitySource != null) {
                 CompoundTag sourceTag = entitySource.getPersistentData();
@@ -534,102 +542,103 @@ public class ModEvents {
                 if (entityInSpiritWorld != sourceInSpiritWorld) {
                     event.setCanceled(true);
                 }
-            }
-            if (entity instanceof LivingEntity living) {
-                monsterDodgeAttack(event);
-                int stoneImmunity = tag.getInt("luckStoneDamageImmunity");
-                int stoneDamage = tag.getInt("luckStoneDamage");
-                int meteorDamage = tag.getInt("luckMeteorDamage");
-                int meteorImmunity = tag.getInt("calamityMeteorImmunity");
-                int MCLightingDamage = tag.getInt("luckLightningMCDamage");
-                int mcLightningImmunity = tag.getInt("luckMCLightningImmunity");
-                int calamityExplosionOccurrenceDamage = tag.getInt("calamityExplosionOccurrence");
-                int lotmLightningDamage = tag.getInt("luckLightningLOTMDamage");
-                int lightningBoltResistance = tag.getInt("calamityLightningBoltMonsterResistance");
-                int lotmLightningDamageCalamity = tag.getInt("calamityLightningStormResistance");
-                int tornadoResistance = tag.getInt("luckTornadoResistance");
-                int tornadoImmunity = tag.getInt("luckTornadoImmunity");
-                int lotmLightningImmunity = tag.getInt("calamityLOTMLightningImmunity");
-                int lightningStormImmunity = tag.getInt("calamityLightningStormImmunity");
-                Level level = entity.level();
-                int enhancement = 1;
-                if (level instanceof ServerLevel serverLevel) {
-                    enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
-                }
-                if (enhancement >= 2) {
-                    event.setAmount((float) (event.getAmount() + (enhancement * 0.25)));
-                }
-                if (entitySource instanceof StoneEntity) {
-                    if (stoneImmunity >= 1) {
-                        event.setCanceled(true);
-                    } else if (stoneDamage >= 1) {
-                        event.setAmount(event.getAmount() / 2);
-                    }
-                }
-                if (entitySource instanceof MeteorEntity || entitySource instanceof MeteorNoLevelEntity) {
-                    if (meteorImmunity >= 1) {
-                        event.setCanceled(true);
-                    } else if (meteorDamage >= 1) {
-                        event.setAmount(event.getAmount() / 2);
-                    }
-                }
-                if (source.is(DamageTypes.LIGHTNING_BOLT)) {
-                    if (mcLightningImmunity >= 1) {
-                        event.setCanceled(true);
-                    } else if (MCLightingDamage >= 1) {
-                        event.setAmount(event.getAmount() / 2);
-                    }
-                }
-                if (source.is(DamageTypes.EXPLOSION)) {
-                    if (calamityExplosionOccurrenceDamage >= 1) {
-                        event.setAmount(event.getAmount() / 2);
-                    }
-                }
-                if (entitySource instanceof LightningEntity) {
-                    if (lotmLightningImmunity >= 1 || lightningStormImmunity >= 1) {
-                        event.setCanceled(true);
-                    } else if (lotmLightningDamage >= 1 || lightningBoltResistance >= 1 || lotmLightningDamageCalamity >= 1) {
-                        event.setAmount(event.getAmount() / 2);
-                    }
-                }
-            }
-            //SAILOR FLIGHT
-            if (entity instanceof Player player) {
-                psychologicalInvisibilityHurt(event);
-                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                int flightCancel = tag.getInt("sailorFlightDamageCancel");
-                if (!player.level().isClientSide()) {
 
-                    //SAILOR FLIGHT
-                    if (flightCancel != 0 && event.getSource() == player.damageSources().fall()) {
-                        event.setCanceled(true);
-                        tag.putInt("sailorFlightDamageCancel", 0);
+                if (entity instanceof LivingEntity living) {
+                    monsterDodgeAttack(event);
+                    int stoneImmunity = tag.getInt("luckStoneDamageImmunity");
+                    int stoneDamage = tag.getInt("luckStoneDamage");
+                    int meteorDamage = tag.getInt("luckMeteorDamage");
+                    int meteorImmunity = tag.getInt("calamityMeteorImmunity");
+                    int MCLightingDamage = tag.getInt("luckLightningMCDamage");
+                    int mcLightningImmunity = tag.getInt("luckMCLightningImmunity");
+                    int calamityExplosionOccurrenceDamage = tag.getInt("calamityExplosionOccurrence");
+                    int lotmLightningDamage = tag.getInt("luckLightningLOTMDamage");
+                    int lightningBoltResistance = tag.getInt("calamityLightningBoltMonsterResistance");
+                    int lotmLightningDamageCalamity = tag.getInt("calamityLightningStormResistance");
+                    int tornadoResistance = tag.getInt("luckTornadoResistance");
+                    int tornadoImmunity = tag.getInt("luckTornadoImmunity");
+                    int lotmLightningImmunity = tag.getInt("calamityLOTMLightningImmunity");
+                    int lightningStormImmunity = tag.getInt("calamityLightningStormImmunity");
+                    Level level = entity.level();
+                    int enhancement = 1;
+                    if (level instanceof ServerLevel serverLevel) {
+                        enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
+                    }
+                    if (enhancement >= 2) {
+                        event.setAmount((float) (event.getAmount() + (enhancement * 0.25)));
+                    }
+                    if (entitySource instanceof StoneEntity) {
+                        if (stoneImmunity >= 1) {
+                            event.setCanceled(true);
+                        } else if (stoneDamage >= 1) {
+                            event.setAmount(event.getAmount() / 2);
+                        }
+                    }
+                    if (entitySource instanceof MeteorEntity || entitySource instanceof MeteorNoLevelEntity) {
+                        if (meteorImmunity >= 1) {
+                            event.setCanceled(true);
+                        } else if (meteorDamage >= 1) {
+                            event.setAmount(event.getAmount() / 2);
+                        }
+                    }
+                    if (source.is(DamageTypes.LIGHTNING_BOLT)) {
+                        if (mcLightningImmunity >= 1) {
+                            event.setCanceled(true);
+                        } else if (MCLightingDamage >= 1) {
+                            event.setAmount(event.getAmount() / 2);
+                        }
+                    }
+                    if (source.is(DamageTypes.EXPLOSION)) {
+                        if (calamityExplosionOccurrenceDamage >= 1) {
+                            event.setAmount(event.getAmount() / 2);
+                        }
+                    }
+                    if (entitySource instanceof LightningEntity) {
+                        if (lotmLightningImmunity >= 1 || lightningStormImmunity >= 1) {
+                            event.setCanceled(true);
+                        } else if (lotmLightningDamage >= 1 || lightningBoltResistance >= 1 || lotmLightningDamageCalamity >= 1) {
+                            event.setAmount(event.getAmount() / 2);
+                        }
                     }
                 }
-                rippleOfMisfortune(player);
+                //SAILOR FLIGHT
+                if (entity instanceof Player player) {
+                    psychologicalInvisibilityHurt(event);
+                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                    int flightCancel = tag.getInt("sailorFlightDamageCancel");
+                    if (!player.level().isClientSide()) {
 
-                //MONSTER LUCK
-                int doubleDamage = tag.getInt("luckDoubleDamage");
-                int ignoreDamage = tag.getInt("luckIgnoreDamage");
-                int halveDamage = tag.getInt("luckHalveDamage");
-                if (halveDamage >= 1) {
-                    event.setAmount(event.getAmount() / 2);
-                    tag.putInt("luckHalveDamage", halveDamage - 1);
+                        //SAILOR FLIGHT
+                        if (flightCancel != 0 && event.getSource() == player.damageSources().fall()) {
+                            event.setCanceled(true);
+                            tag.putInt("sailorFlightDamageCancel", 0);
+                        }
+                    }
+                    rippleOfMisfortune(player);
+
+                    //MONSTER LUCK
+                    int doubleDamage = tag.getInt("luckDoubleDamage");
+                    int ignoreDamage = tag.getInt("luckIgnoreDamage");
+                    int halveDamage = tag.getInt("luckHalveDamage");
+                    if (halveDamage >= 1) {
+                        event.setAmount(event.getAmount() / 2);
+                        tag.putInt("luckHalveDamage", halveDamage - 1);
+                    }
+                    if (ignoreDamage >= 1) {
+                        event.setCanceled(true);
+                        entity.getPersistentData().putInt("luckIgnoreDamage", entity.getPersistentData().getInt("luckIgnoreDamage") - 1);
+                    } else if (doubleDamage >= 1) {
+                        event.setAmount(event.getAmount() * 2);
+                        entity.getPersistentData().putInt("luckDoubleDamage", entity.getPersistentData().getInt("luckDoubleDamage") - 1);
+
+                    }
                 }
-                if (ignoreDamage >= 1) {
+
+
+                //STORM SEAL
+                if (entity.getPersistentData().getInt("inStormSeal") >= 1) {
                     event.setCanceled(true);
-                    entity.getPersistentData().putInt("luckIgnoreDamage", entity.getPersistentData().getInt("luckIgnoreDamage") - 1);
-                } else if (doubleDamage >= 1) {
-                    event.setAmount(event.getAmount() * 2);
-                    entity.getPersistentData().putInt("luckDoubleDamage", entity.getPersistentData().getInt("luckDoubleDamage") - 1);
-
                 }
-            }
-
-
-            //STORM SEAL
-            if (entity.getPersistentData().getInt("inStormSeal") >= 1) {
-                event.setCanceled(true);
             }
         }
     }
@@ -686,7 +695,6 @@ public class ModEvents {
     }
 
 
-
     @Mod.EventBusSubscriber(modid = LOTM.MOD_ID)
     public static class SpawnHandler {
 
@@ -700,7 +708,6 @@ public class ModEvents {
             }
         }
     }
-
 
 
     @SubscribeEvent
@@ -722,7 +729,7 @@ public class ModEvents {
         Player player = event.getEntity();
         CompoundTag persistentData = player.getPersistentData();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int sequence = holder.getCurrentSequence();
+        int sequence = holder.getSequence();
         if (holder.getCurrentClass() != null) {
             player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(holder.getCurrentClass().maxHealth().get(sequence));
             player.setHealth(player.getMaxHealth());

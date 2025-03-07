@@ -32,7 +32,7 @@ public class MonsterDomainLeftClickC2S {
             if (player == null) return;
             ItemStack heldItem = player.getMainHandItem();
             int heldItemSlot = player.getInventory().selected;
-            int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getCurrentSequence();
+            int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getSequence();
             if (sequence == 4) {
                 if (heldItem.getItem() instanceof DomainOfDecay) {
                     player.getInventory().setItem(heldItemSlot, ItemInit.PROVIDENCEDOMAIN.get().getDefaultInstance());

@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -43,7 +44,7 @@ public class EnvisionBarrier extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 800 / dreamIntoReality)) {
+        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 800 / dreamIntoReality, true)) {
             return InteractionResult.FAIL;
         }
         useSpirituality(player, 800 / dreamIntoReality);
@@ -62,22 +63,26 @@ public class EnvisionBarrier extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public static void envisionBarrier(BeyonderHolder holder, Player player, Style style) {
+    public static void envisionBarrier(LivingEntity livingEntity) {
         //ENVISION BARRIER
-        if (holder.getCurrentSequence() != 0) {
+        if (BeyonderUtil.getSequence(livingEntity) != 0) {
             return;
         }
-        int barrierRadius = player.getPersistentData().getInt("BarrierRadius");
-        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof EnvisionBarrier) {
+        int barrierRadius = livingEntity.getPersistentData().getInt("BarrierRadius");
+        if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof EnvisionBarrier) {
             barrierRadius++;
             barrierRadius++;
-            player.displayClientMessage(Component.literal("Barrier Radius: " + barrierRadius).withStyle(style), true);
+            if (livingEntity instanceof Player player) {
+                player.displayClientMessage(Component.literal("Barrier Radius: " + barrierRadius).withStyle(BeyonderUtil.getStyle(player)), true);
+            }
         }
-        if (barrierRadius >= BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_BARRIER.get())) {
+        if (barrierRadius >= BeyonderUtil.getDamage(livingEntity).get(ItemInit.ENVISION_BARRIER.get())) {
             barrierRadius = 0;
-            player.displayClientMessage(Component.literal("Barrier Radius: 0").withStyle(style), true);
+            if (livingEntity instanceof Player player) {
+                player.displayClientMessage(Component.literal("Barrier Radius: 0").withStyle(BeyonderUtil.getStyle(player)), true);
+            }
         }
-        player.getPersistentData().putInt("BarrierRadius", barrierRadius);
+        livingEntity.getPersistentData().putInt("BarrierRadius", barrierRadius);
     }
 
 

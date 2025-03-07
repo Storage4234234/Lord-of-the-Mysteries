@@ -68,7 +68,7 @@ public class ProbabilityManipulationWipe extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
-        if (!checkAll(player, BeyonderClassInit.MONSTER.get(), 0, 1000)) {
+        if (!checkAll(player, BeyonderClassInit.MONSTER.get(), 0, 1000, true)) {
             return InteractionResult.FAIL;
         }
         probabilityWipeWorld(player);

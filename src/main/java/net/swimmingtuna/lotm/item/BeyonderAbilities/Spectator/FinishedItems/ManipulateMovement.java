@@ -19,8 +19,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
@@ -34,14 +32,14 @@ import java.util.List;
 public class ManipulateMovement extends SimpleAbilityItem {
 
     public ManipulateMovement(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 4, 0, 600,75,75);
+        super(properties, BeyonderClassInit.SPECTATOR, 4, 0, 600, 75, 75);
     }
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext context) {
         Player player = context.getPlayer();
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 4, 200 / dreamIntoReality)) {
+        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 4, 200 / dreamIntoReality, true)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player);
@@ -63,44 +61,42 @@ public class ManipulateMovement extends SimpleAbilityItem {
 
     public void manipulateMovement(Player player, UseOnContext context) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
-            if (holder.currentClassMatches(BeyonderClassInit.SPECTATOR) && sequence <= 4 && holder.useSpirituality(200)) {
-                boolean x = player.getPersistentData().getBoolean("manipulateMovementBoolean");
-                if (!x) {
-                    player.getPersistentData().putBoolean("manipulateMovementBoolean", true);
-                    BlockPos pos = context.getClickedPos();
-                    player.getPersistentData().putInt("manipulateMovementX", pos.getX());
-                    player.getPersistentData().putInt("manipulateMovementY", pos.getY());
-                    player.getPersistentData().putInt("manipulateMovementZ", pos.getZ());
-                    player.displayClientMessage(Component.literal("Manipulate Movement Position is " + pos.getX() + " " + pos.getY() + " " + pos.getZ()).withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
+            boolean x = player.getPersistentData().getBoolean("manipulateMovementBoolean");
+            if (!x) {
+                player.getPersistentData().putBoolean("manipulateMovementBoolean", true);
+                BlockPos pos = context.getClickedPos();
+                player.getPersistentData().putInt("manipulateMovementX", pos.getX());
+                player.getPersistentData().putInt("manipulateMovementY", pos.getY());
+                player.getPersistentData().putInt("manipulateMovementZ", pos.getZ());
+                player.displayClientMessage(Component.literal("Manipulate Movement Position is " + pos.getX() + " " + pos.getY() + " " + pos.getZ()).withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
 
-                }
-                if (x) {
-                    player.getPersistentData().remove("manipulateMovementX");
-                    player.getPersistentData().remove("manipulateMovementY");
-                    player.getPersistentData().remove("manipulateMovementZ");
-                    player.getPersistentData().putBoolean("manipulateMovementBoolean", false);
-                    player.displayClientMessage(Component.literal("Manipulate Movement Position Reset").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
-                }
             }
+            if (x) {
+                player.getPersistentData().remove("manipulateMovementX");
+                player.getPersistentData().remove("manipulateMovementY");
+                player.getPersistentData().remove("manipulateMovementZ");
+                player.getPersistentData().putBoolean("manipulateMovementBoolean", false);
+                player.displayClientMessage(Component.literal("Manipulate Movement Position Reset").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
+            }
+
         }
     }
 
     private final Lazy<Multimap<Attribute, AttributeModifier>> lazyAttributeMap = Lazy.of(this::createAttributeMap);
 
-    public static void manipulateMovement(Player player, Level level) {
+    public static void manipulateMovement(LivingEntity livingEntity) {
+        Level level = livingEntity.level();
         //MANIPULATE MOVEMENT
-        if (!player.getPersistentData().getBoolean("manipulateMovementBoolean")) {
+        if (!livingEntity.getPersistentData().getBoolean("manipulateMovementBoolean")) {
             return;
         }
-        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
+        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(250))) {
             if (!entity.hasEffect(ModEffects.MANIPULATION.get())) {
                 continue;
             }
-            int targetX = player.getPersistentData().getInt("manipulateMovementX");
-            int targetY = player.getPersistentData().getInt("manipulateMovementY");
-            int targetZ = player.getPersistentData().getInt("manipulateMovementZ");
+            int targetX = livingEntity.getPersistentData().getInt("manipulateMovementX");
+            int targetY = livingEntity.getPersistentData().getInt("manipulateMovementY");
+            int targetZ = livingEntity.getPersistentData().getInt("manipulateMovementZ");
 
             if (entity.distanceToSqr(targetX, targetY, targetZ) <= 8) {
                 entity.removeEffect(ModEffects.MANIPULATION.get());
@@ -159,6 +155,7 @@ public class ManipulateMovement extends SimpleAbilityItem {
         attributeBuilder.put(ForgeMod.BLOCK_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_BLOCK_REACH, "Reach modifier", 75, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with blocks, p much useless for this item
         return attributeBuilder.build();
     }
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);

@@ -55,7 +55,7 @@ public class LuckManipulation extends SimpleAbilityItem {
             }
             int luckManipulation = tag.getInt("luckManipulationItem");
             if (luckManipulation == 1) { //regen
-                BeyonderUtil.applyMobEffect(player, MobEffects.REGENERATION, 300 - (holder.getCurrentSequence() * 30), 2, true, true);
+                BeyonderUtil.applyMobEffect(player, MobEffects.REGENERATION, 300 - (holder.getSequence() * 30), 2, true, true);
                 tag.putDouble("luck", Math.max(0, luck - 4));
             }
             if (luckManipulation == 2) { //diamonds
@@ -64,7 +64,7 @@ public class LuckManipulation extends SimpleAbilityItem {
                     ItemStack diamondBlock = new ItemStack(Items.DIAMOND_BLOCK, 2);
                     ItemEntity diamondEntity = new ItemEntity(player.level(), player.getX(), player.getY(), player.getZ(), diamonds);
                     ItemEntity diamondBlockEntity = new ItemEntity(player.level(), player.getX(), player.getY(), player.getZ(), diamondBlock);
-                    if (holder.getCurrentSequence() >= 2) {
+                    if (holder.getSequence() >= 2) {
                         player.level().addFreshEntity(diamondEntity);
                     } else player.level().addFreshEntity(diamondBlockEntity);
                 }

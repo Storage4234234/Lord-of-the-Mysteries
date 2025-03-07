@@ -50,13 +50,13 @@ public class BeyonderHolder extends PlayerCapability {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(event.player);
             holder.regenSpirituality(event.player);
             if (holder.getCurrentClass() != null) {
-                holder.getCurrentClass().tick(event.player, holder.getCurrentSequence());
+                holder.getCurrentClass().tick(event.player, holder.getSequence());
             }
         }
 
     }
 
-    public void removeClass() {
+    public void removePathway() {
         this.currentClass = null;
         this.currentSequence = -1;
         this.mentalStrength = 0;
@@ -75,7 +75,7 @@ public class BeyonderHolder extends PlayerCapability {
         LOTMNetworkHandler.sendToPlayer(new SyncSequencePacketS2C(this.currentSequence), (ServerPlayer) player);
     }
 
-    public void setClassAndSequence(BeyonderClass newClass, int sequence) {
+    public void setPathwayAndSequence(BeyonderClass newClass, int sequence) {
         this.currentClass = newClass;
         this.currentSequence = sequence;
         this.maxSpirituality = this.currentClass.spiritualityLevels().get(this.currentSequence);
@@ -130,7 +130,7 @@ public class BeyonderHolder extends PlayerCapability {
         return this.currentClass;
     }
 
-    public void setCurrentClass(BeyonderClass newClass) {
+    public void setPathway(BeyonderClass newClass) {
         this.currentClass = newClass;
         updateTracking();
     }
@@ -140,11 +140,11 @@ public class BeyonderHolder extends PlayerCapability {
         updateTracking();
     }
 
-    public int getCurrentSequence() {
+    public int getSequence() {
         return this.currentSequence;
     }
 
-    public void setCurrentSequence(int currentSequence) {
+    public void setSequence(int currentSequence) {
         this.currentSequence = currentSequence;
         this.maxSpirituality = this.currentClass.spiritualityLevels().get(currentSequence);
         this.spiritualityRegen = this.currentClass.spiritualityRegen().get(currentSequence);

@@ -70,7 +70,7 @@ public class ProbabilityManipulationFortune extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
-        if (!checkAll(player, BeyonderClassInit.MONSTER.get(), 3500,1000)) {
+        if (!checkAll(player, BeyonderClassInit.MONSTER.get(), 3500,1000, true)) {
             return InteractionResult.FAIL;
         }
         probabilityWipeWorld(player);
@@ -87,7 +87,7 @@ public class ProbabilityManipulationFortune extends SimpleAbilityItem {
             }
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             probabilityWipeEntity(pInteractionTarget);
-            addCooldown(player, this, 10 + holder.getCurrentSequence());
+            addCooldown(player, this, 10 + holder.getSequence());
             useSpirituality(player, 200);
         }
         return InteractionResult.SUCCESS;

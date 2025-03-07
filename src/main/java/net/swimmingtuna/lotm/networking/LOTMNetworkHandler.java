@@ -40,6 +40,11 @@ public class LOTMNetworkHandler {
                 .encoder(LuckManipulationLeftClickC2S::toByte)
                 .consumerMainThread(LuckManipulationLeftClickC2S::handle)
                 .add();
+        INSTANCE.messageBuilder(MercuryLiqueficationC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(MercuryLiqueficationC2S::new)
+                .encoder(MercuryLiqueficationC2S::toByte)
+                .consumerMainThread(MercuryLiqueficationC2S::handle)
+                .add();
         INSTANCE.messageBuilder(MonsterDomainLeftClickC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(MonsterDomainLeftClickC2S::new)
                 .encoder(MonsterDomainLeftClickC2S::toByte)
@@ -49,6 +54,11 @@ public class LOTMNetworkHandler {
                 .decoder(DeathKnellLeftClickC2S::new)
                 .encoder(DeathKnellLeftClickC2S::toByte)
                 .consumerMainThread(DeathKnellLeftClickC2S::handle)
+                .add();
+        INSTANCE.messageBuilder(SwordOfSilverC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(SwordOfSilverC2S::new)
+                .encoder(SwordOfSilverC2S::toByte)
+                .consumerMainThread(SwordOfSilverC2S::handle)
                 .add();
         INSTANCE.messageBuilder(SyncAlliesPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SyncAlliesPacket::decode)
@@ -64,6 +74,11 @@ public class LOTMNetworkHandler {
                 .decoder(SyncAntiConcealmentPacketS2C::new)
                 .encoder(SyncAntiConcealmentPacketS2C::encode)
                 .consumerMainThread(SyncAntiConcealmentPacketS2C::handle)
+                .add();
+        INSTANCE.messageBuilder(ScribeCopyAbilityC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ScribeCopyAbilityC2S::new)
+                .encoder(ScribeCopyAbilityC2S::toByte)
+                .consumerMainThread(ScribeCopyAbilityC2S::handle)
                 .add();
         INSTANCE.messageBuilder(RemoveInvisibiltyS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(RemoveInvisibiltyS2C::new)
@@ -145,6 +160,11 @@ public class LOTMNetworkHandler {
                 .encoder(UpdateEntityLocationS2C::encode)
                 .consumerMainThread(UpdateEntityLocationS2C::handle)
                 .add();
+        INSTANCE.messageBuilder(UpdateDragonBreathS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(UpdateDragonBreathS2C::decode)
+                .encoder(UpdateDragonBreathS2C::encode)
+                .consumerMainThread(UpdateDragonBreathS2C::handle)
+                .add();
         INSTANCE.messageBuilder(SyncSequencePacketS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(SyncSequencePacketS2C::new)
                 .encoder(SyncSequencePacketS2C::encode)
@@ -194,6 +214,16 @@ public class LOTMNetworkHandler {
                 .decoder(ClearAbilitiesS2C::new)
                 .encoder(ClearAbilitiesS2C::toByte)
                 .consumerMainThread(ClearAbilitiesS2C::handle)
+                .add();
+        INSTANCE.messageBuilder(ToggleDistanceC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ToggleDistanceC2S::new)
+                .encoder(ToggleDistanceC2S::toByte)
+                .consumerMainThread(ToggleDistanceC2S::handle)
+                .add();
+        INSTANCE.messageBuilder(TravelerWaypointC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(TravelerWaypointC2S::new)
+                .encoder(TravelerWaypointC2S::toByte)
+                .consumerMainThread(TravelerWaypointC2S::handle)
                 .add();
     }
 

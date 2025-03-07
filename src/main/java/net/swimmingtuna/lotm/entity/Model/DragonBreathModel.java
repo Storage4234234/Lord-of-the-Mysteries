@@ -55,7 +55,7 @@ public class DragonBreathModel extends EntityModel<DragonBreathEntity> {
 
     @Override
     public void setupAnim(@NotNull DragonBreathEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        float fraction = Math.min(1.0F, ageInTicks / DragonBreathEntity.CHARGE);
+        float fraction = Math.min(1.0F, ageInTicks / entity.getCharge());
         float scale = (float) (Math.pow(fraction, 0.5F) * 3 + 0.05F * Math.cos(ageInTicks * 3));
 
         this.setScale(this.body4, scale * 0.4F, scale * 0.4F, scale * 0.4F);

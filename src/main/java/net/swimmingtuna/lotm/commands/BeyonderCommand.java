@@ -60,7 +60,7 @@ public class BeyonderCommand {
                                             persistentData.remove(REGISTERED_ABILITIES_KEY);
                                         }
                                     }
-                                    holder.setClassAndSequence(result, level);
+                                    holder.setPathwayAndSequence(result, level);
 
                                     String sequenceName = result.sequenceNames().get(level);
                                     context.getSource().getPlayerOrException().sendSystemMessage(Component.translatable("item.lotm.beholder_potion.alert", sequenceName)
@@ -74,8 +74,10 @@ public class BeyonderCommand {
                             Player player = context.getSource().getPlayerOrException();
                             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                             ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
-                            holder.removeClass();
+                            holder.removePathway();
+
                             player.getPersistentData().putInt("monsterReincarnationCounter", 0);
+                            player.getPersistentData().putInt("age",0);
                             scaleData.setScale(1);
                             Abilities playerAbilities = player.getAbilities();
                             playerAbilities.setFlyingSpeed(0.05F);

@@ -20,7 +20,6 @@ import net.swimmingtuna.lotm.client.AbilityOverlay;
 import net.swimmingtuna.lotm.client.SpiritualityBarOverlay;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.util.ClientData.ClientAbilityCooldownData;
-import net.swimmingtuna.lotm.util.ClientData.ClientAntiConcealmentData;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderTransformData;
 
@@ -43,8 +42,6 @@ public class ClientEvents {
             double z = player.zo + (player.getZ() - player.zo) * partialTick;
             float yRot = lerpAngle(partialTick, player.yRotO, player.getYRot());
             float xRot = lerpAngle(partialTick, player.xRotO, player.getXRot());
-
-
             mob.setPos(x, y, z);
             mob.setYRot(yRot);
             mob.setXRot(xRot);
@@ -93,14 +90,11 @@ public class ClientEvents {
     @OnlyIn(Dist.CLIENT)
     public static void livingRender(RenderLivingEvent.Pre<?, ?> event) {
         LivingEntity entity = event.getEntity();
-        if (!ClientAntiConcealmentData.getAntiConceal()) {
-            if (ClientShouldntRenderInvisibilityData.getShouldntRender() && entity.getUUID().equals(ClientShouldntRenderInvisibilityData.getLivingUUID())) {
-                event.setCanceled(true);
-            }
+        if (ClientShouldntRenderInvisibilityData.getShouldntRender() && entity.getUUID().equals(ClientShouldntRenderInvisibilityData.getLivingUUID())) {
+            event.setCanceled(true);
+            return; // Skip further processing
         }
-        //    if (ClientShouldntRenderSpiritWorldData.getShouldntRender(entity.getUUID())) {
-        //        event.setCanceled(true);
-        //    }
+
     }
 
 

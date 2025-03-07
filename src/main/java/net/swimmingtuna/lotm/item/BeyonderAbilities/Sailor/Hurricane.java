@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -44,36 +45,37 @@ public class Hurricane extends SimpleAbilityItem {
             pPlayer.getPersistentData().putInt("sailorHurricane", (int) (float) BeyonderUtil.getDamage(pPlayer).get(ItemInit.HURRICANE.get()));
         }
     }
-    public static void hurricane(CompoundTag playerPersistentData, Player player) {
+    public static void hurricane(LivingEntity livingEntity) {
         //HURRICANE
-        boolean sailorHurricaneRain = playerPersistentData.getBoolean("sailorHurricaneRain");
-        BlockPos pos = new BlockPos((int) (player.getX() + (Math.random() * 100 - 100)), (int) (player.getY() - 100), (int) (player.getZ() + (Math.random() * 300 - 300)));
-        int hurricane = playerPersistentData.getInt("sailorHurricane");
+        CompoundTag tag = livingEntity.getPersistentData();
+        boolean sailorHurricaneRain = tag.getBoolean("sailorHurricaneRain");
+        BlockPos pos = new BlockPos((int) (livingEntity.getX() + (Math.random() * 100 - 100)), (int) (livingEntity.getY() - 100), (int) (livingEntity.getZ() + (Math.random() * 300 - 300)));
+        int hurricane = tag.getInt("sailorHurricane");
         if (hurricane < 1) {
             return;
         }
         if (sailorHurricaneRain) {
-            playerPersistentData.putInt("sailorHurricane", hurricane - 1);
-            if (hurricane == 600 && player.level() instanceof ServerLevel serverLevel) {
+            tag.putInt("sailorHurricane", hurricane - 1);
+            if (hurricane == 600 && livingEntity.level() instanceof ServerLevel serverLevel) {
                 serverLevel.setWeatherParameters(0, 700, true, true);
             }
             if (hurricane % 5 == 0) {
-                SailorLightning.lightningHigh(player, player.level());
+                SailorLightning.lightningHigh(livingEntity, livingEntity.level());
             }
             if (hurricane == 600 || hurricane == 300) {
                 for (int i = 0; i < 5; i++) {
-                    TornadoEntity tornado = new TornadoEntity(player.level(), player, 0, 0, 0);
+                    TornadoEntity tornado = new TornadoEntity(livingEntity.level(), livingEntity, 0, 0, 0);
                     tornado.teleportTo(pos.getX(), pos.getY() + 100, pos.getZ());
                     tornado.setTornadoRandom(true);
                     tornado.setTornadoHeight(300);
                     tornado.setTornadoRadius(30);
                     tornado.setTornadoPickup(false);
-                    player.level().addFreshEntity(tornado);
+                    livingEntity.level().addFreshEntity(tornado);
                 }
             }
         }
-        if (!sailorHurricaneRain && player.level() instanceof ServerLevel serverLevel && hurricane == 600) {
-            playerPersistentData.putInt("sailorHurricane", hurricane - 1);
+        if (!sailorHurricaneRain && livingEntity.level() instanceof ServerLevel serverLevel && hurricane == 600) {
+            tag.putInt("sailorHurricane", hurricane - 1);
             serverLevel.setWeatherParameters(0, 700, true, false);
         }
     }

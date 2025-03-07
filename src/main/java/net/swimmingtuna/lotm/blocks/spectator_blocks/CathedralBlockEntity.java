@@ -2,8 +2,8 @@ package net.swimmingtuna.lotm.blocks.spectator_blocks;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -11,11 +11,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.registries.RegistryObject;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.BlockEntityInit;
 import net.swimmingtuna.lotm.init.BlockInit;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.TickableBlockEntity;
 
 import java.util.List;
@@ -34,13 +33,13 @@ public class CathedralBlockEntity extends BlockEntity implements TickableBlockEn
         }
         ticks++;
         if (this.ticks % 20 == 0) {
-            for (Player player : level.players()) {
-                CompoundTag compoundTag = player.getPersistentData();
-                double distanceX = player.getX() - worldPosition.getX();
-                double distanceY = player.getY() - worldPosition.getY();
-                double distanceZ = player.getZ() - worldPosition.getZ();
-                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                if (holder.getCurrentSequence() == 0 && holder.currentClassMatches(BeyonderClassInit.SPECTATOR)) {
+            AABB boundingBox = new AABB(worldPosition.offset(-80, -100, -110), worldPosition.offset(80, 100, 110));
+            for (LivingEntity livingEntity : level.getEntitiesOfClass(LivingEntity.class, boundingBox)) {
+                CompoundTag compoundTag = livingEntity.getPersistentData();
+                double distanceX = livingEntity.getX() - worldPosition.getX();
+                double distanceY = livingEntity.getY() - worldPosition.getY();
+                double distanceZ = livingEntity.getZ() - worldPosition.getZ();
+                if (BeyonderUtil.currentPathwayAndSequenceMatchesNoException(livingEntity, BeyonderClassInit.SPECTATOR.get(), 0)) {
                     if (Math.abs(distanceX) <= 80 && Math.abs(distanceY) <= 100 && Math.abs(distanceZ) <= 110) {
                         compoundTag.putInt("mindscapeAbilities", 25);
                     }

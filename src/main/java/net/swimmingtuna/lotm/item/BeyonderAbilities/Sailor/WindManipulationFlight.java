@@ -7,6 +7,7 @@ import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -18,6 +19,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -36,7 +38,7 @@ public class WindManipulationFlight extends SimpleAbilityItem {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        if (holder.getCurrentSequence() <= 4) {
+        if (holder.getSequence() <= 4) {
             toggleFlying(player);
         } else {
             useSpirituality(player,40);
@@ -85,8 +87,8 @@ public class WindManipulationFlight extends SimpleAbilityItem {
         }
     }
 
-    public static void stopFlying(Player player) {
-        if (!player.level().isClientSide()) {
+    public static void stopFlying(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide() && livingEntity instanceof Player player) { //marked
             player.getPersistentData().putBoolean("sailorFlight1", false);
             Abilities playerAbilities = player.getAbilities();
             if (!player.isCreative() && !player.isSpectator()) {
@@ -101,32 +103,33 @@ public class WindManipulationFlight extends SimpleAbilityItem {
         }
     }
 
-    public static void windManipulationGuide(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
+    public static void windManipulationGuide(LivingEntity livingEntity) {
         //WIND MANIPULATION GLIDE
-        boolean enhancedFlight = playerPersistentData.getBoolean("sailorFlight1");
-        if (holder.currentClassMatches(BeyonderClassInit.SAILOR) && holder.getCurrentSequence() <= 6 && player.isShiftKeyDown() && player.fallDistance >= 3 && !player.getAbilities().instabuild && !enhancedFlight) {
-            Vec3 movement = player.getDeltaMovement();
-            double deltaX = Math.cos(Math.toRadians(player.getYRot() + 90)) * 0.06;
-            double deltaZ = Math.sin(Math.toRadians(player.getYRot() + 90)) * 0.06;
-            player.setDeltaMovement(movement.x + deltaX, -0.05, movement.z + deltaZ);
-            player.fallDistance = 5;
-            player.hurtMarked = true;
+        CompoundTag tag = livingEntity.getPersistentData();
+        boolean enhancedFlight = tag.getBoolean("sailorFlight1");
+        if (BeyonderUtil.currentPathwayAndSequenceMatches(livingEntity, BeyonderClassInit.SAILOR.get(), 6) && livingEntity.isShiftKeyDown() && livingEntity.fallDistance >= 3 && !(livingEntity instanceof Player player && player.getAbilities().instabuild) && !enhancedFlight) {
+            Vec3 movement = livingEntity.getDeltaMovement();
+            double deltaX = Math.cos(Math.toRadians(livingEntity.getYRot() + 90)) * 0.06;
+            double deltaZ = Math.sin(Math.toRadians(livingEntity.getYRot() + 90)) * 0.06;
+            livingEntity.setDeltaMovement(movement.x + deltaX, -0.05, movement.z + deltaZ);
+            livingEntity.fallDistance = 5;
+            livingEntity.hurtMarked = true;
         }
     }
 
-    public static void windManipulationFlight(Player player, CompoundTag tag) {
-        Vec3 lookVector = player.getLookAngle();
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+    public static void windManipulationFlight(LivingEntity livingEntity) {
+        Vec3 lookVector = livingEntity.getLookAngle();
+        CompoundTag tag = livingEntity.getPersistentData();
         if (tag.getBoolean("sailorFlight1")) {
-            if (holder.getSpirituality() >= 3) {
-                holder.useSpirituality(3);
+            if (BeyonderUtil.getSpirituality(livingEntity) >= 3) {
+                BeyonderUtil.useSpirituality(livingEntity,3);
             } else {
-                WindManipulationFlight.stopFlying(player);
+                WindManipulationFlight.stopFlying(livingEntity);
             }
         }
         int flightCancel = tag.getInt("sailorFlightDamageCancel");
         if (flightCancel >= 1) {
-            player.fallDistance = 0;
+            livingEntity.fallDistance = 0;
             tag.putInt("sailorFlightDamageCancel", flightCancel + 1);
             if (flightCancel >= 300) {
                 tag.putInt("sailorFlightDamageCancel", 0);
@@ -136,8 +139,8 @@ public class WindManipulationFlight extends SimpleAbilityItem {
         if (flight >= 1) {
             tag.putInt("sailorFlight", flight + 1);
             if (flight <= 45 && flight % 15 == 0) {
-                player.setDeltaMovement(lookVector.x * 2, lookVector.y * 2, lookVector.z * 2);
-                player.hurtMarked = true;
+                livingEntity.setDeltaMovement(lookVector.x * 2, lookVector.y * 2, lookVector.z * 2);
+                livingEntity.hurtMarked = true;
             }
             if (flight > 45) {
                 tag.putInt("sailorFlight", 0);

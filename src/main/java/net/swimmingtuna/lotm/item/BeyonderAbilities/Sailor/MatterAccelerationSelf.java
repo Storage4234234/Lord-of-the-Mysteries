@@ -4,7 +4,6 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,9 +19,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoor;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.LuckGifting;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocationBlink;
@@ -44,7 +43,7 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         int matterAccelerationDistance = player.getPersistentData().getInt("tyrantSelfAcceleration");
-        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 0, matterAccelerationDistance * 10)) {
+        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 0, matterAccelerationDistance * 10, true)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player);
@@ -113,38 +112,57 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
         player.teleportTo(teleportLocation.getX() + 0.5, teleportLocation.getY(), teleportLocation.getZ() + 0.5);
     }
 
-    public static void matterAccelerationSelf(Player player, BeyonderHolder holder, Style style) {
+    public static void matterAccelerationSelf(LivingEntity livingEntity) {
         //MATTER ACCELERATION SELF
-        if (player.isSpectator()) return;
-        int matterAccelerationDistance = player.getPersistentData().getInt("tyrantSelfAcceleration");
-        int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
-        int luckGiftingAmount = player.getPersistentData().getInt("monsterLuckGifting");
-        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof MatterAccelerationSelf && holder.currentClassMatches(BeyonderClassInit.SAILOR)) {
+        if (livingEntity.isSpectator()) return;
+        int matterAccelerationDistance = livingEntity.getPersistentData().getInt("tyrantSelfAcceleration");
+        int blinkDistance = livingEntity.getPersistentData().getInt("BlinkDistance");
+        int luckGiftingAmount = livingEntity.getPersistentData().getInt("monsterLuckGifting");
+        int doorBlinkDistance = livingEntity.getPersistentData().getInt("travelBlinkDistance");
+        if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof MatterAccelerationSelf && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.SAILOR.get())) {
             matterAccelerationDistance += 50;
-            player.getPersistentData().putInt("tyrantSelfAcceleration", matterAccelerationDistance);
-            player.displayClientMessage(Component.literal("Matter Acceleration Distance is " + matterAccelerationDistance).withStyle(style), true);
+            livingEntity.getPersistentData().putInt("tyrantSelfAcceleration", matterAccelerationDistance);
+            if (livingEntity instanceof Player player) {
+                player.displayClientMessage(Component.literal("Matter Acceleration Distance is " + matterAccelerationDistance).withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+            }
         }
-        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof EnvisionLocationBlink && holder.currentClassMatches(BeyonderClassInit.SPECTATOR)) {
+        if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof EnvisionLocationBlink && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.SPECTATOR.get())) {
             blinkDistance += 5;
-            player.getPersistentData().putInt("BlinkDistance", blinkDistance);
-            player.displayClientMessage(Component.literal("Blink Distance is " + blinkDistance).withStyle(style), true);
-        }
-        if (matterAccelerationDistance >= 1001) {
-            player.displayClientMessage(Component.literal("Matter Acceleration Distance is 0").withStyle(style), true);
-            player.getPersistentData().putInt("tyrantSelfAcceleration", 0);
-        }
-        if (blinkDistance >= 201) {
-            player.displayClientMessage(Component.literal("Blink Distance is 0").withStyle(style), true);
-            player.getPersistentData().putInt("BlinkDistance", 0);
-        }
-        //LUCK GIFTING
-        if (player.isShiftKeyDown() && player.getMainHandItem().getItem() instanceof LuckGifting && holder.currentClassMatches(BeyonderClassInit.MONSTER)) {
-            player.getPersistentData().putInt("monsterLuckGifting", luckGiftingAmount + 1);
-            player.displayClientMessage(Component.literal("Luck Gifting Amount is " + luckGiftingAmount).withStyle(style), true);
-        }
-        if (luckGiftingAmount >= BeyonderUtil.getDamage(player).get(ItemInit.LUCKGIFTING.get())) {
-            player.displayClientMessage(Component.literal("Luck Gifting Amount is 0").withStyle(style), true);
-            player.getPersistentData().putInt("monsterLuckGifting", 0);
+            livingEntity.getPersistentData().putInt("BlinkDistance", blinkDistance);
+            if (livingEntity instanceof Player player) {
+                player.displayClientMessage(Component.literal("Blink Distance is " + blinkDistance).withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+            }
+            if (matterAccelerationDistance >= 1001) {
+                if (livingEntity instanceof Player player) {
+                    player.displayClientMessage(Component.literal("Matter Acceleration Distance is 0").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                }
+                livingEntity.getPersistentData().putInt("tyrantSelfAcceleration", 0);
+            }
+            if (blinkDistance >= 201) {
+                if (livingEntity instanceof Player player) {
+                    player.displayClientMessage(Component.literal("Blink Distance is 0").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                }
+                livingEntity.getPersistentData().putInt("BlinkDistance", 0);
+            }
+            //LUCK GIFTING
+            if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof LuckGifting && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.MONSTER.get())) {
+                livingEntity.getPersistentData().putInt("monsterLuckGifting", luckGiftingAmount + 1);
+                if (livingEntity instanceof Player player) {
+                    player.displayClientMessage(Component.literal("Luck Gifting Amount is " + luckGiftingAmount).withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                }
+                if (luckGiftingAmount >= BeyonderUtil.getDamage(livingEntity).get(ItemInit.LUCKGIFTING.get())) {
+                    if (livingEntity instanceof Player player) {
+                        player.displayClientMessage(Component.literal("Luck Gifting Amount is 0").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                    }
+                    livingEntity.getPersistentData().putInt("monsterLuckGifting", 0);
+                }
+            }
+            if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof TravelDoor && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.APPRENTICE.get())) {
+                livingEntity.getPersistentData().putInt("travelBlinkDistance", doorBlinkDistance + 2);
+                if (livingEntity instanceof Player player) {
+                    player.displayClientMessage(Component.literal("Blink Distance is " + doorBlinkDistance).withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                }
+            }
         }
     }
 
@@ -152,12 +170,14 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use, accelerates you to the speed of light, instantly getting you to your destination and leaving behind destruction in your path"));
+        tooltipComponents.add(Component.literal("Shift to increase distance"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("5 x Distance Traveled").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("15 seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(BeyonderClassInit.SAILOR.get()));
         tooltipComponents.add(SimpleAbilityItem.getClassText(0, BeyonderClassInit.SAILOR.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);

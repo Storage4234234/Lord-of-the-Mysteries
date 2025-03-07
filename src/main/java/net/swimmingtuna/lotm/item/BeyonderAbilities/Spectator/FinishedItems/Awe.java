@@ -47,7 +47,7 @@ public class Awe extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             int dir = (int) dreamIntoReality.getValue();
             double radius = (18.0 - sequence) * dir;
             float damage = (float) (17.0 * (Math.max(1, dir * 0.5)) - (sequence * 1.2));

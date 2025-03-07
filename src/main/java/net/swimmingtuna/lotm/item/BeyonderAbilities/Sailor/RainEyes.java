@@ -37,7 +37,7 @@ public class RainEyes extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void rainEyesTick(Player player) {
+    public static void rainEyesTick(LivingEntity player) {
         //RAIN EYES
         if (!player.level().isRaining()) {
             return;

@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
@@ -21,6 +22,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -84,57 +86,57 @@ public class DreamIntoReality extends SimpleAbilityItem {
         }
     }
 
-    public static void stopFlying(Player player) {
-        if (!player.level().isClientSide()) {
-            AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-            player.getPersistentData().putBoolean(CAN_FLY, false);
-            Abilities playerAbilities = player.getAbilities();
-            CompoundTag compoundTag = player.getPersistentData();
-            int mindscape = compoundTag.getInt("inMindscape");
-            if (!playerAbilities.instabuild || mindscape >= 1) {
-                playerAbilities.mayfly = false;
-                playerAbilities.flying = false;
-            }
-            dreamIntoReality.setBaseValue(1);
-            playerAbilities.setFlyingSpeed(0.05F);
-            player.onUpdateAbilities();
-            ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
-            scaleData.setTargetScale(1);
-            scaleData.markForSync(true);
-            if (player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
+    public static void stopFlying(LivingEntity livingEntity) { //marked
+        if (!livingEntity.level().isClientSide()) {
+            if (livingEntity instanceof Player player) {
+                AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
+                livingEntity.getPersistentData().putBoolean(CAN_FLY, false);
+                Abilities playerAbilities = player.getAbilities();
+                CompoundTag compoundTag = livingEntity.getPersistentData();
+                int mindscape = compoundTag.getInt("inMindscape");
+                if (!playerAbilities.instabuild || mindscape >= 1) {
+                    playerAbilities.mayfly = false;
+                    playerAbilities.flying = false;
+                }
+                dreamIntoReality.setBaseValue(1);
+                playerAbilities.setFlyingSpeed(0.05F);
+                player.onUpdateAbilities();
+                ScaleData scaleData = ScaleTypes.BASE.getScaleData(livingEntity);
+                scaleData.setTargetScale(1);
+                scaleData.markForSync(true);
+                if (livingEntity instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
+                }
             }
         }
     }
 
-    public static void dreamIntoReality(Player player, BeyonderHolder holder) {
+    public static void dreamIntoReality(LivingEntity livingEntity) {
         //DREAM INTO REALITY
-        boolean canFly = player.getPersistentData().getBoolean("CanFly");
+        boolean canFly = livingEntity.getPersistentData().getBoolean("CanFly");
         if (!canFly) {
             return;
         }
-        if (holder.getSpirituality() >= 15) {
-            if (player.tickCount % 2 == 0) {
-                holder.useSpirituality(10);
+        if (BeyonderUtil.getSpirituality(livingEntity) >= 15) {
+            if (livingEntity.tickCount % 2 == 0) {
+                BeyonderUtil.useSpirituality(livingEntity, 10);
             }
         }
-        if (holder.getSpirituality() <= 15) {
-            DreamIntoReality.stopFlying(player);
+        if (BeyonderUtil.getSpirituality(livingEntity) >= 15) {
+            DreamIntoReality.stopFlying(livingEntity);
         }
-        if (holder.getCurrentSequence() == 2) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 2, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
-        }
-        if (holder.getCurrentSequence() == 1) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
-        }
-        if (holder.getCurrentSequence() == 0) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 4, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 5, false, false));
+        if (BeyonderUtil.getSequence(livingEntity) == 2) {
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 2, false, false));
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
+        } else if (BeyonderUtil.getSequence(livingEntity) == 1) {
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
+        }else if (BeyonderUtil.getSequence(livingEntity) == 0) {
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 4, false, false));
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 5, false, false));
         }
     }
 

@@ -355,14 +355,14 @@ public class MonsterClass implements BeyonderClass {
         }
     }
 
-    public static void monsterLuckIgnoreMobs(Player pPlayer) {
+    public static void monsterLuckIgnoreMobs(LivingEntity pPlayer) {
         if (pPlayer.tickCount % 40 == 0) {
             if (pPlayer.getPersistentData().getInt("luckIgnoreMobs") >= 1) {
                 for (Mob mob : pPlayer.level().getEntitiesOfClass(Mob.class, pPlayer.getBoundingBox().inflate(20))) {
                     if (mob.getTarget() == pPlayer) {
-                        for (LivingEntity livingEntity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(50))) {
-                            if (livingEntity != null) {
-                                mob.setTarget(livingEntity);
+                        for (LivingEntity living : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(50))) {
+                            if (living != null) {
+                                mob.setTarget(living);
                             } else
                                 mob.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 60, 1, false, false));
                         }
@@ -373,21 +373,20 @@ public class MonsterClass implements BeyonderClass {
         }
     }
 
-    public static void decrementMonsterAttackEvent(Player pPlayer) {
-        if (pPlayer.getPersistentData().getInt("attackedMonster") >= 1) {
-            pPlayer.getPersistentData().putInt("attackedMonster", pPlayer.getPersistentData().getInt("attackedMonster") - 1);
+    public static void decrementMonsterAttackEvent(LivingEntity livingEntity) {
+        if (livingEntity.getPersistentData().getInt("attackedMonster") >= 1) {
+            livingEntity.getPersistentData().putInt("attackedMonster", livingEntity.getPersistentData().getInt("attackedMonster") - 1);
         }
     }
 
     public static void monsterDodgeAttack(LivingHurtEvent event) {
-        LivingEntity entity = event.getEntity();
+        LivingEntity livingEntity = event.getEntity();
         DamageSource source = event.getSource();
         Entity entitySource = source.getEntity();
-        if (!entity.level().isClientSide() && BeyonderUtil.isBeyonderCapable(entity)) {
-            if (entity instanceof Player pPlayer && (entitySource != null && entitySource != entity) && !source.is(DamageTypes.CRAMMING) && !source.is(DamageTypes.STARVE) && !source.is(DamageTypes.FALL) && !source.is(DamageTypes.DROWN) && !source.is(DamageTypes.FELL_OUT_OF_WORLD) && !source.is(DamageTypes.ON_FIRE)) {
-                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                if (holder.currentClassMatches(BeyonderClassInit.MONSTER)) {
-                    int randomChance = (int) ((Math.random() * 20) - holder.getCurrentSequence());
+        if (!livingEntity.level().isClientSide() && BeyonderUtil.isBeyonderCapable(livingEntity)) {
+            if ((entitySource != null && entitySource != livingEntity) && !source.is(DamageTypes.CRAMMING) && !source.is(DamageTypes.STARVE) && !source.is(DamageTypes.FALL) && !source.is(DamageTypes.DROWN) && !source.is(DamageTypes.FELL_OUT_OF_WORLD) && !source.is(DamageTypes.ON_FIRE)) {
+                if (BeyonderUtil.currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.MONSTER.get())) {
+                    int randomChance = (int) ((Math.random() * 20) - BeyonderUtil.getSequence(livingEntity));
                     if (randomChance >= 13) {
                         double amount = event.getAmount();
                         double x = 0;
@@ -400,15 +399,16 @@ public class MonsterClass implements BeyonderClass {
                             x = Math.min(3, amount * 0.15);
                             z = Math.min(3, amount * 0.15);
                         }
-                        entity.setDeltaMovement(x, 1, z);
-                        entity.hurtMarked = true;
+                        livingEntity.setDeltaMovement(x, 1, z);
+                        livingEntity.hurtMarked = true;
                         event.setAmount(0);
-                        entity.sendSystemMessage(Component.literal("A breeze of wind moved you out of the way of damage").withStyle(ChatFormatting.GREEN));
+                        livingEntity.sendSystemMessage(Component.literal("A breeze of wind moved you out of the way of damage").withStyle(ChatFormatting.GREEN));
                     }
                 }
             }
         }
     }
+
     public static void dodgeProjectiles(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             if (livingEntity.getPersistentData().getInt("windMovingProjectilesCounter") >= 1) {
@@ -443,8 +443,8 @@ public class MonsterClass implements BeyonderClass {
                 if (BeyonderUtil.isBeyonderCapable(livingEntity)) {
                     if (livingEntity instanceof Player pPlayer) {
                         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                        int sequence = holder.getCurrentSequence();
-                        if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 7) {
+                        int sequence = holder.getSequence();
+                        if (BeyonderUtil.currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.MONSTER.get()) && holder.getSequence() <= 7) {
                             int reverseChance = (int) (Math.random() * 20 - sequence);
                             for (Projectile projectile : livingEntity.level().getEntitiesOfClass(Projectile.class, livingEntity.getBoundingBox().inflate(100))) {
                                 if (projectile.getPersistentData().getInt("monsterReverseProjectiles") == 0) {
@@ -479,11 +479,12 @@ public class MonsterClass implements BeyonderClass {
             }
         }
     }
+
     public static void showMonsterParticles(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide() && livingEntity.tickCount % 100 == 0) {
             if (livingEntity instanceof ServerPlayer serverPlayer) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(serverPlayer);
-                if (holder.getCurrentSequence() <= 2 && holder.currentClassMatches(BeyonderClassInit.MONSTER)) {
+                if (holder.getSequence() <= 2 && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.MONSTER.get())) {
                     for (LivingEntity entities : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(50))) {
                         if (entities != serverPlayer) {
                             CompoundTag tag = entities.getPersistentData();
@@ -854,11 +855,10 @@ public class MonsterClass implements BeyonderClass {
         return trajectory;
     }
 
-    public static void calamityUndeadArmy(Player pPlayer) {
+    public static void calamityUndeadArmy(LivingEntity pPlayer) {
         CompoundTag tag = pPlayer.getPersistentData();
         if (pPlayer.level() instanceof ServerLevel serverLevel) {
             int enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
-
             int x = tag.getInt("calamityUndeadArmyX");
             int y = tag.getInt("calamityUndeadArmyY");
             int z = tag.getInt("calamityUndeadArmyZ");
@@ -896,8 +896,7 @@ public class MonsterClass implements BeyonderClass {
                     int randomPos = (int) ((Math.random() * 24) - 12);
                     if (random.nextInt(10) == 10) {
                         for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
+                            if (BeyonderUtil.currentPathwayMatchesNoException(pPlayer, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(pPlayer) <= 6) {
                                 if (entity != null) {
                                     zombie.setTarget(entity);
                                 }
@@ -913,8 +912,7 @@ public class MonsterClass implements BeyonderClass {
                         zombie.setItemSlot(EquipmentSlot.FEET, leatherBoots);
                         zombie.setItemSlot(EquipmentSlot.MAINHAND, woodSword);
                         for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
+                            if (BeyonderUtil.currentPathwayMatchesNoException(pPlayer, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(pPlayer) <= 6) {
                                 if (entity != null) {
                                     zombie.setTarget(entity);
                                 }
@@ -930,8 +928,7 @@ public class MonsterClass implements BeyonderClass {
                         zombie.setItemSlot(EquipmentSlot.FEET, ironBoots);
                         zombie.setItemSlot(EquipmentSlot.MAINHAND, ironSword);
                         for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
+                            if (BeyonderUtil.currentPathwayMatchesNoException(pPlayer, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(pPlayer) <= 6) {
                                 if (entity != null) {
                                     zombie.setTarget(entity);
                                 }
@@ -947,8 +944,7 @@ public class MonsterClass implements BeyonderClass {
                         zombie.setItemSlot(EquipmentSlot.FEET, diamondBoots);
                         zombie.setItemSlot(EquipmentSlot.MAINHAND, diamondSword);
                         for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
+                            if (BeyonderUtil.currentPathwayMatchesNoException(pPlayer, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(pPlayer) <= 6) {
                                 if (entity != null) {
                                     zombie.setTarget(entity);
                                 }
@@ -964,8 +960,7 @@ public class MonsterClass implements BeyonderClass {
                         zombie.setItemSlot(EquipmentSlot.FEET, netheriteBoots);
                         zombie.setItemSlot(EquipmentSlot.MAINHAND, netheriteSword);
                         for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
+                            if (BeyonderUtil.currentPathwayMatchesNoException(pPlayer, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(pPlayer) <= 6) {
                                 if (entity != null) {
                                     zombie.setTarget(entity);
                                 }
@@ -977,8 +972,7 @@ public class MonsterClass implements BeyonderClass {
                         skeleton.setPos(x + randomPos, surfaceY, z + randomPos);
                         skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
                         for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
+                            if (BeyonderUtil.currentPathwayMatchesNoException(pPlayer, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(pPlayer) <= 6) {
                                 if (entity != null) {
                                     zombie.setTarget(entity);
                                 }
@@ -995,8 +989,7 @@ public class MonsterClass implements BeyonderClass {
                         enchantedBow.enchant(Enchantments.POWER_ARROWS, 1);
                         skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
                         for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
+                            if (BeyonderUtil.currentPathwayMatchesNoException(pPlayer, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(pPlayer) <= 6) {
                                 if (entity != null) {
                                     zombie.setTarget(entity);
                                 }
@@ -1013,8 +1006,7 @@ public class MonsterClass implements BeyonderClass {
                         enchantedBow.enchant(Enchantments.POWER_ARROWS, 2);
                         skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
                         for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
+                            if (BeyonderUtil.currentPathwayMatchesNoException(pPlayer, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(pPlayer) <= 6) {
                                 if (entity != null) {
                                     zombie.setTarget(entity);
                                 }
@@ -1031,8 +1023,7 @@ public class MonsterClass implements BeyonderClass {
                         enchantedBow.enchant(Enchantments.POWER_ARROWS, 3);
                         skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
                         for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
+                            if (BeyonderUtil.currentPathwayMatchesNoException(pPlayer, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(pPlayer) <= 6) {
                                 if (entity != null) {
                                     zombie.setTarget(entity);
                                 }
@@ -1049,8 +1040,7 @@ public class MonsterClass implements BeyonderClass {
                         enchantedBow.enchant(Enchantments.POWER_ARROWS, 4);
                         skeleton.setItemSlot(EquipmentSlot.MAINHAND, enchantedBow);
                         for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(20))) {
-                            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                            if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 6) {
+                            if (BeyonderUtil.currentPathwayMatchesNoException(pPlayer, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(pPlayer) <= 6) {
                                 if (entity != null) {
                                     zombie.setTarget(entity);
                                 }
@@ -1071,24 +1061,22 @@ public class MonsterClass implements BeyonderClass {
             }
         }
     }
-    public static void calamityExplosion(Player pPlayer) {
-        CompoundTag tag = pPlayer.getPersistentData();
-        if (pPlayer.level() instanceof ServerLevel serverLevel) {
+
+    public static void calamityExplosion(LivingEntity livingEntity) {
+        CompoundTag tag = livingEntity.getPersistentData();
+        if (livingEntity.level() instanceof ServerLevel serverLevel) {
             int x = tag.getInt("calamityExplosionOccurrence");
-            if (x >= 1 && pPlayer.tickCount % 20 == 0 && !pPlayer.level().isClientSide()) {
+            if (x >= 1 && livingEntity.tickCount % 20 == 0 && !livingEntity.level().isClientSide()) {
                 int explosionX = tag.getInt("calamityExplosionX");
                 int explosionY = tag.getInt("calamityExplosionY");
                 int explosionZ = tag.getInt("calamityExplosionZ");
-                int subtractX = explosionX - (int) pPlayer.getX();
-                int subtractY = explosionY - (int) pPlayer.getY();
-                int subtractZ = explosionZ - (int) pPlayer.getZ();
+                int subtractX = explosionX - (int) livingEntity.getX();
+                int subtractY = explosionY - (int) livingEntity.getY();
+                int subtractZ = explosionZ - (int) livingEntity.getZ();
                 tag.putInt("calamityExplosionOccurrence", x - 1);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(15))) {
-                    if (entity instanceof Player player) {
-                        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                        if (holder.currentClassMatches(BeyonderClassInit.MONSTER) && holder.getCurrentSequence() <= 3) {
-                            player.getPersistentData().putInt("calamityExplosionImmunity", 2);
-                        }
+                for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(15))) {
+                    if (BeyonderUtil.currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(livingEntity) <= 3) {
+                        entity.getPersistentData().putInt("calamityExplosionImmunity", 2);
                     }
                 }
             }
@@ -1097,8 +1085,8 @@ public class MonsterClass implements BeyonderClass {
                 int explosionY = tag.getInt("calamityExplosionY");
                 int explosionZ = tag.getInt("calamityExplosionZ");
                 int data = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
-                pPlayer.level().playSound(null, explosionX, explosionY, explosionZ, SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 5.0F, 5.0F);
-                Explosion explosion = new Explosion(pPlayer.level(), null, explosionX, explosionY, explosionZ, 10.0F + (data * 3), true, Explosion.BlockInteraction.DESTROY);
+                livingEntity.level().playSound(null, explosionX, explosionY, explosionZ, SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 5.0F, 5.0F);
+                Explosion explosion = new Explosion(livingEntity.level(), null, explosionX, explosionY, explosionZ, 10.0F + (data * 3), true, Explosion.BlockInteraction.DESTROY);
                 explosion.explode();
                 explosion.finalizeExplosion(true);
                 tag.putInt("calamityExplosionOccurrence", 0);

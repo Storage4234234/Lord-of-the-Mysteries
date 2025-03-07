@@ -31,7 +31,7 @@ public class EnvisionHealth extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 3500 / dreamIntoReality)) {
+        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 3500 / dreamIntoReality, true)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player);

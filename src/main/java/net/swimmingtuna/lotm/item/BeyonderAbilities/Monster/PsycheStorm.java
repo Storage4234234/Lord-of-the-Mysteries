@@ -87,7 +87,7 @@ public class PsycheStorm extends SimpleAbilityItem {
     private void psycheStorm(Player player, Level level, BlockPos targetPos) {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             double radius = (15.0 - sequence);
             float damage = (float) (25.0 - (sequence * 2));
             int corruptionAddition = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.PSYCHESTORM.get());

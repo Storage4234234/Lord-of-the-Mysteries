@@ -17,9 +17,15 @@ public class EntityInit {
     public static final RegistryObject<EntityType<AqueousLightEntity>> AQUEOUS_LIGHT_ENTITY =
             ENTITIES.register("aqueous_light", () -> EntityType.Builder.<AqueousLightEntity>of(AqueousLightEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).clientTrackingRange(100).build(new ResourceLocation(LOTM.MOD_ID, "aqueous_light").toString()));
+    public static final RegistryObject<EntityType<MercuryEntity>> MERCURY_ENTITY =
+            ENTITIES.register("mercury_entity", () -> EntityType.Builder.<MercuryEntity>of(MercuryEntity::new, MobCategory.MISC)
+                    .sized(0.5f,0.5f).clientTrackingRange(100).build(new ResourceLocation(LOTM.MOD_ID, "mercury_entity").toString()));
     public static final RegistryObject<EntityType<DawnRayEntity>> DAWN_RAY_ENTITY =
             ENTITIES.register("dawn_ray_entity", () -> EntityType.Builder.<DawnRayEntity>of(DawnRayEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).clientTrackingRange(400).build(new ResourceLocation(LOTM.MOD_ID, "dawn_ray_entity").toString()));
+    public static final RegistryObject<EntityType<TwilightLightEntity>> TWILIGHT_LIGHT =
+            ENTITIES.register("twilight_light_entity", () -> EntityType.Builder.<TwilightLightEntity>of(TwilightLightEntity::new, MobCategory.MISC)
+                    .sized(0.5f,0.5f).clientTrackingRange(400).build(new ResourceLocation(LOTM.MOD_ID, "twilight_light_entity").toString()));
     public static final RegistryObject<EntityType<GuardianBoxEntity>> GUARDIAN_BOX_ENTITY =
             ENTITIES.register("guardian_box_entity", () -> EntityType.Builder.<GuardianBoxEntity>of(GuardianBoxEntity::new, MobCategory.MISC)
                     .sized(5.0f,5.0f).clientTrackingRange(400).build(new ResourceLocation(LOTM.MOD_ID, "guardian_box_entity").toString()));
@@ -56,6 +62,12 @@ public class EntityInit {
     public static final RegistryObject<EntityType<CircleEntity>> CIRCLE_ENTITY =
             ENTITIES.register("circle", () -> EntityType.Builder.<CircleEntity>of(CircleEntity::new, MobCategory.MISC)
                     .sized(1.0f,1.0f).build("circle"));
+    public static final RegistryObject<EntityType<DivineHandRightEntity>> DIVINE_HAND_RIGHT_ENTITY =
+            ENTITIES.register("divine_hand_right_entity", () -> EntityType.Builder.<DivineHandRightEntity>of(DivineHandRightEntity::new, MobCategory.MISC)
+                    .sized(1.0f,1.0f).build("divine_hand_right_entity"));
+    public static final RegistryObject<EntityType<DivineHandLeftEntity>> DIVINE_HAND_LEFT_ENTITY =
+            ENTITIES.register("divine_hand_left_entity", () -> EntityType.Builder.<DivineHandLeftEntity>of(DivineHandLeftEntity::new, MobCategory.MISC)
+                    .sized(1.0f,1.0f).build("divine_hand_left_entity"));
     public static final RegistryObject<EntityType<MeteorTrailEntity>> METEOR_TRAIL_ENTITY =
             ENTITIES.register("meteortrailentity", () -> EntityType.Builder.<MeteorTrailEntity>of(MeteorTrailEntity::new, MobCategory.MISC)
                     .sized(1.0f,1.0f).clientTrackingRange(200).build("meteortrailentity"));
@@ -80,9 +92,24 @@ public class EntityInit {
     public static final RegistryObject<EntityType<MeteorNoLevelEntity>> METEOR_NO_LEVEL_ENTITY =
             ENTITIES.register("meteor_no_hurt", () -> EntityType.Builder.<MeteorNoLevelEntity>of(MeteorNoLevelEntity::new, MobCategory.MISC)
                     .sized(2.0f,2.0f).clientTrackingRange(300).build("meteor_no_hurt"));
+    public static final RegistryObject<EntityType<SilverLightEntity>> SILVER_LIGHT_ENTITY =
+            ENTITIES.register("silver_beam_entity", () -> EntityType.Builder.<SilverLightEntity>of(SilverLightEntity::new, MobCategory.MISC)
+                    .sized(2.5f,2.5f).clientTrackingRange(400).build(new ResourceLocation(LOTM.MOD_ID, "silver_beam_entity").toString()));
+    public static final RegistryObject<EntityType<GlobeOfTwilightEntity>> GLOBE_OF_TWILIGHT_ENTITY =
+            ENTITIES.register("globe_of_twilight_entity", () -> EntityType.Builder.<GlobeOfTwilightEntity>of(GlobeOfTwilightEntity::new, MobCategory.MISC)
+                    .sized(1.0f,1.0f).clientTrackingRange(200).build(new ResourceLocation(LOTM.MOD_ID, "globe_of_twilight_entity").toString()));
     public static final RegistryObject<EntityType<WindBladeEntity>> WIND_BLADE_ENTITY =
             ENTITIES.register("wind_blade", () -> EntityType.Builder.<WindBladeEntity>of(WindBladeEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).clientTrackingRange(100).clientTrackingRange(4).updateInterval(20).build("wind_blade"));
+    public static final RegistryObject<EntityType<LowSequenceDoorEntity>> LOW_SEQUENCE_DOOR_ENTITY =
+            ENTITIES.register("low_sequence_door_entity", () -> EntityType.Builder.<LowSequenceDoorEntity>of(LowSequenceDoorEntity::new, MobCategory.MISC)
+                    .sized(0.5f,2f).clientTrackingRange(100).build("low_sequence_door_entity"));
+    public static final RegistryObject<EntityType<MercuryPortalEntity>> MERCURY_PORTAL_ENTITY =
+            ENTITIES.register("mercury_portal_entity", () -> EntityType.Builder.<MercuryPortalEntity>of(MercuryPortalEntity::new, MobCategory.MISC)
+                    .sized(0.5f,0.5f).clientTrackingRange(100).build("mercury_portal_entity"));
+    public static final RegistryObject<EntityType<MidSequenceDoorEntity>> MID_SEQUENCE_DOOR_ENTITY =
+            ENTITIES.register("mid_sequence_door_entity", () -> EntityType.Builder.<MidSequenceDoorEntity>of(MidSequenceDoorEntity::new, MobCategory.MISC)
+                    .sized(0.5f,2f).clientTrackingRange(100).build("mid_sequence_door_entity"));
     public static final RegistryObject<EntityType<WindCushionEntity>> WIND_CUSHION_ENTITY =
             ENTITIES.register("wind_cushion", () -> EntityType.Builder.<WindCushionEntity>of(WindCushionEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).build("wind_cushion"));

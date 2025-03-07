@@ -53,7 +53,7 @@ public class StarOfLightning extends SimpleAbilityItem {
     private static void starOfLightning(Player player) {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            if (holder.getCurrentSequence() == 0) {
+            if (holder.getSequence() == 0) {
                 player.getPersistentData().putInt("sailorLightningStar", 50);
             } else {
                 player.getPersistentData().putInt("sailorLightningStar", 80);
@@ -61,19 +61,20 @@ public class StarOfLightning extends SimpleAbilityItem {
         }
     }
 
-    public static void starOfLightning(Player player, CompoundTag playerPersistentData) {
+    public static void starOfLightning(LivingEntity livingEntity) {
         //STAR OF LIGHTNING
-        int sailorLightningStar = playerPersistentData.getInt("sailorLightningStar");
+        CompoundTag tag = livingEntity.getPersistentData();
+        int sailorLightningStar = tag.getInt("sailorLightningStar");
         if (sailorLightningStar >= 2) {
-            StarOfLightning.summonLightningParticles(player);
-            player.level().playSound(player, player.getOnPos(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 10, 1);
-            playerPersistentData.putInt("sailorLightningStar", sailorLightningStar - 1);
+            StarOfLightning.summonLightningParticles(livingEntity);
+            livingEntity.level().playSound(livingEntity, livingEntity.getOnPos(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 10, 1);
+            tag.putInt("sailorLightningStar", sailorLightningStar - 1);
         }
         if (sailorLightningStar == 1) {
-            StarOfLightning.starOfLightningExplode(player, player.getOnPos(), 15);
-            playerPersistentData.putInt("sailorLightningStar", 0);
-            for (int i = 0; i < BeyonderUtil.getDamage(player).get(ItemInit.STAR_OF_LIGHTNING.get()); i++) {
-                LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());
+            StarOfLightning.starOfLightningExplode(livingEntity, livingEntity.getOnPos(), 15);
+            tag.putInt("sailorLightningStar", 0);
+            for (int i = 0; i < BeyonderUtil.getDamage(livingEntity).get(ItemInit.STAR_OF_LIGHTNING.get()); i++) {
+                LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), livingEntity.level());
                 lightningEntity.setSpeed(50);
                 lightningEntity.setDamage(15);
                 double sailorStarX = (Math.random() * 2 - 1);
@@ -81,9 +82,9 @@ public class StarOfLightning extends SimpleAbilityItem {
                 double sailorStarZ = (Math.random() * 2 - 1);
                 lightningEntity.setDeltaMovement(sailorStarX, sailorStarY, sailorStarZ);
                 lightningEntity.setMaxLength(10);
-                lightningEntity.setOwner(player);
-                lightningEntity.teleportTo(player.getX(), player.getY(), player.getZ());
-                player.level().addFreshEntity(lightningEntity);
+                lightningEntity.setOwner(livingEntity);
+                lightningEntity.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
+                livingEntity.level().addFreshEntity(lightningEntity);
             }
         }
     }

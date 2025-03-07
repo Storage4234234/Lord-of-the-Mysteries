@@ -21,9 +21,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Ability;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
@@ -182,10 +179,8 @@ public class AbilityRegisterCommand {
     private static void loadAbilities(CommandContext<CommandSourceStack> context) {
         Player player = context.getSource().getPlayer();
         if (player != null) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int sequence = BeyonderUtil.getSequence(player);
-            BeyonderClass beyonderClass = holder.getCurrentClass();
-            if (beyonderClass == BeyonderClassInit.SPECTATOR.get()) {
+            if (BeyonderUtil.currentPathwayMatchesNoException(player, BeyonderClassInit.SPECTATOR.get())) {
                 if (sequence == 9) {
                     player.sendSystemMessage(Component.literal("No abilities to register"));
                 } else if (sequence >= 8) {
@@ -211,7 +206,6 @@ public class AbilityRegisterCommand {
                 } else if (sequence == 4) {
                     excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
                     excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
-                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
                     excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
                     excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
                     excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dreamwalking");
@@ -220,16 +214,15 @@ public class AbilityRegisterCommand {
                 } else if (sequence == 3) {
                     excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
                     excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
-                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
                     excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
                     excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
                     excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dreamwalking");
                     excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dragonbreath");
                     excecuteAbilityCommand(context, "/abilityput RLLLL lotm:plaguestorm");
+                    excecuteAbilityCommand(context, "/abilityput RLRLR lotm:dreamweaving");
                 } else if (sequence == 2) {
                     excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
                     excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
-                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
                     excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
                     excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
                     excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dreamwalking");
@@ -237,10 +230,10 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput RLLLL lotm:plaguestorm");
                     excecuteAbilityCommand(context, "/abilityput RRLRR lotm:dreamintoreality");
                     excecuteAbilityCommand(context, "/abilityput LLLLR lotm:discern");
+                    excecuteAbilityCommand(context, "/abilityput RLRLR lotm:dreamweaving");
                 } else if (sequence == 1) {
                     excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
                     excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
-                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
                     excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
                     excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
                     excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dreamwalking");
@@ -252,10 +245,10 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput LLRLR lotm:prophesizeplayer");
                     excecuteAbilityCommand(context, "/abilityput LLRLL lotm:prophesizedemise");
                     excecuteAbilityCommand(context, "/abilityput RRLLL lotm:meteorshower");
+                    excecuteAbilityCommand(context, "/abilityput RLRLR lotm:dreamweaving");
                 } else if (sequence == 0) {
                     excecuteAbilityCommand(context, "/abilityput LRRLL lotm:mindreading");
                     excecuteAbilityCommand(context, "/abilityput LLLLL lotm:awe");
-                    excecuteAbilityCommand(context, "/abilityput LLLRL lotm:frenzy");
                     excecuteAbilityCommand(context, "/abilityput RRRLR lotm:placate");
                     excecuteAbilityCommand(context, "/abilityput RRRLL lotm:psychologicalinvisibility");
                     excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dreamwalking");
@@ -270,9 +263,9 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput RLRRR lotm:envisionhealth");
                     excecuteAbilityCommand(context, "/abilityput RLLRR lotm:envisionbarrier");
                     excecuteAbilityCommand(context, "/abilityput LLRRL lotm:envisionlocationblink");
+                    excecuteAbilityCommand(context, "/abilityput RLRLR lotm:dreamweaving");
                 }
-            } else if (beyonderClass == BeyonderClassInit.MONSTER.get()) {
-                player.sendSystemMessage(Component.literal("monster"));
+            } else if (BeyonderUtil.currentPathwayMatchesNoException(player, BeyonderClassInit.MONSTER.get())) {
                 if (sequence == 9) {
                     excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
                 } else if (sequence >= 8) {
@@ -359,8 +352,7 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput LRLRL lotm:probabilityfortune");
                     excecuteAbilityCommand(context, "/abilityput RLRLR lotm:probabilitymisfortune");
                 }
-            } else if (beyonderClass == BeyonderClassInit.SAILOR.get()) {
-                player.sendSystemMessage(Component.literal("sailor"));
+            } else if (BeyonderUtil.currentPathwayMatchesNoException(player, BeyonderClassInit.SAILOR.get())) {
                 if (sequence == 9) {
                     player.sendSystemMessage(Component.literal("No abilities to register"));
                 } else if (sequence >= 8) {

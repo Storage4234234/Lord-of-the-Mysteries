@@ -92,7 +92,7 @@ public class Nightmare extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             int dir = (int) dreamIntoReality.getValue();
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.NIGHTMARE.get());
             float damagePlayer = ((float) (40.0 * dir) - (sequence * 2));
@@ -126,14 +126,14 @@ public class Nightmare extends SimpleAbilityItem {
         }
     }
 
-    public static void nightmareTick(Player player, CompoundTag playerPersistentData) {
-        AttributeInstance nightmareAttribute = player.getAttribute(ModAttributes.NIGHTMARE.get());
+    public static void nightmareTick(LivingEntity livingEntity) {
+        AttributeInstance nightmareAttribute = livingEntity.getAttribute(ModAttributes.NIGHTMARE.get());
+        CompoundTag playerPersistentData = livingEntity.getPersistentData();
         int nightmareTimer = playerPersistentData.getInt("NightmareTimer");
-        int matterAccelerationBlockTimer = player.getPersistentData().getInt("matterAccelerationBlockTimer");
+        int matterAccelerationBlockTimer = livingEntity.getPersistentData().getInt("matterAccelerationBlockTimer");
         if (matterAccelerationBlockTimer >= 1) {
-            player.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
+            livingEntity.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
         }
-
         if (nightmareAttribute.getValue() >= 1) {
             nightmareTimer++;
             if (nightmareTimer >= 600) {

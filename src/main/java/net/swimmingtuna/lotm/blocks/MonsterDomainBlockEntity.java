@@ -151,9 +151,9 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
             CompoundTag tag = livingEntity.getPersistentData();
             double misfortune = tag.getDouble("misfortune");
             double luck = tag.getDouble("luck");
-            if (livingEntity instanceof Player pPlayer ) {
+            if (livingEntity instanceof Player pPlayer) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-                if (!(holder.getCurrentClass() == BeyonderClassInit.MONSTER.get() && holder.getCurrentSequence() <= 3)) {
+                if (!(BeyonderUtil.currentPathwayAndSequenceMatchesNoException(livingEntity, BeyonderClassInit.MONSTER.get(), 3))) {
                     if (ticks % 40 == 0) {
                         BeyonderUtil.applyMobEffect(livingEntity, MobEffects.REGENERATION, 100, 2 * multiplier, false, false); //configure this to make it scale with how small the radius is compared to max radius
                         BeyonderUtil.applyMobEffect(livingEntity, MobEffects.SATURATION, 100, multiplier, false, false); //configure this to make it scale with how small the radius is compared to max radius
@@ -235,9 +235,9 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
                         tag.putDouble("misfortune", Math.max(0, misfortune - multiplier));
                     }
                 }
-            } else if (livingEntity instanceof PlayerMobEntity pPlayer) {
-                boolean isMonster = pPlayer.getCurrentPathway() == BeyonderClassInit.MONSTER;
-                if (!(isMonster && pPlayer.getCurrentSequence() <= 3)) {
+            } else {
+                boolean isMonster = BeyonderUtil.currentPathwayAndSequenceMatchesNoException(livingEntity, BeyonderClassInit.MONSTER.get(), 3);
+                if (!isMonster) {
                     if (ticks % 40 == 0) {
                         BeyonderUtil.applyMobEffect(livingEntity, MobEffects.REGENERATION, 100, 2 * multiplier, false, false); //configure this to make it scale with how small the radius is compared to max radius
                         BeyonderUtil.applyMobEffect(livingEntity, MobEffects.SATURATION, 100, multiplier, false, false); //configure this to make it scale with how small the radius is compared to max radius
@@ -322,7 +322,7 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
         if (owner != null) {
             int safeRadius = Math.max(1, getRadius());
             BeyonderHolder beyonderHolder = BeyonderHolderAttacher.getHolderUnwrap(owner);
-            int maxRadius = 250 - (beyonderHolder.getCurrentSequence() * 45);
+            int maxRadius = 250 - (beyonderHolder.getSequence() * 45);
             multiplier = Math.max(1, (maxRadius / safeRadius) / 2);
         } else multiplier = 1;
 
@@ -333,7 +333,7 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
                 if (ticks % 10 == 0) {
                     if (isAlly && !isBad) {
                         removeMobEffects(mob, multiplier);
-                    } else if (!isAlly && isBad){
+                    } else if (!isAlly && isBad) {
                         if (mob.hasEffect(MobEffects.REGENERATION)) {
                             mob.removeEffect(MobEffects.REGENERATION);
                         }
@@ -352,7 +352,7 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
             } else {
                 if (isAlly && !isBad) {
                     isGoodPlayerAffect(entity, multiplier);
-                } else if (!isAlly && isBad){
+                } else if (!isAlly && isBad) {
                     applyNegativeEffects(entity, multiplier);
                 }
             }
@@ -365,33 +365,31 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
             processBlocksBad(multiplier);
         }
     }
-    private void applyNegativeEffects(LivingEntity entity, int multiplier) {
-        if (!entity.level().isClientSide()) {
-            CompoundTag tag = entity.getPersistentData();
+
+    private void applyNegativeEffects(LivingEntity livingEntity, int multiplier) {
+        if (!livingEntity.level().isClientSide()) {
+            CompoundTag tag = livingEntity.getPersistentData();
             double luck = tag.getDouble("luck");
             double misfortune = tag.getDouble("misfortune");
 
-            if (entity instanceof Player player) {
-                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                if (!(holder.getCurrentClass() == BeyonderClassInit.MONSTER.get() && holder.getCurrentSequence() <= 3)) {
-                    if (ticks % 40 == 0) {
-                        BeyonderUtil.applyMobEffect(entity, MobEffects.WEAKNESS, 100, multiplier, false, false);
-                        BeyonderUtil.applyMobEffect(entity, MobEffects.MOVEMENT_SLOWDOWN, 100, multiplier, false, false);
-                        BeyonderUtil.applyMobEffect(entity, MobEffects.HUNGER, 100, multiplier, false, false);
-                        BeyonderUtil.applyMobEffect(entity, MobEffects.POISON, 100, multiplier, false, false);
-                    }
 
-                    handlePlayerInventoryDamage(player, multiplier);
-                    removePositiveEffects(entity);
-
-                    if (ticks % 200 == 0) {
-                        tag.putDouble("luck", Math.max(0, luck - multiplier));
-                        tag.putDouble("misfortune", Math.min(100, misfortune + multiplier));
-                    }
+            boolean isMonster = BeyonderUtil.currentPathwayAndSequenceMatchesNoException(livingEntity, BeyonderClassInit.MONSTER.get(), 3);
+            if (!isMonster) {
+                if (ticks % 40 == 0) {
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.WEAKNESS, 100, multiplier, false, false);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.MOVEMENT_SLOWDOWN, 100, multiplier, false, false);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.HUNGER, 100, multiplier, false, false);
+                    BeyonderUtil.applyMobEffect(livingEntity, MobEffects.POISON, 100, multiplier, false, false);
                 }
-            } else if (entity instanceof PlayerMobEntity pMob) {
-                if (!(pMob.getCurrentPathway() == BeyonderClassInit.MONSTER && pMob.getCurrentSequence() <= 3)) {
-                    applyNegativeEffectsToPlayerMob(pMob, multiplier, tag, luck, misfortune);
+
+                if (livingEntity instanceof Player player) {
+                    handlePlayerInventoryDamage(player, multiplier);
+                }
+                removePositiveEffects(livingEntity);
+
+                if (ticks % 200 == 0) {
+                    tag.putDouble("luck", Math.max(0, luck - multiplier));
+                    tag.putDouble("misfortune", Math.min(100, misfortune + multiplier));
                 }
             }
         }
@@ -413,6 +411,7 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
             player.getFoodData().setFoodLevel(Math.max(0, player.getFoodData().getFoodLevel() - multiplier));
         }
     }
+
     private void removePositiveEffects(LivingEntity entity) {
         if (ticks % 2 == 0) {
             if (entity.hasEffect(MobEffects.REGENERATION)) {
@@ -511,6 +510,7 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
 
         return ownedDomains;
     }
+
     private boolean isAllyOfOwner(LivingEntity entity) {
         Player owner = getOwner();
         if (owner == null) return false;
@@ -547,6 +547,7 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
             tag.putDouble("misfortune", Math.min(100, misfortune + multiplier));
         }
     }
+
     private void processBlocksBad(int multiplier) {
         int blocksProcessed = 0;
         while (blocksProcessed < 200 && currentX <= getRadius()) {

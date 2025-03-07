@@ -5,11 +5,13 @@
   "refmap": "lotm.refmap.json",
   "mixins": [
     "ClientUpdateStructureBlockUnlimit",
+    "EntityTickMixin",
     "ExplosionNoKnockback",
     "MixinBrewingStandMenu",
     "MixinItems",
     "MixinPotionItem",
     "MixinSplashPotionItem",
+    "MobAttackMixin",
     "StructureBlockRenderMixin",
     "StructureBlockUnlimit"
   ],

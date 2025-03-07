@@ -30,23 +30,10 @@ public class LightningEntityRenderer extends EntityRenderer<LightningEntity> {
         if (positions.size() < 2) return;
 
         VertexConsumer mainBuilder = buffer.getBuffer(RenderType.leash());
-        VertexConsumer firstOutlineBuilder = buffer.getBuffer(RenderType.leash());
-        VertexConsumer secondOutlineBuilder = buffer.getBuffer(RenderType.leash());
-
         poseStack.pushPose();
-
         Vec3 entityPos = entity.position();
         poseStack.translate(-entityPos.x, -entityPos.y, -entityPos.z);
-
         Matrix4f matrix = poseStack.last().pose();
-
-        // Render second outline (outermost)
-        //renderSmoothLine(secondOutlineBuilder, matrix, positions, LINE_WIDTH + 0.2f, packedLight, 0.7f, 200, 200, 255);
-
-        // Render first outline
-        //renderSmoothLine(firstOutlineBuilder, matrix, positions, LINE_WIDTH + 0.1f, packedLight, 0.8f, 220, 220, 255);
-
-        // Render main line
         renderSmoothLine(mainBuilder, matrix, positions, LINE_WIDTH, packedLight, 1.0f, 246, 255, 155);
 
         poseStack.popPose();

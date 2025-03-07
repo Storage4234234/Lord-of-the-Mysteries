@@ -156,7 +156,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
             meteorEntity.noPhysics = true;
 
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int scalecheck = 10 - holder.getCurrentSequence() * 2;
+            int scalecheck = 10 - holder.getSequence() * 2;
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(meteorEntity);
             scaleData.setScale(scalecheck);
             scaleData.markForSync(true);
@@ -229,7 +229,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
         }
     }
 
-    public void explodeMeteorBlock(BlockPos hitPos, double radius, float scale) {
+    public void explodeMeteorBlock(BlockPos hitPos, double radius, float damage) {
         for (BlockPos pos : BlockPos.betweenClosed(
                 hitPos.offset((int) -radius, (int) -radius, (int) -radius),
                 hitPos.offset((int) radius, (int) radius, (int) radius))) {
@@ -245,7 +245,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
 
         for (Entity entity : entities) {
             if (entity instanceof LivingEntity livingEntity) {
-                livingEntity.hurt(BeyonderUtil.genericSource(this), 16 * scale); // problem w/ damage sources
+                livingEntity.hurt(BeyonderUtil.genericSource(this), damage); // problem w/ damage sources
             }
         }
     }

@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -61,14 +62,16 @@ public class CalamityIncarnationTsunami extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public static void calamityIncarnationTsunamiTick(CompoundTag playerPersistentData, Player player, ServerLevel level) {
+    public static void calamityIncarnationTsunamiTick(LivingEntity livingEntity) {
         //CALAMITY INCARNATION TSUNAMI
-        int calamityIncarnationTsunami = playerPersistentData.getInt("calamityIncarnationTsunami");
+        CompoundTag tag = livingEntity.getPersistentData();
+        int calamityIncarnationTsunami = tag.getInt("calamityIncarnationTsunami");
         if (calamityIncarnationTsunami < 1) {
             return;
         }
-        playerPersistentData.putInt("calamityIncarnationTsunami", calamityIncarnationTsunami - 1);
-        BlockPos playerPos = player.blockPosition();
+        Level level = livingEntity.level();
+        tag.putInt("calamityIncarnationTsunami", calamityIncarnationTsunami - 1);
+        BlockPos playerPos = livingEntity.blockPosition();
         double radius = 23.0;
         double minRemovalRadius = 25.0;
         double maxRemovalRadius = 30.0;

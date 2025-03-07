@@ -38,6 +38,10 @@
   "item.lotm.swordofdawn": "Sword of Dawn",
   "item.lotm.pickaxeofdawn": "Pickaxe of Dawn",
   "item.lotm.spearofdawn": "Spear of Dawn",
+  "item.lotm.swordofsilver": "Sword of Silver",
+  "item.lotm.swordoftwilight": "Sword of Twilight",
+
+
   "lotm.effect.awe": "Awe",
   "lotm.effect.bleeding": "Bleeding",
   "lotm.effect.stun": "Stun",
@@ -266,6 +270,7 @@
   "item.lotm.eyeofdemonhunting": "Enable/Disable Eye of Demon Hunting",
   "item.lotm.warriordangersense": "Enable/Disable Danger Sense",
   "item.lotm.mercuryliquefication": "Mercury Liquefication",
+  "item.lotm.silverswordmanifestation": "Silver Sword Manifestation",
   "item.lotm.silverrapier": "Silver Rapier",
   "item.lotm.lightconcealment": "Light Concealment",
   "item.lotm.silverarmory": "Silver Armory",
@@ -277,10 +282,26 @@
   "item.lotm.divinehandleft": "Divine Hand (Left)",
   "item.lotm.twilightmanifestation": "Twilight Manifestation",
   "item.lotm.silverlight": "Silver Light",
-  "item.lotm.auraoftwilight": "Aura of Twilight",
-  "item.lotm.globeoftwilight": "Globe of Twilight",
-  "item.lotm.beamoftwilight": "Beam of Twilight",
+  "item.lotm.twilightfreeze": "Twilight: Freeze",
+  "item.lotm.twilightaccelerate": "Twilight: Accelerate",
 
+  "item.lotm.auraoftwilight": "Twilight: Aura",
+  "item.lotm.twilightlight": "Twilight: Light",
+  "item.lotm.globeoftwilight": "Twilight: Globe",
+  "item.lotm.beamoftwilight": "Twilight: Beam",
+
+  "item.lotm.createdoor": "Create Door",
+  "item.lotm.trickburn": "Trick: Burn",
+  "item.lotm.trickbounce": "Trick: Enable/Disable Bounce",
+  "item.lotm.trickfreeze": "Trick: Freeze",
+  "item.lotm.tricktumble": "Trick: Tumble",
+  "item.lotm.trickwindpull": "Trick: Wind Pull",
+  "item.lotm.trickwindpush": "Trick: Wind Push",
+  "item.lotm.recordscribe": "Record",
+  "item.lotm.traveldoor": "Travel: Door",
+  "item.lotm.traveldoorhome": "Travel: Waypoint",
+  "item.lotm.invisiblehand": "Invisible Hand",
+  "item.lotm.scribeabilities":"Scribed Abilities",
 
 
   "item.lotm.monsterdangersense": "Monster Danger Sense",
@@ -355,6 +376,8 @@
   "effects.lotm.advancement0": "Advancement 0",
   "effects.lotm.mentalplague": "Mental Plague",
   "effects.lotm.awe": "Paralysis",
+  "effects.lotm.tumble": "Tumble",
+
 
   "attribute.lotm.spirituality": "Spirituality",
   "attribute.lotm.max_spirituality": "Max Spirituality",

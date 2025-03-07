@@ -28,7 +28,7 @@ public class MisfortuneManipulationLeftClickC2S {
         context.enqueueWork(() -> {
             if (player == null) return;
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getCurrentSequence();
+            int sequence = holder.getSequence();
             CompoundTag tag = player.getPersistentData();
             int x = tag.getInt("misfortuneManipulationItem");
             if (sequence != 0) {

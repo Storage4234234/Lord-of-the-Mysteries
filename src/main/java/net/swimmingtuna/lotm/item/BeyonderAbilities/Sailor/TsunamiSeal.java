@@ -17,9 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.swimmingtuna.lotm.entity.MCLightningBoltEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
-import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
@@ -156,7 +154,7 @@ public class TsunamiSeal extends SimpleAbilityItem {
         }
     }
 
-    public static void summonTsunami(Player player) {
+    public static void summonTsunami(LivingEntity player) {
         CompoundTag tag = player.getPersistentData();
         int playerX = tag.getInt("sailorTsunamiSealX");
         int playerY = tag.getInt("sailorTsunamiSealY");

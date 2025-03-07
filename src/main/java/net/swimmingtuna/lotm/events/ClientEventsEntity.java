@@ -27,10 +27,20 @@ public class ClientEventsEntity {
         event.registerLayerDefinition(NetherrackEntityModel.NETHERRACK_MODEL_LOCATION, NetherrackEntityModel::createBodyLayer);
         event.registerLayerDefinition(LavaEntityModel.LAVA_ENTITY_LOCATION, LavaEntityModel::createBodyLayer);
         event.registerLayerDefinition(LightningBallModel.LIGHTNING_BALL_LOCATION, LightningBallModel::createBodyLayer);
+
     }
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(EntityInit.LOW_SEQUENCE_DOOR_ENTITY.get(), LowSequenceDoorRenderer::new);
+        event.registerEntityRenderer(EntityInit.MERCURY_PORTAL_ENTITY.get(), MercuryPortalRenderer::new);
+        event.registerEntityRenderer(EntityInit.DIVINE_HAND_RIGHT_ENTITY.get(), DivineHandRightRenderer::new);
+        event.registerEntityRenderer(EntityInit.DIVINE_HAND_LEFT_ENTITY.get(), DivineHandLeftRenderer::new);
+        event.registerEntityRenderer(EntityInit.SILVER_LIGHT_ENTITY.get(), SilverLightRenderer::new);
+        event.registerEntityRenderer(EntityInit.GLOBE_OF_TWILIGHT_ENTITY.get(), GlobeOfTwilightRenderer::new);
+        event.registerEntityRenderer(EntityInit.MID_SEQUENCE_DOOR_ENTITY.get(), MidSequenceDoorRenderer::new);
+        event.registerEntityRenderer(EntityInit.MERCURY_ENTITY.get(), MercuryEntityRenderer::new);
         event.registerEntityRenderer(EntityInit.DAWN_RAY_ENTITY.get(), DawnRayRenderer::new);
+        event.registerEntityRenderer(EntityInit.TWILIGHT_LIGHT.get(), TwilightLightRenderer::new);
         event.registerEntityRenderer(EntityInit.GUARDIAN_BOX_ENTITY.get(), GuardianBoxEntityRenderer::new);
         event.registerEntityRenderer(EntityInit.METEOR_ENTITY.get(), MeteorEntityRenderer::new);
         event.registerEntityRenderer(EntityInit.DEATH_KNELL_BULLET_ENTITY.get(), BulletEntityRenderer::new);
@@ -54,12 +64,15 @@ public class ClientEventsEntity {
         event.registerEntityRenderer(EntityInit.WIND_BLADE_ENTITY.get(), WindBladeRenderer::new);
         event.registerEntityRenderer(EntityInit.WIND_CUSHION_ENTITY.get(), WindCushionRenderer::new);
     }
+
+
     @SubscribeEvent
     public static void registerParticleProvidersEvent(final RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ParticleInit.ACIDRAIN_PARTICLE.get(), AcidRainParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.PLAYER_TRAIL_PARTICLE.get(), PlayerTrailParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.MOB_TRAIL_PARTICLE.get(), MobTrailParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.NULL_PARTICLE.get(), NullParticle.Provider::new);
+        event.registerSpriteSet(ParticleInit.VOID_BREAK_PARTICLE.get(), VoidBreakParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.METEOR_PARTICLE.get(), MeteorParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.TORNADO_PARTICLE.get(), NullParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.SONIC_BOOM_PARTICLE.get(), SonicBoomParticle.Provider::new);

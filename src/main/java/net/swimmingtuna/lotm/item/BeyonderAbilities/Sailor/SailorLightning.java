@@ -73,23 +73,23 @@ public class SailorLightning extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbility(Level level, Player player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
-        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 120)) {
+        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 120, true)) {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         lightningDirection(player, level);
-        addCooldown(player, this, 10 + holder.getCurrentSequence());
+        addCooldown(player, this, 10 + holder.getSequence());
         useSpirituality(player, 200);
         return InteractionResult.SUCCESS;
     }
 
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack pStack, Player player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
-        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 200)) {
+        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 200, true)) {
             return InteractionResult.FAIL;
         }
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        addCooldown(player, this, 10 + (holder.getCurrentSequence() * 2));
+        addCooldown(player, this, 10 + (holder.getSequence() * 2));
         useSpirituality(player, 200);
         lightningTargetEntity(pInteractionTarget, player);
         return InteractionResult.SUCCESS;
@@ -99,11 +99,11 @@ public class SailorLightning extends SimpleAbilityItem {
     public InteractionResult useAbilityOnBlock(UseOnContext context) {
         Player player = context.getPlayer();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 200)) {
+        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 200, true)) {
             return InteractionResult.FAIL;
         }
         lightningblock(player, player.level(), context.getClickLocation());
-        addCooldown(player, this, 10 + holder.getCurrentSequence() * 2);
+        addCooldown(player, this, 10 + holder.getSequence() * 2);
         return InteractionResult.SUCCESS;
     }
 
@@ -133,7 +133,7 @@ public class SailorLightning extends SimpleAbilityItem {
             float speed = 10.0f;
             if (!player.isCreative()) {
                 ItemStack itemStack = player.getUseItem();
-                player.getCooldowns().addCooldown(itemStack.getItem(), 10 + (holder.getCurrentSequence() * 2));
+                player.getCooldowns().addCooldown(itemStack.getItem(), 10 + (holder.getSequence() * 2));
             }
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), level);
             lightningEntity.setSpeed(speed);
@@ -147,18 +147,17 @@ public class SailorLightning extends SimpleAbilityItem {
         }
     }
 
-    public static void lightningHigh(Player player, Level level) {
+    public static void lightningHigh(LivingEntity livingEntity, Level level) {
         if (!level.isClientSide()) {
             float speed = 10.0f;
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), level);
             lightningEntity.setSpeed(speed);
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             lightningEntity.setDeltaMovement(0, -2, 0);
             lightningEntity.setMaxLength(60);
-            lightningEntity.setOwner(player);
-            lightningEntity.setDamage((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.SAILOR_LIGHTNING.get()));
-            lightningEntity.setOwner(player);
-            lightningEntity.teleportTo(player.getX() + ((Math.random() * 150) - 75), player.getY() + 60, player.getZ() + ((Math.random() * 150) - 75));
+            lightningEntity.setOwner(livingEntity);
+            lightningEntity.setDamage((int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.SAILOR_LIGHTNING.get()));
+            lightningEntity.setOwner(livingEntity);
+            lightningEntity.teleportTo(livingEntity.getX() + ((Math.random() * 150) - 75), livingEntity.getY() + 60, livingEntity.getZ() + ((Math.random() * 150) - 75));
             level.addFreshEntity(lightningEntity);
         }
     }

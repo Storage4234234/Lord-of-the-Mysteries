@@ -145,21 +145,32 @@ public class CreativeTabInit {
                         event.accept(ItemInit.EYEOFDEMONHUNTING.get());
                         event.accept(ItemInit.WARRIORDANGERSENSE.get());
                         event.accept(ItemInit.MERCURYLIQUEFICATION.get());
+                        event.accept(ItemInit.SILVERSWORDMANIFESTATION.get());
                         event.accept(ItemInit.SILVERRAPIER.get());
                         event.accept(ItemInit.LIGHTCONCEALMENT.get());
                         event.accept(ItemInit.SILVERARMORY.get());
                         event.accept(ItemInit.BEAMOFGLORY.get());
                         event.accept(ItemInit.AURAOFGLORY.get());
+                        event.accept(ItemInit.GLOBEOFTWILIGHT.get());
                         event.accept(ItemInit.TWILIGHTSWORD.get());
                         event.accept(ItemInit.MERCURYCAGE.get());
                         event.accept(ItemInit.DIVINEHANDRIGHT.get());
                         event.accept(ItemInit.DIVINEHANDLEFT.get());
-                        event.accept(ItemInit.TWILIGHTMANIFESTATION.get());
-                        event.accept(ItemInit.SILVERLIGHT.get());
                         event.accept(ItemInit.AURAOFTWILIGHT.get());
+                        event.accept(ItemInit.TWILIGHTFREEZE.get());
+                        event.accept(ItemInit.TWILIGHTLIGHT.get());
                         event.accept(ItemInit.GLOBEOFTWILIGHT.get());
                         event.accept(ItemInit.BEAMOFTWILIGHT.get());
-
+                        event.accept(ItemInit.TRICKBURN.get());
+                        event.accept(ItemInit.TRICKBOUNCE.get());
+                        event.accept(ItemInit.TRICKFREEZE.get());
+                        event.accept(ItemInit.TRICKTUMBLE.get());
+                        event.accept(ItemInit.TRICKWINDPULL.get());
+                        event.accept(ItemInit.TRICKWINDPUSH.get());
+                        event.accept(ItemInit.RECORDSCRIBE.get());
+                        event.accept(ItemInit.TRAVELDOOR.get());
+                        event.accept(ItemInit.TRAVELDOORHOME.get());
+                        event.accept(ItemInit.INVISIBLEHAND.get());
                     })
                     .build());
 
