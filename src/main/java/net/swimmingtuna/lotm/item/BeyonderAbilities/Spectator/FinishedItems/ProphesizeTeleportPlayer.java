@@ -67,16 +67,17 @@ public class ProphesizeTeleportPlayer extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public static void prophesizeTeleportation(CompoundTag playerPersistentData, LivingEntity livingEntity) {
+    public static void prophesizeTeleportation(LivingEntity livingEntity) {
         //PROPHESIZE TELEPORT BLOCK/PLAYER
-        if (playerPersistentData.getInt("prophesizeTeleportationCounter") >= 1) {
-            playerPersistentData.putInt("prophesizeTeleportationCounter", playerPersistentData.getInt("prophesizeTeleportationCounter") - 1);
+        CompoundTag tag = livingEntity.getPersistentData();
+        if (tag.getInt("prophesizeTeleportationCounter") >= 1) {
+            tag.putInt("prophesizeTeleportationCounter", tag.getInt("prophesizeTeleportationCounter") - 1);
         }
-        if (playerPersistentData.getInt("prophesizeTeleportationCounter") == 1) {
-            playerPersistentData.putInt("prophesizeTeleportationCounter", playerPersistentData.getInt("prophesizeTeleportationCounter") - 1);
-            int x = playerPersistentData.getInt("prophesizeTeleportX");
-            int y = playerPersistentData.getInt("prophesizeTeleportY");
-            int z = playerPersistentData.getInt("prophesizeTeleportZ");
+        if (tag.getInt("prophesizeTeleportationCounter") == 1) {
+            tag.putInt("prophesizeTeleportationCounter", tag.getInt("prophesizeTeleportationCounter") - 1);
+            int x = tag.getInt("prophesizeTeleportX");
+            int y = tag.getInt("prophesizeTeleportY");
+            int z = tag.getInt("prophesizeTeleportZ");
             livingEntity.teleportTo(x, y, z);
         }
     }

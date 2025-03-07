@@ -59,20 +59,20 @@ public class AcidicRain extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public static void acidicRain(Player player, int sequence) {
+    public static void acidicRainTick(LivingEntity livingEntity) {
         //ACIDIC RAIN
-        int acidicRain = player.getPersistentData().getInt("sailorAcidicRain");
+        int acidicRain = livingEntity.getPersistentData().getInt("sailorAcidicRain");
         if (acidicRain <= 0) {
             return;
         }
-        player.getPersistentData().putInt("sailorAcidicRain", acidicRain + 1);
-        AcidicRain.spawnAcidicRainParticles(player);
-        double radius1 = BeyonderUtil.getDamage(player).get(ItemInit.ACIDIC_RAIN.get());
+        livingEntity.getPersistentData().putInt("sailorAcidicRain", acidicRain + 1);
+        AcidicRain.spawnAcidicRainParticles(livingEntity);
+        double radius1 = BeyonderUtil.getDamage(livingEntity).get(ItemInit.ACIDIC_RAIN.get());
         double radius2 = radius1 / 5;
 
 
-        for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius1))) {
-            if (entity == player || BeyonderUtil.isAllyOf(player, entity)) {
+        for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(radius1))) {
+            if (entity == livingEntity || BeyonderUtil.isAllyOf(livingEntity, entity)) {
                 continue;
             }
             if (entity.hasEffect(MobEffects.POISON)) {
@@ -85,8 +85,8 @@ public class AcidicRain extends SimpleAbilityItem {
             }
         }
 
-        for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius2))) {
-            if (entity == player) {
+        for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(radius2))) {
+            if (entity == livingEntity) {
                 continue;
             }
             if (entity.hasEffect(MobEffects.POISON)) {
@@ -101,18 +101,17 @@ public class AcidicRain extends SimpleAbilityItem {
 
 
         if (acidicRain > 300) {
-            player.getPersistentData().putInt("sailorAcidicRain", 0);
+            livingEntity.getPersistentData().putInt("sailorAcidicRain", 0);
         }
     }
 
 
-    public static void spawnAcidicRainParticles(Player player) {
-        if (player.level() instanceof ServerLevel serverLevel) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getSequence();
-            double x = player.getX();
-            double y = player.getY() + 5;
-            double z = player.getZ();
+    public static void spawnAcidicRainParticles(LivingEntity livingEntity) {
+        if (livingEntity.level() instanceof ServerLevel serverLevel) {
+            int sequence = BeyonderUtil.getSequence(livingEntity);
+            double x = livingEntity.getX();
+            double y = livingEntity.getY() + 5;
+            double z = livingEntity.getZ();
             int maxRadius = 50 - (sequence * 7);
             int maxParticles = 250 - (sequence * 30);
             BeyonderUtil.spawnParticlesInSphere(serverLevel, x, y, z, maxRadius, maxParticles, 0, -3, 0, ParticleInit.ACIDRAIN_PARTICLE.get());

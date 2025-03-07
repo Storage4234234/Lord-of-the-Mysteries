@@ -68,6 +68,9 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                 player.displayClientMessage(Component.literal("Liquefied: " + (x ? "Off" : "On")).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.BOLD), true);
 
             }
+            if (x) {
+                LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(false, livingEntity.getUUID()));
+            }
         }
     }
 

@@ -75,6 +75,7 @@ public class BeyonderCommand {
                             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                             ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
                             holder.removePathway();
+
                             player.getPersistentData().putInt("monsterReincarnationCounter", 0);
                             player.getPersistentData().putInt("age",0);
                             scaleData.setScale(1);

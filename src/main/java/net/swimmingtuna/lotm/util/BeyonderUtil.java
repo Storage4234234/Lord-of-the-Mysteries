@@ -12,6 +12,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -58,6 +59,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
@@ -117,9 +119,9 @@ public class BeyonderUtil {
         return null;
     }
 
-    public static void projectileEvent(Player player, BeyonderHolder holder) {
+    public static void projectileEvent(LivingEntity living) {
         //PROJECTILE EVENT
-        Projectile projectile = BeyonderUtil.getProjectiles(player);
+        Projectile projectile = BeyonderUtil.getProjectiles(living);
         if (projectile == null) return;
 
 
@@ -139,7 +141,7 @@ public class BeyonderUtil {
                     }
                 }
                 for (LivingEntity livingEntity : projectile.level().getEntitiesOfClass(LivingEntity.class, projectile.getBoundingBox().inflate(5))) {
-                    if (currentPathwayAndSequenceMatches(player, BeyonderClassInit.SAILOR.get(), 0)) {
+                    if (currentPathwayAndSequenceMatches(living, BeyonderClassInit.SAILOR.get(), 0)) {
                         livingEntity.hurt(livingEntity.damageSources().lightningBolt(), 40);
                     }
                 }
@@ -147,7 +149,7 @@ public class BeyonderUtil {
         }
         LivingEntity target = BeyonderUtil.getTarget(projectile, 75, 0);
         if (target != null) {
-            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.SAILOR.get(), 8) && player.getPersistentData().getBoolean("sailorProjectileMovement")) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(living, BeyonderClassInit.SAILOR.get(), 8) && living.getPersistentData().getBoolean("sailorProjectileMovement")) {
                 double dx = target.getX() - projectile.getX();
                 double dy = target.getY() - projectile.getY();
                 double dz = target.getZ() - projectile.getZ();
@@ -157,7 +159,7 @@ public class BeyonderUtil {
                 projectile.hurtMarked = true;
             }
             //APPRENTICE BOUNCE SHOT ARROWS
-            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.APPRENTICE.get(), 8) && player.getPersistentData().getBoolean("ApprenticeBounceProjectileMovement")) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(living, BeyonderClassInit.APPRENTICE.get(), 8) && living.getPersistentData().getBoolean("ApprenticeBounceProjectileMovement")) {
                 double dx = target.getX() - projectile.getX();
                 double dy = target.getY() - projectile.getY();
                 double dz = target.getZ() - projectile.getZ();
@@ -171,7 +173,7 @@ public class BeyonderUtil {
 
         //SAILOR PASSIVE CHECK FROM HERE
         if (target != null) {
-            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.SAILOR.get(), 8) && player.getPersistentData().getBoolean("sailorProjectileMovement")) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(living, BeyonderClassInit.SAILOR.get(), 8) && living.getPersistentData().getBoolean("sailorProjectileMovement")) {
                 double dx = target.getX() - projectile.getX();
                 double dy = target.getY() - projectile.getY();
                 double dz = target.getZ() - projectile.getZ();
@@ -184,7 +186,7 @@ public class BeyonderUtil {
 
         //MONSTER CALCULATION PASSIVE
         if (target != null) {
-            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.APPRENTICE.get(), 8) && player.getPersistentData().getBoolean("monsterProjectileControl")) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(living, BeyonderClassInit.APPRENTICE.get(), 8) && living.getPersistentData().getBoolean("monsterProjectileControl")) {
                 double dx = target.getX() - projectile.getX();
                 double dy = target.getY() - projectile.getY();
                 double dz = target.getZ() - projectile.getZ();
@@ -696,10 +698,13 @@ public class BeyonderUtil {
         }
     }
 
-    public static Style getStyle(Player player) {
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (holder.getCurrentClass() != null) {
-            return Style.EMPTY.withBold(true).withColor(holder.getCurrentClass().getColorFormatting());
+    public static Style getStyle(LivingEntity livingEntity) {
+        if (livingEntity instanceof Player player) {
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+            if (holder.getCurrentClass() != null) {
+                return Style.EMPTY.withBold(true).withColor(holder.getCurrentClass().getColorFormatting());
+            }
+            return Style.EMPTY;
         }
         return Style.EMPTY;
     }
@@ -1749,6 +1754,7 @@ public class BeyonderUtil {
         }
     }
 
+
     public static void addSpirituality(LivingEntity living, int spirituality) {
         if (!living.level().isClientSide()) {
             if (living instanceof Player player) {
@@ -1765,6 +1771,19 @@ public class BeyonderUtil {
                 return (int) BeyonderHolderAttacher.getHolderUnwrap(player).getSpirituality();
             } else if (living instanceof PlayerMobEntity playerMobEntity) {
                 return playerMobEntity.getSpirituality();
+            } else {
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    public static int getMaxSpirituality(LivingEntity living) {
+        if (!living.level().isClientSide()) {
+            if (living instanceof Player player) {
+                return (int) BeyonderHolderAttacher.getHolderUnwrap(player).getMaxSpirituality();
+            } else if (living instanceof PlayerMobEntity playerMobEntity) {
+                return playerMobEntity.getMaxSpirituality();
             } else {
                 return 0;
             }
@@ -2331,6 +2350,14 @@ public class BeyonderUtil {
             if (pEntity instanceof LivingEntity livingEntity) {
                 livingEntity.hurt(BeyonderUtil.genericSource(entity), damage);
             }
+        }
+    }
+
+    public static void disableAbilities(LivingEntity livingEntity) {
+        CompoundTag tag = livingEntity.getPersistentData();
+        if (!livingEntity.level().isClientSide()) {
+            LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(false, livingEntity.getUUID()));
+
         }
     }
 }

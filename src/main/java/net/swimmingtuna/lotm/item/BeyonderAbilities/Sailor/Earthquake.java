@@ -32,7 +32,7 @@ import java.util.Random;
 public class Earthquake extends SimpleAbilityItem {
 
     public Earthquake(Properties properties) {
-        super(properties, BeyonderClassInit.SAILOR, 4,600,500);
+        super(properties, BeyonderClassInit.SAILOR, 4, 600, 500);
     }
 
     @Override
@@ -51,30 +51,32 @@ public class Earthquake extends SimpleAbilityItem {
             player.getPersistentData().putInt("sailorEarthquake", 200);
         }
     }
-    public static void earthquake(Player player, int sequence) {
-        int sailorEarthquake = player.getPersistentData().getInt("sailorEarthquake");
+
+    public static void earthquake(LivingEntity livingEntity) {
+        int sequence = BeyonderUtil.getSequence(livingEntity);
+        int sailorEarthquake = livingEntity.getPersistentData().getInt("sailorEarthquake");
         if (sailorEarthquake >= 1) {
-            int radius = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.EARTHQUAKE.get());
+            int radius = (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.EARTHQUAKE.get());
             if (sailorEarthquake % 20 == 0) {
-                for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate((radius)))) {
-                    if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
+                for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate((radius)))) {
+                    if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
                         if (entity.onGround()) {
-                            entity.hurt(player.damageSources().fall(), 35 - (sequence * 5));
+                            entity.hurt(livingEntity.damageSources().fall(), 35 - (sequence * 5));
                         }
                     }
                 }
             }
             if (sailorEarthquake % 2 == 0) {
-                AABB checkArea = player.getBoundingBox().inflate(radius);
+                AABB checkArea = livingEntity.getBoundingBox().inflate(radius);
                 Random random = new Random();
                 for (BlockPos blockPos : BlockPos.betweenClosed(
                         new BlockPos((int) checkArea.minX, (int) checkArea.minY, (int) checkArea.minZ),
                         new BlockPos((int) checkArea.maxX, (int) checkArea.maxY, (int) checkArea.maxZ))) {
 
-                    if (!player.level().getBlockState(blockPos).isAir() && isOnSurface(player.level(), blockPos)) {
+                    if (!livingEntity.level().getBlockState(blockPos).isAir() && isOnSurface(livingEntity.level(), blockPos)) {
                         if (random.nextInt(20) == 1) {
-                            BlockState blockState = player.level().getBlockState(blockPos); // Use the desired block type here
-                            if (player.level() instanceof ServerLevel serverLevel) {
+                            BlockState blockState = livingEntity.level().getBlockState(blockPos); // Use the desired block type here
+                            if (livingEntity.level() instanceof ServerLevel serverLevel) {
                                 serverLevel.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, blockState),
                                         blockPos.getX(),
                                         blockPos.getY() + 1,
@@ -83,23 +85,21 @@ public class Earthquake extends SimpleAbilityItem {
                             }
                         }
                         if (random.nextInt(4000) == 1) { // 50% chance to destroy a block
-                            player.level().destroyBlock(blockPos, false);
+                            livingEntity.level().destroyBlock(blockPos, false);
                         } else if (random.nextInt(10000) == 2) { // 10% chance to spawn a stone entity
-                            StoneEntity stoneEntity = new StoneEntity(player.level(), player);
+                            StoneEntity stoneEntity = new StoneEntity(livingEntity.level(), livingEntity);
                             ScaleData scaleData = ScaleTypes.BASE.getScaleData(stoneEntity);
                             stoneEntity.teleportTo(blockPos.getX(), blockPos.getY() + 3, blockPos.getZ());
                             stoneEntity.setDeltaMovement(0, (3 + (Math.random() * (6 - 3))), 0);
                             stoneEntity.setStoneYRot((int) (Math.random() * 18));
                             stoneEntity.setStoneXRot((int) (Math.random() * 18));
                             scaleData.setScale((float) (1 + (Math.random()) * 2.0f));
-                            player.level().addFreshEntity(stoneEntity);
+                            livingEntity.level().addFreshEntity(stoneEntity);
                         }
                     }
                 }
             }
-            if (sailorEarthquake >= 1) {
-                player.getPersistentData().putInt("sailorEarthquake", sailorEarthquake - 1);
-            }
+            livingEntity.getPersistentData().putInt("sailorEarthquake", sailorEarthquake - 1);
         }
     }
 

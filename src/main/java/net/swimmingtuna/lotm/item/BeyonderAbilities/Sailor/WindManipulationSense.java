@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -82,19 +83,21 @@ public class WindManipulationSense extends SimpleAbilityItem {
         }
     }
 
-    public static void windManipulationSense(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
-        boolean windManipulationSense = playerPersistentData.getBoolean("windManipulationSense");
+    public static void windManipulationSense(LivingEntity livingEntity) {
+        CompoundTag tag = livingEntity.getPersistentData();
+        boolean windManipulationSense = tag.getBoolean("windManipulationSense");
         if (!windManipulationSense) {
             return;
         }
-        if (!holder.useSpirituality(1)) return;
-        double radius = 100 - (holder.getSequence() * 10);
-        for (Player otherPlayer : player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius))) {
-            if (otherPlayer == player || BeyonderUtil.isAllyOf(player, otherPlayer)) {
+        if (BeyonderUtil.getSpirituality(livingEntity) <= 1) return;
+        BeyonderUtil.useSpirituality(livingEntity, 1);
+        double radius = 100 - (BeyonderUtil.getSequence(livingEntity) * 10);
+        for (Player otherPlayer : livingEntity.level().getEntitiesOfClass(Player.class, livingEntity.getBoundingBox().inflate(radius))) {
+            if (otherPlayer == livingEntity || BeyonderUtil.isAllyOf(livingEntity, otherPlayer)) {
                 continue;
             }
-            Vec3 directionToPlayer = otherPlayer.position().subtract(player.position()).normalize();
-            Vec3 lookAngle = player.getLookAngle();
+            Vec3 directionToPlayer = otherPlayer.position().subtract(livingEntity.position()).normalize();
+            Vec3 lookAngle = livingEntity.getLookAngle();
             double horizontalAngle = Math.atan2(directionToPlayer.x, directionToPlayer.z) - Math.atan2(lookAngle.x, lookAngle.z);
 
             String horizontalDirection;
@@ -118,8 +121,8 @@ public class WindManipulationSense extends SimpleAbilityItem {
             }
 
             String message = otherPlayer.getName().getString() + " is " + horizontalDirection + " and " + verticalDirection + " you.";
-            if (player.tickCount % 200 == 0) {
-                player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
+            if (livingEntity.tickCount % 140 == 0) {
+                livingEntity.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
             }
         }
     }

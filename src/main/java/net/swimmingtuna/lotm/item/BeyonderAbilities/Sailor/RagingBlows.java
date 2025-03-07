@@ -57,28 +57,30 @@ public class RagingBlows extends SimpleAbilityItem {
         }
     }
 
-    public static void ragingBlowsTick(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
+    public static void ragingBlowsTick(LivingEntity livingEntity) {
         //RAGING BLOWS
-        boolean sailorLightning = playerPersistentData.getBoolean("SailorLightning");
-        int ragingBlows = playerPersistentData.getInt("ragingBlows");
-        int ragingBlowsRadius = (27 - (holder.getSequence() * 3));
-        float damage = BeyonderUtil.getDamage(player).get(ItemInit.RAGING_BLOWS.get());
+        CompoundTag tag = livingEntity.getPersistentData();
+        int sequence = BeyonderUtil.getSequence(livingEntity);
+        boolean sailorLightning = tag.getBoolean("SailorLightning");
+        int ragingBlows = tag.getInt("ragingBlows");
+        int ragingBlowsRadius = (27 - (sequence * 3));
+        float damage = BeyonderUtil.getDamage(livingEntity).get(ItemInit.RAGING_BLOWS.get());
         if (ragingBlows >= 1) {
-            RagingBlows.spawnRagingBlowsParticles(player);
-            playerPersistentData.putInt("ragingBlows", ragingBlows + 1);
+            RagingBlows.spawnRagingBlowsParticles(livingEntity);
+            tag.putInt("ragingBlows", ragingBlows + 1);
         }
         if (ragingBlows >= 6 && ragingBlows <= 96 && ragingBlows % 6 == 0) {
-            player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.NEUTRAL, 0.5F, 0.5F);
-            Vec3 playerLookVector = player.getViewVector(1.0F);
-            Vec3 playerPos = player.position();
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, new AABB(playerPos.x - ragingBlowsRadius, playerPos.y - ragingBlowsRadius, playerPos.z - ragingBlowsRadius, playerPos.x + ragingBlowsRadius, playerPos.y + ragingBlowsRadius, playerPos.z + ragingBlowsRadius))) {
-                if (entity != player && playerLookVector.dot(entity.position().subtract(playerPos)) > 0 && !BeyonderUtil.isAllyOf(player, entity)) {
+            livingEntity.level().playSound(null, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.NEUTRAL, 0.5F, 0.5F);
+            Vec3 playerLookVector = livingEntity.getViewVector(1.0F);
+            Vec3 playerPos = livingEntity.position();
+            for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, new AABB(playerPos.x - ragingBlowsRadius, playerPos.y - ragingBlowsRadius, playerPos.z - ragingBlowsRadius, playerPos.x + ragingBlowsRadius, playerPos.y + ragingBlowsRadius, playerPos.z + ragingBlowsRadius))) {
+                if (entity != livingEntity && playerLookVector.dot(entity.position().subtract(playerPos)) > 0 && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
                     entity.hurt(entity.damageSources().generic(), damage);
-                    double ragingBlowsX = player.getX() - entity.getX();
-                    double ragingBlowsZ = player.getZ() - entity.getZ();
+                    double ragingBlowsX = livingEntity.getX() - entity.getX();
+                    double ragingBlowsZ = livingEntity.getZ() - entity.getZ();
                     entity.knockback(0.25, ragingBlowsX, ragingBlowsZ);
-                    if (holder.getSequence() <= 7) {
-                        double chanceOfDamage = (100.0 - (holder.getSequence() * 12.5));
+                    if (sequence <= 7) {
+                        double chanceOfDamage = (100.0 - (sequence * 12.5));
                         if (Math.random() * 100 < chanceOfDamage && sailorLightning) {
                             LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, entity.level());
                             lightningBolt.moveTo(entity.getX(), entity.getY(), entity.getZ());
@@ -90,7 +92,7 @@ public class RagingBlows extends SimpleAbilityItem {
         }
         if (ragingBlows >= 100) {
             ragingBlows = 0;
-            playerPersistentData.putInt("ragingBlows", 0);
+            tag.putInt("ragingBlows", 0);
         }
     }
 
@@ -104,12 +106,11 @@ public class RagingBlows extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public static void spawnRagingBlowsParticles(Player player) {
+    public static void spawnRagingBlowsParticles(LivingEntity player) {
         if (player.level() instanceof ServerLevel serverLevel) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             Vec3 playerPos = player.position();
             Vec3 playerLookVector = player.getViewVector(1.0F);
-            int radius = (27 - (holder.getSequence() * 3));
+            int radius = (27 - (BeyonderUtil.getSequence(player) * 3));
             CompoundTag persistentData = player.getPersistentData();
             int particleCounter = persistentData.getInt("ragingBlowsParticleCounter");
 

@@ -84,18 +84,19 @@ public class ManipulateMovement extends SimpleAbilityItem {
 
     private final Lazy<Multimap<Attribute, AttributeModifier>> lazyAttributeMap = Lazy.of(this::createAttributeMap);
 
-    public static void manipulateMovement(Player player, Level level) {
+    public static void manipulateMovement(LivingEntity livingEntity) {
+        Level level = livingEntity.level();
         //MANIPULATE MOVEMENT
-        if (!player.getPersistentData().getBoolean("manipulateMovementBoolean")) {
+        if (!livingEntity.getPersistentData().getBoolean("manipulateMovementBoolean")) {
             return;
         }
-        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
+        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(250))) {
             if (!entity.hasEffect(ModEffects.MANIPULATION.get())) {
                 continue;
             }
-            int targetX = player.getPersistentData().getInt("manipulateMovementX");
-            int targetY = player.getPersistentData().getInt("manipulateMovementY");
-            int targetZ = player.getPersistentData().getInt("manipulateMovementZ");
+            int targetX = livingEntity.getPersistentData().getInt("manipulateMovementX");
+            int targetY = livingEntity.getPersistentData().getInt("manipulateMovementY");
+            int targetZ = livingEntity.getPersistentData().getInt("manipulateMovementZ");
 
             if (entity.distanceToSqr(targetX, targetY, targetZ) <= 8) {
                 entity.removeEffect(ModEffects.MANIPULATION.get());

@@ -74,28 +74,29 @@ public class ExtremeColdness extends SimpleAbilityItem {
                 block != Blocks.ICE;
     }
 
-    public static void extremeColdness(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
+    public static void extremeColdness(LivingEntity livingEntity) {
+        CompoundTag tag = livingEntity.getPersistentData();
         //EXTREME COLDNESS
-        int extremeColdness = playerPersistentData.getInt("sailorExtremeColdness");
-        if (extremeColdness >= BeyonderUtil.getDamage(player).get(ItemInit.EXTREME_COLDNESS.get())) {
-            playerPersistentData.putInt("sailorExtremeColdness", 0);
+        int extremeColdness = tag.getInt("sailorExtremeColdness");
+        if (extremeColdness >= BeyonderUtil.getDamage(livingEntity).get(ItemInit.EXTREME_COLDNESS.get())) {
+            tag.putInt("sailorExtremeColdness", 0);
             extremeColdness = 0;
         }
         if (extremeColdness < 1) {
             return;
         }
-        playerPersistentData.putInt("sailorExtremeColdness", extremeColdness + 1);
+        tag.putInt("sailorExtremeColdness", extremeColdness + 1);
 
-        AABB areaOfEffect = player.getBoundingBox().inflate(extremeColdness);
-        List<LivingEntity> entities = player.level().getEntitiesOfClass(LivingEntity.class, areaOfEffect);
+        AABB areaOfEffect = livingEntity.getBoundingBox().inflate(extremeColdness);
+        List<LivingEntity> entities = livingEntity.level().getEntitiesOfClass(LivingEntity.class, areaOfEffect);
         for (LivingEntity entity : entities) {
-            if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
+            if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
                 int affectedBySailorExtremeColdness = entity.getPersistentData().getInt("affectedBySailorExtremeColdness");
                 entity.getPersistentData().putInt("affectedBySailorExtremeColdness", affectedBySailorExtremeColdness + 1);
                 entity.setTicksFrozen(1);
             }
         }
-        List<Entity> entities1 = player.level().getEntitiesOfClass(Entity.class, areaOfEffect); //test thsi
+        List<Entity> entities1 = livingEntity.level().getEntitiesOfClass(Entity.class, areaOfEffect); //test thsi
         for (Entity entity : entities1) {
             if (!(entity instanceof LivingEntity)) {
                 int affectedBySailorColdness = entity.getPersistentData().getInt("affectedBySailorColdness");
@@ -107,30 +108,24 @@ public class ExtremeColdness extends SimpleAbilityItem {
                 }
             }
         }
-
-        // Additional part: Turn the top 3 surface blocks within radius into ice
-        BlockPos playerPos = player.blockPosition();
-        int radius = extremeColdness; // Adjust the division factor as needed
-        int blocksToProcessPerTick = 2000;  // Adjust as needed
+        BlockPos playerPos = livingEntity.blockPosition();
+        int radius = extremeColdness;
+        int blocksToProcessPerTick = 2000;
         int processedBlocks = 0;
         Map<BlockPos, Integer> heightMapCache = new HashMap<>();
-
         for (int dx = -radius; dx <= radius && processedBlocks < blocksToProcessPerTick; dx++) {
             for (int dz = -radius; dz <= radius && processedBlocks < blocksToProcessPerTick; dz++) {
                 BlockPos surfacePos = playerPos.offset(dx, 0, dz);
-
-                // Check cache first
                 Integer surfaceY = heightMapCache.get(surfacePos);
                 if (surfaceY == null) {
-                    // If not cached, calculate and store in cache
-                    surfaceY = player.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, surfacePos).getY();
+                    surfaceY = livingEntity.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, surfacePos).getY();
                     heightMapCache.put(surfacePos, surfaceY);
                 }
 
                 for (int dy = 0; dy < 3; dy++) {
                     BlockPos targetPos = new BlockPos(surfacePos.getX(), surfaceY - dy, surfacePos.getZ());
-                    if (ExtremeColdness.canFreezeBlock(player, targetPos)) {
-                        player.level().setBlockAndUpdate(targetPos, Blocks.ICE.defaultBlockState());
+                    if (ExtremeColdness.canFreezeBlock(livingEntity, targetPos)) {
+                        livingEntity.level().setBlockAndUpdate(targetPos, Blocks.ICE.defaultBlockState());
                         processedBlocks++;
                     }
                 }

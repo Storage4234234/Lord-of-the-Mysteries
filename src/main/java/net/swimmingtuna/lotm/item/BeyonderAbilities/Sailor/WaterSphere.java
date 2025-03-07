@@ -49,15 +49,16 @@ public class WaterSphere extends SimpleAbilityItem {
             player.getPersistentData().putInt("sailorSphere", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.WATER_SPHERE.get()));
         }
     }
-    public static void waterSphereCheck(Player player, ServerLevel level) {
+    public static void waterSphereCheck(LivingEntity livingEntity) {
         //WATER SPHERE CHECK
-        if (player.getPersistentData().getInt("sailorSphere") >= 5) {
-            for (Entity entity : player.level().getEntitiesOfClass(Entity.class, player.getBoundingBox().inflate(4))) {
+        Level level = livingEntity.level();
+        if (livingEntity.getPersistentData().getInt("sailorSphere") >= 5) {
+            for (Entity entity : livingEntity.level().getEntitiesOfClass(Entity.class, livingEntity.getBoundingBox().inflate(4))) {
                 if (!(entity instanceof LivingEntity) && !(entity instanceof MeteorEntity) && !(entity instanceof MeteorNoLevelEntity)) {
                     entity.remove(Entity.RemovalReason.DISCARDED);
                 }
             }
-            BlockPos playerPos = player.blockPosition();
+            BlockPos playerPos = livingEntity.blockPosition();
             double radius = 3.0;
             double minRemovalRadius = 4.0;
             double maxRemovalRadius = 7.0;
@@ -92,8 +93,8 @@ public class WaterSphere extends SimpleAbilityItem {
                 }
             }
         }
-        if (player.getPersistentData().getInt("sailorSphere") >= 1 && player.getPersistentData().getInt("sailorSphere") <= 4) {
-            player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 100, 100, false, false));
+        if (livingEntity.getPersistentData().getInt("sailorSphere") >= 1 && livingEntity.getPersistentData().getInt("sailorSphere") <= 4) {
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 100, 100, false, false));
             for (int sphereX = -6; sphereX <= 6; sphereX++) {
                 for (int sphereY = -6; sphereY <= 6; sphereY++) {
                     for (int sphereZ = -6; sphereZ <= 6; sphereZ++) {
@@ -101,16 +102,16 @@ public class WaterSphere extends SimpleAbilityItem {
                         if (!(sphereDistance <= 6)) {
                             continue;
                         }
-                        BlockPos blockPos = player.getOnPos().offset(sphereX, sphereY, sphereZ);
-                        if (player.level().getBlockState(blockPos).getBlock() == Blocks.WATER) {
-                            player.level().setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
+                        BlockPos blockPos = livingEntity.getOnPos().offset(sphereX, sphereY, sphereZ);
+                        if (livingEntity.level().getBlockState(blockPos).getBlock() == Blocks.WATER) {
+                            livingEntity.level().setBlock(blockPos, Blocks.AIR.defaultBlockState(), 3);
                         }
                     }
                 }
             }
         }
-        if (player.getPersistentData().getInt("sailorSphere") >= 1) {
-            player.getPersistentData().putInt("sailorSphere", player.getPersistentData().getInt("sailorSphere") - 1);
+        if (livingEntity.getPersistentData().getInt("sailorSphere") >= 1) {
+            livingEntity.getPersistentData().putInt("sailorSphere", livingEntity.getPersistentData().getInt("sailorSphere") - 1);
         }
     }
 

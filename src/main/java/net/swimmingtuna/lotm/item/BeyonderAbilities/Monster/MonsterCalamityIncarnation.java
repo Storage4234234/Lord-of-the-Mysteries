@@ -98,18 +98,17 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
         }
     }
 
-    public static void calamityIncarnationTornado(CompoundTag playerPersistentData, Player player) {
-        //CALAMITY INCARNATION TORNADO
-        if (playerPersistentData.getInt("calamityIncarnationTornado") >= 1) {
-            playerPersistentData.putInt("calamityIncarnationTornado", player.getPersistentData().getInt("calamityIncarnationTornado") - 1);
+    public static void calamityIncarnationTornado(LivingEntity livingEntity) {
+        if (livingEntity.getPersistentData().getInt("calamityIncarnationTornado") >= 1) {
+            livingEntity.getPersistentData().putInt("calamityIncarnationTornado", livingEntity.getPersistentData().getInt("calamityIncarnationTornado") - 1);
         }
     }
 
-    public static void calamityLightningStorm(Player pPlayer) {
-        CompoundTag tag = pPlayer.getPersistentData();
+    public static void calamityLightningStorm(LivingEntity livingEntity) {
+        CompoundTag tag = livingEntity.getPersistentData();
         int stormCounter = tag.getInt("calamityLightningStormSummon");
         if (stormCounter >= 1) {
-            LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), pPlayer.level());
+            LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), livingEntity.level());
             tag.putInt("calamityLightningStormSummon", stormCounter - 1);
             lightningEntity.setSpeed(6);
             lightningEntity.setDamage(5);
@@ -118,10 +117,10 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             int stormX = tag.getInt("calamityLightningStormX");
             int stormY = tag.getInt("calamityLightningStormY");
             int stormZ = tag.getInt("calamityLightningStormZ");
-            int subtractX = (int) (stormX - pPlayer.getX());
-            int subtractY = (int) (stormY - pPlayer.getY());
-            int subtractZ = (int) (stormZ - pPlayer.getZ());
-            for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(40))) {
+            int subtractX = (int) (stormX - livingEntity.getX());
+            int subtractY = (int) (stormY - livingEntity.getY());
+            int subtractZ = (int) (stormZ - livingEntity.getZ());
+            for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(40))) {
                 if (BeyonderUtil.currentPathwayAndSequenceMatches(entity, BeyonderClassInit.MONSTER.get(), 3)) {
                     entity.getPersistentData().putInt("calamityLightningStormImmunity", 20);
                 }
@@ -129,7 +128,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             double random = (Math.random() * 60) - 30;
             lightningEntity.teleportTo(stormX + random, stormY + 60, stormZ + random);
             lightningEntity.setMaxLength(60);
-            pPlayer.level().addFreshEntity(lightningEntity);
+            livingEntity.level().addFreshEntity(lightningEntity);
         }
     }
 

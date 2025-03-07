@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -34,19 +35,20 @@ public class ConsciousnessStroll extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public static void consciousnessStroll(CompoundTag playerPersistentData, Player player) {
+    public static void consciousnessStroll(LivingEntity livingEntity) {
         //CONSCIOUSNESS STROLL
-        if (!(player instanceof ServerPlayer serverPlayer)) return;
-        int strollCounter = playerPersistentData.getInt("consciousnessStrollActivated");
-        int consciousnessStrollActivatedX = playerPersistentData.getInt("consciousnessStrollActivatedX");
-        int consciousnessStrollActivatedY = playerPersistentData.getInt("consciousnessStrollActivatedY");
-        int consciousnessStrollActivatedZ = playerPersistentData.getInt("consciousnessStrollActivatedZ");
+        if (!(livingEntity instanceof ServerPlayer serverPlayer)) return;
+        CompoundTag tag = livingEntity.getPersistentData();
+        int strollCounter = tag.getInt("consciousnessStrollActivated");
+        int consciousnessStrollActivatedX = tag.getInt("consciousnessStrollActivatedX");
+        int consciousnessStrollActivatedY = tag.getInt("consciousnessStrollActivatedY");
+        int consciousnessStrollActivatedZ = tag.getInt("consciousnessStrollActivatedZ");
         if (strollCounter >= 1) {
-            playerPersistentData.putInt("consciousnessStrollActivated", strollCounter - 1);
+            tag.putInt("consciousnessStrollActivated", strollCounter - 1);
             serverPlayer.setGameMode(GameType.SPECTATOR);
         }
         if (strollCounter == 1) {
-            player.teleportTo(consciousnessStrollActivatedX, consciousnessStrollActivatedY, consciousnessStrollActivatedZ);
+            livingEntity.teleportTo(consciousnessStrollActivatedX, consciousnessStrollActivatedY, consciousnessStrollActivatedZ);
             serverPlayer.setGameMode(GameType.SURVIVAL);
         }
     }

@@ -22,6 +22,7 @@ import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.SyncShouldntRenderInvisibilityPacketS2C;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ClientData.ClientShouldntRenderInvisibilityData;
 import org.jetbrains.annotations.NotNull;
 
@@ -92,26 +93,27 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
 
     public static final Map<UUID, Boolean> lastSentInvisibilityStates = new HashMap<>();
 
-    public static void psychologicalInvisibility(Player player, CompoundTag playerPersistentData, BeyonderHolder holder) {
-        if (player.tickCount % 10 == 0) {
-            boolean currentState = playerPersistentData.getBoolean("psychologicalInvisibility");
+    public static void psychologicalInvisibility(LivingEntity livingEntity) {
+        if (livingEntity.tickCount % 10 == 0) {
+            CompoundTag tag = livingEntity.getPersistentData();
+            boolean currentState = tag.getBoolean("psychologicalInvisibility");
             if (currentState) {
-                Collection<MobEffectInstance> effects = player.getActiveEffects();
+                Collection<MobEffectInstance> effects = livingEntity.getActiveEffects();
                 effects.forEach(effect -> {
                     if (effect.isAmbient() || effect.isVisible()) {
                         MobEffectInstance newEffect = new MobEffectInstance(effect.getEffect(), effect.getDuration(), effect.getAmplifier(), false, false, false);
                         effect.update(newEffect);
                     }
                 });
-                for (Mob mob : player.level().getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(40))) {
-                    if (mob.getTarget() == player) {
+                for (Mob mob : livingEntity.level().getEntitiesOfClass(Mob.class, livingEntity.getBoundingBox().inflate(40))) {
+                    if (mob.getTarget() == livingEntity) {
                         mob.setTarget(null);
                     }
                 }
-                player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 11, 1, false, false));
-                holder.useSpirituality((int) holder.getMaxSpirituality() / 100);
+                livingEntity.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 11, 1, false, false));
+                BeyonderUtil.useSpirituality(livingEntity, BeyonderUtil.getMaxSpirituality(livingEntity) / 100);
             }
-            UUID playerId = player.getUUID();
+            UUID playerId = livingEntity.getUUID();
             Boolean lastState = lastSentInvisibilityStates.get(playerId);
             if (lastState == null || lastState != currentState) {
                 LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(currentState, playerId));

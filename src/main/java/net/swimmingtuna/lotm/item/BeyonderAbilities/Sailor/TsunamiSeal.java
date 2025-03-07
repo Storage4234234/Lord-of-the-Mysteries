@@ -154,7 +154,7 @@ public class TsunamiSeal extends SimpleAbilityItem {
         }
     }
 
-    public static void summonTsunami(Player player) {
+    public static void summonTsunami(LivingEntity player) {
         CompoundTag tag = player.getPersistentData();
         int playerX = tag.getInt("sailorTsunamiSealX");
         int playerY = tag.getInt("sailorTsunamiSealY");

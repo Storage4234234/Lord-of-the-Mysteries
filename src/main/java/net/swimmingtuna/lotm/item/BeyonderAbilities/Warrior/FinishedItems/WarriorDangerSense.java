@@ -47,19 +47,19 @@ public class WarriorDangerSense extends SimpleAbilityItem {
         }
     }
 
-    public static void warriorDangerSense(CompoundTag playerPersistentData, BeyonderHolder holder, Player player) {
-        boolean warriorDangerSense = playerPersistentData.getBoolean("warriorDangerSense");
+    public static void warriorDangerSense(LivingEntity livingEntity) {
+        boolean warriorDangerSense = livingEntity.getPersistentData().getBoolean("warriorDangerSense");
         if (!warriorDangerSense) {
             return;
         }
-        double radius = 200 - (holder.getSequence() * 20);
-        for (Player otherPlayer : player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius))) {
-            if (otherPlayer == player || BeyonderUtil.isAllyOf(player, otherPlayer)) {
+        double radius = 200 - (BeyonderUtil.getSequence(livingEntity) * 20);
+        for (Player otherPlayer : livingEntity.level().getEntitiesOfClass(Player.class, livingEntity.getBoundingBox().inflate(radius))) {
+            if (otherPlayer == livingEntity || BeyonderUtil.isAllyOf(livingEntity, otherPlayer)) {
                 continue;
             }
             if (otherPlayer.getMainHandItem().getItem() instanceof SimpleAbilityItem || otherPlayer.getMainHandItem().getItem() instanceof ProjectileWeaponItem || otherPlayer.getMainHandItem().getItem() instanceof SwordItem || otherPlayer.getMainHandItem().getItem() instanceof AxeItem) { //also add for sealed artifacts
-                Vec3 directionToPlayer = otherPlayer.position().subtract(player.position()).normalize();
-                Vec3 lookAngle = player.getLookAngle();
+                Vec3 directionToPlayer = otherPlayer.position().subtract(livingEntity.position()).normalize();
+                Vec3 lookAngle = livingEntity.getLookAngle();
                 double horizontalAngle = Math.atan2(directionToPlayer.x, directionToPlayer.z) - Math.atan2(lookAngle.x, lookAngle.z);
 
                 String horizontalDirection;
@@ -83,8 +83,8 @@ public class WarriorDangerSense extends SimpleAbilityItem {
                 }
 
                 String message = otherPlayer.getName().getString() + " is " + horizontalDirection + " and " + verticalDirection + " you.";
-                if (player.tickCount % 200 == 0) {
-                    player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.BOLD, ChatFormatting.RED));
+                if (livingEntity.tickCount % 200 == 0) {
+                    livingEntity.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.BOLD, ChatFormatting.RED));
                 }
             }
         }

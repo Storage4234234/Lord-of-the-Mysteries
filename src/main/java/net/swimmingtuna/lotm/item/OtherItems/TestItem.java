@@ -19,6 +19,7 @@ import net.swimmingtuna.lotm.entity.SilverLightEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 
 public class TestItem extends SimpleAbilityItem {
@@ -73,7 +74,8 @@ public class TestItem extends SimpleAbilityItem {
                     player.getCooldowns().removeCooldown(stack.getItem());
                 }
             }
-            player.hurt(player.damageSources().fall(), 15);
+            BeyonderUtil.disableAbilities(player);
+            tag.putInt("inTwilight", 60);
         }
 
         return InteractionResult.SUCCESS;

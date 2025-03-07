@@ -126,14 +126,14 @@ public class Nightmare extends SimpleAbilityItem {
         }
     }
 
-    public static void nightmareTick(Player player, CompoundTag playerPersistentData) {
-        AttributeInstance nightmareAttribute = player.getAttribute(ModAttributes.NIGHTMARE.get());
+    public static void nightmareTick(LivingEntity livingEntity) {
+        AttributeInstance nightmareAttribute = livingEntity.getAttribute(ModAttributes.NIGHTMARE.get());
+        CompoundTag playerPersistentData = livingEntity.getPersistentData();
         int nightmareTimer = playerPersistentData.getInt("NightmareTimer");
-        int matterAccelerationBlockTimer = player.getPersistentData().getInt("matterAccelerationBlockTimer");
+        int matterAccelerationBlockTimer = livingEntity.getPersistentData().getInt("matterAccelerationBlockTimer");
         if (matterAccelerationBlockTimer >= 1) {
-            player.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
+            livingEntity.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
         }
-
         if (nightmareAttribute.getValue() >= 1) {
             nightmareTimer++;
             if (nightmareTimer >= 600) {

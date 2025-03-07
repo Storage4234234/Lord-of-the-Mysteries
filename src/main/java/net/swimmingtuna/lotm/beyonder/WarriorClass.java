@@ -3,6 +3,7 @@ package net.swimmingtuna.lotm.beyonder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
@@ -10,7 +11,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
@@ -578,6 +581,22 @@ public class WarriorClass implements BeyonderClass {
                 float finalReduction = Math.min(supernaturalReduction, 0.8f);
                 event.setAmount(amount * (1.0f - finalReduction));
             }
+        }
+    }
+
+    public static void twilightTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        CompoundTag tag = livingEntity.getPersistentData();
+        if (!livingEntity.level().isClientSide() && tag.getInt("inTwilight") >= 1) {
+            double x = livingEntity.getX();
+            double y = livingEntity.getY();
+            double z = livingEntity.getZ();
+            livingEntity.teleportTo(x, y, z);
+            livingEntity.setDeltaMovement(0,0,0);
+            livingEntity.hurtMarked = true;
+            livingEntity.sendSystemMessage(Component.literal("value is " + tag.getInt("inTwilight")));
+            event.setCanceled(true);
+            event.setResult(Event.Result.DENY);
         }
     }
 }

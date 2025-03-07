@@ -147,18 +147,17 @@ public class SailorLightning extends SimpleAbilityItem {
         }
     }
 
-    public static void lightningHigh(Player player, Level level) {
+    public static void lightningHigh(LivingEntity livingEntity, Level level) {
         if (!level.isClientSide()) {
             float speed = 10.0f;
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), level);
             lightningEntity.setSpeed(speed);
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             lightningEntity.setDeltaMovement(0, -2, 0);
             lightningEntity.setMaxLength(60);
-            lightningEntity.setOwner(player);
-            lightningEntity.setDamage((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.SAILOR_LIGHTNING.get()));
-            lightningEntity.setOwner(player);
-            lightningEntity.teleportTo(player.getX() + ((Math.random() * 150) - 75), player.getY() + 60, player.getZ() + ((Math.random() * 150) - 75));
+            lightningEntity.setOwner(livingEntity);
+            lightningEntity.setDamage((int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.SAILOR_LIGHTNING.get()));
+            lightningEntity.setOwner(livingEntity);
+            lightningEntity.teleportTo(livingEntity.getX() + ((Math.random() * 150) - 75), livingEntity.getY() + 60, livingEntity.getZ() + ((Math.random() * 150) - 75));
             level.addFreshEntity(lightningEntity);
         }
     }

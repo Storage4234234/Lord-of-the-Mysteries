@@ -39,7 +39,7 @@ public class EnvisionLife extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public static void envisionLife(Player player) {
+    public static void envisionLife(LivingEntity player) {
         //ENVISION LIFE
         int waitMakeLifeCounter = player.getPersistentData().getInt("waitMakeLifeTimer");
         if (waitMakeLifeCounter >= 1) {

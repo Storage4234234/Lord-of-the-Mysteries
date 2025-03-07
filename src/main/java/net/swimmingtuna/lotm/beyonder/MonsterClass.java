@@ -355,14 +355,14 @@ public class MonsterClass implements BeyonderClass {
         }
     }
 
-    public static void monsterLuckIgnoreMobs(Player pPlayer) {
+    public static void monsterLuckIgnoreMobs(LivingEntity pPlayer) {
         if (pPlayer.tickCount % 40 == 0) {
             if (pPlayer.getPersistentData().getInt("luckIgnoreMobs") >= 1) {
                 for (Mob mob : pPlayer.level().getEntitiesOfClass(Mob.class, pPlayer.getBoundingBox().inflate(20))) {
                     if (mob.getTarget() == pPlayer) {
-                        for (LivingEntity livingEntity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(50))) {
-                            if (livingEntity != null) {
-                                mob.setTarget(livingEntity);
+                        for (LivingEntity living : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(50))) {
+                            if (living != null) {
+                                mob.setTarget(living);
                             } else
                                 mob.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 60, 1, false, false));
                         }
@@ -373,9 +373,9 @@ public class MonsterClass implements BeyonderClass {
         }
     }
 
-    public static void decrementMonsterAttackEvent(Player pPlayer) {
-        if (pPlayer.getPersistentData().getInt("attackedMonster") >= 1) {
-            pPlayer.getPersistentData().putInt("attackedMonster", pPlayer.getPersistentData().getInt("attackedMonster") - 1);
+    public static void decrementMonsterAttackEvent(LivingEntity livingEntity) {
+        if (livingEntity.getPersistentData().getInt("attackedMonster") >= 1) {
+            livingEntity.getPersistentData().putInt("attackedMonster", livingEntity.getPersistentData().getInt("attackedMonster") - 1);
         }
     }
 
@@ -408,6 +408,7 @@ public class MonsterClass implements BeyonderClass {
             }
         }
     }
+
     public static void dodgeProjectiles(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             if (livingEntity.getPersistentData().getInt("windMovingProjectilesCounter") >= 1) {
@@ -478,6 +479,7 @@ public class MonsterClass implements BeyonderClass {
             }
         }
     }
+
     public static void showMonsterParticles(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide() && livingEntity.tickCount % 100 == 0) {
             if (livingEntity instanceof ServerPlayer serverPlayer) {
@@ -1059,24 +1061,22 @@ public class MonsterClass implements BeyonderClass {
             }
         }
     }
-    public static void calamityExplosion(Player pPlayer) {
-        CompoundTag tag = pPlayer.getPersistentData();
-        if (pPlayer.level() instanceof ServerLevel serverLevel) {
+
+    public static void calamityExplosion(LivingEntity livingEntity) {
+        CompoundTag tag = livingEntity.getPersistentData();
+        if (livingEntity.level() instanceof ServerLevel serverLevel) {
             int x = tag.getInt("calamityExplosionOccurrence");
-            if (x >= 1 && pPlayer.tickCount % 20 == 0 && !pPlayer.level().isClientSide()) {
+            if (x >= 1 && livingEntity.tickCount % 20 == 0 && !livingEntity.level().isClientSide()) {
                 int explosionX = tag.getInt("calamityExplosionX");
                 int explosionY = tag.getInt("calamityExplosionY");
                 int explosionZ = tag.getInt("calamityExplosionZ");
-                int subtractX = explosionX - (int) pPlayer.getX();
-                int subtractY = explosionY - (int) pPlayer.getY();
-                int subtractZ = explosionZ - (int) pPlayer.getZ();
+                int subtractX = explosionX - (int) livingEntity.getX();
+                int subtractY = explosionY - (int) livingEntity.getY();
+                int subtractZ = explosionZ - (int) livingEntity.getZ();
                 tag.putInt("calamityExplosionOccurrence", x - 1);
-                for (LivingEntity entity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(15))) {
-                    if (entity instanceof Player player) {
-                        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                        if (BeyonderUtil.currentPathwayMatchesNoException(pPlayer, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(pPlayer) <= 3) {
-                            player.getPersistentData().putInt("calamityExplosionImmunity", 2);
-                        }
+                for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().move(subtractX, subtractY, subtractZ).inflate(15))) {
+                    if (BeyonderUtil.currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.MONSTER.get()) && BeyonderUtil.getSequence(livingEntity) <= 3) {
+                        entity.getPersistentData().putInt("calamityExplosionImmunity", 2);
                     }
                 }
             }
@@ -1085,8 +1085,8 @@ public class MonsterClass implements BeyonderClass {
                 int explosionY = tag.getInt("calamityExplosionY");
                 int explosionZ = tag.getInt("calamityExplosionZ");
                 int data = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
-                pPlayer.level().playSound(null, explosionX, explosionY, explosionZ, SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 5.0F, 5.0F);
-                Explosion explosion = new Explosion(pPlayer.level(), null, explosionX, explosionY, explosionZ, 10.0F + (data * 3), true, Explosion.BlockInteraction.DESTROY);
+                livingEntity.level().playSound(null, explosionX, explosionY, explosionZ, SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 5.0F, 5.0F);
+                Explosion explosion = new Explosion(livingEntity.level(), null, explosionX, explosionY, explosionZ, 10.0F + (data * 3), true, Explosion.BlockInteraction.DESTROY);
                 explosion.explode();
                 explosion.finalizeExplosion(true);
                 tag.putInt("calamityExplosionOccurrence", 0);
