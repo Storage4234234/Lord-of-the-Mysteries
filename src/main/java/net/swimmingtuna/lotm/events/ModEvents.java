@@ -89,7 +89,7 @@ import java.util.Map;
 import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.apprenticeWindSlowFall;
 import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.trickmasterBounceHitProjectiles;
 import static net.swimmingtuna.lotm.beyonder.MonsterClass.*;
-import static net.swimmingtuna.lotm.beyonder.WarriorClass.warriorDamageNegation;
+import static net.swimmingtuna.lotm.beyonder.WarriorClass.newWarriorDamageNegation;
 import static net.swimmingtuna.lotm.blocks.MonsterDomainBlockEntity.domainDrops;
 import static net.swimmingtuna.lotm.entity.PlayerMobEntity.getDrop;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser.clickEvent;
@@ -526,7 +526,7 @@ public class ModEvents {
         if (!event.getEntity().level().isClientSide()) {
             BeyonderUtil.ageHandlerHurt(event);
             GuardianBoxEntity.guardianHurtEvent(event);
-            warriorDamageNegation(event);
+            newWarriorDamageNegation(event);
             MercuryLiquefication.mercuryArmorHurt(event);
             boolean entityInSpiritWorld = tag.getBoolean("inSpiritWorld");
             if (entitySource != null) {

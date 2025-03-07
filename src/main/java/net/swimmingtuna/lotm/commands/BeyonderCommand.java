@@ -76,6 +76,7 @@ public class BeyonderCommand {
                             ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
                             holder.removePathway();
                             player.getPersistentData().putInt("monsterReincarnationCounter", 0);
+                            player.getPersistentData().putInt("age",0);
                             scaleData.setScale(1);
                             Abilities playerAbilities = player.getAbilities();
                             playerAbilities.setFlyingSpeed(0.05F);

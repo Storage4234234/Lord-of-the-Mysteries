@@ -189,6 +189,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                         CompoundTag tag = targetEntity.getPersistentData();
                         user.getPersistentData().putUUID("mercuryArmor", targetEntity.getUUID());
                         user.getPersistentData().putInt("mercuryArmorForm", 10);
+                        user.sendSystemMessage(Component.literal("armor put on " + targetEntity.getName()));
                         targetEntity.getPersistentData().putInt("mercuryArmorEquipped", 10);
                         CompoundTag armorData = new CompoundTag();
                         ListTag armorItems = new ListTag();
@@ -240,19 +241,24 @@ public class MercuryLiquefication extends SimpleAbilityItem {
         int x = tag.getInt("mercuryArmorEquipped");
         int y = tag.getInt("mercuryArmorForm");
         if (!livingEntity.level().isClientSide() && x >= 1) {
+            System.out.println("x greater than 1"); //working
             tag.putInt("mercuryArmorEquipped", x - 1);
             for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(150))) {
                 if (living.getPersistentData().contains("mercuryArmor")) {
+                    System.out.println("mercury armor spotted");
                     if (living.getPersistentData().getUUID("mercuryArmor").equals(livingEntity.getUUID())) {
                         living.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
                         living.getPersistentData().putInt("mercuryArmorForm", 10);
+                        System.out.println("user spotted, teleporting");
                     }
                     if (!hasFullSilverArmor(livingEntity)) {
+                        System.out.println("doesnt have armor on");
                         if (tag.contains("mercuryArmorStorage")) {
                             CompoundTag armorData = tag.getCompound("mercuryArmorStorage");
                             ListTag armorItems = armorData.getList("mercuryStoredArmor", 10);
                             for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
                                 livingEntity.setItemSlot(slot, ItemStack.EMPTY);
+                                System.out.println("set empty");
                             }
                             for (int i = 0; i < armorItems.size(); i++) {
                                 CompoundTag slotTag = armorItems.getCompound(i);
@@ -261,6 +267,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                                 EquipmentSlot slot = EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, slotIndex);
                                 if (slot != null) {
                                     livingEntity.setItemSlot(slot, armorStack);
+                                    System.out.println("set as original armor");
                                 }
                             }
                             tag.remove("mercuryArmorStorage");
@@ -270,6 +277,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                         living.getPersistentData().putInt("mercuryArmorForm", 0);
                     } else {
                         tag.putInt("mercuryArmorEquipped", 10);
+                        System.out.println("put as 10");
                     }
                 }
             }
@@ -277,6 +285,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
         if (!livingEntity.level().isClientSide() && y >= 1) {
             BeyonderUtil.useSpirituality(livingEntity, 5);
             tag.putInt("mercuryArmorForm", y - 1);
+            System.out.println("y decremented, using spirituality");
             if (!livingEntity.isShiftKeyDown()) {
                 if (livingEntity instanceof Player player && player.tickCount % 10 == 0) {
                     player.displayClientMessage(Component.literal("Shift to unequip yourself").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD), true);
@@ -335,7 +344,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (slot.getType() == EquipmentSlot.Type.ARMOR) {
                 ItemStack itemStack = entity.getItemBySlot(slot);
-                if (!(itemStack.getItem() instanceof ArmorItem armor) || armor.getMaterial() != ModArmorMaterials.DAWN) {
+                if (!(itemStack.getItem() instanceof ArmorItem armor) || armor.getMaterial() != ModArmorMaterials.SILVER) {
                     return false;
                 }
             }

@@ -30,7 +30,7 @@ public class TwilightLight extends SimpleAbilityItem {
 
 
     public TwilightLight(Properties properties) {
-        super(properties, BeyonderClassInit.WARRIOR, 6, 0, 20);
+        super(properties, BeyonderClassInit.WARRIOR, 0, 0, 20);
     }
 
     @Override

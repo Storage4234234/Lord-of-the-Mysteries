@@ -2,6 +2,7 @@ package net.swimmingtuna.lotm.networking.packet;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -35,7 +36,7 @@ public class MercuryLiqueficationC2S {
             boolean currentState = tag.getBoolean("mercuryLiquefication");
             float damage = BeyonderUtil.getDamage(player).get(ItemInit.MERCURYLIQUEFICATION.get());
             Level level = player.level();
-            if (!level.isClientSide() && currentState && BeyonderUtil.getSequence(player) <= 1 && player.getMainHandItem().isEmpty()) {
+            if (!level.isClientSide() && currentState && BeyonderUtil.getSequence(player) <= 2 && player.getMainHandItem().isEmpty()) {
                 for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(damage * 5.0f))) {
                     if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
                         MercuryEntity mercuryEntity = new MercuryEntity(EntityInit.MERCURY_ENTITY.get(), level);

@@ -91,7 +91,7 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
     protected void onHitBlock(BlockHitResult pResult) {
         if (!this.level().isClientSide()) {
             if (!getShouldTeleport() && this.tickCount >= 10) {
-                destroyBlocksAroundEntityDropBlocks((int) ((int) ScaleTypes.BASE.getScaleData(this).getScale() * 1.2));
+                BeyonderUtil.destroyBlocksInSphere(this,pResult.getBlockPos(), (int) ((int) ScaleTypes.BASE.getScaleData(this).getScale() * 1.2), 15 );
                 this.discard();
             }
         }

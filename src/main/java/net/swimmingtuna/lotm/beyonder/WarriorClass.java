@@ -3,6 +3,7 @@ package net.swimmingtuna.lotm.beyonder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -28,7 +29,7 @@ import static net.swimmingtuna.lotm.util.BeyonderUtil.applyMobEffect;
 
 public class WarriorClass implements BeyonderClass {
     private int speed;
-    private int resistance;
+    public static int resistance;
     private int strength;
     private int regen;
 
@@ -200,7 +201,6 @@ public class WarriorClass implements BeyonderClass {
                     resistance = 2;
                     regen = 2;
                 } else if (sequenceLevel == 1) {
-
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
@@ -213,7 +213,6 @@ public class WarriorClass implements BeyonderClass {
                 } else if (sequenceLevel == 0) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
-                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.REGENERATION, 300, 2, false, false);
                     speed = 2;
@@ -262,6 +261,7 @@ public class WarriorClass implements BeyonderClass {
     public ChatFormatting getColorFormatting() {
         return ChatFormatting.DARK_RED;
     }
+
     public static void warriorDamageNegation(LivingHurtEvent event) {
         LivingEntity livingEntity = event.getEntity();
         DamageSource source = event.getSource();
@@ -276,6 +276,8 @@ public class WarriorClass implements BeyonderClass {
             boolean isSupernatural = BeyonderUtil.isSupernaturalDamage(source);
             float amount = event.getAmount();
             int sequence = -1;
+
+
             if (livingEntity instanceof Player player) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                 sequence = holder.getSequence();
@@ -286,18 +288,10 @@ public class WarriorClass implements BeyonderClass {
             boolean isWarrior = BeyonderUtil.currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.WARRIOR.get());
             if (hasFullSilverArmor(livingEntity) || hasFullDawnArmor(livingEntity)) {
                 if (hasFullSilverArmor(livingEntity)) {
-                    if (!(isWarrior && sequence > 3)) {
-                        if (event.getAmount() <= 20) {
-                            event.setAmount(0);
-                        } else {
-                            event.setAmount(amount * 0.33f);
-                        }
+                    if (event.getAmount() <= 25) {
+                        event.setAmount(0);
                     } else {
-                        if (event.getAmount() <= 40 - (sequence * 7)) {
-                            event.setCanceled(true);
-                        } else {
-                            event.setAmount(amount * 0.33f);
-                        }
+                        event.setAmount(amount * 0.33f);
                     }
                 } else if (hasFullDawnArmor(livingEntity)) {
                     if (livingEntity.tickCount % 2 == 0) {
@@ -311,7 +305,6 @@ public class WarriorClass implements BeyonderClass {
                 }
             }
             if (isWarrior) {
-
                 if (sequence == 8) {
                     if (isSupernatural) {
                         event.setAmount((float) (amount * 0.75));
@@ -424,5 +417,167 @@ public class WarriorClass implements BeyonderClass {
             }
         }
     }
+    public static void newWarriorDamageNegation(LivingHurtEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        DamageSource source = event.getSource();
+        Entity entitySource = source.getEntity();
+        if (!livingEntity.level().isClientSide()) {
+            boolean isGiant = livingEntity.getPersistentData().getBoolean("warriorGiant");
+            boolean isHoGGiant = livingEntity.getPersistentData().getBoolean("handOfGodGiant");
+            boolean isTwilightGiant = livingEntity.getPersistentData().getBoolean("twilightGiant");
+            boolean isPhysical = BeyonderUtil.isPhysicalDamage(source);
+            boolean isSupernatural = BeyonderUtil.isSupernaturalDamage(source);
+            float originalAmount = event.getAmount();
+            float amount = originalAmount;
+            int sequence = -1;
 
+            // Track damage reduction multipliers
+            float physicalReduction = 0.0f;
+            float supernaturalReduction = 0.0f;
+
+            if (livingEntity instanceof Player player) {
+                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+                sequence = holder.getSequence();
+            } else if (livingEntity instanceof PlayerMobEntity player) {
+                sequence = player.getCurrentSequence();
+            }
+            boolean isWarrior = BeyonderUtil.currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.WARRIOR.get());
+            if (hasFullSilverArmor(livingEntity) && originalAmount <= 25) {
+                event.setAmount(0);
+                return;
+            }
+
+            if (hasFullDawnArmor(livingEntity)) {
+                if (livingEntity.tickCount % 2 == 0) {
+                    BeyonderUtil.useSpirituality(livingEntity, 2);
+                }
+                if (originalAmount <= 10) {
+                    event.setAmount(0);
+                    return;
+                }
+            }
+            if (isWarrior && isPhysical) {
+                if (sequence == 6 && isGiant && originalAmount <= 5) {
+                    event.setAmount(0);
+                    return;
+                } else if (sequence == 5 && isGiant && originalAmount <= 7) {
+                    event.setAmount(0);
+                    return;
+                } else if (sequence == 4 && isGiant && originalAmount <= 10) {
+                    event.setAmount(0);
+                    return;
+                } else if ((sequence == 3 || sequence == 2) && isGiant && originalAmount <= 15) {
+                    event.setCanceled(true);
+                    return;
+                } else if (sequence == 1 && isHoGGiant && originalAmount <= 20) {
+                    event.setAmount(0);
+                    return;
+                } else if (sequence == 0 && isHoGGiant && originalAmount <= 25) {
+                    event.setAmount(0);
+                    return;
+                }
+            }
+            if (isWarrior && isSupernatural) {
+                if (sequence == 1 && isHoGGiant && originalAmount <= 20) {
+                    event.setAmount(0);
+                    return;
+                } else if (sequence == 0 && isTwilightGiant && originalAmount <= 25) {
+                    event.setAmount(0);
+                    return;
+                }
+            }
+            if (hasFullSilverArmor(livingEntity)) {
+                physicalReduction += 0.67f;
+                supernaturalReduction += 0.67f;
+            } else if (hasFullDawnArmor(livingEntity) && isSupernatural) {
+                supernaturalReduction += 0.5f;
+            }
+            if (isWarrior) {
+                if (sequence == 8) {
+                    if (isSupernatural) {
+                        supernaturalReduction += 0.25f;
+                    }
+                } else if (sequence == 7) {
+                    if (isSupernatural) {
+                        supernaturalReduction += 0.25f;
+                    } else if (isPhysical) {
+                        physicalReduction += 0.3f;
+                    }
+                } else if (sequence == 6) {
+                    if (isSupernatural) {
+                        supernaturalReduction += 0.3f;
+                    } else if (isPhysical) {
+                        if (!isGiant) {
+                            physicalReduction += 0.4f;
+                        } else {
+                            physicalReduction += 0.55f;
+                        }
+                    }
+                } else if (sequence == 5) {
+                    if (isSupernatural) {
+                        supernaturalReduction += 0.3f;
+                    } else if (isPhysical) {
+                        if (!isGiant) {
+                            physicalReduction += 0.5f;
+                        } else {
+                            physicalReduction += 0.65f;
+                        }
+                    }
+                } else if (sequence == 4) {
+                    if (isSupernatural) {
+                        supernaturalReduction += 0.4f;
+                    } else if (isPhysical) {
+                        if (!isGiant) {
+                            physicalReduction += 0.55f;
+                        } else {
+                            physicalReduction += 0.65f;
+                        }
+                    }
+                } else if (sequence == 3 || sequence == 2) {
+                    if (isSupernatural) {
+                        supernaturalReduction += 0.4f;
+                    } else if (isPhysical) {
+                        if (!isGiant) {
+                            physicalReduction += 0.6f;
+                        } else {
+                            physicalReduction += 0.65f;
+                        }
+                    }
+                } else if (sequence == 1) {
+                    if (isSupernatural) {
+                        if (isHoGGiant) {
+                            supernaturalReduction += 0.7f;
+                        }
+                    } else if (isPhysical) {
+                        if (isHoGGiant) {
+                            physicalReduction += 0.725f;
+                        } else {
+                            physicalReduction += 0.65f;
+                        }
+                    }
+                } else if (sequence == 0) {
+                    if (isSupernatural) {
+                        if (isTwilightGiant) {
+                            supernaturalReduction += 0.8f;
+                        } else {
+                            supernaturalReduction += 0.5f;
+                        }
+                    } else if (isPhysical) {
+                        if (isHoGGiant) {
+                            physicalReduction += 0.8f;
+                        } else {
+                            physicalReduction += 0.65f;
+                        }
+                    }
+                }
+            }
+            if (isPhysical) {
+                float finalReduction = Math.min(physicalReduction, 0.8f);
+                event.setAmount(amount * (1.0f - finalReduction));
+            } else if (isSupernatural) {
+                float finalReduction = Math.min(supernaturalReduction, 0.8f);
+                event.setAmount(amount * (1.0f - finalReduction));
+            }
+        }
+    }
 }

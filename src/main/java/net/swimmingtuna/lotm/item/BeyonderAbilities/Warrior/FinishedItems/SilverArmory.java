@@ -34,11 +34,11 @@ public class SilverArmory extends SimpleAbilityItem {
         }
         addCooldown(player);
         useSpirituality(player);
-        startGigantification(player);
+        silverArmory(player);
         return InteractionResult.SUCCESS;
     }
 
-    public static void startGigantification(LivingEntity livingEntity) {
+    public static void silverArmory(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             float x = livingEntity.getHealth();
             livingEntity.setHealth(Math.max(0.1f, x - 10.0f));

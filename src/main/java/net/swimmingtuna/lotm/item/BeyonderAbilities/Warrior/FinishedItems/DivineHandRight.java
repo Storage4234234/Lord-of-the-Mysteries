@@ -40,6 +40,7 @@ public class DivineHandRight extends SimpleAbilityItem {
             Vec3 scale = livingEntity.getLookAngle().scale(5.0f);
             divineHandRight.teleportTo(livingEntity.getX() + scale.x, livingEntity.getY(), livingEntity.getZ() + scale.z);
             divineHandRight.hurtMarked = true;
+            divineHandRight.setOwner(livingEntity);
             divineHandRight.setYaw(livingEntity.getYRot());
             divineHandRight.setPitch(livingEntity.getXRot());
             livingEntity.level().addFreshEntity(divineHandRight);

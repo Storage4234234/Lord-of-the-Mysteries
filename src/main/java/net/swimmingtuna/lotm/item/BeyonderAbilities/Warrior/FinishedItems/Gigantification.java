@@ -16,6 +16,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.swimmingtuna.lotm.beyonder.WarriorClass;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
@@ -191,7 +192,7 @@ public class Gigantification extends SimpleAbilityItem {
                 if (livingEntity.hasEffect(MobEffects.DAMAGE_RESISTANCE)) {
                     amp = livingEntity.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier();
                 }
-                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DAMAGE_RESISTANCE, 40, amp + 1, true, true);
+                BeyonderUtil.applyMobEffect(livingEntity, MobEffects.DAMAGE_RESISTANCE, 40, WarriorClass.resistance + 1, true, true);
             }
         }
     }

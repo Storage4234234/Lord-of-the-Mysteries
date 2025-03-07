@@ -1290,6 +1290,8 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.DIVINEHANDLEFT.get(), applyAbilityStrengthened((10.0f - (sequence * 4)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.SILVERRAPIER.get(), applyAbilityStrengthened((40.0f - (sequence * 6)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.GLOBEOFTWILIGHT.get(), applyAbilityStrengthened((20.0f - (sequence * 8)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.TWILIGHTLIGHT.get(), applyAbilityStrengthened((300.0f - (sequence * 60)) / abilityWeakness, abilityStrengthened));
+
 
         // APPRENTICE
         damageMap.put(ItemInit.CREATEDOOR.get(), applyAbilityStrengthened(0.0f, abilityStrengthened));
@@ -2312,5 +2314,23 @@ public class BeyonderUtil {
     public static float getRandomInRange(float range) {
         float random = (float) Math.random();
         return (random * 2 * range) - range;
+    }
+
+    public static void destroyBlocksInSphere(Entity entity, BlockPos hitPos, double radius, float damage) {
+        for (BlockPos pos : BlockPos.betweenClosed(
+                hitPos.offset((int) -radius, (int) -radius, (int) -radius),
+                hitPos.offset((int) radius, (int) radius, (int) radius))) {
+            if (pos.distSqr(hitPos) <= radius * radius) {
+                if (entity.level().getBlockState(pos).getDestroySpeed(entity.level(), pos) >= 0) {
+                    entity.level().setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
+                }
+            }
+        }
+        List<Entity> entities = entity.level().getEntities(entity, new AABB(hitPos.offset((int) -radius, (int) -radius, (int) -radius), hitPos.offset((int) radius, (int) radius, (int) radius)));
+        for (Entity pEntity : entities) {
+            if (pEntity instanceof LivingEntity livingEntity) {
+                livingEntity.hurt(BeyonderUtil.genericSource(entity), damage);
+            }
+        }
     }
 }

@@ -73,14 +73,7 @@ public class TestItem extends SimpleAbilityItem {
                     player.getCooldowns().removeCooldown(stack.getItem());
                 }
             }
-            SilverLightEntity silverLight = new SilverLightEntity(EntityInit.SILVER_LIGHT_ENTITY.get(), level);
-            silverLight.setOwner(player);
-            silverLight.setDeltaMovement(player.getLookAngle().scale(2.0f));
-            silverLight.hurtMarked = true;
-            silverLight.teleportTo(player.getX(), player.getY(), player.getZ());
-            silverLight.setYaw(player.getYRot());
-            silverLight.setPitch(player.getXRot());
-            player.level().addFreshEntity(silverLight);
+            player.hurt(player.damageSources().fall(), 15);
         }
 
         return InteractionResult.SUCCESS;
