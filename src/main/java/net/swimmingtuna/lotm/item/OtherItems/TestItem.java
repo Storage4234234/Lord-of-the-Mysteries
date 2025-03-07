@@ -58,7 +58,7 @@ public class TestItem extends SimpleAbilityItem {
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
-            interactionTarget.getPersistentData().putInt("age", (int) interactionTarget.getMaxHealth() * 20);
+            BeyonderUtil.makeAlly(interactionTarget, player);
         }
         return InteractionResult.SUCCESS;
     }

@@ -588,15 +588,13 @@ public class WarriorClass implements BeyonderClass {
         LivingEntity livingEntity = event.getEntity();
         CompoundTag tag = livingEntity.getPersistentData();
         if (!livingEntity.level().isClientSide() && tag.getInt("inTwilight") >= 1) {
+            tag.putInt("inTwilight", tag.getInt("inTwilight") - 1);
             double x = livingEntity.getX();
             double y = livingEntity.getY();
             double z = livingEntity.getZ();
             livingEntity.teleportTo(x, y, z);
             livingEntity.setDeltaMovement(0,0,0);
             livingEntity.hurtMarked = true;
-            livingEntity.sendSystemMessage(Component.literal("value is " + tag.getInt("inTwilight")));
-            event.setCanceled(true);
-            event.setResult(Event.Result.DENY);
         }
     }
 }

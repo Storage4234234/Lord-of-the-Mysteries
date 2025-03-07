@@ -1139,7 +1139,12 @@ public class BeyonderUtil {
         if (level instanceof ServerLevel serverLevel) {
             enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
         }
-        double dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
+        double dreamIntoReality;
+        if (livingEntity instanceof Player player) {
+            dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
+        } else {
+            dreamIntoReality = 1;
+        }
         float abilityStrengthened = 1;
         if (livingEntity.getPersistentData().getInt("abilityStrengthened") >= 1) {
             abilityStrengthened = 2;
@@ -1742,6 +1747,13 @@ public class BeyonderUtil {
             return allyData.areAllies(livingEntity.getUUID(), ally.getUUID());
         }
         return false;
+    }
+
+    public static void makeAlly(LivingEntity user, LivingEntity allyToBe) {
+        if (user.level() instanceof ServerLevel serverLevel) {
+            PlayerAllyData allyData = serverLevel.getDataStorage().computeIfAbsent(PlayerAllyData::load, PlayerAllyData::create, "player_allies");
+            allyData.addAlly(user.getUUID(), allyToBe.getUUID());
+        }
     }
 
     public static void useSpirituality(LivingEntity living, int spirituality) {

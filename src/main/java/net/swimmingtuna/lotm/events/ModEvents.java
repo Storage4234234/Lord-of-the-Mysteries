@@ -338,6 +338,8 @@ public class ModEvents {
             if (livingEntity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
             }
+            twilightTick(event);
+            envisionKingdom(livingEntity, level);
             if (tag.getInt("inTwilight") == 0) {
                 dreamIntoReality(livingEntity);
                 acidicRainTick(livingEntity);
@@ -355,7 +357,6 @@ public class ModEvents {
                 hurricane(livingEntity);
                 extremeColdness(livingEntity);
                 calamityIncarnationTsunamiTick(livingEntity);
-                envisionKingdom(livingEntity, level);
                 envisionBarrier(livingEntity);
                 manipulateMovement(livingEntity);
                 envisionBarrier(livingEntity);
@@ -368,8 +369,6 @@ public class ModEvents {
                 sailorLightningTravel(livingEntity);
                 psychologicalInvisibility(livingEntity);
                 monsterDomainIntHandler(livingEntity);
-                livingEntity.sendSystemMessage(Component.literal("not working"));
-                twilightTick(event);
                 nightmareTick(livingEntity);
                 calamityUndeadArmy(livingEntity);
                 calamityLightningStorm(livingEntity);
@@ -436,8 +435,6 @@ public class ModEvents {
                 StormSeal.sealTick(event);
                 AqueousLightDrown.lightTickEvent(livingEntity);
                 TsunamiSeal.sealTick(event);
-            } else {
-                livingEntity.sendSystemMessage(Component.literal("twilight value is " + tag.getInt("inTwilight")));
             }
         }
     }
