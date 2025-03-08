@@ -146,7 +146,7 @@ public class DivineHandLeftEntity extends AbstractHurtingProjectile implements G
                 this.setYaw(newYaw);
                 this.setPitch(newPitch);
             }
-            float radius = ScaleTypes.BASE.getScaleData(this).getScale();
+            float radius = ScaleTypes.BASE.getScaleData(this).getScale() * 0.6f;
             destroyBlocksAround((int) radius);
             Vec3 currentPos = this.position();
             for (ServerPlayer player : level().getEntitiesOfClass(ServerPlayer.class, this.getBoundingBox().inflate(100))) {

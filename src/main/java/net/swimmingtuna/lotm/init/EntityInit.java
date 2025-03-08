@@ -104,6 +104,9 @@ public class EntityInit {
     public static final RegistryObject<EntityType<LowSequenceDoorEntity>> LOW_SEQUENCE_DOOR_ENTITY =
             ENTITIES.register("low_sequence_door_entity", () -> EntityType.Builder.<LowSequenceDoorEntity>of(LowSequenceDoorEntity::new, MobCategory.MISC)
                     .sized(0.5f,2f).clientTrackingRange(100).build("low_sequence_door_entity"));
+    public static final RegistryObject<EntityType<MercuryCageEntity>> MERCURY_CAGE_ENTITY =
+            ENTITIES.register("mercury_cage_entity", () -> EntityType.Builder.<MercuryCageEntity>of(MercuryCageEntity::new, MobCategory.MISC)
+                    .sized(1.0f,1.0f).clientTrackingRange(400).build("mercury_cage_entity"));
     public static final RegistryObject<EntityType<MercuryPortalEntity>> MERCURY_PORTAL_ENTITY =
             ENTITIES.register("mercury_portal_entity", () -> EntityType.Builder.<MercuryPortalEntity>of(MercuryPortalEntity::new, MobCategory.MISC)
                     .sized(0.5f,0.5f).clientTrackingRange(100).build("mercury_portal_entity"));

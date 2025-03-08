@@ -60,7 +60,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
         boolean twilight = tag.getBoolean("auraOfTwilight");
         if (!livingEntity.level().isClientSide() && (glory || twilight)) {
             if (glory && livingEntity.tickCount % 20 == 0) {
-                for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(200))) {
+                for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(150))) {
                     if (!BeyonderUtil.isAllyOf(livingEntity, living) && living != livingEntity) {
                         living.getPersistentData().putInt("age", (int) (living.getPersistentData().getInt("age") + BeyonderUtil.getDamage(livingEntity).get(ItemInit.AURAOFGLORY.get())));
                         living.sendSystemMessage(Component.literal("You are getting rapidly aged").withStyle(ChatFormatting.YELLOW));

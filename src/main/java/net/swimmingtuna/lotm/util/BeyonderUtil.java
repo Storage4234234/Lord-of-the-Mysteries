@@ -1299,6 +1299,7 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.DIVINEHANDRIGHT.get(), applyAbilityStrengthened((10.0f - (sequence * 4)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.DIVINEHANDLEFT.get(), applyAbilityStrengthened((10.0f - (sequence * 4)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.SILVERRAPIER.get(), applyAbilityStrengthened((40.0f - (sequence * 6)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MERCURYCAGE.get(), applyAbilityStrengthened((500.0f - (sequence * 80)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.GLOBEOFTWILIGHT.get(), applyAbilityStrengthened((20.0f - (sequence * 8)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.TWILIGHTLIGHT.get(), applyAbilityStrengthened((300.0f - (sequence * 60)) / abilityWeakness, abilityStrengthened));
 
@@ -1905,7 +1906,29 @@ public class BeyonderUtil {
         LivingEntity livingEntity = event.getEntity();
         CompoundTag tag = livingEntity.getPersistentData();
         int age = tag.getInt("age");
-        int maxAge = (int) (livingEntity.getMaxHealth() * 5);
+        int sequence = getSequence(livingEntity);
+        int maxAge = 20;
+        if (sequence == 9) {
+            maxAge = 40;
+        } else if (sequence == 8) {
+            maxAge = 80;
+        } else if (sequence == 7) {
+            maxAge = 150;
+        } else if (sequence == 6) {
+            maxAge = 230;
+        } else if (sequence == 5) {
+            maxAge = 330;
+        } else if (sequence == 4) {
+            maxAge = 550;
+        } else if (sequence == 3) {
+            maxAge = 700;
+        } else if (sequence == 2) {
+            maxAge = 1000;
+        } else if (sequence == 1) {
+            maxAge = 1600;
+        } else if (sequence == 0) {
+            maxAge = 3000;
+        }
         boolean tenPercent = age >= maxAge * 0.1;
         boolean twentyPercent = age >= maxAge * 0.2;
         boolean thirtyPercent = age >= maxAge * 0.3;
@@ -1916,7 +1939,6 @@ public class BeyonderUtil {
         boolean eightyPercent = age >= maxAge * 0.8;
         boolean ninetyPercent = age >= maxAge * 0.9;
         boolean oneHundredPercent = age >= maxAge;
-        int sequence = BeyonderUtil.getSequence(livingEntity);
         if (!livingEntity.level().isClientSide()) {
             int ageDecay = tag.getInt("ageDecay");
             if (ageDecay >= 1) {

@@ -15,6 +15,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
+import net.swimmingtuna.lotm.entity.MercuryCageEntity;
 import net.swimmingtuna.lotm.entity.SilverLightEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
@@ -74,8 +75,11 @@ public class TestItem extends SimpleAbilityItem {
                     player.getCooldowns().removeCooldown(stack.getItem());
                 }
             }
-            BeyonderUtil.disableAbilities(player);
-            tag.putInt("inTwilight", 60);
+            MercuryCageEntity mercuryCage = new MercuryCageEntity(EntityInit.MERCURY_CAGE_ENTITY.get(), level);
+            mercuryCage.teleportTo(player.getX(), player.getY(), player.getZ());
+            mercuryCage.getPersistentData().putUUID("cageOwnerUUID", player.getUUID());
+            BeyonderUtil.setScale(mercuryCage, 30);
+            player.level().addFreshEntity(mercuryCage);
         }
 
         return InteractionResult.SUCCESS;

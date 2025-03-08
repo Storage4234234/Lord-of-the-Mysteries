@@ -63,20 +63,6 @@ public class SilverSwordManifestation extends SimpleAbilityItem {
         return armor;
     }
 
-    private static ItemStack createSpear(ItemStack armor) {
-        armor.enchant(Enchantments.SHARPNESS, 3);
-        armor.enchant(Enchantments.UNBREAKING, 3);
-        armor.enchant(Enchantments.LOYALTY, 1);
-        return armor;
-    }
-
-    private static ItemStack createPickaxe(ItemStack armor) {
-        armor.enchant(Enchantments.BLOCK_EFFICIENCY, 5);
-        armor.enchant(Enchantments.BLOCK_FORTUNE, 2);
-        armor.enchant(Enchantments.UNBREAKING, 3);
-        return armor;
-    }
-
     private static int findClosestEmptySlot(Player player) {
         Inventory inventory = player.getInventory();
         int selectedSlot = player.getInventory().selected;
@@ -101,55 +87,6 @@ public class SilverSwordManifestation extends SimpleAbilityItem {
         return -1;
     }
 
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
-        if (entity instanceof Player player) {
-            if (player.tickCount % 2 == 0 && !level.isClientSide()) {
-                if (player.getMainHandItem().getItem() instanceof SilverSwordManifestation) {
-                    player.displayClientMessage(Component.literal("Dawn Weaponry Choice is: " + dawnWeaponryString(player)).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.YELLOW), true);
-                }
-            }
-        }
-        super.inventoryTick(stack, level, entity, itemSlot, isSelected);
-    }
-
-    public static String dawnWeaponryString(Player pPlayer) {
-        CompoundTag tag = pPlayer.getPersistentData();
-        int dawnWeaponry = tag.getInt("dawnWeaponry");
-        if (dawnWeaponry == 1) {
-            return "Sword of Dawn";
-        } else if (dawnWeaponry == 2) {
-            return "Pickaxe of Dawn";
-        } else if (dawnWeaponry == 3) {
-            return "Spear of Dawn";
-        }
-        return "None";
-    }
-
-    public static boolean hasFullDawnArmor(LivingEntity entity) {
-        if (entity == null) return false;
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
-                ItemStack itemStack = entity.getItemBySlot(slot);
-                if (!(itemStack.getItem() instanceof ArmorItem armor) || armor.getMaterial() != ModArmorMaterials.DAWN) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public static boolean hasFullSilverArmor(LivingEntity entity) {
-        if (entity == null) return false;
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
-                ItemStack itemStack = entity.getItemBySlot(slot);
-                if (!(itemStack.getItem() instanceof ArmorItem armor) || armor.getMaterial() != ModArmorMaterials.DAWN) {
-                    return false; // If any slot is not diamond armor, return false
-                }
-            }
-        }
-        return true;
-    }
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {

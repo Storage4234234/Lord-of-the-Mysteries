@@ -32,6 +32,7 @@ public class ClientEventsEntity {
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(EntityInit.LOW_SEQUENCE_DOOR_ENTITY.get(), LowSequenceDoorRenderer::new);
+        event.registerEntityRenderer(EntityInit.MERCURY_CAGE_ENTITY.get(), MercuryCageRenderer::new);
         event.registerEntityRenderer(EntityInit.MERCURY_PORTAL_ENTITY.get(), MercuryPortalRenderer::new);
         event.registerEntityRenderer(EntityInit.DIVINE_HAND_RIGHT_ENTITY.get(), DivineHandRightRenderer::new);
         event.registerEntityRenderer(EntityInit.DIVINE_HAND_LEFT_ENTITY.get(), DivineHandLeftRenderer::new);
