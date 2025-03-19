@@ -187,6 +187,8 @@ public class SpearOfDawnEntity extends AbstractHurtingProjectile implements GeoE
                 }
             }
         }
+        this.xRotO = this.getXRot();
+        this.yRotO = this.getYRot();
     }
 
     @Override

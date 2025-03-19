@@ -56,6 +56,9 @@ public class EntityInit {
     public static final RegistryObject<EntityType<MeteorEntity>> METEOR_ENTITY =
             ENTITIES.register("meteor", () -> EntityType.Builder.<MeteorEntity>of(MeteorEntity::new, MobCategory.MISC)
                     .sized(2.0f,2.0f).clientTrackingRange(300).build("meteor"));
+    public static final RegistryObject<EntityType<SwordOfTwilightEntity>> SWORD_OF_TWILIGHT_ENTITY =
+            ENTITIES.register("sword_of_twilight_entity", () -> EntityType.Builder.<SwordOfTwilightEntity>of(SwordOfTwilightEntity::new, MobCategory.MISC)
+                    .sized(2.0f,2.0f).clientTrackingRange(300).build("sword_of_twilight_entity"));
     public static final RegistryObject<EntityType<LightningBallEntity>> LIGHTNING_BALL =
             ENTITIES.register("lightningball", () -> EntityType.Builder.<LightningBallEntity>of(LightningBallEntity::new, MobCategory.MISC)
                     .sized(2.0f,2.0f).clientTrackingRange(300).build("lightningball"));

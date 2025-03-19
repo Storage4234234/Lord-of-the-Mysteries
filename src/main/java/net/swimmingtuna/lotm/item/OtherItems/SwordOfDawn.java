@@ -124,8 +124,8 @@ public class SwordOfDawn extends SwordItem implements GeoItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, create a hurricane of dawn, destroying everything in it's path. At sequence 2, this will fragment armor, causing it to rapidly break. If you're shifting, you can also createa box of light to protect you and your allies from enemies."));
-        tooltipComponents.add(Component.literal("On hit, if the creature is evil, it will deal additional damage, slow, and weaken them."));
+        tooltipComponents.add(Component.literal("Upon use, create a hurricane of dawn, destroying everything in it's path. At sequence 2, this will fragment armor, causing it to rapidly break. If you're shifting, you can also create a box of light to protect you and your allies from enemies.").withStyle(ChatFormatting.YELLOW));
+        tooltipComponents.add(Component.literal("On hit, if the creature is evil, it will deal additional damage, slow, and weaken them.").withStyle(ChatFormatting.YELLOW));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("25 per second, 300 with each use of ability.").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("20 Seconds.").withStyle(ChatFormatting.YELLOW)));
     }

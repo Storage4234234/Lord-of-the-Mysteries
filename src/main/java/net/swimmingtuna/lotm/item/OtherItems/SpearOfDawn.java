@@ -117,9 +117,9 @@ public class SpearOfDawn extends SwordItem {
 
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level
-            level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("WORK IN PROGRESS").withStyle(ChatFormatting.RED));
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.literal("Can be used as a melee weapon, or hold down right click to throw it at a rapid speed."));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("25 per second.").withStyle(ChatFormatting.YELLOW)));
     }
 
     @Override

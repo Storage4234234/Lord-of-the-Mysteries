@@ -99,7 +99,7 @@ public class PickaxeOfDawn extends PickaxeItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("When you break a block, destroy all blocks in the direction you're looking as well."));
+        tooltipComponents.add(Component.literal("When you break a block, destroy the 3 blocks around the block you broke as well."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("25 per second.").withStyle(ChatFormatting.YELLOW)));
     }
 

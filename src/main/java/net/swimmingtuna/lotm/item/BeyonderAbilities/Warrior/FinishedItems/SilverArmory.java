@@ -72,7 +72,7 @@ public class SilverArmory extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, conjure a set of armor made of mercury and silver which can be worn by allies. While worn, all damage under 20 will be negated, and supernatural damage heavily reduced."));
+        tooltipComponents.add(Component.literal("Upon use, conjure a set of armor made of mercury and silver which can be worn by anyone. While worn, all damage under 20 will be negated, and supernatural damage heavily reduced."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("None. 10 Health").withStyle(ChatFormatting.RED)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("45 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(getPathwayText(this.requiredClass.get()));

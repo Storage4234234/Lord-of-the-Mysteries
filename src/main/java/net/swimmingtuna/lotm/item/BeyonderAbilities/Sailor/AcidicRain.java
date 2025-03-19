@@ -29,7 +29,7 @@ import java.util.List;
 public class AcidicRain extends SimpleAbilityItem {
 
     public AcidicRain(Properties properties) {
-        super(properties, BeyonderClassInit.SAILOR, 5, 175, 500);
+        super(properties, BeyonderClassInit.SAILOR, 3, 175, 500);
     }
 
     @Override

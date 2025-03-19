@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.item.OtherItems;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -14,23 +15,34 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.entity.GuardianBoxEntity;
 import net.swimmingtuna.lotm.entity.HurricaneOfLightEntity;
+import net.swimmingtuna.lotm.entity.SwordOfTwilightEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
+import net.swimmingtuna.lotm.item.Renderer.SwordOfDawnRenderer;
+import net.swimmingtuna.lotm.item.Renderer.SwordOfTwilightRenderer;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Consumer;
 
-public class SwordOfTwilight extends SwordItem {
+public class SwordOfTwilight extends SwordItem implements GeoItem {
 
 
     public SwordOfTwilight(Tier pTier, int pAttackDamageModifier, float pAttackSpeedModifier, Properties pProperties) {
@@ -91,12 +103,16 @@ public class SwordOfTwilight extends SwordItem {
                 }
             }
             if (closestTarget != null && entityPos.distanceTo(closestTarget.position()) >= 1 ) {
+                SwordOfTwilightEntity swordOfTwilightEntity = new SwordOfTwilightEntity(EntityInit.SWORD_OF_TWILIGHT_ENTITY.get(), livingEntity.level());
+                swordOfTwilightEntity.teleportTo(closestTarget.getX(), closestTarget.getY(), closestTarget.getZ());
+                swordOfTwilightEntity.setOwner(livingEntity);
+                livingEntity.level().addFreshEntity(swordOfTwilightEntity);
                 Random random = new Random();
                 double offsetX = closestTarget.getX() + (random.nextDouble() - 0.5) * 2;
                 double offsetY = closestTarget.getY() + (random.nextDouble() - 0.5) * 2;
                 double offsetZ = closestTarget.getZ() + (random.nextDouble() - 0.5) * 2;
-                LOTMNetworkHandler.sendToAllPlayers(new SendParticleS2C(ParticleInit.VOID_BREAK_PARTICLE.get(), particlePos.x, particlePos.y, particlePos.z, 0,0,0));
-                LOTMNetworkHandler.sendToAllPlayers(new SendParticleS2C(ParticleInit.VOID_BREAK_PARTICLE.get(), offsetX, offsetY, offsetZ, 0,0,0));
+                //LOTMNetworkHandler.sendToAllPlayers(new SendParticleS2C(ParticleInit.VOID_BREAK_PARTICLE.get(), particlePos.x, particlePos.y, particlePos.z, 0,0,0));
+                //LOTMNetworkHandler.sendToAllPlayers(new SendParticleS2C(ParticleInit.VOID_BREAK_PARTICLE.get(), offsetX, offsetY, offsetZ, 0,0,0));
             }
         }
         return true;
@@ -126,7 +142,7 @@ public class SwordOfTwilight extends SwordItem {
                     BeyonderUtil.useSpirituality(pPlayer, 1000);
                     pPlayer.getCooldowns().addCooldown(this, 400);
                 }
-            } else if (pPlayer.isShiftKeyDown() && BeyonderUtil.getSequence(pPlayer) <= 5) {
+            } else if (pPlayer.isShiftKeyDown()) {
                 int boxCount = 0;
                 for (GuardianBoxEntity guardianBox : pPlayer.level().getEntitiesOfClass(GuardianBoxEntity.class, pPlayer.getBoundingBox().inflate(200))) {
                     Optional<UUID> ownerUUID = Optional.of(pPlayer.getUUID());
@@ -160,12 +176,43 @@ public class SwordOfTwilight extends SwordItem {
         return super.use(pLevel, pPlayer, pUsedHand);
     }
 
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "Activation", 0, state -> PlayState.STOP));
+    }
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        System.out.println("Initializing client for SwordOfTwilight");
+        consumer.accept(new IClientItemExtensions() {
+            private SwordOfTwilightRenderer renderer;
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (this.renderer == null)
+                    this.renderer = new SwordOfTwilightRenderer();
+
+                return this.renderer;
+            }
+        });
+    }
+
+
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("WORK IN PROGRESS").withStyle(ChatFormatting.RED));
+        tooltipComponents.add(Component.literal("Upon use, create a hurricane of dawn, destroying everything in it's path, aging and dealing damage to all those hit, and rapidly destroying all armor. If you're shifting, you can also create two boxes of light to protect you and your allies from enemies.").withStyle(ChatFormatting.YELLOW));
+        tooltipComponents.add(Component.literal("On swing, this will teleport to the entity you're looking at, becoming gigantic before swinging and dealing immense damage.").withStyle(ChatFormatting.YELLOW));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("150 per second. 1000 to create the boxes of twilight and create the hurricanes.").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("20 Seconds for hurricane and box.").withStyle(ChatFormatting.YELLOW)));
     }
-
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("DAWN_ITEM", ChatFormatting.YELLOW);

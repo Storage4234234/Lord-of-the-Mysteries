@@ -30,7 +30,7 @@ public class TwilightLight extends SimpleAbilityItem {
 
 
     public TwilightLight(Properties properties) {
-        super(properties, BeyonderClassInit.WARRIOR, 0, 0, 20);
+        super(properties, BeyonderClassInit.WARRIOR, 0, 0, 2000);
     }
 
     @Override
@@ -111,11 +111,11 @@ public class TwilightLight extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, bathe the area around you in light. Causing all allies to be healed, have their corruption lowered, beneficial effects lengthened, and harmful effects removed. Any evil entities around you will be damaged heavily and weakned."));
-        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("200").withStyle(ChatFormatting.YELLOW)));
-        tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("25 Seconds").withStyle(ChatFormatting.YELLOW)));
-        tooltipComponents.add(getPathwayText(this.requiredClass.get()));
-        tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));
+        tooltipComponents.add(Component.literal("Upon use, cause rays of twilight to fall from the sky, causing all entities around you to be rapidly aged."));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1000").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("100 Seconds").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
+        tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 }

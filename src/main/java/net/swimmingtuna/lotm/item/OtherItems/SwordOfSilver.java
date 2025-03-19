@@ -64,8 +64,8 @@ public class SwordOfSilver extends SwordItem implements GeoItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-
-        super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
+        tooltipComponents.add(Component.literal("A sword made out of mercury, you can hold down right click in order to throw it like a spear.").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.literal("On hit, if the creature is evil, it will deal additional damage, slow, and weaken them.").withStyle(ChatFormatting.GRAY));
     }
 
     @Override

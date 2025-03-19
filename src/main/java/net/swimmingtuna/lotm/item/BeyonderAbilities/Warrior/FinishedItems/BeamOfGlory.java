@@ -22,7 +22,7 @@ public class BeamOfGlory extends SimpleAbilityItem {
 
 
     public BeamOfGlory(Properties properties) {
-        super(properties, BeyonderClassInit.WARRIOR, 6, 750, 140);
+        super(properties, BeyonderClassInit.WARRIOR, 2, 750, 140);
     }
 
     @Override
