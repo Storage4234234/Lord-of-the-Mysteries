@@ -2,6 +2,7 @@ package net.swimmingtuna.lotm.item.OtherItems;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -22,11 +23,8 @@ import net.swimmingtuna.lotm.entity.HurricaneOfLightEntity;
 import net.swimmingtuna.lotm.entity.SwordOfTwilightEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
-import net.swimmingtuna.lotm.init.ParticleInit;
-import net.swimmingtuna.lotm.item.Renderer.SwordOfDawnRenderer;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.Renderer.SwordOfTwilightRenderer;
-import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
-import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoItem;
@@ -102,11 +100,10 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
                     }
                 }
             }
-            if (closestTarget != null && entityPos.distanceTo(closestTarget.position()) >= 1 ) {
-                SwordOfTwilightEntity swordOfTwilightEntity = new SwordOfTwilightEntity(EntityInit.SWORD_OF_TWILIGHT_ENTITY.get(), livingEntity.level());
-                swordOfTwilightEntity.teleportTo(closestTarget.getX(), closestTarget.getY(), closestTarget.getZ());
-                swordOfTwilightEntity.setOwner(livingEntity);
-                livingEntity.level().addFreshEntity(swordOfTwilightEntity);
+            if (closestTarget != null && entityPos.distanceTo(closestTarget.position()) >= 1) {
+                removeItemFromSlot(livingEntity, stack);
+                closestTarget.getPersistentData().putUUID("twilightSwordOwnerUUID", livingEntity.getUUID());
+                closestTarget.getPersistentData().putInt("twilightSwordSpawnTick", 21);
                 Random random = new Random();
                 double offsetX = closestTarget.getX() + (random.nextDouble() - 0.5) * 2;
                 double offsetY = closestTarget.getY() + (random.nextDouble() - 0.5) * 2;
@@ -118,11 +115,68 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
         return true;
     }
 
+    public static void twilightSwordTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        CompoundTag tag = livingEntity.getPersistentData();
+        if (!livingEntity.level().isClientSide()) {
+            if (tag.contains("twilightSwordOwnerUUID")) {
+                int x = tag.getInt("twilightSwordSpawnTick");
+                UUID uuid = tag.getUUID("twilightSwordOwnerUUID");
+                if (x >= 1) {
+                    tag.putInt("twilightSwordSpawnTick", x - 1);
+                    LivingEntity swordOwner = BeyonderUtil.getEntityFromUUID(livingEntity.level(), uuid);
+                    if (swordOwner.isAlive()) {
+                        if (x == 21) {
+                            SwordOfTwilightEntity swordOfTwilight = new SwordOfTwilightEntity(EntityInit.SWORD_OF_TWILIGHT_ENTITY.get(), livingEntity.level());
+                            BeyonderUtil.setScale(swordOfTwilight, 30);
+                            int position = livingEntity.level().random.nextInt(4);
+                            float yaw = livingEntity.getYRot();
+                            double offsetX = 0;
+                            double offsetZ = 0;
+                            float swordYaw = 0;
+                            switch (position) {
+                                case 0:
+                                    offsetX = Math.sin(Math.toRadians(yaw - 90)) * 2;
+                                    offsetZ = Math.cos(Math.toRadians(yaw - 90)) * 2;
+                                    swordYaw = yaw + 90;
+                                    break;
+                                case 1:
+                                    offsetX = Math.sin(Math.toRadians(yaw + 90)) * 2;
+                                    offsetZ = Math.cos(Math.toRadians(yaw + 90)) * 2;
+                                    swordYaw = yaw - 90;
+                                    break;
+                                case 2:
+                                    offsetX = Math.sin(Math.toRadians(yaw)) * 2;
+                                    offsetZ = Math.cos(Math.toRadians(yaw)) * 2;
+                                    swordYaw = yaw + 180;
+                                    break;
+                                case 3: // Back
+                                    offsetX = Math.sin(Math.toRadians(yaw + 180)) * 2;
+                                    offsetZ = Math.cos(Math.toRadians(yaw + 180)) * 2;
+                                    swordYaw = yaw;
+                                    break;
+                            }
+                            swordOfTwilight.teleportTo(livingEntity.getX() + offsetX, livingEntity.getY() - 30, livingEntity.getZ() + offsetZ);
+                            swordOfTwilight.setYaw(swordYaw % 360);
+                            swordOfTwilight.setYRot(swordYaw % 360);
+                            swordOfTwilight.setOwner(livingEntity);
+                            livingEntity.level().addFreshEntity(swordOfTwilight);
+                        }
+                        if (x == 2) {
+                            swordOwner.setItemInHand(InteractionHand.MAIN_HAND, ItemInit.SWORDOFTWILIGHT.get().getDefaultInstance());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static void decrementTwilightSword(LivingEvent.LivingTickEvent event) {
         if (!event.getEntity().level().isClientSide() && event.getEntity().getPersistentData().getInt("twilightSwordCooldown") >= 1) {
             event.getEntity().getPersistentData().putInt("twilightSwordCooldown", event.getEntity().getPersistentData().getInt("twilightSwordCooldown") - 1);
         }
     }
+
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
@@ -190,20 +244,19 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
 
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        System.out.println("Initializing client for SwordOfTwilight");
         consumer.accept(new IClientItemExtensions() {
             private SwordOfTwilightRenderer renderer;
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                if (this.renderer == null)
+                if (this.renderer == null) {
                     this.renderer = new SwordOfTwilightRenderer();
-
+                }
                 return this.renderer;
             }
         });
-    }
 
+    }
 
 
     @Override
@@ -213,6 +266,7 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("150 per second. 1000 to create the boxes of twilight and create the hurricanes.").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("20 Seconds for hurricane and box.").withStyle(ChatFormatting.YELLOW)));
     }
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("DAWN_ITEM", ChatFormatting.YELLOW);

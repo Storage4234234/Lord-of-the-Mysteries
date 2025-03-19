@@ -8,9 +8,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.entity.DivineHandRightEntity;
-import net.swimmingtuna.lotm.entity.MercuryPortalEntity;
 import net.swimmingtuna.lotm.entity.Model.DivineHandRightModel;
-import net.swimmingtuna.lotm.entity.Model.MercuryPortalModel;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 

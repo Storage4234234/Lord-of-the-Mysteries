@@ -65,8 +65,6 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.BattleHypnotism;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeDemise;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.SilverRapier;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.GlobeOfTwilight;
 import net.swimmingtuna.lotm.item.OtherItems.SwordOfTwilight;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
@@ -338,7 +336,9 @@ public class ModEvents {
             }
             twilightTick(event);
             envisionKingdom(livingEntity, level);
+            SwordOfTwilight.twilightSwordTick(event);
             if (tag.getInt("inTwilight") == 0) {
+
                 dreamIntoReality(livingEntity);
                 acidicRainTick(livingEntity);
                 lightningStorm(livingEntity);

@@ -4,32 +4,22 @@ package net.swimmingtuna.lotm.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.ParticleInit;
-import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
-import net.swimmingtuna.lotm.networking.packet.UpdateEntityLocationS2C;
-import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
-import virtuoel.pehkui.api.ScaleData;
-import virtuoel.pehkui.api.ScaleTypes;
 
 public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements GeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
@@ -116,15 +106,7 @@ public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements 
     public void tick() {
         super.tick();
         if (!level().isClientSide()) {
-            if (this.getOwner() != null) {
-                Vec3 motion = this.getDeltaMovement();
-                double horizontalDist = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
-                float newYaw = (float) Math.toDegrees(Math.atan2(motion.x, motion.z));
-                float newPitch = (float) Math.toDegrees(Math.atan2(motion.y, horizontalDist));
-                this.setYaw(newYaw);
-                this.setPitch(newPitch);
-            }
-            if (this.tickCount >= 100) {
+            if (this.tickCount >= 20) {
                 this.discard();
             }
         }

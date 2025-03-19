@@ -1,12 +1,8 @@
 package net.swimmingtuna.lotm.entity.Model;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.entity.DivineHandRightEntity;
-import net.swimmingtuna.lotm.entity.MercuryPortalEntity;
-import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
-import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.model.GeoModel;
 
 public class DivineHandRightModel extends GeoModel<DivineHandRightEntity> {

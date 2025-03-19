@@ -5,8 +5,6 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.swimmingtuna.lotm.LOTM;
-import net.swimmingtuna.lotm.entity.DivineHandLeftEntity;
-import net.swimmingtuna.lotm.entity.Model.DivineHandLeftModel;
 import net.swimmingtuna.lotm.entity.Model.SwordOfTwilightEntityModel;
 import net.swimmingtuna.lotm.entity.SwordOfTwilightEntity;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
