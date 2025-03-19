@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -45,10 +46,16 @@ public class MercuryCageEntity extends Entity implements GeoEntity {
             double cageX = this.getX();
             double cageY = this.getY();
             double cageZ = this.getZ();
-
+            double minX = cageX - (scale * 0.58);
+            double maxX = cageX + (scale * 0.58);
+            double minY = cageY - (scale * 0.08);
+            double maxY = cageY + (scale * 0.93);
+            double minZ = cageZ - (scale * 0.58);
+            double maxZ = cageZ + (scale * 0.58);
+            AABB aabb = new AABB(minX, minY, minZ, maxX, maxY, maxZ);
             if (tag.contains("cageOwnerUUID") && this.tickCount >= 20) {
                 LivingEntity owner = BeyonderUtil.getEntityFromUUID(this.level(), tag.getUUID("cageOwnerUUID"));
-                for (LivingEntity living : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale + 10))) {
+                for (LivingEntity living : this.level().getEntitiesOfClass(LivingEntity.class, aabb)) {
                     if (living != owner) {
                         if (BeyonderUtil.getSequence(living) >= BeyonderUtil.getSequence(owner)) {
                             if (ScaleTypes.BASE.getScaleData(living).getScale() >= scale) {
@@ -58,16 +65,15 @@ public class MercuryCageEntity extends Entity implements GeoEntity {
                         double entityX = living.getX();
                         double entityY = living.getY();
                         double entityZ = living.getZ();
-                        double minX = cageX - (scale * 0.55);
-                        double maxX = cageX + (scale * 0.55);
-                        double minY = cageY - (scale * 0.05);
-                        double maxY = cageY + (scale * 0.9);
-                        double minZ = cageZ - (scale * 0.55);
-                        double maxZ = cageZ + (scale * 0.55);
-                        boolean isOutsideCage = entityX >= maxX || entityY >= maxY || entityZ >= maxZ || entityX <= minX || entityY <= minY || entityZ <= minZ;
+                        double newMinX = cageX - (scale * 0.55);
+                        double newMaxX = cageX + (scale * 0.55);
+                        double newMinY = cageY - (scale * 0.05);
+                        double newMaxY = cageY + (scale * 0.9);
+                        double newMinZ = cageZ - (scale * 0.55);
+                        double newMaxZ = cageZ + (scale * 0.55);
+                        boolean isOutsideCage = entityX >= newMaxX || entityY >= newMaxY || entityZ >= newMaxZ || entityX <= newMinX || entityY <= newMinY || entityZ <= newMinZ;
                         if (isOutsideCage) {
                             living.teleportTo(this.getX(), this.getY(), this.getZ());
-                            living.sendSystemMessage(Component.literal("outside"));
                             setLife((int) (getMaxLife() - (50 - (BeyonderUtil.getSequence(living) * 5))));
                         }
                     }

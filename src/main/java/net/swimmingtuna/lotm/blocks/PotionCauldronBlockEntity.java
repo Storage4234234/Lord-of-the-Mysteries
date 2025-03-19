@@ -185,10 +185,7 @@ public class PotionCauldronBlockEntity extends BlockEntity implements MenuProvid
         if (inputIngredients.size() != recipeIngredients.size()) {
             return false;
         }
-
-        // Create a copy of recipe ingredients to track matches
         List<ItemStack> remainingRecipeIngredients = new ArrayList<>(recipeIngredients);
-
         for (ItemStack inputIngredient : inputIngredients) {
             boolean ingredientMatched = false;
             for (int i = 0; i < remainingRecipeIngredients.size(); i++) {

@@ -490,95 +490,95 @@ public class WarriorClass implements BeyonderClass {
                 }
             }
             if (hasFullSilverArmor(livingEntity)) {
-                physicalReduction += 0.67f;
-                supernaturalReduction += 0.67f;
+                physicalReduction += 0.5f;
+                supernaturalReduction += 0.2f;
             } else if (hasFullDawnArmor(livingEntity) && isSupernatural) {
-                supernaturalReduction += 0.5f;
+                supernaturalReduction += 0.4f;
             }
             if (isWarrior) {
                 if (sequence == 8) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.25f;
+                        supernaturalReduction += 0.225f;
                     }
                 } else if (sequence == 7) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.25f;
+                        supernaturalReduction += 0.225f;
                     } else if (isPhysical) {
-                        physicalReduction += 0.3f;
+                        physicalReduction += 0.225f;
                     }
                 } else if (sequence == 6) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.3f;
+                        supernaturalReduction += 0.27f;
                     } else if (isPhysical) {
                         if (!isGiant) {
-                            physicalReduction += 0.4f;
+                            physicalReduction += 0.3f;
                         } else {
-                            physicalReduction += 0.55f;
+                            physicalReduction += 0.41f;
                         }
                     }
                 } else if (sequence == 5) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.3f;
+                        supernaturalReduction += 0.27f;
                     } else if (isPhysical) {
                         if (!isGiant) {
-                            physicalReduction += 0.5f;
+                            physicalReduction += 0.375f;
                         } else {
-                            physicalReduction += 0.65f;
+                            physicalReduction += 0.49f;
                         }
                     }
                 } else if (sequence == 4) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.4f;
+                        supernaturalReduction += 0.36f;
                     } else if (isPhysical) {
                         if (!isGiant) {
-                            physicalReduction += 0.55f;
+                            physicalReduction += 0.41f;
                         } else {
-                            physicalReduction += 0.65f;
+                            physicalReduction += 0.49f;
                         }
                     }
                 } else if (sequence == 3 || sequence == 2) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.4f;
+                        supernaturalReduction += 0.36f;
                     } else if (isPhysical) {
                         if (!isGiant) {
-                            physicalReduction += 0.6f;
+                            physicalReduction += 0.45f;
                         } else {
-                            physicalReduction += 0.65f;
+                            physicalReduction += 0.49f;
                         }
                     }
                 } else if (sequence == 1) {
                     if (isSupernatural) {
                         if (isHoGGiant) {
-                            supernaturalReduction += 0.7f;
+                            supernaturalReduction += 0.63f;
                         }
                     } else if (isPhysical) {
                         if (isHoGGiant) {
-                            physicalReduction += 0.725f;
+                            physicalReduction += 0.544f;
                         } else {
-                            physicalReduction += 0.65f;
+                            physicalReduction += 0.49f;
                         }
                     }
                 } else if (sequence == 0) {
                     if (isSupernatural) {
                         if (isTwilightGiant) {
-                            supernaturalReduction += 0.8f;
+                            supernaturalReduction += 0.72f;
                         } else {
-                            supernaturalReduction += 0.5f;
+                            supernaturalReduction += 0.45f;
                         }
                     } else if (isPhysical) {
-                        if (isHoGGiant) {
-                            physicalReduction += 0.8f;
+                        if (isTwilightGiant) {
+                            physicalReduction += 0.6f;
                         } else {
-                            physicalReduction += 0.65f;
+                            physicalReduction += 0.49f;
                         }
                     }
                 }
             }
             if (isPhysical) {
-                float finalReduction = Math.min(physicalReduction, 0.8f);
+                float finalReduction = Math.min(physicalReduction, 0.7f);
                 event.setAmount(amount * (1.0f - finalReduction));
             } else if (isSupernatural) {
-                float finalReduction = Math.min(supernaturalReduction, 0.8f);
+                float finalReduction = Math.min(supernaturalReduction, 0.7f);
                 event.setAmount(amount * (1.0f - finalReduction));
             }
         }

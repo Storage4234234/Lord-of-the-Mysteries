@@ -95,6 +95,9 @@ public class EntityInit {
     public static final RegistryObject<EntityType<SilverLightEntity>> SILVER_LIGHT_ENTITY =
             ENTITIES.register("silver_beam_entity", () -> EntityType.Builder.<SilverLightEntity>of(SilverLightEntity::new, MobCategory.MISC)
                     .sized(2.5f,2.5f).clientTrackingRange(400).build(new ResourceLocation(LOTM.MOD_ID, "silver_beam_entity").toString()));
+    public static final RegistryObject<EntityType<SpearOfDawnEntity>> SPEAR_OF_DAWN_ENTITY =
+            ENTITIES.register("spear_of_dawn_entity", () -> EntityType.Builder.<SpearOfDawnEntity>of(SpearOfDawnEntity::new, MobCategory.MISC)
+                    .sized(1.0f,1.0f).clientTrackingRange(400).build(new ResourceLocation(LOTM.MOD_ID, "spear_of_dawn_entity").toString()));
     public static final RegistryObject<EntityType<GlobeOfTwilightEntity>> GLOBE_OF_TWILIGHT_ENTITY =
             ENTITIES.register("globe_of_twilight_entity", () -> EntityType.Builder.<GlobeOfTwilightEntity>of(GlobeOfTwilightEntity::new, MobCategory.MISC)
                     .sized(1.0f,1.0f).clientTrackingRange(200).build(new ResourceLocation(LOTM.MOD_ID, "globe_of_twilight_entity").toString()));

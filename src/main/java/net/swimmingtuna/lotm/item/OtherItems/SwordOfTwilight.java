@@ -66,7 +66,7 @@ public class SwordOfTwilight extends SwordItem {
 
     @Override
     public boolean hurtEnemy(ItemStack pStack, LivingEntity pTarget, LivingEntity pAttacker) {
-        pTarget.getPersistentData().putInt("age", pTarget.getPersistentData().getInt("age") + 100);
+        pTarget.getPersistentData().putInt("age", pTarget.getPersistentData().getInt("age") + 900);
         return super.hurtEnemy(pStack, pTarget, pAttacker);
     }
 

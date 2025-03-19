@@ -78,7 +78,7 @@ public class TwilightLight extends SimpleAbilityItem {
             }
             for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(y))) {
                 if (living != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, living)) {
-                    living.getPersistentData().putInt("age", living.getPersistentData().getInt("age") + 1);
+                    living.getPersistentData().putInt("age", living.getPersistentData().getInt("age") + 4);
                     if (living instanceof Player player) {
                         if (player.tickCount % 10 == 0) {
                             player.displayClientMessage(Component.literal("You are being rapidly aged").withStyle(ChatFormatting.RED), true);

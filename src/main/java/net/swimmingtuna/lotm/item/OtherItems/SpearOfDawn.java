@@ -13,9 +13,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.entity.SilverLightEntity;
+import net.swimmingtuna.lotm.entity.SpearOfDawnEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -77,32 +82,28 @@ public class SpearOfDawn extends SwordItem {
     }
 
     @Override
-    public void releaseUsing(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity, int pTimeCharged) {
-        if (!(pLivingEntity instanceof Player player)) {
-            return;
-        }
-        int i = this.getUseDuration(pStack) - pTimeCharged;
-        float powerScale = getPowerForTime(i);
-        if (!pLevel.isClientSide) {
-            Arrow arrow = new Arrow(pLevel, player);
-            arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, powerScale * 3.0F, 1.0F);
-
-            arrow.setCritArrow(powerScale > 0.5F);
-            arrow.setBaseDamage(arrow.getBaseDamage() * 2.0);
-
-            // Spawn the arrow in the world
-            pLevel.addFreshEntity(arrow);
+    public void releaseUsing(ItemStack stack, Level level, LivingEntity livingEntity, int pTimeCharged) {
+        if (!level.isClientSide) {
+            SpearOfDawnEntity silverLight = new SpearOfDawnEntity(EntityInit.SPEAR_OF_DAWN_ENTITY.get(), level);
+            Vec3 lookVec = livingEntity.getLookAngle().normalize().scale(5);
+            silverLight.setDeltaMovement(lookVec);
+            silverLight.setOwner(livingEntity);
+            silverLight.hurtMarked = true;
+            silverLight.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
+            BeyonderUtil.setScale(silverLight, BeyonderUtil.getDamage(livingEntity).get(ItemInit.SPEAROFDAWN.get()));
+            livingEntity.level().addFreshEntity(silverLight);
+            removeItemFromSlot(livingEntity, stack);
         }
     }
 
     @Override
     public int getUseDuration(ItemStack pStack) {
-        return 72000; // Same as bow
+        return 72000;
     }
 
     @Override
     public UseAnim getUseAnimation(ItemStack pStack) {
-        return UseAnim.SPEAR; // Or BOW if you prefer that animation
+        return UseAnim.SPEAR;
     }
 
     private float getPowerForTime(int pCharge) {

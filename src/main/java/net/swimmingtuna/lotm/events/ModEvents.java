@@ -352,6 +352,7 @@ public class ModEvents {
                 starOfLightning(livingEntity);
                 sirenSongsTick(livingEntity);
                 matterAccelerationSelf(livingEntity);
+                DivineHandRightEntity.divineHandCooldownDecrease(livingEntity);
                 rainEyesTick(livingEntity);
                 earthquake(livingEntity);
                 hurricane(livingEntity);
@@ -383,7 +384,6 @@ public class ModEvents {
                 SilverRapier.mercuryTick(event);
                 FateReincarnation.monsterReincarnationChecker(event);
                 DawnArmory.dawnArmorTickEvent(event);
-                DivineHandLeftEntity.divineHandTick(event);
                 TwilightAccelerate.twilightAccelerateTick(event);
                 TwilightFreeze.twilightFreezeTick(event);
                 TwilightLight.twilightLightTick(event);

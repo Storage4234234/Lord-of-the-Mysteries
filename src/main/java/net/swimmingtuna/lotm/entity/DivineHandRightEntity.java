@@ -1,9 +1,11 @@
 package net.swimmingtuna.lotm.entity;
 
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -13,13 +15,13 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.UpdateEntityLocationS2C;
@@ -27,13 +29,13 @@ import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.*;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DivineHandRightEntity extends AbstractHurtingProjectile implements GeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
@@ -50,36 +52,6 @@ public class DivineHandRightEntity extends AbstractHurtingProjectile implements 
     @Override
     protected float getInertia() {
         return 0.99F;
-    }
-
-    @Override
-    protected void onHitEntity(EntityHitResult pResult) {
-        if (!this.level().isClientSide()) {
-            Entity entity = pResult.getEntity();
-            if (entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity owner) {
-                if (livingEntity == owner && this.tickCount >= 20) {
-                    livingEntity.getPersistentData().putDouble("corruption", livingEntity.getPersistentData().getDouble("corruption") - 25);
-                    for (MobEffectInstance mobEffect : livingEntity.getActiveEffects()) {
-                        MobEffect type = mobEffect.getEffect();
-                        if (!type.isBeneficial()) {
-                            livingEntity.removeEffect(type);
-                        }
-                    }
-                    livingEntity.getPersistentData().putDouble("luck", livingEntity.getPersistentData().getDouble("luck") + 25);
-                } else if (BeyonderUtil.isAllyOf(livingEntity, owner)) {
-                    livingEntity.getPersistentData().putDouble("corruption", livingEntity.getPersistentData().getDouble("corruption") - 25);
-                    for (MobEffectInstance mobEffect : livingEntity.getActiveEffects()) {
-                        MobEffect type = mobEffect.getEffect();
-                        if (!type.isBeneficial()) {
-                            livingEntity.removeEffect(type);
-                        }
-                    }
-                    livingEntity.getPersistentData().putDouble("luck", livingEntity.getPersistentData().getDouble("luck") + 25);
-                    livingEntity.getPersistentData().putUUID("divineHandUUID", owner.getUUID());
-                    livingEntity.getPersistentData().putInt("divineHandGuarding", 3600);
-                }
-            }
-        }
     }
 
     @Override
@@ -138,9 +110,6 @@ public class DivineHandRightEntity extends AbstractHurtingProjectile implements 
     }
 
 
-
-
-
     @Override
     public void tick() {
         super.tick();
@@ -158,14 +127,49 @@ public class DivineHandRightEntity extends AbstractHurtingProjectile implements 
             destroyBlocksAround((int) radius);
             Vec3 currentPos = this.position();
             for (ServerPlayer player : level().getEntitiesOfClass(ServerPlayer.class, this.getBoundingBox().inflate(100))) {
-                LOTMNetworkHandler.sendToPlayer(new UpdateEntityLocationS2C(currentPos.x(), currentPos.y(), currentPos.z(),this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z(), this.getId()), player);
+                LOTMNetworkHandler.sendToPlayer(new UpdateEntityLocationS2C(currentPos.x(), currentPos.y(), currentPos.z(), this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z(), this.getId()), player);
             }
             if (this.tickCount >= 300) {
                 this.discard();
             }
+            ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
+            float scale = scaleData.getScale();
+            if (this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
+                for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 0.8f))) {
+                    if (livingEntity != owner && BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                        livingEntity.getPersistentData().putDouble("luck", livingEntity.getPersistentData().getDouble("luck") + 25);
+                        livingEntity.getPersistentData().putUUID("divineHandUUID", owner.getUUID());
+                        livingEntity.getPersistentData().putInt("divineHandGuarding", 1200);
+                        if (livingEntity instanceof Player player) {
+                            player.displayClientMessage(Component.literal("You are being guarded by " + owner.getName() + "for 1 minute").withStyle(ChatFormatting.GREEN), true);
+                        }
+                        owner.sendSystemMessage(Component.literal("Guarding Entity:" + livingEntity.getScoreboardName()).withStyle(ChatFormatting.YELLOW));
+                    }
+                    if (livingEntity == owner || BeyonderUtil.isAllyOf(owner ,livingEntity) && livingEntity.getPersistentData().getInt("divineHandLuckCooldown") == 0) {
+                        livingEntity.getPersistentData().putDouble("corruption", livingEntity.getPersistentData().getDouble("corruption") - 25);
+                        for (MobEffectInstance mobEffect : livingEntity.getActiveEffects()) {
+                            MobEffect type = mobEffect.getEffect();
+                            if (!type.isBeneficial()) {
+                                livingEntity.removeEffect(type);
+                            }
+                        }
+                        livingEntity.getPersistentData().putInt("divineHandLuckCooldown", 100);
+                        if (livingEntity instanceof Player player) {
+                            player.displayClientMessage(Component.literal("You were blessed with luck!").withStyle(ChatFormatting.GREEN), true);
+                        }
+                        livingEntity.getPersistentData().putDouble("luck", livingEntity.getPersistentData().getDouble("luck") + 25);
+                    }
+                }
+            }
         }
         this.xRotO = this.getXRot();
         this.yRotO = this.getYRot();
+    }
+
+    public static void divineHandCooldownDecrease(LivingEntity living) {
+        if (living.getPersistentData().getInt("divineHandLuckCooldown") >= 1) {
+            living.getPersistentData().putInt("divineHandLuckCooldown", living.getPersistentData().getInt("divineHandLuckCooldown") -  1);
+        }
     }
 
 
@@ -185,9 +189,11 @@ public class DivineHandRightEntity extends AbstractHurtingProjectile implements 
             }
         }
     }
+
     public void setYaw(float yaw) {
         this.entityData.set(YAW, yaw);
     }
+
     public void setPitch(float pitch) {
         this.entityData.set(PITCH, pitch);
     }

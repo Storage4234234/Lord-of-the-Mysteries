@@ -75,11 +75,7 @@ public class TestItem extends SimpleAbilityItem {
                     player.getCooldowns().removeCooldown(stack.getItem());
                 }
             }
-            MercuryCageEntity mercuryCage = new MercuryCageEntity(EntityInit.MERCURY_CAGE_ENTITY.get(), level);
-            mercuryCage.teleportTo(player.getX(), player.getY(), player.getZ());
-            mercuryCage.getPersistentData().putUUID("cageOwnerUUID", player.getUUID());
-            BeyonderUtil.setScale(mercuryCage, 30);
-            player.level().addFreshEntity(mercuryCage);
+            tag.putInt("monsterMisfortuneManipulationGravity", 100);
         }
 
         return InteractionResult.SUCCESS;

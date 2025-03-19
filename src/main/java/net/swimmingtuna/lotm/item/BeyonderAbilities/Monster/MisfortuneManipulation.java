@@ -255,7 +255,10 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
             int gravity = tag.getInt("monsterMisfortuneManipulationGravity");
             if (gravity >= 1) {
                 tag.putInt("monsterMisfortuneManipulationGravity", gravity - 1);
-                livingEntity.getDeltaMovement().add(0, -2, 0);
+                livingEntity.push(0, -10, 0);
+                livingEntity.hurtMarked = true;
+                Vec3 motion = livingEntity.getDeltaMovement();
+                livingEntity.setDeltaMovement(motion.x, -2, motion.z);
             }
         }
     }

@@ -4,6 +4,7 @@ package net.swimmingtuna.lotm.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -32,6 +33,7 @@ import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 public class DivineHandLeftEntity extends AbstractHurtingProjectile implements GeoEntity {
@@ -52,24 +54,14 @@ public class DivineHandLeftEntity extends AbstractHurtingProjectile implements G
     protected void onHitEntity(EntityHitResult pResult) {
         if (!this.level().isClientSide()) {
             Entity entity = pResult.getEntity();
-            if (entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity owner && this.tickCount % 10 == 0) {
-                if (livingEntity != owner && BeyonderUtil.isAllyOf(owner, livingEntity)) {
+            if (entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity owner ) {
+                if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
                     CompoundTag tag = livingEntity.getPersistentData();
-                    tag.putInt("age", tag.getInt("age") + 60);
-                    tag.putInt("pressedDownByDivineHand", 200);
+                    tag.putInt("age", tag.getInt("age") + 100);
+                    tag.putInt("monsterMisfortuneManipulationGravity", 200);
+                    owner.sendSystemMessage(Component.literal(livingEntity.getName() + "hit"));
                 }
             }
-        }
-    }
-
-    public static void divineHandTick(LivingEvent.LivingTickEvent event) {
-        if (!event.getEntity().level().isClientSide() && event.getEntity().getPersistentData().getInt("pressedDownByDivineHand") >= 1) {
-            Vec3 movement = event.getEntity().getDeltaMovement();
-            event.getEntity().getPersistentData().putInt("pressedDownByDivineHand", event.getEntity().getPersistentData().getInt("pressedDownByDivineHand") - 1);
-            event.getEntity().setDeltaMovement(movement.x(), movement.y() - 0.2f, movement.z());
-            event.getEntity().hurtMarked = true;
-            event.getEntity().getPersistentData().putInt("age", event.getEntity().getPersistentData().getInt("age") + 1);
-
         }
     }
 
@@ -146,7 +138,7 @@ public class DivineHandLeftEntity extends AbstractHurtingProjectile implements G
                 this.setYaw(newYaw);
                 this.setPitch(newPitch);
             }
-            float radius = ScaleTypes.BASE.getScaleData(this).getScale() * 0.6f;
+            float radius = ScaleTypes.BASE.getScaleData(this).getScale() * 1.5f;
             destroyBlocksAround((int) radius);
             Vec3 currentPos = this.position();
             for (ServerPlayer player : level().getEntitiesOfClass(ServerPlayer.class, this.getBoundingBox().inflate(100))) {
@@ -154,6 +146,16 @@ public class DivineHandLeftEntity extends AbstractHurtingProjectile implements G
             }
             if (this.tickCount >= 300) {
                 this.discard();
+            }
+            ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
+            float scale = scaleData.getScale();
+            for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 0.8f))) {
+                if (this.getOwner() instanceof LivingEntity owner && livingEntity != owner) {
+                    CompoundTag tag = livingEntity.getPersistentData();
+                    tag.putInt("age", tag.getInt("age") + 70);
+                    tag.putInt("monsterMisfortuneManipulationGravity", 200);
+                    this.discard();
+                }
             }
         }
         this.xRotO = this.getXRot();

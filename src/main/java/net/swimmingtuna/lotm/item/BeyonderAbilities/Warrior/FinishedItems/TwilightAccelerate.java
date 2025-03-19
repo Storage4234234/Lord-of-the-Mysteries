@@ -127,7 +127,7 @@ public class TwilightAccelerate extends SimpleAbilityItem {
                     }
                 }
                 if (Math.random() > 0.95) {
-                    tag.putInt("age", tag.getInt("age") + 1);
+                    tag.putInt("age", tag.getInt("age") + 20);
                 }
                 for (MobEffectInstance mobEffect : livingEntity.getActiveEffects()) {
                     int currentDuration = mobEffect.getDuration();

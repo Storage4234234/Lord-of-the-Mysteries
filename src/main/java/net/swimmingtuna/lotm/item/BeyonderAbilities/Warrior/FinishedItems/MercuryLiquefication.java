@@ -333,7 +333,11 @@ public class MercuryLiquefication extends SimpleAbilityItem {
         if (!livingEntity.level().isClientSide() && x >= 1) {
             for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(15))) {
                 if (living.getPersistentData().contains("mercuryArmor")) {
-                    if (living.getPersistentData().getUUID("mercuryArmor") == livingEntity.getUUID()) {
+                    if (living.getPersistentData().getUUID("mercuryArmor").equals(livingEntity.getUUID())) {
+                        living.horizontalCollision = false;
+                        living.minorHorizontalCollision = false;
+                        living.verticalCollision = false;
+                        living.verticalCollisionBelow = false;
                         living.hurt(event.getSource(), event.getAmount());
                         event.setAmount(0);
                     }

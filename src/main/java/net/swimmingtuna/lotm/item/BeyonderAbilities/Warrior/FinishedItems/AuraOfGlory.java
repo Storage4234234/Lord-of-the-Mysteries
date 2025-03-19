@@ -84,7 +84,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
                         if (owner != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, owner)) {
                             projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.5).x(), projectile.getDeltaMovement().y() - 0.1, projectile.getDeltaMovement().scale(0.5).z());
                             projectile.hurtMarked = true;
-                            projectile.getPersistentData().putInt("age", projectile.getPersistentData().getInt("age") + 4);
+                            projectile.getPersistentData().putInt("age", projectile.getPersistentData().getInt("age") + 5);
                         }
                     }
                     float scale = ScaleTypes.BASE.getScaleData(projectile).getScale();
@@ -118,7 +118,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
                         if (owner != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, owner)) {
                             projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.3).x(), projectile.getDeltaMovement().y() - 0.2, projectile.getDeltaMovement().scale(0.3).z());
                             projectile.hurtMarked = true;
-                            projectile.getPersistentData().putInt("age", projectile.getPersistentData().getInt("age") + 8);
+                            projectile.getPersistentData().putInt("age", projectile.getPersistentData().getInt("age") + 10);
                         }
                     }
                     float scale = ScaleTypes.BASE.getScaleData(projectile).getScale();

@@ -37,10 +37,8 @@ public class TwilightFreeze extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         saveDataReboot(player, player, player.getPersistentData());
-        if (!player.isShiftKeyDown()) {
-            useSpirituality(player);
-            addCooldown(player);
-        }
+        useSpirituality(player);
+        addCooldown(player);
         return InteractionResult.SUCCESS;
     }
 
@@ -67,7 +65,7 @@ public class TwilightFreeze extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public static void saveDataReboot(LivingEntity livingEntity,LivingEntity target, CompoundTag tag) {
+    public static void saveDataReboot(LivingEntity livingEntity, LivingEntity target, CompoundTag tag) {
         if (!livingEntity.level().isClientSide()) {
             if (livingEntity == target || BeyonderUtil.isAllyOf(livingEntity, target)) {
                 Collection<MobEffectInstance> activeEffects = target.getActiveEffects();
@@ -131,8 +129,8 @@ public class TwilightFreeze extends SimpleAbilityItem {
         CompoundTag tag = livingEntity.getPersistentData();
         int x = tag.getInt("twilightFreezeCooldown");
         if (!livingEntity.level().isClientSide() && x >= 1) {
-            int y = (int) x /20;
-            tag.putInt("twilightFreezeCooldown", x -1);
+            int y = (int) x / 20;
+            tag.putInt("twilightFreezeCooldown", x - 1);
             restoreDataReboot(livingEntity, tag);
             if (livingEntity instanceof Player player && player.tickCount % 20 == 0) {
                 player.displayClientMessage(Component.literal("Frozen in time for " + y + " seconds").withStyle(ChatFormatting.YELLOW), true);

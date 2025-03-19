@@ -121,21 +121,6 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
         }
     }
 
-    public static void summonHurricaneOfLightGlory(LivingEntity livingEntity) {
-        if (!livingEntity.level().isClientSide()) {
-            int sequence = BeyonderUtil.getSequence(livingEntity);
-            HurricaneOfLightEntity hurricaneOfLightEntity = new HurricaneOfLightEntity(livingEntity.level(), livingEntity, 0, 0, 0);
-            hurricaneOfLightEntity.setHurricaneRadius((int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.SWORDOFSILVER.get()));
-            hurricaneOfLightEntity.setHurricaneHeight((int) ((int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.SWORDOFSILVER.get()) * 0.5f));
-            hurricaneOfLightEntity.setHurricaneLifecount(300 - (sequence * 20));
-            hurricaneOfLightEntity.setHurricaneDestroy(true);
-            hurricaneOfLightEntity.setHurricaneMov(livingEntity.getLookAngle().scale(0.75f).toVector3f());
-            hurricaneOfLightEntity.setDestroyArmor(true);
-            hurricaneOfLightEntity.setBlockDestroyInterval(5);
-            livingEntity.level().addFreshEntity(hurricaneOfLightEntity);
-        }
-    }
-
     public static void summonHurricaneOfLightDeity(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             int sequence = BeyonderUtil.getSequence(livingEntity);
@@ -351,7 +336,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             if (this.tickCount % 15 == 0) {
                 if (this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
                     if (!BeyonderUtil.isAllyOf(owner, livingEntity) && getAge()) {
-                        livingEntity.getPersistentData().putInt("age", livingEntity.getPersistentData().getInt("age") + 5);
+                        livingEntity.getPersistentData().putInt("age", livingEntity.getPersistentData().getInt("age") + 40);
                     }
                 }
                 livingEntity.addEffect(new MobEffectInstance(ModEffects.ARMOR_WEAKNESS.get(), 200, amplifier, true, true));

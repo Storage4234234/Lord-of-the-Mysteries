@@ -90,7 +90,7 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
     @Override
     protected void onHitBlock(BlockHitResult pResult) {
         if (!this.level().isClientSide()) {
-            if (!getShouldTeleport() && this.tickCount >= 10) {
+            if (!getShouldTeleport() && this.tickCount >= 5) {
                 BeyonderUtil.destroyBlocksInSphere(this,pResult.getBlockPos(), (int) ((int) ScaleTypes.BASE.getScaleData(this).getScale() * 1.2), 15 );
                 this.discard();
             }
@@ -190,7 +190,7 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
                     this.setDeltaMovement(direction.scale(speed));
                 }
             }
-            if (this.tickCount >= 100) {
+            if (this.tickCount >= 80) {
                 this.discard();
             }
             if (this.level() instanceof ServerLevel serverLevel) {
@@ -213,6 +213,14 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
             float newPitch = (float) Math.toDegrees(Math.atan2(motion.y, horizontalDist));
             this.setYaw(newYaw);
             this.setPitch(newPitch);
+            ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
+            float scale = scaleData.getScale();
+            for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 0.8f))) {
+                if (this.getOwner() instanceof LivingEntity owner && livingEntity != owner) {
+                    livingEntity.hurt(BeyonderUtil.genericSource(this.getOwner()), scale * 25);
+                    this.discard();
+                }
+            }
         }
     }
 
