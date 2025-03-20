@@ -116,31 +116,41 @@ public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements 
                 this.discard();
             }
             AABB aabb;
-            if (this.tickCount == 16 && this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
+            if (this.tickCount == 12 && this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
                 int caseInt = this.getPersistentData().getInt("swordOfTwilightCase");
                 if (caseInt == 0) {
-                    aabb = new AABB(this.getX() + (scale * 0.66) - 2.5, this.getY() + (scale) - 5, this.getZ() - (scale * 1.1), this.getX() + (scale * 0.66) + 2.5, this.getY() + (scale * 2) + 5, this.getZ() + (scale  * 1.1));
+                    aabb = new AABB(this.getX() + (scale * 0.66) - 5, this.getY() + (scale) - 5, this.getZ() - (scale * 1.1), this.getX() + (scale * 0.66) + 5, this.getY() + (scale * 2) + 5, this.getZ() + (scale  * 1.1));
                     for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, aabb)) {
+                        if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                            CompoundTag tag = livingEntity.getPersistentData();
+                            tag.putInt("age", tag.getInt("age") + 800);
+                            livingEntity.hurt(BeyonderUtil.genericSource(owner), 80);
+                            livingEntity.getPersistentData().putInt("inTwilight", Math.max(tag.getInt("inTwilight"), 25));
+                        }
                     }
                 } else if (caseInt == 1) {
-                    aabb = new AABB(this.getX() - (scale * 0.66) - 2.5, this.getY() + (scale) - 5, this.getZ() - (scale * 1.1), this.getX() - (scale * 0.66) + 2.5, this.getY() + (scale * 2) + 5, this.getZ() + (scale  * 1.1));
+                    aabb = new AABB(this.getX() - (scale * 0.66) - 5, this.getY() + (scale) - 5, this.getZ() - (scale * 1.1), this.getX() - (scale * 0.66) + 5, this.getY() + (scale * 2) + 5, this.getZ() + (scale  * 1.1));
                     for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, aabb)) {
-                        System.out.println("hit " + livingEntity.getName().toString());
+                        if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                            CompoundTag tag = livingEntity.getPersistentData();
+                            tag.putInt("age", tag.getInt("age") + 800);
+                            livingEntity.hurt(BeyonderUtil.genericSource(owner), 80);
+                            livingEntity.getPersistentData().putInt("inTwilight", Math.max(tag.getInt("inTwilight"), 25));
+                        }
                     }
                 } else if (caseInt == 2) {
-                    aabb = new AABB(this.getX() - (scale * 1.1),this.getY() + (scale) - 5, this.getZ() - (scale * 0.66) - 2.5, this.getX() + (scale * 1.1), this.getY() + (scale * 2) + 5, this.getZ() - (scale * 0.66) + 2.5);
+                    aabb = new AABB(this.getX() - (scale * 1.1),this.getY() + (scale) - 5, this.getZ() - (scale * 0.66) - 5, this.getX() + (scale * 1.1), this.getY() + (scale * 2) + 5, this.getZ() - (scale * 0.66) + 5);
                     for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, aabb)) {
-                        System.out.println("hit " + livingEntity.getName().toString());
+                        if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                            CompoundTag tag = livingEntity.getPersistentData();
+                            tag.putInt("age", tag.getInt("age") + 800);
+                            livingEntity.hurt(BeyonderUtil.genericSource(owner), 80);
+                            livingEntity.getPersistentData().putInt("inTwilight", Math.max(tag.getInt("inTwilight"), 25));
+                        }
                     }
-                    System.out.println("THIS IS 2");
-                    System.out.println("min X is " + aabb.minX);
-                    System.out.println("min Y is " + aabb.minY);
-                    System.out.println("min Z is " + aabb.minZ);
-                    System.out.println("max X is " + aabb.maxX);
-                    System.out.println("max Y is " + aabb.maxY);
-                    System.out.println("max Z is " + aabb.maxZ);
+
                 } else if (caseInt == 3) {
-                    aabb = new AABB(this.getX() - (scale * 0.66) - 2.5, this.getY() + (scale) - 5, this.getZ() - (scale * 1.1), this.getX() - (scale * 0.66) + 2.5, this.getY() + (scale * 2) + 5, this.getZ() + (scale * 1.1));
+                    aabb = new AABB(this.getX() - (scale * 0.66) - 5, this.getY() + (scale) - 5, this.getZ() - (scale * 1.1), this.getX() - (scale * 0.66) + 5, this.getY() + (scale * 2) + 5, this.getZ() + (scale * 1.1));
                     for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, aabb)) {
                         if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
                             CompoundTag tag = livingEntity.getPersistentData();

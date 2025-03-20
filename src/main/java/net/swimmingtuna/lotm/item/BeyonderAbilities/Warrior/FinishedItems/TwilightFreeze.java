@@ -66,6 +66,7 @@ public class TwilightFreeze extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use on an ally or nothing, freeze them or yourself in time, causing your health, potion effects, luck, misfortune, sanity, corruption, age, and spirituality to all stay static for 30 seconds. If used on an enemy, they will be completely stuck and unable to move for 15 seconds."));
+        tooltipComponents.add(Component.literal("Left Click for Twilight: Accelerate"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("3000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("90 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
@@ -170,7 +171,8 @@ public class TwilightFreeze extends SimpleAbilityItem {
 
 
     @Override
-    public Rarity getRarity(ItemStack pStack) {
-        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
+
 }

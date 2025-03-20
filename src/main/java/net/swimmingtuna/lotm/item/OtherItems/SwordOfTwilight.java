@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ClipContext;
@@ -39,6 +40,8 @@ import virtuoel.pehkui.api.ScaleTypes;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
+
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.SilverSwordManifestation.findClosestEmptySlot;
 
 public class SwordOfTwilight extends SwordItem implements GeoItem {
 
@@ -129,6 +132,7 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
                     if (swordOwner.isAlive()) {
                         if (x == 21) {
                             SwordOfTwilightEntity swordOfTwilight = new SwordOfTwilightEntity(EntityInit.SWORD_OF_TWILIGHT_ENTITY.get(), livingEntity.level());
+                            swordOfTwilight.setOwner(swordOwner);
                             BeyonderUtil.setScale(swordOfTwilight, 30);
                             int position = livingEntity.level().random.nextInt(4);
                             float yaw = 0;
@@ -165,7 +169,6 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
                             swordOfTwilight.teleportTo(livingEntity.getX() + offsetX, livingEntity.getY() - 30, livingEntity.getZ() + offsetZ);
                             swordOfTwilight.setYaw(swordYaw % 360);
                             swordOfTwilight.setYRot(swordYaw % 360);
-                            swordOfTwilight.setOwner(livingEntity);
                             livingEntity.level().addFreshEntity(swordOfTwilight);
                         }
                     }
@@ -174,7 +177,13 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
             if (tag.getInt("returnSwordOfTwilight") >= 1) {
                 tag.putInt("returnSwordOfTwilight", tag.getInt("returnSwordOfTwilight") - 1);
                 if (tag.getInt("returnSwordOfTwilight") == 1) {
-                    livingEntity.setItemInHand(InteractionHand.OFF_HAND, ItemInit.SWORDOFTWILIGHT.get().getDefaultInstance());
+                    if (livingEntity instanceof Player player) {
+                        int selectedSlot = findClosestEmptySlot(player);
+                        Inventory inventory = player.getInventory();
+                        inventory.setItem(selectedSlot, ItemInit.SWORDOFTWILIGHT.get().getDefaultInstance());
+                    } else {
+                        livingEntity.setItemInHand(InteractionHand.MAIN_HAND, ItemInit.SWORDOFTWILIGHT.get().getDefaultInstance());
+                    }
                     tag.putInt("returnSwordOfTwilight", 0);
                 }
             }
@@ -279,7 +288,7 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
 
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
-        return Rarity.create("DAWN_ITEM", ChatFormatting.YELLOW);
+        return Rarity.create("DAWN_ITEM", ChatFormatting.GOLD);
     }
 
 

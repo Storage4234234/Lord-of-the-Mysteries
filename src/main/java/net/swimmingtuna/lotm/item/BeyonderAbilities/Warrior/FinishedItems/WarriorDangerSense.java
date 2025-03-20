@@ -97,5 +97,12 @@ public class WarriorDangerSense extends SimpleAbilityItem {
         tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
+    @Override
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
+    }
+
+
 }
 

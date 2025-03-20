@@ -15,14 +15,8 @@ import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
 public class SpearOfDawnRenderer extends GeoEntityRenderer<SpearOfDawnEntity> {
-    // Store previous motion for smooth interpolation
-    private double prevMotionX = 0;
-    private double prevMotionY = 0;
-    private double prevMotionZ = 0;
-
     public SpearOfDawnRenderer(EntityRendererProvider.Context context) {
         super(context, new SpearOfDawnModel());
-        this.shadowRadius = 0.0F; // Disable shadow
     }
 
     @Override
@@ -32,56 +26,35 @@ public class SpearOfDawnRenderer extends GeoEntityRenderer<SpearOfDawnEntity> {
 
     @Override
     public void render(SpearOfDawnEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        // Save the current state
-        poseStack.pushPose();
-
-        // Calculate direction from motion instead of relying on entity rotation
-        Vec3 motion = entity.getDeltaMovement();
-
-        // Update previous motion for next frame interpolation
-        if (prevMotionX == 0 && prevMotionY == 0 && prevMotionZ == 0) {
-            // Initialize on first render
-            prevMotionX = motion.x;
-            prevMotionY = motion.y;
-            prevMotionZ = motion.z;
-        }
-
-        // Interpolate motion for smooth rotation
-        double lerpX = Mth.lerp(partialTick, prevMotionX, motion.x);
-        double lerpY = Mth.lerp(partialTick, prevMotionY, motion.y);
-        double lerpZ = Mth.lerp(partialTick, prevMotionZ, motion.z);
-
-        // Store for next frame
-        prevMotionX = motion.x;
-        prevMotionY = motion.y;
-        prevMotionZ = motion.z;
-
-        // Calculate rotation based on interpolated motion
-        double horizontalDist = Math.sqrt(lerpX * lerpX + lerpZ * lerpZ);
-        float yaw = (float) (Math.atan2(lerpX, lerpZ) * (180.0D / Math.PI));
-        float pitch = (float) (Math.atan2(lerpY, horizontalDist) * (180.0D / Math.PI));
-
-        // Apply rotations to the pose stack
-        poseStack.mulPose(Axis.YP.rotationDegrees(yaw - 90.0F));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(pitch + 90.0F));
-        poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
-
-        // Do not modify entity's rotation at all
-        // Instead pass 0 for entityYaw to avoid GeckoLib applying its own rotations
         super.render(entity, 0, partialTick, poseStack, bufferSource, packedLight);
-
-        // Restore the pose stack state
-        poseStack.popPose();
     }
 
     @Override
     protected void applyRotations(SpearOfDawnEntity entity, PoseStack poseStack, float ageInTicks, float rotationYaw, float partialTicks) {
-        // Skip the default rotation behavior completely
-        // Everything is handled in render()
+        float lerpYRot = Mth.lerp(partialTicks, entity.yRotO, entity.getYRot());
+        float lerpXRot = Mth.lerp(partialTicks, entity.xRotO, entity.getXRot());
+        entity.setYRot(0);
+        entity.setXRot(0);
+        entity.yRotO = 0;
+        entity.xRotO = 0;
+        poseStack.mulPose(Axis.YP.rotationDegrees(lerpYRot - 90.0F));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(lerpXRot + 90.0F));
+        poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
     }
 
     @Override
     public void preRender(PoseStack poseStack, SpearOfDawnEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
         super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+        animatable.xRotO = animatable.getXRot();
+        animatable.yRotO = animatable.getYRot();
+    }
+
+    @Override
+    public void postRender(PoseStack poseStack, SpearOfDawnEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        super.postRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
+        Vec3 motion = animatable.getDeltaMovement();
+        double horizontalDist = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+        animatable.setYRot((float) (Math.atan2(motion.x, motion.z) * (180.0D / Math.PI)));
+        animatable.setXRot((float) (Math.atan2(motion.y, horizontalDist) * (180.0D / Math.PI)));
     }
 }

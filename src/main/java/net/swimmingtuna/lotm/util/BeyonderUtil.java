@@ -76,8 +76,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.DawnWeaponry;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.Gigantification;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
 import net.swimmingtuna.lotm.item.OtherItems.SwordOfSilver;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
@@ -900,7 +899,32 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYEFFECT.get())));
             } else if (heldItem.getItem() instanceof ProbabilityManipulationImpulse) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYFORTUNE.get())));
-            } else if (heldItem.getItem() instanceof LuckManipulation) {
+            } else if (heldItem.getItem() instanceof ProbabilityManipulationImpulse) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYFORTUNE.get())));
+            } else if (heldItem.getItem() instanceof DivineHandRight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDLEFT.get())));
+            }  else if (heldItem.getItem() instanceof DivineHandLeft) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDRIGHT.get())));
+            } else if (heldItem.getItem() instanceof BeamOfGlory) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFGLORY.get())));
+            } else if (heldItem.getItem() instanceof AuraOfGlory) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.BEAMOFGLORY.get())));
+            } else if (heldItem.getItem() instanceof AuraOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTFREEZE.get())));
+            } else if (heldItem.getItem() instanceof TwilightFreeze) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTACCELERATE.get())));
+            } else if (heldItem.getItem() instanceof TwilightAccelerate) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTLIGHT.get())));
+            } else if (heldItem.getItem() instanceof TwilightLight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.GLOBEOFTWILIGHT.get())));
+            } else if (heldItem.getItem() instanceof GlobeOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.BEAMOFTWILIGHT.get())));
+            } else if (heldItem.getItem() instanceof BeamOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFTWILIGHT.get())));
+            }
+
+
+            else if (heldItem.getItem() instanceof LuckManipulation) {
                 LOTMNetworkHandler.sendToServer(new LuckManipulationLeftClickC2S());
             } else if (heldItem.getItem() instanceof MisfortuneManipulation) {
                 LOTMNetworkHandler.sendToServer(new MisfortuneManipulationLeftClickC2S());
@@ -1051,6 +1075,27 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new ToggleDistanceC2S());
             } else if (heldItem.getItem() instanceof ScribeAbilities) {
                 LOTMNetworkHandler.sendToServer(new ScribeCopyAbilityC2S());
+
+            }  else if (heldItem.getItem() instanceof DivineHandRight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDLEFT.get())));
+            }  else if (heldItem.getItem() instanceof DivineHandLeft) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDRIGHT.get())));
+            } else if (heldItem.getItem() instanceof BeamOfGlory) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFGLORY.get())));
+            } else if (heldItem.getItem() instanceof AuraOfGlory) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.BEAMOFGLORY.get())));
+            } else if (heldItem.getItem() instanceof AuraOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTFREEZE.get())));
+            } else if (heldItem.getItem() instanceof TwilightFreeze) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTACCELERATE.get())));
+            } else if (heldItem.getItem() instanceof TwilightAccelerate) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTLIGHT.get())));
+            } else if (heldItem.getItem() instanceof TwilightLight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.GLOBEOFTWILIGHT.get())));
+            } else if (heldItem.getItem() instanceof GlobeOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.BEAMOFTWILIGHT.get())));
+            } else if (heldItem.getItem() instanceof BeamOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFTWILIGHT.get())));
             }
         }
     }

@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -360,5 +361,11 @@ public class MercuryLiquefication extends SimpleAbilityItem {
         tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
+    @Override
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
+    }
+
 }
 

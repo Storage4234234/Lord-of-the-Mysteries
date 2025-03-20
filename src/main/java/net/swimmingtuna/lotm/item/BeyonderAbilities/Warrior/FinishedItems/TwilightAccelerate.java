@@ -68,6 +68,7 @@ public class TwilightAccelerate extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use on nothing or an ally, accelerates your/them in a positive way. Having their speed be higher, all their abilities that happen over time to occur quicker, their spirituality and health to regenerate faster, their benefitial potion effects to last longer, and harmful ones to go away quicker. If used on an enemy, accelerates their time negatively, causing them to age quick, lose spirituality fast, have beneficial effects go away faster, and harmful effects to last longer."));
+        tooltipComponents.add(Component.literal("Left Click for Twilight: Light"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("3000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("60 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
@@ -169,9 +170,8 @@ public class TwilightAccelerate extends SimpleAbilityItem {
         return attributeBuilder.build();
     }
 
-
     @Override
-    public Rarity getRarity(ItemStack pStack) {
-        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 }

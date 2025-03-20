@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -136,11 +137,17 @@ public class AuraOfGlory extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use, enable or disable your aura of glory. If enabled, all entities around you will be affected by glory. If they are an ally or yourself, they will age positively, gaining spirituality quickly, recovering fast, and have their item cooldowns reduced. If they aren't an ally, they will age rapidly, eventually turning to dust. This applies to projectiles too."));
+        tooltipComponents.add(Component.literal("Left Click for Beam of Glory"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("200 per second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
+
+    @Override
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 }
 

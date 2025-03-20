@@ -57,9 +57,10 @@ public class EnableOrDisableProtection extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
     @Override
-    public Rarity getRarity(ItemStack pStack) {
-        return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 
     public static void warriorProtectionTick(LivingEvent.LivingTickEvent event) {
