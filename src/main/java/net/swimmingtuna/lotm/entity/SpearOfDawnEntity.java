@@ -111,6 +111,7 @@ public class SpearOfDawnEntity extends AbstractHurtingProjectile implements GeoE
     }
 
 
+    /*
     public float getYaw() {
         return this.entityData.get(YAW);
     }
@@ -119,8 +120,6 @@ public class SpearOfDawnEntity extends AbstractHurtingProjectile implements GeoE
         this.entityData.set(YAW, yaw);
     }
 
-
-
     public float getPitch() {
         return this.entityData.get(PITCH);
     }
@@ -128,6 +127,7 @@ public class SpearOfDawnEntity extends AbstractHurtingProjectile implements GeoE
     public void setPitch(float pitch) {
         this.entityData.set(PITCH, pitch);
     }
+    */
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
@@ -147,11 +147,14 @@ public class SpearOfDawnEntity extends AbstractHurtingProjectile implements GeoE
     @Override
     public void tick() {
         super.tick();
+
         if (!this.level().isClientSide() && this.getOwner() instanceof LivingEntity owner) {
             if (this.tickCount >= 80) {
                 this.discard();
             }
+
             if (this.level() instanceof ServerLevel serverLevel) {
+                // Keep chunk loading logic
                 int chunkRadius = 5;
                 ChunkPos centerChunk = new ChunkPos(this.blockPosition());
                 for (int dx = -chunkRadius; dx <= chunkRadius; dx++) {
@@ -161,15 +164,16 @@ public class SpearOfDawnEntity extends AbstractHurtingProjectile implements GeoE
                     }
                 }
             }
+
             LOTMNetworkHandler.sendToAllPlayers(new UpdateEntityLocationS2C(this.getX(), this.getY(), this.getZ(), this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z(), this.getId()));
         }
+        Vec3 motion = this.getDeltaMovement();
+        double horizontalDist = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
+        this.setYRot((float) (Math.atan2(motion.x, motion.z) * (180.0D / Math.PI)));
+        this.setXRot((float) (Math.atan2(motion.y, horizontalDist) * (180.0D / Math.PI)));
+        this.yRotO = this.getYRot();
+        this.xRotO = this.getXRot();
         if (!level().isClientSide()) {
-            Vec3 motion = this.getDeltaMovement();
-            double horizontalDist = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
-            float newYaw = (float) Math.toDegrees(Math.atan2(motion.z, motion.x));
-            float newPitch = (float) Math.toDegrees(Math.atan2(motion.y, horizontalDist));
-            this.setYaw(newYaw);
-            this.setPitch(newPitch);
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
             float scale = scaleData.getScale();
             for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 0.6f))) {
@@ -179,16 +183,15 @@ public class SpearOfDawnEntity extends AbstractHurtingProjectile implements GeoE
                 }
             }
         }
-        this.xRotO = this.getXRot();
-        this.yRotO = this.getYRot();
     }
-
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        // Either don't register any controllers, or make sure they don't interfere with rotation
         controllers.add(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
     private PlayState predicate(AnimationState<SpearOfDawnEntity> animationState) {
+        // Don't play any animations that might interfere with rotation
         return PlayState.STOP;
     }
 
