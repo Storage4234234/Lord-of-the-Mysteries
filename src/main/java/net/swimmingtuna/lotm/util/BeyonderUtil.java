@@ -2357,6 +2357,14 @@ public class BeyonderUtil {
         }
     }
 
+    public static float getScale(Entity entity) {
+        float scale = 1;
+        if (!entity.level().isClientSide()) {
+            scale = ScaleTypes.BASE.getScaleData(entity).getScale();
+        }
+        return scale;
+    }
+
     public static void setTargetScale(Entity entity, float scale) {
         if (!entity.level().isClientSide()) {
             ScaleTypes.BASE.getScaleData(entity).setTargetScale(scale);

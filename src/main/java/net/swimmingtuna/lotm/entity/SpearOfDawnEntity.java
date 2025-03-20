@@ -45,7 +45,7 @@ public class SpearOfDawnEntity extends AbstractHurtingProjectile implements GeoE
 
 
     protected float getInertia() {
-        return 1.0F;
+        return 0.9F;
     }
 
     @Override

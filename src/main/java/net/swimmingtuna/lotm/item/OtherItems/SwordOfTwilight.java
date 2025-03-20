@@ -104,6 +104,7 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
                 removeItemFromSlot(livingEntity, stack);
                 closestTarget.getPersistentData().putUUID("twilightSwordOwnerUUID", livingEntity.getUUID());
                 closestTarget.getPersistentData().putInt("twilightSwordSpawnTick", 21);
+                livingEntity.getPersistentData().putInt("returnSwordOfTwilight", 21);
                 Random random = new Random();
                 double offsetX = closestTarget.getX() + (random.nextDouble() - 0.5) * 2;
                 double offsetY = closestTarget.getY() + (random.nextDouble() - 0.5) * 2;
@@ -130,29 +131,34 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
                             SwordOfTwilightEntity swordOfTwilight = new SwordOfTwilightEntity(EntityInit.SWORD_OF_TWILIGHT_ENTITY.get(), livingEntity.level());
                             BeyonderUtil.setScale(swordOfTwilight, 30);
                             int position = livingEntity.level().random.nextInt(4);
-                            float yaw = livingEntity.getYRot();
+                            float yaw = 0;
                             double offsetX = 0;
                             double offsetZ = 0;
                             float swordYaw = 0;
+                            float scaleSubtraction = BeyonderUtil.getScale(swordOfTwilight) / 2;
                             switch (position) {
                                 case 0:
-                                    offsetX = Math.sin(Math.toRadians(yaw - 90)) * 2;
+                                    swordOfTwilight.getPersistentData().putInt("swordOfTwilightCase", 0);
+                                    offsetX = (Math.sin(Math.toRadians(yaw - 90)) * 2) - (scaleSubtraction + 2);
                                     offsetZ = Math.cos(Math.toRadians(yaw - 90)) * 2;
                                     swordYaw = yaw + 90;
                                     break;
                                 case 1:
-                                    offsetX = Math.sin(Math.toRadians(yaw + 90)) * 2;
+                                    swordOfTwilight.getPersistentData().putInt("swordOfTwilightCase", 1);
+                                    offsetX = (Math.sin(Math.toRadians(yaw + 90)) * 2) + (scaleSubtraction + 2);
                                     offsetZ = Math.cos(Math.toRadians(yaw + 90)) * 2;
                                     swordYaw = yaw - 90;
                                     break;
                                 case 2:
+                                    swordOfTwilight.getPersistentData().putInt("swordOfTwilightCase", 2);
                                     offsetX = Math.sin(Math.toRadians(yaw)) * 2;
-                                    offsetZ = Math.cos(Math.toRadians(yaw)) * 2;
+                                    offsetZ = (Math.cos(Math.toRadians(yaw)) * 2) + (scaleSubtraction + 2);
                                     swordYaw = yaw + 180;
                                     break;
-                                case 3: // Back
+                                case 3:
+                                    swordOfTwilight.getPersistentData().putInt("swordOfTwilightCase", 3);
                                     offsetX = Math.sin(Math.toRadians(yaw + 180)) * 2;
-                                    offsetZ = Math.cos(Math.toRadians(yaw + 180)) * 2;
+                                    offsetZ = (Math.cos(Math.toRadians(yaw + 180)) * 2) - (scaleSubtraction + 2);
                                     swordYaw = yaw;
                                     break;
                             }
@@ -162,10 +168,14 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
                             swordOfTwilight.setOwner(livingEntity);
                             livingEntity.level().addFreshEntity(swordOfTwilight);
                         }
-                        if (x == 2) {
-                            swordOwner.setItemInHand(InteractionHand.MAIN_HAND, ItemInit.SWORDOFTWILIGHT.get().getDefaultInstance());
-                        }
                     }
+                }
+            }
+            if (tag.getInt("returnSwordOfTwilight") >= 1) {
+                tag.putInt("returnSwordOfTwilight", tag.getInt("returnSwordOfTwilight") - 1);
+                if (tag.getInt("returnSwordOfTwilight") == 1) {
+                    livingEntity.setItemInHand(InteractionHand.OFF_HAND, ItemInit.SWORDOFTWILIGHT.get().getDefaultInstance());
+                    tag.putInt("returnSwordOfTwilight", 0);
                 }
             }
         }
