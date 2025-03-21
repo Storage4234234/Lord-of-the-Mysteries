@@ -107,7 +107,6 @@ public class GlobeOfTwilight extends SimpleAbilityItem {
                         double startX, startY, startZ, endX, endY, endZ;
 
                         if (i < 4) {
-                            // Bottom face edges
                             startX = x + (i == 0 || i == 3 ? -halfSize : halfSize);
                             startZ = z + (i == 0 || i == 1 ? -halfSize : halfSize);
                             startY = y - halfSize;
@@ -115,7 +114,6 @@ public class GlobeOfTwilight extends SimpleAbilityItem {
                             endZ = z + (i == 2 || i == 3 ? halfSize : -halfSize);
                             endY = y - halfSize;
                         } else if (i < 8) {
-                            // Top face edges
                             startX = x + (i == 4 || i == 7 ? -halfSize : halfSize);
                             startZ = z + (i == 4 || i == 5 ? -halfSize : halfSize);
                             startY = y + halfSize;
@@ -123,7 +121,6 @@ public class GlobeOfTwilight extends SimpleAbilityItem {
                             endZ = z + (i == 6 || i == 7 ? halfSize : -halfSize);
                             endY = y + halfSize;
                         } else {
-                            // Vertical edges connecting top and bottom faces
                             int j = i - 8;
                             startX = x + (j == 0 || j == 2 ? -halfSize : halfSize);
                             startZ = z + (j == 0 || j == 1 ? -halfSize : halfSize);

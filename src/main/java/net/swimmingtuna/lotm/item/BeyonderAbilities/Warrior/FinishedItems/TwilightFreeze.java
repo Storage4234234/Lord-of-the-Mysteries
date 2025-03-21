@@ -169,6 +169,32 @@ public class TwilightFreeze extends SimpleAbilityItem {
         return attributeBuilder.build();
     }
 
+    public static void removeTwilightFreezeEffect(LivingEntity living) {
+        if (living.level().isClientSide()) {
+            return;
+        }
+        CompoundTag playerTag = living.getPersistentData();
+        clearTwilightFreezeData(playerTag);
+    }
+
+    private static void clearTwilightFreezeData(CompoundTag tag) {
+        tag.putInt("twilightFreezeCooldown", 0);
+        tag.putInt("inTwilight", 0);
+        tag.remove("twilightAge");
+        tag.remove("twilightLuck");
+        tag.remove("twilightMisfortune");
+        tag.remove("twilightSanity");
+        tag.remove("twilightCorruption");
+        tag.remove("twilightHealth");
+        tag.remove("twilightSpirituality");
+        int effectCount = tag.getInt("twilightPotionEffectsCount");
+        for (int i = 0; i < effectCount; i++) {
+            tag.remove("twilightPotionEffect_" + i);
+        }
+        tag.remove("twilightPotionEffectsCount");
+        tag.remove("twilightFreezeHolder");
+    }
+
 
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {

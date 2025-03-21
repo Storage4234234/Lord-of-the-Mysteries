@@ -103,6 +103,17 @@ public class TravelDoorWaypoint extends SimpleAbilityItem {
         }
     }
 
+    public static void clearAllWaypoints(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide) {
+            CompoundTag tag = livingEntity.getPersistentData();
+            for (int i = 0; i < 100; i++) {
+                tag.remove("x" + i);
+                tag.remove("y" + i);
+                tag.remove("z" + i);
+            }
+        }
+    }
+
 
     @Override
     public Rarity getRarity(ItemStack pStack) {

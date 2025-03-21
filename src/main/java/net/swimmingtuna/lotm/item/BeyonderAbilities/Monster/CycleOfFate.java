@@ -90,7 +90,6 @@ public class CycleOfFate extends SimpleAbilityItem {
 
             player.getPersistentData().putInt("monsterCycleOfFateUser", 70);
             savePotionEffectsToTag(player, player.getPersistentData());
-
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             player.getPersistentData().putInt("monsterCycleOfFateUserX", (int) player.getX());
             player.getPersistentData().putInt("monsterCycleOfFateUserY", (int) player.getY());
@@ -185,7 +184,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                         tag.putInt("monsterCycleOfFateEntitySpirituality", 0);
                         tag.putInt("monsterCycleOfFateEntitySequence", 0);
                         tag.putInt("monsterCycleOfFateEntityHealth", 0);
-                        tag.putInt("monsterCycleOfFateHolder", 0);
+                        tag.remove("monsterCycleOfFateHolder");
                     }
                 }
             }
@@ -271,9 +270,9 @@ public class CycleOfFate extends SimpleAbilityItem {
             int cycleZ = tag.getInt("monsterCycleOfFateEntityZ");
             boolean isDead = tag.getBoolean("monsterCycleOfFateIsDead");
             if (isDead) {
-                entity.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 20,1,false,false));
-                entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 20,1,false,false));
-                entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 20,5,false,false));
+                entity.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 20, 1, false, false));
+                entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 20, 1, false, false));
+                entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 20, 5, false, false));
                 entity.teleportTo(cycleX, cycleY + 400, cycleZ);
             }
             if (entity.tickCount % 20 == 0) {
@@ -307,7 +306,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                     tag.putInt("monsterCycleOfFateX", 0);
                     tag.putInt("monsterCycleOfFateY", 0);
                     tag.putInt("monsterCycleOfFateZ", 0);
-                    tag.putInt("monsterCycleOfFateHolder", 0);
+                    tag.remove("monsterCycleOfFateHolder");
                     tag.putInt("monsterCycleOfFateHealth", 0);
                     tag.putInt("monsterCycleOfFateSpirituality", 0);
                     tag.putInt("monsterCycleOfFateSequence", 0);
@@ -326,6 +325,7 @@ public class CycleOfFate extends SimpleAbilityItem {
             }
         }
     }
+
     private static void savePotionEffectsToTag(LivingEntity entity, CompoundTag tag) {
         Collection<MobEffectInstance> activeEffects = entity.getActiveEffects();
         tag.putInt("monsterCyclePotionEffectsCount", activeEffects.size());
@@ -340,12 +340,9 @@ public class CycleOfFate extends SimpleAbilityItem {
     }
 
     private static void restorePotionEffectsFromTag(LivingEntity entity, CompoundTag tag) {
-        // Clear existing effects
         for (MobEffectInstance activeEffect : new ArrayList<>(entity.getActiveEffects())) {
             entity.removeEffect(activeEffect.getEffect());
         }
-
-        // Restore saved effects
         int effectCount = tag.getInt("monsterCyclePotionEffectsCount");
         for (int i = 0; i < effectCount; i++) {
             CompoundTag effectTag = tag.getCompound("monsterCyclePotionEffect_" + i);
@@ -355,6 +352,51 @@ public class CycleOfFate extends SimpleAbilityItem {
             }
         }
     }
+
+    public static void removeCycleEffect(LivingEntity living) {
+        if (living.level().isClientSide()) {
+            return;
+        }
+        CompoundTag playerTag = living.getPersistentData();
+        clearCycleData(playerTag);
+        for (LivingEntity entity : living.level().getEntitiesOfClass(LivingEntity.class, living.getBoundingBox().inflate(800))) {
+            CompoundTag entityTag = entity.getPersistentData();
+            if (entityTag.contains("monsterCycleOfFateHolder") && living.getUUID().equals(entityTag.getUUID("monsterCycleOfFateHolder"))) {
+                clearCycleData(entityTag);
+            }
+        }
+    }
+
+    private static void clearCycleData(CompoundTag tag) {
+        tag.putInt("monsterCycleOfFateUser", 0);
+        tag.putInt("monsterCycleOfFate", 0);
+        tag.putInt("monsterCycleOfFateEntity", 0);
+        tag.putInt("monsterCycleOfFateUserX", 0);
+        tag.putInt("monsterCycleOfFateUserY", 0);
+        tag.putInt("monsterCycleOfFateUserZ", 0);
+        tag.putInt("monsterCycleOfFateUserHealth", 0);
+        tag.putInt("monsterCycleOfFateUserSequence", 0);
+        tag.putInt("monsterCycleOfFateX", 0);
+        tag.putInt("monsterCycleOfFateY", 0);
+        tag.putInt("monsterCycleOfFateZ", 0);
+        tag.putInt("monsterCycleOfFateHealth", 0);
+        tag.putInt("monsterCycleOfFateSpirituality", 0);
+        tag.putInt("monsterCycleOfFateSequence", 0);
+        tag.putInt("monsterCycleOfFateEntityX", 0);
+        tag.putInt("monsterCycleOfFateEntityY", 0);
+        tag.putInt("monsterCycleOfFateEntityZ", 0);
+        tag.putInt("monsterCycleOfFateEntityHealth", 0);
+        tag.putInt("monsterCycleOfFateEntitySpirituality", 0);
+        tag.putInt("monsterCycleOfFateEntitySequence", 0);
+        tag.putBoolean("monsterCycleOfFateIsDead", false);
+        tag.remove("monsterCycleOfFateHolder");
+        int effectCount = tag.getInt("monsterCyclePotionEffectsCount");
+        for (int i = 0; i < effectCount; i++) {
+            tag.remove("monsterCyclePotionEffect_" + i);
+        }
+        tag.remove("monsterCyclePotionEffectsCount");
+    }
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);

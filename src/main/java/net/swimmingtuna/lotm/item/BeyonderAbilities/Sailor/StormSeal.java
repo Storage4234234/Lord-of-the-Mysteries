@@ -66,7 +66,6 @@ public class StormSeal extends SimpleAbilityItem {
         CompoundTag tag = entity.getPersistentData();
         if (!entity.level().isClientSide()) {
             if (tag.getInt("inStormSeal") >= 3) {
-
                 int stormSeal = tag.getInt("inStormSeal");
                 int x = tag.getInt("stormSealX");
                 int y = tag.getInt("stormSealY");

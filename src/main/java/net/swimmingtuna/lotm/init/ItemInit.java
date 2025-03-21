@@ -18,6 +18,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.TwilightSword;
+import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderCharacteristic;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderPotion;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderResetPotion;
 import net.swimmingtuna.lotm.item.OtherItems.*;
@@ -495,6 +496,8 @@ public class ItemInit {
             () -> new LightningStrikeRune(new Item.Properties().stacksTo(1)));
 
     //OTHER
+    public static final RegistryObject<Item> BEYONDER_CHARACTERISTICS = ITEMS.register("beyondercharacteristics",
+            () -> new BeyonderCharacteristic(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> BEYONDER_ABILITY_USER = ITEMS.register("beyonderabilityuser",
             () -> new BeyonderAbilityUser(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> TEST_ITEM = ITEMS.register("testitem",

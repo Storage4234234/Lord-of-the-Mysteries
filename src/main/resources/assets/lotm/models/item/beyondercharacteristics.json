@@ -1,0 +1,17 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "lotm:item/beyonder_characteristics/characteristic_eye_0",
+    "layer1": "lotm:item/beyonder_characteristics/characteristic_eye_1"
+  },
+  "overrides": [
+    {
+      "predicate": { "random_beyonder": 1 },
+      "model": "lotm:item/beyonder_characteristics/beyondercharacteristics1"
+    },
+    {
+      "predicate": { "random_beyonder": 2 },
+      "model": "lotm:item/beyonder_characteristics/beyondercharacteristics2"
+    }
+  ]
+}

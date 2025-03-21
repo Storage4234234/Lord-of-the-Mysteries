@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
@@ -18,6 +19,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.ClearAbilitiesS2C;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ClientData.ClientAbilitiesData;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -44,7 +46,6 @@ public class BeyonderCommand {
                                     if (result != holder.getCurrentClass()) {
                                         Player player = context.getSource().getPlayerOrException();
                                         ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
-                                        player.getPersistentData().putInt("monsterReincarnationCounter", 0);
                                         scaleData.setScale(1);
                                         Abilities playerAbilities = player.getAbilities();
                                         playerAbilities.setFlyingSpeed(0.05F);
@@ -75,9 +76,7 @@ public class BeyonderCommand {
                             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                             ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
                             holder.removePathway();
-
-                            player.getPersistentData().putInt("monsterReincarnationCounter", 0);
-                            player.getPersistentData().putInt("age",0);
+                            BeyonderUtil.removeTags(context.getSource().getPlayerOrException());
                             scaleData.setScale(1);
                             Abilities playerAbilities = player.getAbilities();
                             playerAbilities.setFlyingSpeed(0.05F);
@@ -91,5 +90,6 @@ public class BeyonderCommand {
                 )
         );
     }
+
 }
 

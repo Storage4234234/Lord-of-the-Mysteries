@@ -56,9 +56,9 @@ public class ScribeAbilities extends SimpleAbilityItem {
         Item offHand = player.getOffhandItem().getItem();
         if(offHand instanceof SimpleAbilityItem ability){
             player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage -> {
-                if(storage.hasScribedAbility(ability)){
+                if(storage.hasScribedAbility(ability)) {
                     player.displayClientMessage(Component.literal("Scribed copies: ").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN).append(Component.literal(String.valueOf(storage.getRemainUses(ability))).withStyle(ChatFormatting.WHITE).withStyle(ChatFormatting.BOLD)), true);
-                }else{
+                } else {
                     player.displayClientMessage(Component.literal("Haven`t scribed this ability yet.").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.WHITE), true);
                 }
             });

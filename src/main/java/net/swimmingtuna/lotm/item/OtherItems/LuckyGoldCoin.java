@@ -1,7 +1,9 @@
 package net.swimmingtuna.lotm.item.OtherItems;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
@@ -11,6 +13,7 @@ public class LuckyGoldCoin extends Item {
     public LuckyGoldCoin(Properties pProperties) {
         super(pProperties);
     }
+
 
     public static void setUUID(ItemStack stack, UUID ownerUUID) {
         stack.getOrCreateTag().putUUID("coinOwner", ownerUUID);

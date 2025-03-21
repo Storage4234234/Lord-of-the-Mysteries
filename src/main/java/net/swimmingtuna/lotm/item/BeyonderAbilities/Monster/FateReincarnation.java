@@ -46,7 +46,7 @@ public class FateReincarnation extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void fateReincarnation(Player player) { //add functionality for being able to control a player mob
+    private void fateReincarnation(Player player) {
         if (!player.level().isClientSide()) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int x = (int) (player.getX() + (Math.random() * 5000) - 2500);

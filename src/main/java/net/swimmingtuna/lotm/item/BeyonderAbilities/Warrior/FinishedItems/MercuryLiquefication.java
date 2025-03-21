@@ -193,7 +193,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                         CompoundTag tag = targetEntity.getPersistentData();
                         user.getPersistentData().putUUID("mercuryArmor", targetEntity.getUUID());
                         user.getPersistentData().putInt("mercuryArmorForm", 10);
-                        user.sendSystemMessage(Component.literal("armor put on " + targetEntity.getName()));
+                        user.sendSystemMessage(Component.literal("Armor put on " + targetEntity.getName()));
                         targetEntity.getPersistentData().putInt("mercuryArmorEquipped", 10);
                         CompoundTag armorData = new CompoundTag();
                         ListTag armorItems = new ListTag();

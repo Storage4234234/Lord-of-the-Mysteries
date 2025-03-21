@@ -15,6 +15,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -32,6 +33,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -58,6 +60,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
+import net.swimmingtuna.lotm.beyonder.*;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
@@ -94,6 +97,10 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 import static net.swimmingtuna.lotm.init.DamageTypeInit.MENTAL_DAMAGE;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.CycleOfFate.removeCycleEffect;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.DreamIntoReality.stopFlying;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.PsychologicalInvisibility.removePsychologicalInvisibilityEffect;
+import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.TwilightFreeze.removeTwilightFreezeEffect;
 
 public class BeyonderUtil {
 
@@ -294,14 +301,13 @@ public class BeyonderUtil {
         return settings;
     }
 
-    public static List<Item> getAbilities(Player player) {
+    public static List<Item> getAbilities(LivingEntity livingEntity) {
         List<Item> abilityNames = new ArrayList<>();
-        if (player.level().isClientSide()) {
+        if (livingEntity.level().isClientSide()) {
             return abilityNames;
         }
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int sequence = holder.getSequence();
-        if (currentPathwayMatchesNoException(player, BeyonderClassInit.SPECTATOR.get())) {
+        int sequence = getSequence(livingEntity);
+        if (currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.SPECTATOR.get())) {
             if (sequence <= 8) {
                 abilityNames.add(ItemInit.MIND_READING.get());
             }
@@ -358,7 +364,7 @@ public class BeyonderUtil {
             }
         }
 
-        if (currentPathwayMatchesNoException(player, BeyonderClassInit.SAILOR.get())) {
+        if (currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.SAILOR.get())) {
             if (sequence <= 8) {
                 abilityNames.add(ItemInit.RAGING_BLOWS.get());
             }
@@ -419,7 +425,7 @@ public class BeyonderUtil {
                 abilityNames.add(ItemInit.TYRANNY.get());
             }
         }
-        if (currentPathwayMatchesNoException(player, BeyonderClassInit.MONSTER.get())) {
+        if (currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.MONSTER.get())) {
             if (sequence <= 9) {
                 abilityNames.add(ItemInit.SPIRITVISION.get());
                 abilityNames.add(ItemInit.MONSTERDANGERSENSE.get());
@@ -482,7 +488,7 @@ public class BeyonderUtil {
                 abilityNames.add(ItemInit.PROBABILITYINFINITEFORTUNE.get());
                 abilityNames.add(ItemInit.PROBABILITYINFINITEMISFORTUNE.get());
             }
-            if (currentPathwayMatchesNoException(player, BeyonderClassInit.WARRIOR.get())) {
+            if (currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.WARRIOR.get())) {
                 if (sequence <= 6) {
                     abilityNames.add(ItemInit.GIGANTIFICATION.get());
                     abilityNames.add(ItemInit.LIGHTOFDAWN.get());
@@ -523,7 +529,7 @@ public class BeyonderUtil {
                     abilityNames.add(ItemInit.TWILIGHTLIGHT.get());
                 }
             }
-            if (currentPathwayMatchesNoException(player, BeyonderClassInit.APPRENTICE.get())) {
+            if (currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.APPRENTICE.get())) {
                 if (sequence <= 9) {
                     abilityNames.add(ItemInit.CREATEDOOR.get());
                 }
@@ -547,6 +553,50 @@ public class BeyonderUtil {
             }
         }
         return abilityNames;
+    }
+
+    private static final Map<ChatFormatting, Integer> COLOR_MAP = new HashMap<>();
+    private static final Map<String, BeyonderClass> NAME_TO_BEYONDER = new HashMap<>();
+
+    static {
+        COLOR_MAP.put(ChatFormatting.BLACK, 0x000000);
+        COLOR_MAP.put(ChatFormatting.DARK_BLUE, 0x0000AA);
+        COLOR_MAP.put(ChatFormatting.DARK_GREEN, 0x00AA00);
+        COLOR_MAP.put(ChatFormatting.DARK_AQUA, 0x00AAAA);
+        COLOR_MAP.put(ChatFormatting.DARK_RED, 0xAA0000);
+        COLOR_MAP.put(ChatFormatting.DARK_PURPLE, 0xAA00AA);
+        COLOR_MAP.put(ChatFormatting.GOLD, 0xFFAA00);
+        COLOR_MAP.put(ChatFormatting.GRAY, 0xAAAAAA);
+        COLOR_MAP.put(ChatFormatting.DARK_GRAY, 0x555555);
+        COLOR_MAP.put(ChatFormatting.BLUE, 0x5555FF);
+        COLOR_MAP.put(ChatFormatting.GREEN, 0x55FF55);
+        COLOR_MAP.put(ChatFormatting.AQUA, 0x55FFFF);
+        COLOR_MAP.put(ChatFormatting.RED, 0xFF5555);
+        COLOR_MAP.put(ChatFormatting.LIGHT_PURPLE, 0xFF55FF);
+        COLOR_MAP.put(ChatFormatting.YELLOW, 0xFFFF55);
+        COLOR_MAP.put(ChatFormatting.WHITE, 0xFFFFFF);
+        NAME_TO_BEYONDER.put("Apothecary", new ApothecaryClass());
+        NAME_TO_BEYONDER.put("Apprentice", new ApprenticeClass());
+        NAME_TO_BEYONDER.put("Arbiter", new ArbiterClass());
+        NAME_TO_BEYONDER.put("Assassin", new AssassinClass());
+        NAME_TO_BEYONDER.put("Bard", new BardClass());
+        NAME_TO_BEYONDER.put("Corpse Collector", new CorpseCollectorClass());
+        NAME_TO_BEYONDER.put("Criminal", new CriminalClass());
+        NAME_TO_BEYONDER.put("Hunter", new HunterClass());
+        NAME_TO_BEYONDER.put("Lawyer", new LawyerClass());
+        NAME_TO_BEYONDER.put("Marauder", new MarauderClass());
+        NAME_TO_BEYONDER.put("Monster", new MonsterClass());
+        NAME_TO_BEYONDER.put("Mystery Pryer", new MysteryPryerClass());
+        NAME_TO_BEYONDER.put("Planter", new PlanterClass());
+        NAME_TO_BEYONDER.put("Prisoner", new PrisonerClass());
+        NAME_TO_BEYONDER.put("Reader", new ReaderClass());
+        NAME_TO_BEYONDER.put("Sailor", new SailorClass());
+        NAME_TO_BEYONDER.put("Savant", new SavantClass());
+        NAME_TO_BEYONDER.put("Secret Supplicant", new SecretsSupplicantClass());
+        NAME_TO_BEYONDER.put("Seer", new SeerClass());
+        NAME_TO_BEYONDER.put("Sleepless", new SleeplessClass());
+        NAME_TO_BEYONDER.put("Spectator", new SpectatorClass());
+        NAME_TO_BEYONDER.put("Warrior", new WarriorClass());
     }
 
     private static String getItemName(Item item) {
@@ -903,7 +953,7 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYFORTUNE.get())));
             } else if (heldItem.getItem() instanceof DivineHandRight) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDLEFT.get())));
-            }  else if (heldItem.getItem() instanceof DivineHandLeft) {
+            } else if (heldItem.getItem() instanceof DivineHandLeft) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDRIGHT.get())));
             } else if (heldItem.getItem() instanceof BeamOfGlory) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFGLORY.get())));
@@ -921,10 +971,7 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.BEAMOFTWILIGHT.get())));
             } else if (heldItem.getItem() instanceof BeamOfTwilight) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFTWILIGHT.get())));
-            }
-
-
-            else if (heldItem.getItem() instanceof LuckManipulation) {
+            } else if (heldItem.getItem() instanceof LuckManipulation) {
                 LOTMNetworkHandler.sendToServer(new LuckManipulationLeftClickC2S());
             } else if (heldItem.getItem() instanceof MisfortuneManipulation) {
                 LOTMNetworkHandler.sendToServer(new MisfortuneManipulationLeftClickC2S());
@@ -1076,9 +1123,9 @@ public class BeyonderUtil {
             } else if (heldItem.getItem() instanceof ScribeAbilities) {
                 LOTMNetworkHandler.sendToServer(new ScribeCopyAbilityC2S());
 
-            }  else if (heldItem.getItem() instanceof DivineHandRight) {
+            } else if (heldItem.getItem() instanceof DivineHandRight) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDLEFT.get())));
-            }  else if (heldItem.getItem() instanceof DivineHandLeft) {
+            } else if (heldItem.getItem() instanceof DivineHandLeft) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDRIGHT.get())));
             } else if (heldItem.getItem() instanceof BeamOfGlory) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFGLORY.get())));
@@ -1139,6 +1186,15 @@ public class BeyonderUtil {
             return (BeyonderClass) playerMobEntity.getCurrentPathway();
         }
         return null;
+    }
+
+    public static void setPathway(LivingEntity living, BeyonderClass pathway) {
+        if (living instanceof Player player) {
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+            holder.setPathway(pathway);
+        } else if (living instanceof PlayerMobEntity playerMobEntity) {
+            playerMobEntity.setPathway(pathway);
+        }
     }
 
     public static int getSequence(LivingEntity living) {
@@ -2086,7 +2142,7 @@ public class BeyonderUtil {
     public static boolean scribeLookingAtYou(Player target, LivingEntity scribe) {
         double radius = 30.0;
         double angleThreshold = 45.0;
-        if (currentPathwayAndSequenceMatchesNoException(scribe,BeyonderClassInit.APPRENTICE.get(), 6)) {
+        if (currentPathwayAndSequenceMatchesNoException(scribe, BeyonderClassInit.APPRENTICE.get(), 6)) {
             Vec3 scribePos = scribe.position();
             Vec3 targetPos = target.position();
             double distanceQr = scribePos.distanceToSqr(targetPos);
@@ -2341,19 +2397,6 @@ public class BeyonderUtil {
         return true;
     }
 
-    public static void setPathway(LivingEntity livingEntity, BeyonderClass pathway) {
-        if (!livingEntity.level().isClientSide()) {
-            if (livingEntity instanceof Player player) {
-                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                holder.setPathway(pathway);
-            } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
-                playerMobEntity.setPathway(pathway);
-            } else {
-                return;
-            }
-        }
-    }
-
     public static void setSequence(LivingEntity livingEntity, int sequence) {
         if (!livingEntity.level().isClientSide()) {
             if (livingEntity instanceof Player player) {
@@ -2382,19 +2425,21 @@ public class BeyonderUtil {
         }
     }
 
-    public static void removePathway(LivingEntity livingEntity) {
-        if (!livingEntity.level().isClientSide()) {
-            if (livingEntity instanceof Player player) {
-                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                holder.removePathway();
-            } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
-                playerMobEntity.setPathway(null);
-                playerMobEntity.setSequence(-1);
-            } else {
-                return;
+    public static void removePathway(LivingEntity living) {
+        BeyonderUtil.setPathwayAndSequence(living, null, -1);
+        ScaleTypes.BASE.getScaleData(living).setScale(1);
+        if (living instanceof Player player) {
+            Abilities playerAbilities = player.getAbilities();
+            playerAbilities.setFlyingSpeed(0.05F);
+            playerAbilities.setWalkingSpeed(0.1F);
+            player.onUpdateAbilities();
+            if (player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
             }
         }
+        BeyonderUtil.removeTags(living);
     }
+
 
     public static void setScale(Entity entity, float scale) {
         if (!entity.level().isClientSide()) {
@@ -2444,6 +2489,134 @@ public class BeyonderUtil {
         if (!livingEntity.level().isClientSide()) {
             LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(false, livingEntity.getUUID()));
 
+        }
+    }
+
+    public static int chatFormatingToInt(ChatFormatting color) {
+        return COLOR_MAP.getOrDefault(color, 0xFFFFFF);
+    }
+
+    public static String getPathwayName(BeyonderClass pathway) {
+        return pathway.sequenceNames().get(9);
+    }
+
+    public static BeyonderClass getPathwayByName(String name) {
+        return NAME_TO_BEYONDER.getOrDefault(name, new SeerClass());
+    }
+
+
+    public static void removeTags(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide()) {
+            CompoundTag tag = livingEntity.getPersistentData();
+            for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(500))) {
+                if (living.getPersistentData().contains("divineHandUUID")) {
+                    if (living.getPersistentData().getUUID("divineHandUUID").equals(livingEntity.getUUID())) {
+                        living.getPersistentData().putInt("divineHandGuarding", 0);
+                    }
+                }
+            }
+            tag.putInt("apprenticeBounceHitArrows", 0);
+            tag.putBoolean("ApprenticeBounceProjectileMovement", false);
+            tag.putInt("invisibleHandCounter", 0);
+            tag.putDouble("invisibleHandDistance", 0);
+            tag.putInt("travelBlinkDistance", 0);
+            TravelDoorWaypoint.clearAllWaypoints(livingEntity);
+            tag.putBoolean("monsterAuraOfChaos", false);
+            tag.putBoolean("monsterChaosWalkerCombat", false);
+            tag.putInt("monsterCyclePotionEffectsCount", 0);
+            tag.putInt("monsterCycleOfFateUser", 0);
+            removeCycleEffect(livingEntity);
+            removeTwilightFreezeEffect(livingEntity);
+            tag.putBoolean("monsterRipple", false);
+            tag.putInt("monsterReincarnationCounter", 0);
+            tag.putInt("age", 0);
+            ProbabilityManipulationWipe.wipeProbablility(tag);
+            tag.putInt("calamityIncarnationInMeteor", 0);
+            tag.putInt("calamityIncarnationInTornado", 0);
+            tag.putInt("calamityIncarnationInLightning", 0);
+            tag.putInt("calamityIncarnationInPlague", 0);
+            tag.putInt("monsterCalamityImmunity", 0);
+            tag.putBoolean("monsterDangerSense", false);
+            tag.putBoolean("monsterCalamityAttraction", false);
+            tag.putInt("probabilityManipulationInfiniteFortune", 0);
+            tag.putInt("probabilityManipulationInfiniteMisfortune", 0);
+            tag.putInt("monsterRebootPotionEffectsCount", 0);
+            tag.putInt("monsterRebootAge", 0);
+            tag.putInt("monsterRebootLuck", 0);
+            tag.putInt("monsterRebootMisfortune", 0);
+            tag.putInt("monsterRebootSanity", 0);
+            tag.putInt("monsterRebootCorruption", 0);
+            tag.putInt("monsterRebootHealth", 20);
+            tag.putInt("monsterRebootSpirituality", 0);
+            tag.putBoolean("auraOfGlory", false);
+            tag.putBoolean("auraOfTwilight", false);
+            tag.remove("dawnStoredArmorData");
+            tag.putBoolean("warriorProtection", false);
+            tag.putInt("monsterMisfortuneManipulationGravity", 0);
+            tag.putBoolean("warriorProtection", false);
+            tag.putBoolean("demonHuntingEye", false);
+            tag.putBoolean("warriorShouldDestroyBlock", false);
+            tag.putInt("globeOfTwilight", 0);
+            tag.putInt("warriorLightConcealment", 0);
+            tag.putInt("lightOfDawnCounter", 0);
+            tag.putInt("corruption", 0);
+            tag.putBoolean("mercuryLiquefication", false);
+            tag.putInt("silverRapierSummoning", 0);
+            tag.putInt("twilightAgeAccelerate", 0);
+            tag.putInt("twilightAgeAccelerateEnemy", 0);
+            tag.putInt("twilightLight", 0);
+            tag.putInt("twilightManifestation", 0);
+            tag.putBoolean("warriorDangerSense", false);
+            stopFlying(livingEntity);
+            tag.putInt("BarrierRadius", 0);
+            tag.putInt("waitMakeLifeTimer", 0);
+            tag.putInt("BlinkDistance", 0);
+            tag.remove("manipulateMovementX");
+            tag.remove("manipulateMovementY");
+            tag.remove("manipulateMovementZ");
+            tag.putBoolean("manipulateMovementBoolean", false);
+            removePsychologicalInvisibilityEffect(livingEntity);
+            tag.putInt("sailorAcidicRain", 0);
+            tag.putInt("calamityIncarnationTornado", 0);
+            tag.putInt("calamityIncarnationTsunami", 0);
+            tag.putInt("sailorEarthquake", 0);
+            tag.putBoolean("SailorLightning", false);
+            tag.putInt("sailorExtremeColdness", 0);
+            tag.putInt("sailorHurricane", 0);
+            tag.putInt("tyrantMentionedInChat", 0);
+            tag.putInt("sailorLightningStorm1", 0);
+            tag.putInt("sailorLightningStorm", 0);
+            tag.putInt("matterAccelerationBlockTimer", 0);
+            tag.putInt("tyrantSelfAcceleration", 0);
+            tag.putInt("ragingBlows", 0);
+            tag.putBoolean("torrentialDownpour", false);
+            tag.putBoolean("sailorProjectileMovement", false);
+            tag.putInt("sirenSongHarm", 0);
+            tag.putInt("sirenSongWeaken", 0);
+            tag.putInt("sirenSongStun", 0);
+            tag.putInt("sirenSongStrengthen", 0);
+            tag.putInt("sailorLightningStar", 0);
+            tag.putInt("inStormSeal", 0);
+            tag.putInt("sailorTsunami", 0);
+            tag.putInt("sailorTsunamiSeal", 0);
+            tag.putInt("sailorSphere", 0);
+            tag.putBoolean("sailorFlight1", false);
+            tag.putInt("sailorFlight", 0);
+            tag.putInt("sailorFlightDamageCancel", 0);
+            tag.putInt("luckStoneDamageImmunity", 0);
+            tag.putInt("luckStoneDamage", 0);
+            tag.putInt("luckMeteorDamage", 0);
+            tag.putInt("calamityMeteorImmunity", 0);
+            tag.putInt("luckLightningMCDamage", 0);
+            tag.putInt("luckMCLightningImmunity", 0);
+            tag.putInt("calamityExplosionOccurrence", 0);
+            tag.putInt("luckLightningLOTMDamage", 0);
+            tag.putInt("calamityLightningBoltMonsterResistance", 0);
+            tag.putInt("calamityLightningStormResistance", 0);
+            tag.putInt("luckTornadoResistance", 0);
+            tag.putInt("luckTornadoImmunity", 0);
+            tag.putInt("calamityLOTMLightningImmunity", 0);
+            tag.putInt("calamityLightningStormImmunity", 0);
         }
     }
 }

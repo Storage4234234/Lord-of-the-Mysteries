@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -44,11 +45,9 @@ public class VolcanicEruption extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void volcanicEruption(Player player) {
+    private void volcanicEruption(LivingEntity player) {
         if (!player.level().isClientSide()) {
             Level level = player.level();
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getSequence();
             int spawnCount =(int) (float) BeyonderUtil.getDamage(player).get(ItemInit.VOLCANIC_ERUPTION.get());
             double randomX = (Math.random() * 1) - 0.5;
             double randomZ = (Math.random() * 1) - 0.5;

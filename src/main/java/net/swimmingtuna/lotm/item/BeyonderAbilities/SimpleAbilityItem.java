@@ -116,6 +116,8 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         return InteractionResult.PASS;
     }
 
+
+
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
         tooltipComponents.add(getSpiritualityUsedText(this.requiredSpirituality));

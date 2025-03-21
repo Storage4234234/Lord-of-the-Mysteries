@@ -74,6 +74,21 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
         }
     }
 
+    public static void removePsychologicalInvisibilityEffect(LivingEntity living) {
+        if (living.level().isClientSide()) {
+            return;
+        }
+
+        CompoundTag tag = living.getPersistentData();
+        if (tag.getBoolean("psychologicalInvisibility")) {
+            tag.putBoolean("psychologicalInvisibility", false);
+            tag.putInt("psychologicalInvisibilityHurt", 0);
+            LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(false, living.getUUID()));
+            lastSentInvisibilityStates.put(living.getUUID(), false);
+        }
+        living.removeEffect(MobEffects.INVISIBILITY);
+    }
+
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
