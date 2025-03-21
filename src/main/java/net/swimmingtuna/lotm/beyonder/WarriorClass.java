@@ -4,7 +4,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -13,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
@@ -490,95 +488,95 @@ public class WarriorClass implements BeyonderClass {
                 }
             }
             if (hasFullSilverArmor(livingEntity)) {
-                physicalReduction += 0.67f;
-                supernaturalReduction += 0.67f;
+                physicalReduction += 0.5f;
+                supernaturalReduction += 0.2f;
             } else if (hasFullDawnArmor(livingEntity) && isSupernatural) {
-                supernaturalReduction += 0.5f;
+                supernaturalReduction += 0.4f;
             }
             if (isWarrior) {
                 if (sequence == 8) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.25f;
+                        supernaturalReduction += 0.225f;
                     }
                 } else if (sequence == 7) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.25f;
+                        supernaturalReduction += 0.225f;
                     } else if (isPhysical) {
-                        physicalReduction += 0.3f;
+                        physicalReduction += 0.225f;
                     }
                 } else if (sequence == 6) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.3f;
+                        supernaturalReduction += 0.27f;
                     } else if (isPhysical) {
                         if (!isGiant) {
-                            physicalReduction += 0.4f;
+                            physicalReduction += 0.3f;
                         } else {
-                            physicalReduction += 0.55f;
+                            physicalReduction += 0.41f;
                         }
                     }
                 } else if (sequence == 5) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.3f;
+                        supernaturalReduction += 0.27f;
                     } else if (isPhysical) {
                         if (!isGiant) {
-                            physicalReduction += 0.5f;
+                            physicalReduction += 0.375f;
                         } else {
-                            physicalReduction += 0.65f;
+                            physicalReduction += 0.49f;
                         }
                     }
                 } else if (sequence == 4) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.4f;
+                        supernaturalReduction += 0.36f;
                     } else if (isPhysical) {
                         if (!isGiant) {
-                            physicalReduction += 0.55f;
+                            physicalReduction += 0.41f;
                         } else {
-                            physicalReduction += 0.65f;
+                            physicalReduction += 0.49f;
                         }
                     }
                 } else if (sequence == 3 || sequence == 2) {
                     if (isSupernatural) {
-                        supernaturalReduction += 0.4f;
+                        supernaturalReduction += 0.36f;
                     } else if (isPhysical) {
                         if (!isGiant) {
-                            physicalReduction += 0.6f;
+                            physicalReduction += 0.45f;
                         } else {
-                            physicalReduction += 0.65f;
+                            physicalReduction += 0.49f;
                         }
                     }
                 } else if (sequence == 1) {
                     if (isSupernatural) {
                         if (isHoGGiant) {
-                            supernaturalReduction += 0.7f;
+                            supernaturalReduction += 0.63f;
                         }
                     } else if (isPhysical) {
                         if (isHoGGiant) {
-                            physicalReduction += 0.725f;
+                            physicalReduction += 0.544f;
                         } else {
-                            physicalReduction += 0.65f;
+                            physicalReduction += 0.49f;
                         }
                     }
                 } else if (sequence == 0) {
                     if (isSupernatural) {
                         if (isTwilightGiant) {
-                            supernaturalReduction += 0.8f;
+                            supernaturalReduction += 0.72f;
                         } else {
-                            supernaturalReduction += 0.5f;
+                            supernaturalReduction += 0.45f;
                         }
                     } else if (isPhysical) {
-                        if (isHoGGiant) {
-                            physicalReduction += 0.8f;
+                        if (isTwilightGiant) {
+                            physicalReduction += 0.6f;
                         } else {
-                            physicalReduction += 0.65f;
+                            physicalReduction += 0.49f;
                         }
                     }
                 }
             }
             if (isPhysical) {
-                float finalReduction = Math.min(physicalReduction, 0.8f);
+                float finalReduction = Math.min(physicalReduction, 0.7f);
                 event.setAmount(amount * (1.0f - finalReduction));
             } else if (isSupernatural) {
-                float finalReduction = Math.min(supernaturalReduction, 0.8f);
+                float finalReduction = Math.min(supernaturalReduction, 0.7f);
                 event.setAmount(amount * (1.0f - finalReduction));
             }
         }
@@ -588,15 +586,13 @@ public class WarriorClass implements BeyonderClass {
         LivingEntity livingEntity = event.getEntity();
         CompoundTag tag = livingEntity.getPersistentData();
         if (!livingEntity.level().isClientSide() && tag.getInt("inTwilight") >= 1) {
+            tag.putInt("inTwilight", tag.getInt("inTwilight") - 1);
             double x = livingEntity.getX();
             double y = livingEntity.getY();
             double z = livingEntity.getZ();
             livingEntity.teleportTo(x, y, z);
             livingEntity.setDeltaMovement(0,0,0);
             livingEntity.hurtMarked = true;
-            livingEntity.sendSystemMessage(Component.literal("value is " + tag.getInt("inTwilight")));
-            event.setCanceled(true);
-            event.setResult(Event.Result.DENY);
         }
     }
 }

@@ -205,7 +205,7 @@ public abstract class BeamEntity extends LOTMProjectile {
                         livingEntity.hurt(livingEntity.damageSources().magic(), getDamage());
                     } if (getIsTwilight() && entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity pOwner) {
                         int age = livingEntity.getPersistentData().getInt("age");
-                        livingEntity.getPersistentData().putInt("age", (age + (10 - BeyonderUtil.getSequence(pOwner))) * 3);
+                        livingEntity.getPersistentData().putInt("age", (age + (30 - BeyonderUtil.getSequence(pOwner))) * 9);
                     }
 
                     if (entity instanceof LivingEntity livingEntity && getIsDragonBreath()) {
@@ -400,7 +400,7 @@ public abstract class BeamEntity extends LOTMProjectile {
                                     this.level().destroyBlock(mutablePos, false);
                                 }
                             } else if (this.tickCount % 5 == 0 && getIsTwilight()) {
-                                if (this.level().getBlockState(mutablePos) != Blocks.DIRT.defaultBlockState() && this.level().getBlockState(mutablePos) != Blocks.AIR.defaultBlockState()) {
+                                if (this.level().getBlockState(mutablePos) != Blocks.DIRT.defaultBlockState() && this.level().getBlockState(mutablePos) != Blocks.AIR.defaultBlockState() && this.level().getBlockState(mutablePos) != Blocks.BEDROCK.defaultBlockState()) {
                                     this.level().setBlock(mutablePos, Blocks.DIRT.defaultBlockState(), 11);
                                 } else {
                                     this.level().destroyBlock(mutablePos, false);

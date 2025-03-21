@@ -9,6 +9,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -72,12 +73,19 @@ public class SilverArmory extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, conjure a set of armor made of mercury and silver which can be worn by allies. While worn, all damage under 20 will be negated, and supernatural damage heavily reduced."));
+        tooltipComponents.add(Component.literal("Upon use, conjure a set of armor made of mercury and silver which can be worn by anyone. While worn, all damage under 20 will be negated, and supernatural damage heavily reduced."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("None. 10 Health").withStyle(ChatFormatting.RED)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("45 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
+    @Override
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
+    }
+
+
 }
 

@@ -12,7 +12,6 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -59,7 +58,6 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.server.ServerLifecycleHooks;
-import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
@@ -78,8 +76,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.DawnWeaponry;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.Gigantification;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
 import net.swimmingtuna.lotm.item.OtherItems.SwordOfSilver;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
@@ -902,7 +899,32 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYEFFECT.get())));
             } else if (heldItem.getItem() instanceof ProbabilityManipulationImpulse) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYFORTUNE.get())));
-            } else if (heldItem.getItem() instanceof LuckManipulation) {
+            } else if (heldItem.getItem() instanceof ProbabilityManipulationImpulse) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROBABILITYFORTUNE.get())));
+            } else if (heldItem.getItem() instanceof DivineHandRight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDLEFT.get())));
+            }  else if (heldItem.getItem() instanceof DivineHandLeft) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDRIGHT.get())));
+            } else if (heldItem.getItem() instanceof BeamOfGlory) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFGLORY.get())));
+            } else if (heldItem.getItem() instanceof AuraOfGlory) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.BEAMOFGLORY.get())));
+            } else if (heldItem.getItem() instanceof AuraOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTFREEZE.get())));
+            } else if (heldItem.getItem() instanceof TwilightFreeze) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTACCELERATE.get())));
+            } else if (heldItem.getItem() instanceof TwilightAccelerate) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTLIGHT.get())));
+            } else if (heldItem.getItem() instanceof TwilightLight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.GLOBEOFTWILIGHT.get())));
+            } else if (heldItem.getItem() instanceof GlobeOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.BEAMOFTWILIGHT.get())));
+            } else if (heldItem.getItem() instanceof BeamOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFTWILIGHT.get())));
+            }
+
+
+            else if (heldItem.getItem() instanceof LuckManipulation) {
                 LOTMNetworkHandler.sendToServer(new LuckManipulationLeftClickC2S());
             } else if (heldItem.getItem() instanceof MisfortuneManipulation) {
                 LOTMNetworkHandler.sendToServer(new MisfortuneManipulationLeftClickC2S());
@@ -1053,6 +1075,27 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new ToggleDistanceC2S());
             } else if (heldItem.getItem() instanceof ScribeAbilities) {
                 LOTMNetworkHandler.sendToServer(new ScribeCopyAbilityC2S());
+
+            }  else if (heldItem.getItem() instanceof DivineHandRight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDLEFT.get())));
+            }  else if (heldItem.getItem() instanceof DivineHandLeft) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.DIVINEHANDRIGHT.get())));
+            } else if (heldItem.getItem() instanceof BeamOfGlory) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFGLORY.get())));
+            } else if (heldItem.getItem() instanceof AuraOfGlory) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.BEAMOFGLORY.get())));
+            } else if (heldItem.getItem() instanceof AuraOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTFREEZE.get())));
+            } else if (heldItem.getItem() instanceof TwilightFreeze) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTACCELERATE.get())));
+            } else if (heldItem.getItem() instanceof TwilightAccelerate) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.TWILIGHTLIGHT.get())));
+            } else if (heldItem.getItem() instanceof TwilightLight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.GLOBEOFTWILIGHT.get())));
+            } else if (heldItem.getItem() instanceof GlobeOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.BEAMOFTWILIGHT.get())));
+            } else if (heldItem.getItem() instanceof BeamOfTwilight) {
+                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFTWILIGHT.get())));
             }
         }
     }
@@ -1139,7 +1182,12 @@ public class BeyonderUtil {
         if (level instanceof ServerLevel serverLevel) {
             enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
         }
-        double dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
+        double dreamIntoReality;
+        if (livingEntity instanceof Player player) {
+            dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
+        } else {
+            dreamIntoReality = 1;
+        }
         float abilityStrengthened = 1;
         if (livingEntity.getPersistentData().getInt("abilityStrengthened") >= 1) {
             abilityStrengthened = 2;
@@ -1282,18 +1330,20 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.SWORDOFSILVER.get(), applyAbilityStrengthened((200.0f - (sequence * 20)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.TWILIGHTSWORD.get(), applyAbilityStrengthened((400.0f - (sequence * 100)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.DAWNARMORY.get(), applyAbilityStrengthened((150.0f - (sequence * 15)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.SPEAROFDAWN.get(), applyAbilityStrengthened((10.0f - (sequence)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.DAWNWEAPONRY.get(), applyAbilityStrengthened((150.0f - (sequence * 15)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.SILVERARMORY.get(), applyAbilityStrengthened((150.0f - (sequence * 15)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.LIGHTOFDAWN.get(), applyAbilityStrengthened((100.0f - (sequence * 10)) / abilityWeakness, abilityStrengthened));
-        damageMap.put(ItemInit.AURAOFGLORY.get(), applyAbilityStrengthened((15.0f - (sequence)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.AURAOFGLORY.get(), applyAbilityStrengthened((60.0f - (sequence * 10)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.TWILIGHTMANIFESTATION.get(), applyAbilityStrengthened((200.0f - (sequence * 100)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.TWILIGHTFREEZE.get(), applyAbilityStrengthened((600.0f - (sequence * 100)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.TWILIGHTACCELERATE.get(), applyAbilityStrengthened((1800.0f - (sequence * 300)) / abilityWeakness, abilityStrengthened));
-        damageMap.put(ItemInit.AURAOFTWILIGHT.get(), applyAbilityStrengthened((30.0f - (sequence * 2)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.AURAOFTWILIGHT.get(), applyAbilityStrengthened((100.0f - (sequence * 20)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.MERCURYLIQUEFICATION.get(), applyAbilityStrengthened((15.0f - (sequence * 2)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.DIVINEHANDRIGHT.get(), applyAbilityStrengthened((10.0f - (sequence * 4)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.DIVINEHANDLEFT.get(), applyAbilityStrengthened((10.0f - (sequence * 4)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.SILVERRAPIER.get(), applyAbilityStrengthened((40.0f - (sequence * 6)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.MERCURYCAGE.get(), applyAbilityStrengthened((500.0f - (sequence * 80)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.GLOBEOFTWILIGHT.get(), applyAbilityStrengthened((20.0f - (sequence * 8)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.TWILIGHTLIGHT.get(), applyAbilityStrengthened((300.0f - (sequence * 60)) / abilityWeakness, abilityStrengthened));
 
@@ -1744,6 +1794,13 @@ public class BeyonderUtil {
         return false;
     }
 
+    public static void makeAlly(LivingEntity user, LivingEntity allyToBe) {
+        if (user.level() instanceof ServerLevel serverLevel) {
+            PlayerAllyData allyData = serverLevel.getDataStorage().computeIfAbsent(PlayerAllyData::load, PlayerAllyData::create, "player_allies");
+            allyData.addAlly(user.getUUID(), allyToBe.getUUID());
+        }
+    }
+
     public static void useSpirituality(LivingEntity living, int spirituality) {
         if (!living.level().isClientSide()) {
             if (living instanceof Player player) {
@@ -1893,7 +1950,29 @@ public class BeyonderUtil {
         LivingEntity livingEntity = event.getEntity();
         CompoundTag tag = livingEntity.getPersistentData();
         int age = tag.getInt("age");
-        int maxAge = (int) (livingEntity.getMaxHealth() * 5);
+        int sequence = getSequence(livingEntity);
+        int maxAge = 20;
+        if (sequence == 9) {
+            maxAge = 40;
+        } else if (sequence == 8) {
+            maxAge = 80;
+        } else if (sequence == 7) {
+            maxAge = 150;
+        } else if (sequence == 6) {
+            maxAge = 230;
+        } else if (sequence == 5) {
+            maxAge = 330;
+        } else if (sequence == 4) {
+            maxAge = 550;
+        } else if (sequence == 3) {
+            maxAge = 700;
+        } else if (sequence == 2) {
+            maxAge = 1000;
+        } else if (sequence == 1) {
+            maxAge = 1600;
+        } else if (sequence == 0) {
+            maxAge = 3000;
+        }
         boolean tenPercent = age >= maxAge * 0.1;
         boolean twentyPercent = age >= maxAge * 0.2;
         boolean thirtyPercent = age >= maxAge * 0.3;
@@ -1904,7 +1983,6 @@ public class BeyonderUtil {
         boolean eightyPercent = age >= maxAge * 0.8;
         boolean ninetyPercent = age >= maxAge * 0.9;
         boolean oneHundredPercent = age >= maxAge;
-        int sequence = BeyonderUtil.getSequence(livingEntity);
         if (!livingEntity.level().isClientSide()) {
             int ageDecay = tag.getInt("ageDecay");
             if (ageDecay >= 1) {
@@ -2322,6 +2400,14 @@ public class BeyonderUtil {
         if (!entity.level().isClientSide()) {
             ScaleTypes.BASE.getScaleData(entity).setScale(scale);
         }
+    }
+
+    public static float getScale(Entity entity) {
+        float scale = 1;
+        if (!entity.level().isClientSide()) {
+            scale = ScaleTypes.BASE.getScaleData(entity).getScale();
+        }
+        return scale;
     }
 
     public static void setTargetScale(Entity entity, float scale) {

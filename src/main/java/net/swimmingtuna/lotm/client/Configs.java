@@ -307,7 +307,19 @@ public class Configs {
                 "jeb_",
                 "Dinnerbone",
                 "Grumm",
-                "fry_"
+                "fry_",
+                "LightPhoenix132",
+                "Rei_Kaneki12",
+                "FantasyFan",
+                "Adapter",
+                "JediShaggy",
+                "Isaacwash1122",
+                "Gl_Ink",
+                "Voiddustts",
+                "AlphaMuppet",
+                "Althoros",
+                "L9kii",
+                "thinkfastnow"
         );
     }
 }

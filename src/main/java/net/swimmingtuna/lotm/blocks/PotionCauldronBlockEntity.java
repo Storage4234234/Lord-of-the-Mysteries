@@ -189,7 +189,7 @@ public class PotionCauldronBlockEntity extends BlockEntity implements MenuProvid
         for (ItemStack inputIngredient : inputIngredients) {
             boolean ingredientMatched = false;
             for (int i = 0; i < remainingRecipeIngredients.size(); i++) {
-                if (ItemStack.isSameItemSameTags(inputIngredient, remainingRecipeIngredients.get(i))) {
+                if (inputIngredient.getItem() == remainingRecipeIngredients.get(i).getItem()) {
                     remainingRecipeIngredients.remove(i);
                     ingredientMatched = true;
                     break;

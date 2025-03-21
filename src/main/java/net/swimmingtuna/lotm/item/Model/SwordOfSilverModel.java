@@ -2,7 +2,6 @@ package net.swimmingtuna.lotm.item.Model;
 
 import net.minecraft.resources.ResourceLocation;
 import net.swimmingtuna.lotm.LOTM;
-import net.swimmingtuna.lotm.item.OtherItems.SwordOfDawn;
 import net.swimmingtuna.lotm.item.OtherItems.SwordOfSilver;
 import software.bernie.geckolib.model.GeoModel;
 

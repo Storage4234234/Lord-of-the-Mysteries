@@ -2,25 +2,20 @@ package net.swimmingtuna.lotm.item.OtherItems;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.swimmingtuna.lotm.entity.SilverLightEntity;
-import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.EntityInit;
-import net.swimmingtuna.lotm.item.Renderer.SwordOfDawnRenderer;
 import net.swimmingtuna.lotm.item.Renderer.SwordOfSilverRenderer;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -64,8 +59,8 @@ public class SwordOfSilver extends SwordItem implements GeoItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-
-        super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
+        tooltipComponents.add(Component.literal("A sword made out of mercury, you can hold down right click in order to throw it like a spear.").withStyle(ChatFormatting.GRAY));
+        tooltipComponents.add(Component.literal("On hit, if the creature is evil, it will deal additional damage, slow, and weaken them.").withStyle(ChatFormatting.GRAY));
     }
 
     @Override

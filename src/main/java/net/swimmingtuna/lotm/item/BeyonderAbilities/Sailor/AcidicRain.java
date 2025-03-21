@@ -13,8 +13,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
@@ -29,7 +27,7 @@ import java.util.List;
 public class AcidicRain extends SimpleAbilityItem {
 
     public AcidicRain(Properties properties) {
-        super(properties, BeyonderClassInit.SAILOR, 5, 175, 500);
+        super(properties, BeyonderClassInit.SAILOR, 3, 175, 500);
     }
 
     @Override

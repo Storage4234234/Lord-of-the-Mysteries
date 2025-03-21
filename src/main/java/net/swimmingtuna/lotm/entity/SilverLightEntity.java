@@ -17,11 +17,14 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.world.ForgeChunkManager;
+import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.init.ParticleInit;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.SendParticleS2C;
@@ -90,7 +93,7 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
     @Override
     protected void onHitBlock(BlockHitResult pResult) {
         if (!this.level().isClientSide()) {
-            if (!getShouldTeleport() && this.tickCount >= 10) {
+            if (!getShouldTeleport() && this.tickCount >= 5) {
                 BeyonderUtil.destroyBlocksInSphere(this,pResult.getBlockPos(), (int) ((int) ScaleTypes.BASE.getScaleData(this).getScale() * 1.2), 15 );
                 this.discard();
             }
@@ -168,7 +171,22 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
     public void tick() {
         super.tick();
         if (!this.level().isClientSide() && this.getOwner() instanceof LivingEntity owner) {
-            if (this.tickCount >= 30 && !this.getPersistentData().getBoolean("hasTeleported") && getShouldTeleport()) {
+            if (this.level() instanceof ServerLevel serverLevel) {
+                ChunkPos currentChunk = new ChunkPos(this.blockPosition());
+                ForgeChunkManager.forceChunk(serverLevel, LOTM.MOD_ID, this, currentChunk.x, currentChunk.z, true, true);
+                Vec3 eyePosition = owner.getEyePosition();
+                Vec3 lookVector = owner.getLookAngle();
+                Vec3 reachVector = eyePosition.add(lookVector.x * 80, lookVector.y * 80, lookVector.z * 80);
+                int steps = 16;
+                for (int i = 0; i < steps; i++) {
+                    double t = i / (double) steps;
+                    Vec3 point = eyePosition.lerp(reachVector, t);
+                    BlockPos blockPos = new BlockPos((int) point.x, (int) point.y, (int) point.z);
+                    ChunkPos chunkPos = new ChunkPos(blockPos);
+                    ForgeChunkManager.forceChunk(serverLevel, LOTM.MOD_ID, this, chunkPos.x, chunkPos.z, true, true);
+                }
+            }
+            if (this.tickCount >= 35 + this.getPersistentData().getInt("silverLightTeleportTimer") && !this.getPersistentData().getBoolean("hasTeleported") && getShouldTeleport()) {
                 this.getPersistentData().putBoolean("hasTeleported", true);
                 LivingEntity target;
                 Vec3 eyePosition = owner.getEyePosition();
@@ -181,6 +199,16 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
                 } else {
                     target = findTargetInSight(owner);
                 }
+                if (this.level() instanceof ServerLevel serverLevel) {
+                    ChunkPos targetChunk = new ChunkPos(this.blockPosition());
+                    int chunkRadius = 3;
+                    for (int dx = -chunkRadius; dx <= chunkRadius; dx++) {
+                        for (int dz = -chunkRadius; dz <= chunkRadius; dz++) {
+                            ChunkPos chunkPos = new ChunkPos(targetChunk.x + dx, targetChunk.z + dz);
+                            ForgeChunkManager.forceChunk(serverLevel, LOTM.MOD_ID, this, chunkPos.x, chunkPos.z, true, true);
+                        }
+                    }
+                }
                 if (target != null) {
                     Vec3 teleportPos = getRandomPositionInSphere(target, 20.0);
                     this.setPos(teleportPos.x, teleportPos.y, teleportPos.z);
@@ -190,21 +218,21 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
                     this.setDeltaMovement(direction.scale(speed));
                 }
             }
-            if (this.tickCount >= 100) {
-                this.discard();
-            }
-            if (this.level() instanceof ServerLevel serverLevel) {
-                int chunkRadius = 5;
-                ChunkPos centerChunk = new ChunkPos(this.blockPosition());
-                for (int dx = -chunkRadius; dx <= chunkRadius; dx++) {
-                    for (int dz = -chunkRadius; dz <= chunkRadius; dz++) {
-                        ChunkPos chunkPos = new ChunkPos(centerChunk.x + dx, centerChunk.z + dz);
-                        serverLevel.getChunkSource().addRegionTicket(TicketType.PLAYER, chunkPos, 3, chunkPos);
+            if (this.tickCount % 20 == 0 && this.level() instanceof ServerLevel serverLevel) {
+                ChunkPos currentChunk = new ChunkPos(this.blockPosition());
+                int releaseRadius = 20;
+                for (int dx = -releaseRadius; dx <= releaseRadius; dx++) {
+                    for (int dz = -releaseRadius; dz <= releaseRadius; dz++) {
+                        ChunkPos chunkPos = new ChunkPos(currentChunk.x + dx, currentChunk.z + dz);
+                        if (Math.abs(dx) <= 1 && Math.abs(dz) <= 1) continue;
+                        ForgeChunkManager.forceChunk(serverLevel, LOTM.MOD_ID, this, chunkPos.x, chunkPos.z, false, true);
                     }
                 }
             }
+
             LOTMNetworkHandler.sendToAllPlayers(new UpdateEntityLocationS2C(this.getX(), this.getY(), this.getZ(), this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z(), this.getId()));
         }
+
         if (!level().isClientSide()) {
             LOTMNetworkHandler.sendToAllPlayers(new SendParticleS2C(ParticleInit.FLASH_PARTICLE.get(), this.getX(), this.getY(), this.getZ(), 0, 0, 0));
             Vec3 motion = this.getDeltaMovement();
@@ -213,6 +241,17 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
             float newPitch = (float) Math.toDegrees(Math.atan2(motion.y, horizontalDist));
             this.setYaw(newYaw);
             this.setPitch(newPitch);
+            ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
+            float scale = scaleData.getScale();
+            for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 0.8f))) {
+                if (this.getOwner() instanceof LivingEntity owner && livingEntity != owner) {
+                    livingEntity.hurt(BeyonderUtil.genericSource(this.getOwner()), scale * 25);
+                    this.discard();
+                }
+            }
+            if (this.tickCount >= 80) {
+                this.discard();
+            }
         }
     }
 
@@ -263,14 +302,12 @@ public class SilverLightEntity extends AbstractHurtingProjectile implements GeoE
         double phi = Math.acos(2 * Math.random() - 1);
         double r = radius * Math.cbrt(Math.random());
         double x = surfacePos.x + r * Math.sin(phi) * Math.cos(theta);
-        double y = surfacePos.y + r * Math.sin(phi) * Math.sin(theta);
         double z = surfacePos.z + r * Math.cos(phi);
         int newSurfaceHeight = level.getHeight(Heightmap.Types.WORLD_SURFACE, (int) x, (int) z);
-        if (Math.abs(newSurfaceHeight - target.getY()) > 20) {
-            return new Vec3(x, y, z);
-        } else {
-            return new Vec3(x, newSurfaceHeight, z);
-        }
+        double randomHeightOffset = Math.random() * 20;
+        double y = newSurfaceHeight + randomHeightOffset;
+
+        return new Vec3(x, y, z);
     }
 
 

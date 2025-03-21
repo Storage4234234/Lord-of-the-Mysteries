@@ -1,6 +1,9 @@
 package net.swimmingtuna.lotm.item.OtherItems;
 
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -9,20 +12,37 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.common.util.Lazy;
+import net.swimmingtuna.lotm.entity.SpearOfDawnEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.MindReading;
+import net.swimmingtuna.lotm.item.Renderer.SpearOfDawnRenderer;
+import net.swimmingtuna.lotm.item.Renderer.SwordOfDawnRenderer;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
+import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
+import software.bernie.geckolib.animatable.GeoItem;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Consumer;
 
-public class SpearOfDawn extends SwordItem {
+public class SpearOfDawn extends SwordItem implements GeoItem {
 
 
     public SpearOfDawn(Tier pTier, int pAttackDamageModifier, float pAttackSpeedModifier, Properties pProperties) {
@@ -77,32 +97,28 @@ public class SpearOfDawn extends SwordItem {
     }
 
     @Override
-    public void releaseUsing(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity, int pTimeCharged) {
-        if (!(pLivingEntity instanceof Player player)) {
-            return;
-        }
-        int i = this.getUseDuration(pStack) - pTimeCharged;
-        float powerScale = getPowerForTime(i);
-        if (!pLevel.isClientSide) {
-            Arrow arrow = new Arrow(pLevel, player);
-            arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, powerScale * 3.0F, 1.0F);
-
-            arrow.setCritArrow(powerScale > 0.5F);
-            arrow.setBaseDamage(arrow.getBaseDamage() * 2.0);
-
-            // Spawn the arrow in the world
-            pLevel.addFreshEntity(arrow);
+    public void releaseUsing(ItemStack stack, Level level, LivingEntity livingEntity, int pTimeCharged) {
+        if (!level.isClientSide) {
+            SpearOfDawnEntity silverLight = new SpearOfDawnEntity(EntityInit.SPEAR_OF_DAWN_ENTITY.get(), level);
+            Vec3 lookVec = livingEntity.getLookAngle().normalize().scale(10);
+            silverLight.setDeltaMovement(lookVec);
+            silverLight.setOwner(livingEntity);
+            silverLight.hurtMarked = true;
+            silverLight.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
+            BeyonderUtil.setScale(silverLight, BeyonderUtil.getDamage(livingEntity).get(ItemInit.SPEAROFDAWN.get()));
+            livingEntity.level().addFreshEntity(silverLight);
+            removeItemFromSlot(livingEntity, stack);
         }
     }
 
     @Override
     public int getUseDuration(ItemStack pStack) {
-        return 72000; // Same as bow
+        return 72000;
     }
 
     @Override
     public UseAnim getUseAnimation(ItemStack pStack) {
-        return UseAnim.SPEAR; // Or BOW if you prefer that animation
+        return UseAnim.SPEAR;
     }
 
     private float getPowerForTime(int pCharge) {
@@ -116,10 +132,62 @@ public class SpearOfDawn extends SwordItem {
 
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level
-            level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("WORK IN PROGRESS").withStyle(ChatFormatting.RED));
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        tooltipComponents.add(Component.literal("Can be used as a melee weapon, or hold down right click to throw it at a rapid speed."));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("25 per second.").withStyle(ChatFormatting.YELLOW)));
     }
+
+    private final Lazy<Multimap<Attribute, AttributeModifier>> lazyAttributeMap = Lazy.of(this::createAttributeMap);
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+        if (slot == EquipmentSlot.MAINHAND) {
+            return this.lazyAttributeMap.get();
+        }
+        return super.getDefaultAttributeModifiers(slot);
+    }
+
+    private Multimap<Attribute, AttributeModifier> createAttributeMap() {
+        ImmutableMultimap.Builder<Attribute, AttributeModifier> attributeBuilder = ImmutableMultimap.builder();
+        attributeBuilder.putAll(super.getDefaultAttributeModifiers(EquipmentSlot.MAINHAND));
+        attributeBuilder.put(ForgeMod.ENTITY_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_ENTITY_REACH, "Reach modifier", 2, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with entities
+        attributeBuilder.put(ForgeMod.BLOCK_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_BLOCK_REACH, "Reach modifier", 2, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with blocks, p much useless for this item
+        return attributeBuilder.build();
+    }
+
+    public static boolean usedHand(Player player) {
+        ItemStack mainHandStack = player.getMainHandItem();
+        return mainHandStack.getItem() instanceof MindReading;
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>(this, "Activation", 0, state -> PlayState.STOP));
+    }
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        consumer.accept(new IClientItemExtensions() {
+            private SpearOfDawnRenderer renderer;
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (this.renderer == null)
+                    this.renderer = new SpearOfDawnRenderer();
+
+                return this.renderer;
+            }
+        });
+    }
+
 
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {

@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -60,7 +61,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
         boolean twilight = tag.getBoolean("auraOfTwilight");
         if (!livingEntity.level().isClientSide() && (glory || twilight)) {
             if (glory && livingEntity.tickCount % 20 == 0) {
-                for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(200))) {
+                for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(150))) {
                     if (!BeyonderUtil.isAllyOf(livingEntity, living) && living != livingEntity) {
                         living.getPersistentData().putInt("age", (int) (living.getPersistentData().getInt("age") + BeyonderUtil.getDamage(livingEntity).get(ItemInit.AURAOFGLORY.get())));
                         living.sendSystemMessage(Component.literal("You are getting rapidly aged").withStyle(ChatFormatting.YELLOW));
@@ -84,7 +85,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
                         if (owner != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, owner)) {
                             projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.5).x(), projectile.getDeltaMovement().y() - 0.1, projectile.getDeltaMovement().scale(0.5).z());
                             projectile.hurtMarked = true;
-                            projectile.getPersistentData().putInt("age", projectile.getPersistentData().getInt("age") + 4);
+                            projectile.getPersistentData().putInt("age", projectile.getPersistentData().getInt("age") + 5);
                         }
                     }
                     float scale = ScaleTypes.BASE.getScaleData(projectile).getScale();
@@ -118,7 +119,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
                         if (owner != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, owner)) {
                             projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.3).x(), projectile.getDeltaMovement().y() - 0.2, projectile.getDeltaMovement().scale(0.3).z());
                             projectile.hurtMarked = true;
-                            projectile.getPersistentData().putInt("age", projectile.getPersistentData().getInt("age") + 8);
+                            projectile.getPersistentData().putInt("age", projectile.getPersistentData().getInt("age") + 10);
                         }
                     }
                     float scale = ScaleTypes.BASE.getScaleData(projectile).getScale();
@@ -136,11 +137,17 @@ public class AuraOfGlory extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use, enable or disable your aura of glory. If enabled, all entities around you will be affected by glory. If they are an ally or yourself, they will age positively, gaining spirituality quickly, recovering fast, and have their item cooldowns reduced. If they aren't an ally, they will age rapidly, eventually turning to dust. This applies to projectiles too."));
+        tooltipComponents.add(Component.literal("Left Click for Beam of Glory"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("200 per second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
+    }
+
+    @Override
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 }
 

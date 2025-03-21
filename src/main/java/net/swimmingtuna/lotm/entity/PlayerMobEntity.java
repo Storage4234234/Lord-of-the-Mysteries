@@ -61,7 +61,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 public class PlayerMobEntity extends Monster implements RangedAttackMob, CrossbowAttackMob {
 

@@ -65,8 +65,6 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.BattleHypnotism;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeDemise;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.SilverRapier;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.GlobeOfTwilight;
 import net.swimmingtuna.lotm.item.OtherItems.SwordOfTwilight;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
@@ -108,7 +106,6 @@ import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.AcidicRain.aci
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.CalamityIncarnationTsunami.calamityIncarnationTsunamiTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.Earthquake.earthquake;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.ExtremeColdness.extremeColdness;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.ExtremeColdness.extremeColdnessTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.Hurricane.hurricane;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.LightningStorm.lightningStorm;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.MatterAccelerationEntities.matterAccelerationEntities;
@@ -129,7 +126,6 @@ import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedIte
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.DreamWeaving.dreamWeaving;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionBarrier.envisionBarrier;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionKingdom.envisionKingdom;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLife.envisionLife;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ManipulateMovement.manipulateMovement;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.MentalPlague.mentalPlague;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.Nightmare.nightmareTick;
@@ -338,7 +334,11 @@ public class ModEvents {
             if (livingEntity.level() instanceof ServerLevel serverLevel) {
                 CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
             }
+            twilightTick(event);
+            envisionKingdom(livingEntity, level);
+            SwordOfTwilight.twilightSwordTick(event);
             if (tag.getInt("inTwilight") == 0) {
+
                 dreamIntoReality(livingEntity);
                 acidicRainTick(livingEntity);
                 lightningStorm(livingEntity);
@@ -350,12 +350,12 @@ public class ModEvents {
                 starOfLightning(livingEntity);
                 sirenSongsTick(livingEntity);
                 matterAccelerationSelf(livingEntity);
+                DivineHandRightEntity.divineHandCooldownDecrease(livingEntity);
                 rainEyesTick(livingEntity);
                 earthquake(livingEntity);
                 hurricane(livingEntity);
                 extremeColdness(livingEntity);
                 calamityIncarnationTsunamiTick(livingEntity);
-                envisionKingdom(livingEntity, level);
                 envisionBarrier(livingEntity);
                 manipulateMovement(livingEntity);
                 envisionBarrier(livingEntity);
@@ -368,8 +368,6 @@ public class ModEvents {
                 sailorLightningTravel(livingEntity);
                 psychologicalInvisibility(livingEntity);
                 monsterDomainIntHandler(livingEntity);
-                livingEntity.sendSystemMessage(Component.literal("not working"));
-                twilightTick(event);
                 nightmareTick(livingEntity);
                 calamityUndeadArmy(livingEntity);
                 calamityLightningStorm(livingEntity);
@@ -384,7 +382,6 @@ public class ModEvents {
                 SilverRapier.mercuryTick(event);
                 FateReincarnation.monsterReincarnationChecker(event);
                 DawnArmory.dawnArmorTickEvent(event);
-                DivineHandLeftEntity.divineHandTick(event);
                 TwilightAccelerate.twilightAccelerateTick(event);
                 TwilightFreeze.twilightFreezeTick(event);
                 TwilightLight.twilightLightTick(event);
@@ -436,8 +433,6 @@ public class ModEvents {
                 StormSeal.sealTick(event);
                 AqueousLightDrown.lightTickEvent(livingEntity);
                 TsunamiSeal.sealTick(event);
-            } else {
-                livingEntity.sendSystemMessage(Component.literal("twilight value is " + tag.getInt("inTwilight")));
             }
         }
     }

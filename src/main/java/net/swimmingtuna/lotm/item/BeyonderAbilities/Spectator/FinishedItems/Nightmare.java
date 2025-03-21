@@ -127,23 +127,25 @@ public class Nightmare extends SimpleAbilityItem {
     }
 
     public static void nightmareTick(LivingEntity livingEntity) {
-        AttributeInstance nightmareAttribute = livingEntity.getAttribute(ModAttributes.NIGHTMARE.get());
-        CompoundTag playerPersistentData = livingEntity.getPersistentData();
-        int nightmareTimer = playerPersistentData.getInt("NightmareTimer");
-        int matterAccelerationBlockTimer = livingEntity.getPersistentData().getInt("matterAccelerationBlockTimer");
-        if (matterAccelerationBlockTimer >= 1) {
-            livingEntity.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
-        }
-        if (nightmareAttribute.getValue() >= 1) {
-            nightmareTimer++;
-            if (nightmareTimer >= 600) {
-                nightmareAttribute.setBaseValue(0);
+        if (livingEntity instanceof Player player) {
+            AttributeInstance nightmareAttribute = player.getAttribute(ModAttributes.NIGHTMARE.get());
+            CompoundTag playerPersistentData = player.getPersistentData();
+            int nightmareTimer = playerPersistentData.getInt("NightmareTimer");
+            int matterAccelerationBlockTimer = player.getPersistentData().getInt("matterAccelerationBlockTimer");
+            if (matterAccelerationBlockTimer >= 1) {
+                player.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
+            }
+            if (nightmareAttribute.getValue() >= 1) {
+                nightmareTimer++;
+                if (nightmareTimer >= 600) {
+                    nightmareAttribute.setBaseValue(0);
+                    nightmareTimer = 0;
+                }
+            } else {
                 nightmareTimer = 0;
             }
-        } else {
-            nightmareTimer = 0;
+            playerPersistentData.putInt("NightmareTimer", nightmareTimer);
         }
-        playerPersistentData.putInt("NightmareTimer", nightmareTimer);
     }
 
     @Override

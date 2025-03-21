@@ -29,10 +29,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.client.ClientConfigs;
 import net.swimmingtuna.lotm.client.Configs;
-import net.swimmingtuna.lotm.entity.Renderers.AqueousLightEntityPullRenderer;
-import net.swimmingtuna.lotm.entity.Renderers.AqueousLightEntityPushRenderer;
-import net.swimmingtuna.lotm.entity.Renderers.AqueousLightEntityRenderer;
-import net.swimmingtuna.lotm.entity.Renderers.LightningEntityRenderer;
+import net.swimmingtuna.lotm.entity.Renderers.*;
 import net.swimmingtuna.lotm.events.ClientEvents;
 import net.swimmingtuna.lotm.init.*;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
@@ -133,6 +130,7 @@ public class LOTM {
     @OnlyIn(Dist.CLIENT)
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(EntityInit.AQUEOUS_LIGHT_ENTITY.get(), AqueousLightEntityRenderer::new);
+        event.registerEntityRenderer(EntityInit.SPEAR_OF_DAWN_ENTITY.get(), SpearOfDawnRenderer::new);
         event.registerEntityRenderer(EntityInit.AQUEOUS_LIGHT_ENTITY_PUSH.get(), AqueousLightEntityPushRenderer::new);
         event.registerEntityRenderer(EntityInit.AQUEOUS_LIGHT_ENTITY_PULL.get(), AqueousLightEntityPullRenderer::new);
         event.registerEntityRenderer(EntityInit.LIGHTNING_ENTITY.get(), LightningEntityRenderer::new);

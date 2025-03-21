@@ -22,7 +22,6 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
-import net.swimmingtuna.lotm.util.BeyonderUtil.*;
 
 import javax.annotation.Nullable;
 import java.util.List;

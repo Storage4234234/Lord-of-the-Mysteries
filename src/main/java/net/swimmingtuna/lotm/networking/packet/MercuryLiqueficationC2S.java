@@ -2,7 +2,6 @@ package net.swimmingtuna.lotm.networking.packet;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -42,7 +41,7 @@ public class MercuryLiqueficationC2S {
                         MercuryEntity mercuryEntity = new MercuryEntity(EntityInit.MERCURY_ENTITY.get(), level);
                         mercuryEntity.setSpeed(Math.max(1, (int) damage / 4));
                         mercuryEntity.setHarmTime((int) damage * 25);
-                        mercuryEntity.setLifetime((int) damage * 8);
+                        mercuryEntity.setLifetime((int) damage * 2);
                         mercuryEntity.setTarget(livingEntity);
                         mercuryEntity.teleportTo(player.getX(), player.getY(), player.getZ());
                         level.addFreshEntity(mercuryEntity);

@@ -1,6 +1,8 @@
 package net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems;
 
 
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -9,17 +11,23 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
+import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -59,9 +67,10 @@ public class TwilightAccelerate extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use if you're shifting, save your current state including health, spirituality, potion effects, luck, misfortune, sanity, and corruption. If not shifting, load your saved state"));
-        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("2000").withStyle(ChatFormatting.YELLOW)));
-        tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Minute").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Upon use on nothing or an ally, accelerates your/them in a positive way. Having their speed be higher, all their abilities that happen over time to occur quicker, their spirituality and health to regenerate faster, their benefitial potion effects to last longer, and harmful ones to go away quicker. If used on an enemy, accelerates their time negatively, causing them to age quick, lose spirituality fast, have beneficial effects go away faster, and harmful effects to last longer."));
+        tooltipComponents.add(Component.literal("Left Click for Twilight: Light"));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("3000").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("60 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
@@ -127,7 +136,7 @@ public class TwilightAccelerate extends SimpleAbilityItem {
                     }
                 }
                 if (Math.random() > 0.95) {
-                    tag.putInt("age", tag.getInt("age") + 1);
+                    tag.putInt("age", tag.getInt("age") + 20);
                 }
                 for (MobEffectInstance mobEffect : livingEntity.getActiveEffects()) {
                     int currentDuration = mobEffect.getDuration();
@@ -142,9 +151,27 @@ public class TwilightAccelerate extends SimpleAbilityItem {
         }
     }
 
+    private final Lazy<Multimap<Attribute, AttributeModifier>> lazyAttributeMap = Lazy.of(this::createAttributeMap);
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot slot) {
+        if (slot == EquipmentSlot.MAINHAND) {
+            return this.lazyAttributeMap.get();
+        }
+        return super.getDefaultAttributeModifiers(slot);
+    }
+
+    private Multimap<Attribute, AttributeModifier> createAttributeMap() {
+        ImmutableMultimap.Builder<Attribute, AttributeModifier> attributeBuilder = ImmutableMultimap.builder();
+        attributeBuilder.putAll(super.getDefaultAttributeModifiers(EquipmentSlot.MAINHAND));
+        attributeBuilder.put(ForgeMod.ENTITY_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_ENTITY_REACH, "Reach modifier", 200, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with entities
+        attributeBuilder.put(ForgeMod.BLOCK_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_BLOCK_REACH, "Reach modifier", 200, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with blocks, p much useless for this item
+        return attributeBuilder.build();
+    }
 
     @Override
-    public Rarity getRarity(ItemStack pStack) {
-        return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 }

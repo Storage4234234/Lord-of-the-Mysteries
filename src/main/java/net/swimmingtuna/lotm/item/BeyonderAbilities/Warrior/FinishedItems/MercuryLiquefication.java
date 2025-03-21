@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -244,24 +245,19 @@ public class MercuryLiquefication extends SimpleAbilityItem {
         int x = tag.getInt("mercuryArmorEquipped");
         int y = tag.getInt("mercuryArmorForm");
         if (!livingEntity.level().isClientSide() && x >= 1) {
-            System.out.println("x greater than 1"); //working
             tag.putInt("mercuryArmorEquipped", x - 1);
             for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(150))) {
                 if (living.getPersistentData().contains("mercuryArmor")) {
-                    System.out.println("mercury armor spotted");
                     if (living.getPersistentData().getUUID("mercuryArmor").equals(livingEntity.getUUID())) {
                         living.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
                         living.getPersistentData().putInt("mercuryArmorForm", 10);
-                        System.out.println("user spotted, teleporting");
                     }
                     if (!hasFullSilverArmor(livingEntity)) {
-                        System.out.println("doesnt have armor on");
                         if (tag.contains("mercuryArmorStorage")) {
                             CompoundTag armorData = tag.getCompound("mercuryArmorStorage");
                             ListTag armorItems = armorData.getList("mercuryStoredArmor", 10);
                             for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
                                 livingEntity.setItemSlot(slot, ItemStack.EMPTY);
-                                System.out.println("set empty");
                             }
                             for (int i = 0; i < armorItems.size(); i++) {
                                 CompoundTag slotTag = armorItems.getCompound(i);
@@ -286,9 +282,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
             }
         }
         if (!livingEntity.level().isClientSide() && y >= 1) {
-            BeyonderUtil.useSpirituality(livingEntity, 5);
             tag.putInt("mercuryArmorForm", y - 1);
-            System.out.println("y decremented, using spirituality");
             if (!livingEntity.isShiftKeyDown()) {
                 if (livingEntity instanceof Player player && player.tickCount % 10 == 0) {
                     player.displayClientMessage(Component.literal("Shift to unequip yourself").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD), true);
@@ -299,7 +293,6 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                     living.getPersistentData().putInt("mercuryArmorEquipped", 0);
                     CompoundTag pTag = living.getPersistentData();
                     if (pTag.contains("mercuryArmorStorage")) {
-                        System.out.println("detected one for " + living.getName());
                         CompoundTag armorData = pTag.getCompound("mercuryArmorStorage");
                         ListTag armorItems = armorData.getList("mercuryStoredArmor", 10);
                         for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
@@ -333,7 +326,11 @@ public class MercuryLiquefication extends SimpleAbilityItem {
         if (!livingEntity.level().isClientSide() && x >= 1) {
             for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(15))) {
                 if (living.getPersistentData().contains("mercuryArmor")) {
-                    if (living.getPersistentData().getUUID("mercuryArmor") == livingEntity.getUUID()) {
+                    if (living.getPersistentData().getUUID("mercuryArmor").equals(livingEntity.getUUID())) {
+                        living.horizontalCollision = false;
+                        living.minorHorizontalCollision = false;
+                        living.verticalCollision = false;
+                        living.verticalCollisionBelow = false;
                         living.hurt(event.getSource(), event.getAmount());
                         event.setAmount(0);
                     }
@@ -357,12 +354,18 @@ public class MercuryLiquefication extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, manifest twilight in order to freeze time around you temporarily."));
-        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("0").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Upon use, transform into mercury. In this form, you can move around at high speeds. If your sequence is less than 2, you can right click the air to send our pieces of yourself to trap all those around you. You can also right click an ally in order to transform into a set of armor for them."));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("200 per second.").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
+    @Override
+    public @NotNull Rarity getRarity(ItemStack pStack) {
+        return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
+    }
+
 }
 
