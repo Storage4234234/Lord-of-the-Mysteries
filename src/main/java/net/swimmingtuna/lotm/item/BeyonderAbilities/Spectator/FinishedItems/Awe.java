@@ -43,6 +43,7 @@ public class Awe extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
+
     public static void applyPotionEffectToEntities(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             AttributeInstance dreamIntoReality = livingEntity.getAttribute(ModAttributes.DIR.get());

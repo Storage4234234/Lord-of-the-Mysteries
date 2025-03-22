@@ -77,7 +77,9 @@ public class TestItem extends SimpleAbilityItem {
             }
             for (PlayerMobEntity playerMobEntity : player.level().getEntitiesOfClass(PlayerMobEntity.class, player.getBoundingBox().inflate(20))) {
                 playerMobEntity.setPathway(BeyonderClassInit.SPECTATOR.get());
-                playerMobEntity.setSequence(4);
+                playerMobEntity.setSequence(7);
+                playerMobEntity.setMaxSpirituality(10000);
+                playerMobEntity.setSpiritualityRegen(50);
             }
         }
 

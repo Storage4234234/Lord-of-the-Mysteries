@@ -714,19 +714,66 @@ public class BeyonderUtil {
 
         if ((hasEntityInteraction || hasBlockInteraction) && !hasGeneralAbility) {
             if (successfulUse) {
+                System.out.println("successful use 1st");
                 player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
             } else {
+                System.out.println("missed use 1st");
                 player.displayClientMessage(Component.literal("Missed: " + itemName).withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
             }
         } else if (!hasEntityInteraction && !hasBlockInteraction) {
             ability.useAbility(player.level(), player, hand);
+            System.out.println("successful use 2nd");
             player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
         } else if (successfulUse) {
+            System.out.println("successful use 3rd");
             player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
         } else {
+            System.out.println("successful use 4th");
             ability.useAbility(player.level(), player, hand);
             player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
         }
+    }
+
+    private static boolean tryTargetedAbility(Player player, Ability ability, InteractionHand hand, String itemName) {
+        double entityReach = ability.getEntityReach();
+        double blockReach = ability.getBlockReach();
+
+        // Try entity targeting first
+        Vec3 eyePosition = player.getEyePosition();
+        Vec3 lookVector = player.getLookAngle();
+        Vec3 entityReachVector = eyePosition.add(lookVector.x * entityReach, lookVector.y * entityReach, lookVector.z * entityReach);
+        AABB searchBox = player.getBoundingBox().inflate(entityReach);
+        EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(player.level(), player, eyePosition, entityReachVector, searchBox,
+                entity -> !entity.isSpectator() && entity.isPickable(), 0.0f);
+
+        if (entityHit != null && entityHit.getEntity() instanceof LivingEntity livingEntity) {
+            InteractionResult result = ability.useAbilityOnEntity(player.getItemInHand(hand), player, livingEntity, hand);
+            if (result == InteractionResult.SUCCESS) {
+                player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
+                return true;
+            }
+        }
+
+        // If entity targeting failed, try block targeting
+        Vec3 blockReachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
+        BlockHitResult blockHit = player.level().clip(new ClipContext(
+                eyePosition,
+                blockReachVector,
+                ClipContext.Block.OUTLINE,
+                ClipContext.Fluid.NONE,
+                player
+        ));
+
+        if (blockHit.getType() != HitResult.Type.MISS) {
+            UseOnContext context = new UseOnContext(player.level(), player, hand, player.getItemInHand(hand), blockHit);
+            InteractionResult result = ability.useAbilityOnBlock(context);
+            if (result == InteractionResult.SUCCESS) {
+                player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static Style getStyle(LivingEntity livingEntity) {

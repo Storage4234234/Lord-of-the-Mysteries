@@ -745,6 +745,8 @@ public class ModEvents {
                 if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
                     if (!playerMobEntity.level().getLevelData().getGameRules().getBoolean(GameRuleInit.NPC_SHOULD_SPAWN)) {
                         event.setCanceled(true);
+                    } else {
+                        playerMobEntity.setSpirituality(playerMobEntity.getMaxSpirituality());
                     }
                 }
             } else if (entity instanceof Projectile projectile) {

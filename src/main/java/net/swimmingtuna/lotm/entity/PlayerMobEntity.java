@@ -92,6 +92,7 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
     private static final EntityDataAccessor<String> NAME = SynchedEntityData.defineId(PlayerMobEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> SEQUENCE = SynchedEntityData.defineId(PlayerMobEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SPIRITUALITY = SynchedEntityData.defineId(PlayerMobEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> SPIRITUALITY_REGEN = SynchedEntityData.defineId(PlayerMobEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> MAXSPIRITUALITY = SynchedEntityData.defineId(PlayerMobEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> IS_CHARGING_CROSSBOW = SynchedEntityData.defineId(PlayerMobEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -162,6 +163,7 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
         getEntityData().define(MENTAL_STRENGTH, 10);
         getEntityData().define(MAXSPIRITUALITY, 100);
         getEntityData().define(SPIRITUALITY, 0);
+        getEntityData().define(SPIRITUALITY_REGEN, 0);
     }
 
 
@@ -258,6 +260,7 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
             if (!this.level().getLevelData().getGameRules().getBoolean(GameRuleInit.NPC_SHOULD_SPAWN)) {
                 this.discard();
             }
+            this.setSpirituality(this.getSpirituality() + this.getSpiritualityRegen());
         }
         super.tick();
         xCloakO = xCloak;
@@ -513,9 +516,17 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
     public void setSpirituality(int spirituality) {
         this.entityData.set(SPIRITUALITY, spirituality);
     }
+    public void setSpiritualityRegen(int spiritualityRegen) {
+        this.entityData.set(SPIRITUALITY_REGEN, spiritualityRegen);
+    }
     public int getSpirituality() {
         return this.entityData.get(SPIRITUALITY);
     }
+
+    public int getSpiritualityRegen() {
+        return this.entityData.get(SPIRITUALITY_REGEN);
+    }
+
     public void setMaxSpirituality(int maxSpirituality) {
         this.entityData.set(MAXSPIRITUALITY, maxSpirituality);
     }

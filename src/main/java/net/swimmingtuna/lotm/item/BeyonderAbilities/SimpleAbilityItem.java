@@ -17,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
@@ -28,7 +29,6 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public abstract class SimpleAbilityItem extends Item implements Ability {
-    private boolean isProcessing = false;
     protected final Supplier<? extends BeyonderClass> requiredClass;
     protected final int requiredSequence;
     protected final int requiredSpirituality;
@@ -70,16 +70,25 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
 
 
     protected boolean checkAll(LivingEntity living) {
-        if(living.getItemInHand(InteractionHand.MAIN_HAND).is(this)) {
-            if(!checkAll(living, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, false)) {
-                if(BeyonderUtil.sequenceAbleCopy(living)) {
-                    if(BeyonderUtil.checkAbilityIsCopied(living, this)) {
+        boolean itemCheckPassed = !(living instanceof Player);
+        if (living instanceof Player) {
+            itemCheckPassed = living.getItemInHand(InteractionHand.MAIN_HAND).is(this) || living.getItemInHand(InteractionHand.MAIN_HAND).is(ItemInit.BEYONDER_ABILITY_USER.get());
+        }
+
+        if (itemCheckPassed) {
+            boolean checkAllResult = checkAll(living, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, false);
+            if (!checkAllResult) {
+                boolean sequenceAble = BeyonderUtil.sequenceAbleCopy(living);
+                if (sequenceAble) {
+                    boolean abilityCopied = BeyonderUtil.checkAbilityIsCopied(living, this);
+                    if (abilityCopied) {
                         BeyonderUtil.useCopiedAbility(living, this);
                         return checkSpirituality(living, this.getSpirituality(), true);
                     }
                 }
             }
-            if(checkAll(living, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, true)) {
+            boolean finalCheck = checkAll(living, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, true);
+            if (finalCheck) {
                 BeyonderUtil.copyAbilities(living.level(), living, this);
                 return true;
             }
@@ -89,16 +98,22 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
 
 
 
+
+
+
     public int getSpirituality() {
         return this.requiredSpirituality;
     }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        System.out.println("method called");
         if (!level.isClientSide() && checkIfCanUseAbility(player)) {
             InteractionResult interactionResult = useAbility(level, player, hand);
             System.out.println("use ability used");
             return new InteractionResultHolder<>(interactionResult, player.getItemInHand(hand));
+        } else if (!checkIfCanUseAbility(player)) {
+            System.out.println("not working");
         }
         return InteractionResultHolder.pass(player.getItemInHand(hand));
     }
