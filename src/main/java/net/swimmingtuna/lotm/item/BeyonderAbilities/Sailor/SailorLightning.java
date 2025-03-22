@@ -72,24 +72,22 @@ public class SailorLightning extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
         if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 120, true)) {
             return InteractionResult.FAIL;
         }
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         lightningDirection(player, level);
-        addCooldown(player, this, 10 + holder.getSequence());
+        addCooldown(player, this, 10 + BeyonderUtil.getSequence(player));
         useSpirituality(player, 200);
         return InteractionResult.SUCCESS;
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack pStack, Player player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
+    public InteractionResult useAbilityOnEntity(ItemStack pStack, LivingEntity player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
         if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 200, true)) {
             return InteractionResult.FAIL;
         }
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        addCooldown(player, this, 10 + (holder.getSequence() * 2));
+        addCooldown(player, this, 10 + (BeyonderUtil.getSequence(player) * 2));
         useSpirituality(player, 200);
         lightningTargetEntity(pInteractionTarget, player);
         return InteractionResult.SUCCESS;
@@ -108,11 +106,10 @@ public class SailorLightning extends SimpleAbilityItem {
     }
 
 
-    private static void lightningDirection(Player player, Level level) {
+    private static void lightningDirection(LivingEntity player, Level level) {
         if (!level.isClientSide()) {
             Vec3 lookVec = player.getLookAngle();
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            holder.useSpirituality(100);
+            BeyonderUtil.useSpirituality(player, 100);
             float speed = 10.0f;
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), level);
             lightningEntity.setSpeed(speed);
@@ -177,12 +174,11 @@ public class SailorLightning extends SimpleAbilityItem {
         }
     }
 
-    public static void lightningTargetEntity(LivingEntity targetEntity, Player player) {
+    public static void lightningTargetEntity(LivingEntity targetEntity, LivingEntity player) {
         if (!player.level().isClientSide()) {
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), player.level());
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             lightningEntity.setSpeed(15.0f);
-            holder.useSpirituality(100);
+            BeyonderUtil.useSpirituality(player,100);
             Vec3 lookVec = player.getLookAngle();
             lightningEntity.setDeltaMovement(lookVec.x, lookVec.y, lookVec.z);
             lightningEntity.setMaxLength(30);

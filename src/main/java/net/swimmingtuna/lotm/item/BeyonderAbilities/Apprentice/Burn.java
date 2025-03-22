@@ -35,13 +35,13 @@ public class Burn extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        if (!checkAll(player)) {
+    public InteractionResult useAbility(Level level, LivingEntity livingEntity, InteractionHand hand) {
+        if (!checkAll(livingEntity)) {
             return InteractionResult.FAIL;
         }
-        burn(player);
-        addCooldown(player);
-        useSpirituality(player);
+        burn(livingEntity);
+        addCooldown(livingEntity);
+        useSpirituality(livingEntity);
         return InteractionResult.SUCCESS;
     }
 

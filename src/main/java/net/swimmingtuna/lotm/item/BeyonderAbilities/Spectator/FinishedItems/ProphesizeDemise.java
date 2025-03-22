@@ -49,7 +49,7 @@ public class ProphesizeDemise extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -92,7 +92,7 @@ public class ProphesizeDemise extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public void prophesizeDemise(Player player,LivingEntity interactionTarget) {
+    public void prophesizeDemise(LivingEntity player, LivingEntity interactionTarget) {
         if (!interactionTarget.level().isClientSide() && !player.level().isClientSide()) {
             if (BeyonderUtil.isBeyonderCapable(interactionTarget)) {
                 if (player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {

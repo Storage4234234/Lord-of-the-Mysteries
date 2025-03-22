@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -66,7 +67,7 @@ public class MonsterReboot extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void monsterReboot(Player player, Level level, BlockPos targetPos, int sequence) {
+    private void monsterReboot(LivingEntity player, Level level, BlockPos targetPos, int sequence) {
         if (!player.level().isClientSide()) {
 
         }

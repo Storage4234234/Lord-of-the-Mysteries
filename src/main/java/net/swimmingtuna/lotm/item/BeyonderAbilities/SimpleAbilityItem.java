@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.item.BeyonderAbilities;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -27,7 +28,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public abstract class SimpleAbilityItem extends Item implements Ability {
-
+    private boolean isProcessing = false;
     protected final Supplier<? extends BeyonderClass> requiredClass;
     protected final int requiredSequence;
     protected final int requiredSpirituality;
@@ -67,6 +68,31 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         return entityReach;
     }
 
+
+    protected boolean checkAll(LivingEntity living) {
+        if(living.getItemInHand(InteractionHand.MAIN_HAND).is(this)) {
+            if(!checkAll(living, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, false)) {
+                if(BeyonderUtil.sequenceAbleCopy(living)) {
+                    if(BeyonderUtil.checkAbilityIsCopied(living, this)) {
+                        BeyonderUtil.useCopiedAbility(living, this);
+                        return checkSpirituality(living, this.getSpirituality(), true);
+                    }
+                }
+            }
+            if(checkAll(living, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, true)) {
+                BeyonderUtil.copyAbilities(living.level(), living, this);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    public int getSpirituality() {
+        return this.requiredSpirituality;
+    }
+
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (!level.isClientSide() && checkIfCanUseAbility(player)) {
@@ -74,28 +100,6 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
             return new InteractionResultHolder<>(interactionResult, player.getItemInHand(hand));
         }
         return InteractionResultHolder.pass(player.getItemInHand(hand));
-    }
-
-    protected boolean checkAll(Player player) {
-        if(player.getItemInHand(InteractionHand.MAIN_HAND).is(this)) {
-            if(!checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, false)) {
-                if(BeyonderUtil.sequenceAbleCopy(player)) {
-                    if(BeyonderUtil.checkAbilityIsCopied(player, this)) {
-                        BeyonderUtil.useCopiedAbility(player, this);
-                        return checkSpirituality(BeyonderHolderAttacher.getHolderUnwrap(player), player, this.getSpirituality(), true);
-                    }
-                }
-            }
-            if(checkAll(player, this.requiredClass.get(), this.requiredSequence, this.requiredSpirituality, true)) {
-                BeyonderUtil.copyAbilities(player.level(), player, this);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public int getSpirituality() {
-        return this.requiredSpirituality;
     }
 
     @Override
@@ -109,9 +113,52 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
 
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand usedHand) {
-        if (!player.level().isClientSide()) {
-            return interactLivingEntity(stack, player, interactionTarget, usedHand);
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity livingEntity, LivingEntity interactionTarget, InteractionHand usedHand) {
+        if (!livingEntity.level().isClientSide()) {
+            return interactLivingEntityLivingEntity(stack, livingEntity, interactionTarget, usedHand);
+        }
+        return InteractionResult.PASS;
+    }
+
+    public InteractionResult interactLivingEntityLivingEntity(ItemStack pStack, LivingEntity pPlayer, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
+        return InteractionResult.PASS;
+    }
+
+    @Override
+    public InteractionResult useMobAbility(Level level, LivingEntity mob) {
+        if (!level.isClientSide() && checkIfCanUseAbility(mob) && !isProcessing) {
+            try {
+                isProcessing = true;
+                return Ability.super.useAbility(level, mob, InteractionHand.MAIN_HAND);
+            } finally {
+                isProcessing = false;
+            }
+        }
+        return InteractionResult.PASS;
+    }
+
+    @Override
+    public InteractionResult useMobAbilityOnBlock(Level level, LivingEntity mob, BlockPos pos) {
+        if (!level.isClientSide()) {
+            try {
+                isProcessing = true;
+                return Ability.super.useMobAbilityOnBlock(level, mob, pos);
+            } finally {
+                isProcessing = false;
+            }
+        }
+        return InteractionResult.PASS;
+    }
+
+    @Override
+    public InteractionResult useMobAbilityOnEntity(Level level, LivingEntity mob, LivingEntity target) {
+        if (!level.isClientSide() && checkIfCanUseAbility(mob)) {
+            try {
+                isProcessing = true;
+                return Ability.super.useMobAbilityOnEntity(level, mob, target);
+            } finally {
+                isProcessing = false;
+            }
         }
         return InteractionResult.PASS;
     }
@@ -144,13 +191,17 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
                 .withStyle(beyonderClass.getColorFormatting()));
     }
 
-    public static void addCooldown(Player player, Item item, int cooldown) {
-        if (!player.isCreative()) {
-            player.getCooldowns().addCooldown(item, cooldown);
+    public static void addCooldown(LivingEntity livingEntity, Item item, int cooldown) {
+        if (!(livingEntity instanceof Player pPlayer && pPlayer.isCreative())) {
+            if (livingEntity instanceof Player player) {
+                player.getCooldowns().addCooldown(item, cooldown);
+            } else {
+                livingEntity.getPersistentData().putInt("abilityCooldownFor" + item.getDescription().getString(), cooldown);
+            }
         }
     }
 
-    protected void addCooldown(Player player) {
+    protected void addCooldown(LivingEntity player) {
         addCooldown(player, this, this.cooldown);
     }
 
@@ -184,11 +235,10 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         return stringBuilder.toString();
     }
 
-    public static boolean checkRequiredClass(BeyonderHolder holder, Player player, BeyonderClass requiredClass, boolean message) {
-        if (!holder.currentClassMatches(requiredClass)) {
+    public static boolean checkRequiredClass(LivingEntity living, BeyonderClass requiredClass, boolean message) {
+        if (!BeyonderUtil.currentPathwayMatchesNoException(living, requiredClass)) {
             String name = requiredClass.sequenceNames().get(9);
-
-            if(message)
+            if(message && living instanceof Player player)
                 player.displayClientMessage(
                         Component.literal("You are not of the ").withStyle(ChatFormatting.AQUA).append(
                                 Component.literal(name).withStyle(requiredClass.getColorFormatting())).append(
@@ -198,9 +248,10 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         return true;
     }
 
-    public static boolean checkRequiredSequence(BeyonderHolder holder, Player player, int requiredSequence, boolean message) {
-        if (holder.getSequence() > requiredSequence) {
-            if(message)
+    public static boolean checkRequiredSequence(LivingEntity living, int requiredSequence, boolean message) {
+        int sequence = BeyonderUtil.getSequence(living);
+        if (sequence > requiredSequence) {
+            if(message && living instanceof Player player)
                 player.displayClientMessage(
                         Component.literal("You need to be sequence ").withStyle(ChatFormatting.AQUA).append(
                                 Component.literal(String.valueOf(requiredSequence)).withStyle(ChatFormatting.YELLOW)).append(
@@ -210,9 +261,10 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         return true;
     }
 
-    public static boolean checkSpirituality(BeyonderHolder holder, Player player, int requiredSpirituality, boolean message) {
-        if (holder.getSpirituality() < requiredSpirituality) {
-            if(message)
+    public static boolean checkSpirituality(LivingEntity living, int requiredSpirituality, boolean message) {
+        int spirituality = BeyonderUtil.getSpirituality(living);
+        if (spirituality < requiredSpirituality) {
+            if(message && living instanceof Player player)
                 player.displayClientMessage(
                         Component.literal("You need ").withStyle(ChatFormatting.AQUA).append(
                                 Component.literal(String.valueOf(requiredSpirituality)).withStyle(ChatFormatting.YELLOW)).append(
@@ -222,27 +274,43 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         return true;
     }
 
-    public static boolean checkAll(Player player, BeyonderClass requiredClass, int requiredSequence, int requiredSpirituality, boolean message) {
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        return checkRequiredClass(holder, player, requiredClass, message) && checkRequiredSequence(holder, player, requiredSequence, message) && checkSpirituality(holder, player, requiredSpirituality, message);
+
+
+    public static boolean checkAll(LivingEntity living, BeyonderClass requiredClass, int requiredSequence, int requiredSpirituality, boolean message) {
+        return checkRequiredClass(living, requiredClass, message) && checkRequiredSequence(living, requiredSequence, message) && checkSpirituality(living, requiredSpirituality, message);
     }
 
 
 
 
 
-    public static boolean useSpirituality(Player player, int spirituality) {
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        return holder.useSpirituality(spirituality);
+    public static void useSpirituality(LivingEntity livingEntity, int spirituality) {
+        BeyonderUtil.useSpirituality(livingEntity, spirituality);
     }
 
-    protected boolean useSpirituality(Player player) {
-        return useSpirituality(player, this.requiredSpirituality);
+    protected boolean useSpirituality(LivingEntity living) {
+        if (BeyonderUtil.getSpirituality(living) >= getRequiredSpirituality()) {
+            useSpirituality(living, requiredSpirituality);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public int getRequiredSequence() {
         return this.requiredSequence;
     }
+
+    public int getRequiredSpirituality() {
+        return this.requiredSpirituality;
+    }
+
+
+
+    public BeyonderClass getRequiredPathway() {
+        return this.requiredClass.get();
+    }
+
 
     private boolean checkIfCanUseAbility(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {

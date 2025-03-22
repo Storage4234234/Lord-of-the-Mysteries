@@ -19,6 +19,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -36,7 +37,7 @@ public class FateReincarnation extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -46,15 +47,14 @@ public class FateReincarnation extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void fateReincarnation(Player player) {
+    private void fateReincarnation(LivingEntity player) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int x = (int) (player.getX() + (Math.random() * 5000) - 2500);
             int z = (int) (player.getZ() + (Math.random() * 5000) - 2500);
             int surfaceY = getNonAirSurfaceBlock(player.level(),x,z);
             player.teleportTo(x, surfaceY + 4, z);
             player.getPersistentData().putInt("monsterReincarnationCounter", 7200);
-            if (holder.getSequence() == 0) {
+            if (BeyonderUtil.getSequence(player) == 0) {
                 player.getPersistentData().putBoolean("monsterReincarnation", true);
             } else {
                 player.getPersistentData().putBoolean("monsterReincarnation", false);

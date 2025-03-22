@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -25,7 +26,7 @@ public class EnableOrDisableLightning extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -35,12 +36,14 @@ public class EnableOrDisableLightning extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void enableOrDisableLightning(Player player) {
+    private void enableOrDisableLightning(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean lightning = tag.getBoolean("SailorLightning");
             tag.putBoolean("SailorLightning", !lightning);
-            player.displayClientMessage(Component.literal("Lightning effect turned " + (lightning ? "off" : "on")).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.BOLD), true);
+            if (player instanceof Player pPlayer) {
+                pPlayer.displayClientMessage(Component.literal("Lightning effect turned " + (lightning ? "off" : "on")).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.BOLD), true);
+            }
         }
     }
 

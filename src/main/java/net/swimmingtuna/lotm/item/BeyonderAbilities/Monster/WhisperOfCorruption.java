@@ -5,6 +5,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -22,14 +23,13 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class WhisperOfCorruption extends SimpleAbilityItem {
-    public static final BooleanProperty LIT = BooleanProperty.create("lit");
 
     public WhisperOfCorruption(Properties properties) {
         super(properties, BeyonderClassInit.MONSTER, 2, 800, 300);
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -39,7 +39,7 @@ public class WhisperOfCorruption extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void whisper(Player player) {
+    private void whisper(LivingEntity player) {
         if (!player.level().isClientSide()) {
             WhisperOfCorruptionEntity.summonWhispersInLookVec(player, (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.WHISPEROFCORRUPTION.get()));
         }

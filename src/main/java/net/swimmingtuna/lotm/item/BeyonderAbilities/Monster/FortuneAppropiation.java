@@ -27,7 +27,7 @@ public class FortuneAppropiation extends SimpleAbilityItem {
         super(properties, BeyonderClassInit.MONSTER, 2, 500, 400);
     }
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }

@@ -33,22 +33,21 @@ public class LightningStorm extends SimpleAbilityItem {
 
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        lightningStorm(player);
+        lightningStormAbility(player);
         addCooldown(player);
         useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
 
-    public void lightningStorm(Player player) { //add logic to add persitatent data of targetX,
+    public void lightningStormAbility(LivingEntity player) { //add logic to add persitatent data of targetX,
         if (!player.level().isClientSide()) {
             int sailorStormVec = player.getPersistentData().getInt("sailorStormVec");
             Vec3 lookVec = player.getLookAngle();
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getSequence();
+            int sequence = BeyonderUtil.getSequence(player);
             double targetX = player.getX() + sailorStormVec * lookVec.x();
             double targetY = player.getY() + sailorStormVec * lookVec.y();
             double targetZ = player.getZ() + sailorStormVec * lookVec.z();

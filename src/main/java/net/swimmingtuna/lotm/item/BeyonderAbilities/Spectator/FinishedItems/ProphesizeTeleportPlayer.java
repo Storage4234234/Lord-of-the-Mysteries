@@ -30,7 +30,7 @@ public class ProphesizeTeleportPlayer extends SimpleAbilityItem {
         super(properties, BeyonderClassInit.SPECTATOR, 1, 750, 2400);
     }
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -40,11 +40,8 @@ public class ProphesizeTeleportPlayer extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void teleportEntities(Player player) {
+    private void teleportEntities(LivingEntity player) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getSequence();
-            int dir = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
             double radius = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.PROPHESIZE_TELEPORT_BLOCK.get());
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
                 if (entity != player && !entity.level().isClientSide() && !BeyonderUtil.isAllyOf(player, entity)) {

@@ -31,7 +31,7 @@ public class AcidicRain extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -41,7 +41,7 @@ public class AcidicRain extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void acidicRain(Player player) {
+    private void acidicRain(LivingEntity player) {
         if (!player.level().isClientSide()) {
             player.getPersistentData().putInt("sailorAcidicRain", 1);
         }

@@ -27,6 +27,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +44,7 @@ public class CycleOfFate extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             if (!checkAll(player)) {
                 return InteractionResult.FAIL;
@@ -83,19 +84,18 @@ public class CycleOfFate extends SimpleAbilityItem {
     }
 
 
-    private static void cycleOfFate(LivingEntity interactionTarget, Player player) {
+    private static void cycleOfFate(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide() && !interactionTarget.level().isClientSide()) {
             int spirituality = 0;
             int sequence = -1;
 
             player.getPersistentData().putInt("monsterCycleOfFateUser", 70);
             savePotionEffectsToTag(player, player.getPersistentData());
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             player.getPersistentData().putInt("monsterCycleOfFateUserX", (int) player.getX());
             player.getPersistentData().putInt("monsterCycleOfFateUserY", (int) player.getY());
             player.getPersistentData().putInt("monsterCycleOfFateUserZ", (int) player.getZ());
             player.getPersistentData().putInt("monsterCycleOfFateUserHealth", (int) player.getHealth());
-            player.getPersistentData().putInt("monsterCycleOfFateUserSequence", holder.getSequence());
+            player.getPersistentData().putInt("monsterCycleOfFateUserSequence", BeyonderUtil.getSequence(player));
             if (interactionTarget instanceof Player pPlayer) {
                 spirituality = (int) BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSpirituality();
                 sequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSequence();

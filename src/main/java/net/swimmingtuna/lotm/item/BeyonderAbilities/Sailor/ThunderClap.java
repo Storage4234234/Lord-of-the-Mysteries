@@ -34,7 +34,7 @@ public class ThunderClap extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -44,10 +44,9 @@ public class ThunderClap extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void thunderClap(Player player) {
+    private void thunderClap(LivingEntity player) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getSequence();
+            int sequence = BeyonderUtil.getSequence(player);
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.THUNDER_CLAP.get());
             int duration = 100 - (sequence * 20);
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {

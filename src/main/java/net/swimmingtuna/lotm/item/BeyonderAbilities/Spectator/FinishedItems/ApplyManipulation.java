@@ -36,7 +36,7 @@ public class ApplyManipulation extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -74,7 +74,7 @@ public class ApplyManipulation extends SimpleAbilityItem {
     }
 
 
-    private static void applyManipulation(LivingEntity interactionTarget, Player player) {
+    private static void applyManipulation(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide()) {
             if (!interactionTarget.hasEffect(ModEffects.MANIPULATION.get())) {
                 interactionTarget.addEffect(new MobEffectInstance(ModEffects.MANIPULATION.get(), 600, 1, false, false));

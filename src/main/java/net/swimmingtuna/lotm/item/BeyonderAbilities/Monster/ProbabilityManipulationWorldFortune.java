@@ -28,7 +28,7 @@ public class ProbabilityManipulationWorldFortune extends SimpleAbilityItem {
         super(properties, BeyonderClassInit.MONSTER, 0, 1500, 600);
     }
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -50,7 +50,7 @@ public class ProbabilityManipulationWorldFortune extends SimpleAbilityItem {
         super.inventoryTick(stack, level, entity, itemSlot, isSelected);
     }
 
-    private void worldFortuneManipulation(Player player) {
+    private void worldFortuneManipulation(LivingEntity player) {
         int value = player.getPersistentData().getInt("probabilityManipulationWorldFortuneValue");
         if (!player.level().isClientSide() && player.level() instanceof ServerLevel serverLevel) {
             WorldFortuneValue data = WorldFortuneValue.getInstance(serverLevel);

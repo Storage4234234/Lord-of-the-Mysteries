@@ -29,7 +29,7 @@ public class EnvisionDeath extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -40,7 +40,7 @@ public class EnvisionDeath extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void envisionDeath(Player player, int dir) {
+    private void envisionDeath(LivingEntity player, int dir) {
         if (!player.level().isClientSide()) {
             double radius = 300;
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {

@@ -30,17 +30,17 @@ public class Hurricane extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        hurricane(player);
+        hurricaneAbility(player);
         addCooldown(player);
         useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
 
-    private void hurricane(Player pPlayer) {
+    private void hurricaneAbility(LivingEntity pPlayer) {
         if (!pPlayer.level().isClientSide()) {
             pPlayer.getPersistentData().putInt("sailorHurricane", (int) (float) BeyonderUtil.getDamage(pPlayer).get(ItemInit.HURRICANE.get()));
         }

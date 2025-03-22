@@ -30,18 +30,20 @@ public class Tsunami extends SimpleAbilityItem {
 
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        player.getCooldowns().addCooldown(ItemInit.TSUNAMI_SEAL.get(), 2400);
+        if (player instanceof Player pPlayer) {
+            pPlayer.getCooldowns().addCooldown(ItemInit.TSUNAMI_SEAL.get(), 2400); //marked
+        }
         addCooldown(player);
         useSpirituality(player);
         startTsunami(player);
         return InteractionResult.SUCCESS;
     }
 
-    public static void startTsunami(Player player) {
+    public static void startTsunami(LivingEntity player) {
         if (!player.level().isClientSide()) {
             player.getPersistentData().putInt("sailorTsunami", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.TSUNAMI.get()));
             float yaw = player.getYRot();

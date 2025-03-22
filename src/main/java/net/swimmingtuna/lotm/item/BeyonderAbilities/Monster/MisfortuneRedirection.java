@@ -63,7 +63,7 @@ public class MisfortuneRedirection extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             if (!checkAll(player)) {
                 return InteractionResult.FAIL;
@@ -103,9 +103,8 @@ public class MisfortuneRedirection extends SimpleAbilityItem {
     }
 
 
-    private static void misfortuneRedirection(LivingEntity interactionTarget, Player player) {
+    private static void misfortuneRedirection(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide() && !interactionTarget.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             for (LivingEntity livingEntity : interactionTarget.level().getEntitiesOfClass(LivingEntity.class, interactionTarget.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEREDIRECTION.get())))) {
                 CompoundTag tag = livingEntity.getPersistentData();
                 int enhancement = 1;

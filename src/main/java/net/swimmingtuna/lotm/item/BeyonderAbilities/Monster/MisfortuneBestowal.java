@@ -39,7 +39,7 @@ public class MisfortuneBestowal extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide() && !interactionTarget.level().isClientSide()) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
@@ -79,14 +79,8 @@ public class MisfortuneBestowal extends SimpleAbilityItem {
     }
 
 
-    private static void misfortuneBestowal(LivingEntity interactionTarget, Player player) {
+    private static void misfortuneBestowal(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide()) {
-            Level level = player.level();
-            int enhancement = 1;
-            if (level instanceof ServerLevel serverLevel) {
-                enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
-            }
-            int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getSequence();
             CompoundTag tag = player.getPersistentData();
             CompoundTag pTag = interactionTarget.getPersistentData();
             double misfortune = tag.getDouble("misfortune");

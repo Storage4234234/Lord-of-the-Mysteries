@@ -34,7 +34,7 @@ public class AqueousLightDrown extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -44,7 +44,7 @@ public class AqueousLightDrown extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public void aqueousLightDrown(Player player) {
+    public void aqueousLightDrown(LivingEntity player) {
         if (!player.level().isClientSide()) {
             Vec3 eyePosition = player.getEyePosition(1.0f);
             Vec3 direction = player.getViewVector(1.0f);

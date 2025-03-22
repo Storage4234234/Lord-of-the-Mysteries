@@ -32,11 +32,11 @@ public class MatterAccelerationEntities extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        matterAccelerationEntities(player);
+        matterAccelerationEntitiesAbility(player);
         addCooldown(player);
         useSpirituality(player);
         return InteractionResult.SUCCESS;
@@ -53,7 +53,7 @@ public class MatterAccelerationEntities extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public void matterAccelerationEntities(Player player) {
+    public void matterAccelerationEntitiesAbility(LivingEntity player) {
         if (!player.level().isClientSide()) {
             AABB searchBox = player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.MATTER_ACCELERATION_ENTITIES.get()));
             for (Entity entity : player.level().getEntitiesOfClass(Entity.class, searchBox)) {

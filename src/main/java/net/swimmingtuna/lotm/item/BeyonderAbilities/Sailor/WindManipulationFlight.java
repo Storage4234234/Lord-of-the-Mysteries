@@ -33,12 +33,11 @@ public class WindManipulationFlight extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        if (holder.getSequence() <= 4) {
+        if (BeyonderUtil.getSequence(player) <= 4) {
             toggleFlying(player);
         } else {
             useSpirituality(player,40);
@@ -46,13 +45,13 @@ public class WindManipulationFlight extends SimpleAbilityItem {
         }
         CompoundTag tag = player.getPersistentData();
         boolean sailorFlight1 = tag.getBoolean("sailorFlight1");
-        if (!player.isCreative() && !sailorFlight1) {
+        if ( !sailorFlight1) {
             addCooldown(player);
         }
         return InteractionResult.SUCCESS;
     }
 
-    public static void flightRegular(Player player) {
+    public static void flightRegular(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             tag.putInt("sailorFlight", 1);
@@ -60,23 +59,22 @@ public class WindManipulationFlight extends SimpleAbilityItem {
         }
     }
 
-    public static void startFlying(Player player) {
-        if (!player.level().isClientSide()) {
-
+    public static void startFlying(LivingEntity player) { //marked
+        if (!player.level().isClientSide() && player instanceof Player pPlayer) {
             player.getPersistentData().putBoolean("sailorFlight1", true);
-            Abilities playerAbilities = player.getAbilities();
+            Abilities playerAbilities = pPlayer.getAbilities();
             if (!playerAbilities.instabuild) {
                 playerAbilities.mayfly = true;
                 playerAbilities.flying = true;
                 playerAbilities.setFlyingSpeed(0.1F);
             }
-            player.onUpdateAbilities();
+            pPlayer.onUpdateAbilities();
             if (player instanceof ServerPlayer serverPlayer) {
                 serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
             }
         }
     }
-    public static void toggleFlying(Player player) {
+    public static void toggleFlying(LivingEntity player) {
         if (!player.level().isClientSide()) {
             boolean canFly = player.getPersistentData().getBoolean("sailorFlight1");
             if (canFly) {

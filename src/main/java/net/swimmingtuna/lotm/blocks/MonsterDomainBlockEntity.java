@@ -453,7 +453,7 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
         return this.isBad;
     }
 
-    public void setOwner(Player player) {
+    public void setOwner(LivingEntity player) {
         this.ownerUUID = player.getUUID();
         setChanged();
     }
@@ -463,7 +463,7 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
         return level.getPlayerByUUID(ownerUUID);
     }
 
-    public static List<MonsterDomainBlockEntity> getDomainsOwnedBy(Level level, Player player) {
+    public static List<MonsterDomainBlockEntity> getDomainsOwnedBy(Level level, LivingEntity player) {
         List<MonsterDomainBlockEntity> ownedDomains = new ArrayList<>();
 
         ServerLevel serverLevel = (ServerLevel) level;

@@ -6,6 +6,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -34,7 +36,7 @@ public class EnvisionLocationBlink extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
         int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, blinkDistance * 4, true)) {
@@ -58,12 +60,15 @@ public class EnvisionLocationBlink extends SimpleAbilityItem {
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public void envisionLocationBlink(Player player) {
+    public void envisionLocationBlink(LivingEntity player) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
+            if (player instanceof Mob mob && mob.getTarget() != null) {
+                blinkDistance = (int) mob.distanceTo(mob.getTarget());
+            }
             Level level = player.level();
-            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.SPECTATOR.get(), 0) && !player.level().isClientSide()&& holder.useSpirituality(blinkDistance * 8)) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.SPECTATOR.get(), 0) && !player.level().isClientSide()&& BeyonderUtil.getSpirituality(player) >= blinkDistance * 8) {
+                BeyonderUtil.useSpirituality(player, blinkDistance * 8);
                 Vec3 lookVector = player.getLookAngle();
                 double targetX = player.getX() + blinkDistance * lookVector.x();
                 double targetY = (player.getY() + 1) + blinkDistance * lookVector.y();
@@ -90,10 +95,6 @@ public class EnvisionLocationBlink extends SimpleAbilityItem {
                         }
                     }
                 }
-                AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-                if (!player.getAbilities().instabuild)
-
-                    player.getCooldowns().addCooldown(this, (int) (20 / dreamIntoReality.getValue()));
             }
         }
     }

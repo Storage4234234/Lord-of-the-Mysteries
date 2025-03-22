@@ -39,7 +39,7 @@ public class FalseProphecy extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             if (!checkAll(player)) {
                 return InteractionResult.FAIL;
@@ -78,7 +78,7 @@ public class FalseProphecy extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    private static void manipulateMisfortune(LivingEntity interactionTarget, Player player) {
+    private static void manipulateMisfortune(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide() && !interactionTarget.level().isClientSide()) {
             CompoundTag tag = interactionTarget.getPersistentData();
             CompoundTag playerTag = player.getPersistentData();

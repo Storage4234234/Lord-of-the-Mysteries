@@ -31,7 +31,7 @@ public class SailorLightningTravel extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -51,7 +51,7 @@ public class SailorLightningTravel extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    private static void lightningTravel(Player player, Level level) {
+    private static void lightningTravel(LivingEntity player, Level level) {
         if (!level.isClientSide()) {
             Vec3 lookVec = player.getLookAngle();
             float speed = 8.0f;

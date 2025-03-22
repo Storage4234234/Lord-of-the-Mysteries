@@ -38,7 +38,7 @@ public class DomainOfDecay extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -82,7 +82,7 @@ public class DomainOfDecay extends SimpleAbilityItem {
     }
 
 
-    private void makeDomainOfProvidence(Player player) {
+    private void makeDomainOfProvidence(LivingEntity player) {
         if (!player.level().isClientSide()) {
             Vec3 eyePosition = player.getEyePosition();
             Vec3 lookVector = player.getLookAngle();

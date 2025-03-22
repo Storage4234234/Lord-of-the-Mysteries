@@ -28,7 +28,7 @@ public class CalamityIncarnationTsunami extends SimpleAbilityItem {
         super(properties, BeyonderClassInit.SAILOR, 2,1000,1000);
     }
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -38,14 +38,16 @@ public class CalamityIncarnationTsunami extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public void calamityIncarnationTsunami(Player player) {
+    public void calamityIncarnationTsunami(LivingEntity player) {
         if (!player.level().isClientSide()) {
             int x = player.getPersistentData().getInt("calamityIncarnationTsunami");
             if (x == 0) {
                 player.getPersistentData().putInt("calamityIncarnationTsunami", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.CALAMITY_INCARNATION_TSUNAMI.get()));
             } else {
                 player.getPersistentData().putInt("calamityIncarnationTsunami", 0);
-                player.displayClientMessage(Component.literal("Tsunami Incarnation Cancelled").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
+                if (player instanceof Player pPlayer) {
+                    pPlayer.displayClientMessage(Component.literal("Tsunami Incarnation Cancelled").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
+                }
             }
         }
     }

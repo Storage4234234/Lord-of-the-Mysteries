@@ -40,8 +40,7 @@ public class EnvisionKingdom extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 6000 / dreamIntoReality, true)) {
             return InteractionResult.FAIL;
@@ -133,7 +132,7 @@ public class EnvisionKingdom extends SimpleAbilityItem {
         }
     }
 
-    private void generateCathedral(Player player) {
+    private void generateCathedral(LivingEntity player) {
         if (!player.level().isClientSide) {
             int x = (int) player.getX();
             int y = (int) player.getY();

@@ -40,24 +40,24 @@ public class Freeze extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand){
-        if(!player.level().isClientSide && !interactionTarget.level().isClientSide){
-            if (!checkAll(player)) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity livingEntity, LivingEntity interactionTarget, InteractionHand hand){
+        if(!livingEntity.level().isClientSide && !interactionTarget.level().isClientSide){
+            if (!checkAll(livingEntity)) {
                 return InteractionResult.FAIL;
             }
-            addCooldown(player);
-            useSpirituality(player);
-            freezeEntity(player, interactionTarget);
+            addCooldown(livingEntity);
+            useSpirituality(livingEntity);
+            freezeEntity(livingEntity, interactionTarget);
         }
         return InteractionResult.SUCCESS;
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        if (!checkAll(player)) {
+    public InteractionResult useAbility(Level level, LivingEntity livingEntity, InteractionHand hand) {
+        if (!checkAll(livingEntity)) {
             return InteractionResult.FAIL;
         }
-        freezeAura(player);
+        freezeAura(livingEntity);
         return InteractionResult.SUCCESS;
     }
 

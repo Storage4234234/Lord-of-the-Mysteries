@@ -39,7 +39,7 @@ public class MindReading extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -68,12 +68,12 @@ public class MindReading extends SimpleAbilityItem {
         return attributeBuilder.build();
     }
 
-    public static boolean usedHand(Player player) {
+    public static boolean usedHand(LivingEntity player) {
         ItemStack mainHandStack = player.getMainHandItem();
         return mainHandStack.getItem() instanceof MindReading;
     }
 
-    public static void mindRead(Player player, LivingEntity interactionTarget, ItemStack stack) {
+    public static void mindRead(LivingEntity player, LivingEntity interactionTarget, ItemStack stack) {
         if (!player.level().isClientSide()) {
             if (interactionTarget instanceof Player playerInteractionTarget) {
                 AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());

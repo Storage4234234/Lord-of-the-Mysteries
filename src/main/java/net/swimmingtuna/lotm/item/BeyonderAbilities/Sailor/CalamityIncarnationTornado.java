@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -27,7 +28,7 @@ public class CalamityIncarnationTornado extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -38,7 +39,7 @@ public class CalamityIncarnationTornado extends SimpleAbilityItem {
     }
 
 
-    public void calamityIncarnationTornado(Player player) {
+    public void calamityIncarnationTornado(LivingEntity player) {
         if (!player.level().isClientSide()) {
             TornadoEntity.summonCalamityTornado(player);
             player.getPersistentData().putInt("calamityIncarnationTornado", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.CALAMITY_INCARNATION_TORNADO.get()));

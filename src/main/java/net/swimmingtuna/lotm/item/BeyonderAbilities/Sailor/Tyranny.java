@@ -29,7 +29,7 @@ public class Tyranny extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -39,7 +39,7 @@ public class Tyranny extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void tyranny(Player player) {
+    private void tyranny(LivingEntity player) {
         if (!player.level().isClientSide()) {
             double radius = 500;
             int duration = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.TYRANNY.get());

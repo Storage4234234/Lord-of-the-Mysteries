@@ -57,7 +57,7 @@ public class Nightmare extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack pStack, Player player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
+    public InteractionResult useAbilityOnEntity(ItemStack pStack, LivingEntity player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -88,11 +88,10 @@ public class Nightmare extends SimpleAbilityItem {
     }
 
 
-    private void nightmare(Player player, Level level, BlockPos targetPos) {
+    private void nightmare(LivingEntity player, Level level, BlockPos targetPos) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-            int sequence = holder.getSequence();
+            int sequence = BeyonderUtil.getSequence(player);
             int dir = (int) dreamIntoReality.getValue();
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.NIGHTMARE.get());
             float damagePlayer = ((float) (40.0 * dir) - (sequence * 2));

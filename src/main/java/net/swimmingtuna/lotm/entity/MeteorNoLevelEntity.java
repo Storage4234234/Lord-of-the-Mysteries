@@ -145,7 +145,7 @@ public class MeteorNoLevelEntity extends AbstractHurtingProjectile {
         return false;
     }
 
-    public static void summonMultipleMeteors(Player player) {
+    public static void summonMultipleMeteors(LivingEntity player) {
         if (!player.level().isClientSide()) {
             double scatterRadius = 100.0;
             double randomX, randomY, randomZ;
@@ -166,8 +166,7 @@ public class MeteorNoLevelEntity extends AbstractHurtingProjectile {
             meteorEntity.setOwner(player);
             meteorEntity.noPhysics = true;
 
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int scalecheck = 10 - holder.getSequence() * 2;
+            int scalecheck = 10 - BeyonderUtil.getSequence(player) * 2;
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(meteorEntity);
             scaleData.setScale(scalecheck);
             scaleData.markForSync(true);

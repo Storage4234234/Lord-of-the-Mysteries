@@ -28,17 +28,17 @@ public class BounceProjectiles extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        if (!checkAll(player)) {
+    public InteractionResult useAbility(Level level, LivingEntity livingEntity, InteractionHand hand) {
+        if (!checkAll(livingEntity)) {
             return InteractionResult.FAIL;
         }
-        if (!player.isShiftKeyDown()) {
-            enableOrDisableArrows(player, player);
+        if (!livingEntity.isShiftKeyDown()) {
+            enableOrDisableArrows(livingEntity, livingEntity);
         } else {
-            enableOrDisableArrowsShot(player);
+            enableOrDisableArrowsShot(livingEntity);
         }
-        addCooldown(player);
-        useSpirituality(player);
+        addCooldown(livingEntity);
+        useSpirituality(livingEntity);
         return InteractionResult.SUCCESS;
     }
 
@@ -71,14 +71,14 @@ public class BounceProjectiles extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
-        if(!player.level().isClientSide && !interactionTarget.level().isClientSide){
-            if (!checkAll(player)) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity livingEntity, LivingEntity interactionTarget, InteractionHand hand) {
+        if(!livingEntity.level().isClientSide && !interactionTarget.level().isClientSide){
+            if (!checkAll(livingEntity)) {
                 return InteractionResult.FAIL;
             }
-            enableOrDisableArrows(player, interactionTarget);
-            addCooldown(player);
-            useSpirituality(player);
+            enableOrDisableArrows(livingEntity, interactionTarget);
+            addCooldown(livingEntity);
+            useSpirituality(livingEntity);
         }
         return InteractionResult.SUCCESS;
     }

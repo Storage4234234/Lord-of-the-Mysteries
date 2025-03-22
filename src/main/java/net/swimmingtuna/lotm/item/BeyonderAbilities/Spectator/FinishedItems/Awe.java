@@ -33,7 +33,7 @@ public class Awe extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -43,23 +43,23 @@ public class Awe extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void applyPotionEffectToEntities(Player player) {
-        if (!player.level().isClientSide()) {
-            AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getSequence();
+    public static void applyPotionEffectToEntities(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide()) {
+            AttributeInstance dreamIntoReality = livingEntity.getAttribute(ModAttributes.DIR.get());
+            int sequence = BeyonderUtil.getSequence(livingEntity);
             int dir = (int) dreamIntoReality.getValue();
             double radius = (18.0 - sequence) * dir;
             float damage = (float) (17.0 * (Math.max(1, dir * 0.5)) - (sequence * 1.2));
-            int duration = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.AWE.get());
-            for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
+            int duration = (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.AWE.get());
+            for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(radius))) {
+                if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
                     entity.addEffect((new MobEffectInstance(ModEffects.AWE.get(), duration, 1, false, false)));
-                    BeyonderUtil.applyMentalDamage(player, entity, damage);
+                    BeyonderUtil.applyMentalDamage(livingEntity, entity, damage);
                 }
             }
         }
     }
+
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use, makes all living entities around the user freeze in place and take damage"));

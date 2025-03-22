@@ -65,7 +65,7 @@ public class DreamWeaving extends SimpleAbilityItem {
 
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -130,10 +130,9 @@ public class DreamWeaving extends SimpleAbilityItem {
             level.addFreshEntity(entity);
         }
     }
-    public void dreamWeave(Player player, LivingEntity interactionTarget) {
+    public void dreamWeave(LivingEntity player, LivingEntity interactionTarget) {
         Level level = player.level();
         if (!level.isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             double x = interactionTarget.getX();
             double y = interactionTarget.getY();
             double z = interactionTarget.getZ();

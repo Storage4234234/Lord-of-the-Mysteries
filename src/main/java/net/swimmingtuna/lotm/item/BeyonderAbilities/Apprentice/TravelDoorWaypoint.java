@@ -28,7 +28,7 @@ public class TravelDoorWaypoint extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         CompoundTag tag = player.getPersistentData();
         if (!checkAll(player)) {
@@ -44,14 +44,16 @@ public class TravelDoorWaypoint extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void setWaypoint(Player player, ItemStack stack, CompoundTag tag) {
+    private void setWaypoint(LivingEntity player, ItemStack stack, CompoundTag tag) {
         if (!player.level().isClientSide) {
             int waypoint = tag.getInt("doorWaypoint");
             tag.putDouble("x" + waypoint, player.getX());
             tag.putDouble("y" + waypoint, player.getY());
             tag.putDouble("z" + waypoint, player.getZ());
             String coords = String.format("Waypoint %d set at: %.1f, %.1f, %.1f", waypoint, player.getX(), player.getY(), player.getZ());
-            player.displayClientMessage(Component.literal(coords).withStyle(BeyonderUtil.getStyle(player)), true);
+            if (player instanceof Player pPlayer) {
+                pPlayer.displayClientMessage(Component.literal(coords).withStyle(BeyonderUtil.getStyle(player)), true);
+            }
         }
     }
 

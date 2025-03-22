@@ -36,7 +36,7 @@ public class RagingBlows extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -46,7 +46,7 @@ public class RagingBlows extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void ragingBlows(Player player) {
+    public static void ragingBlows(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag persistentData = player.getPersistentData();
             int ragingBlows = persistentData.getInt("ragingBlows");

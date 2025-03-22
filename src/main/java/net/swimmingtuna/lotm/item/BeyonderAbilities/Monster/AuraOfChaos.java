@@ -47,7 +47,7 @@ public class AuraOfChaos extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -57,12 +57,14 @@ public class AuraOfChaos extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void activateAuraOfChaos(Player player) {
+    private void activateAuraOfChaos(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean auraOfChaos = tag.getBoolean("monsterAuraOfChaos");
             tag.putBoolean("monsterAuraOfChaos", !auraOfChaos);
-            player.displayClientMessage(Component.literal("Aura of Chaos Turned " + (auraOfChaos ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.RED), true);
+            if (player instanceof Player pPlayer) {
+                pPlayer.displayClientMessage(Component.literal("Aura of Chaos Turned " + (auraOfChaos ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.RED), true);
+            }
         }
     }
 

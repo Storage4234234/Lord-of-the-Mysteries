@@ -40,7 +40,7 @@ public class EnvisionBarrier extends SimpleAbilityItem {
 
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 800 / dreamIntoReality, true)) {
             return InteractionResult.FAIL;
@@ -84,7 +84,7 @@ public class EnvisionBarrier extends SimpleAbilityItem {
     }
 
 
-    private void generateBarrier(Player player, Level level, BlockPos playerPos) {
+    private void generateBarrier(LivingEntity player, Level level, BlockPos playerPos) {
         if (!player.level().isClientSide()) {
             int radius = player.getPersistentData().getInt("BarrierRadius");
             int thickness = 1; // Adjust the thickness of the glass dome

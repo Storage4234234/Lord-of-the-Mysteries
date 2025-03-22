@@ -73,6 +73,7 @@ import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Ability;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.InvisibleHand;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.ScribeAbilities;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoor;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoorWaypoint;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
@@ -833,6 +834,8 @@ public class BeyonderUtil {
         if (!heldItem.isEmpty()) {
             if (heldItem.getItem() instanceof DawnWeaponry) {
                 LOTMNetworkHandler.sendToServer(new DawnWeaponryLeftClickC2S());
+            } else if (heldItem.getItem() instanceof TravelDoor) {
+                LOTMNetworkHandler.sendToServer(new TravelDoorC2S());
             } else if (heldItem.getItem() instanceof Gigantification) {
                 LOTMNetworkHandler.sendToServer(new GigantificationC2S());
             } else if (heldItem.getItem() instanceof SwordOfSilver) {
@@ -1143,6 +1146,8 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.BEAMOFTWILIGHT.get())));
             } else if (heldItem.getItem() instanceof BeamOfTwilight) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFTWILIGHT.get())));
+            }  else if (heldItem.getItem() instanceof TravelDoor) {
+                LOTMNetworkHandler.sendToServer(new TravelDoorC2S());
             }
         }
     }
@@ -2299,19 +2304,21 @@ public class BeyonderUtil {
         return false;
     }
 
-    public static void copyAbilities(Level level, Player player, SimpleAbilityItem ability) {
-        int playerSequence = getSequence(player);
-        int abilitySequence = ability.getRequiredSequence();
-        for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
-            if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
-                if (currentPathwayAndSequenceMatchesNoException(player, BeyonderClassInit.APPRENTICE.get(), 6)) {
-                    if (entity instanceof Player scribe) {
-                        if (BeyonderUtil.scribeLookingAtYou(player, scribe)) {
-                            if (checkValidAbilityCopy(new ItemStack(ability))) {
-                                if (player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).map(storage -> storage.getScribedAbilitiesCount()).orElse(0) < player.getPersistentData().getInt("maxScribedAbilities")) {
-                                    if (copyAbilityTest(playerSequence, abilitySequence)) {
-                                        if (!pendingAbilityCopies.containsKey(scribe.getUUID())) {
-                                            pendingAbilityCopies.put(scribe.getUUID(), ability);
+    public static void copyAbilities(Level level, LivingEntity living, SimpleAbilityItem ability) { //marked
+        if (living instanceof Player player) {
+            int playerSequence = getSequence(player);
+            int abilitySequence = ability.getRequiredSequence();
+            for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(50))) {
+                if (BeyonderUtil.isBeyonderCapable(entity) && entity != player) {
+                    if (currentPathwayAndSequenceMatchesNoException(player, BeyonderClassInit.APPRENTICE.get(), 6)) {
+                        if (entity instanceof Player scribe) {
+                            if (BeyonderUtil.scribeLookingAtYou(player, scribe)) {
+                                if (checkValidAbilityCopy(new ItemStack(ability))) {
+                                    if (player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).map(storage -> storage.getScribedAbilitiesCount()).orElse(0) < player.getPersistentData().getInt("maxScribedAbilities")) {
+                                        if (copyAbilityTest(playerSequence, abilitySequence)) {
+                                            if (!pendingAbilityCopies.containsKey(scribe.getUUID())) {
+                                                pendingAbilityCopies.put(scribe.getUUID(), ability);
+                                            }
                                         }
                                     }
                                 }
@@ -2358,24 +2365,27 @@ public class BeyonderUtil {
         }
     }
 
-    public static void useCopiedAbility(Player player, Item ability) {
-        if (currentPathwayAndSequenceMatchesNoException(player, BeyonderClassInit.APPRENTICE.get(), 6)) {
-            player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage -> {
-                storage.useScribeAbility(ability);
-            });
+    public static void useCopiedAbility(LivingEntity living, Item ability) { //marked
+        if (living instanceof Player player) {
+            if (currentPathwayAndSequenceMatchesNoException(player, BeyonderClassInit.APPRENTICE.get(), 6)) {
+                player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null).ifPresent(storage -> {
+                    storage.useScribeAbility(ability);
+                });
+            }
         }
     }
 
-    public static boolean checkAbilityIsCopied(Player player, Item ability) {
-        int sequence = BeyonderUtil.getSequence(player);
-        if (BeyonderUtil.getPathway(player) == BeyonderClassInit.APPRENTICE.get()
-                && sequence <= 6) {
-            return player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null)
-                    .map(storage -> storage.hasScribedAbility(ability))
-                    .orElse(false);
+    public static boolean checkAbilityIsCopied(LivingEntity living, Item ability) { //marked
+        if (living instanceof Player player) {
+            int sequence = BeyonderUtil.getSequence(player);
+            if (currentPathwayAndSequenceMatchesNoException(living, BeyonderClassInit.APOTHECARY.get(), 6))
+                return player.getCapability(CapabilityScribeAbilities.SCRIBE_CAPABILITY, null)
+                        .map(storage -> storage.hasScribedAbility(ability))
+                        .orElse(false);
         }
         return false;
     }
+
 
     public static boolean copyAbilityTest(int copierSequence, int targetAbilitySequence) {
         double chance = 0.3 + (0.7 / 9) * (targetAbilitySequence - copierSequence);
@@ -2504,6 +2514,93 @@ public class BeyonderUtil {
         return NAME_TO_BEYONDER.getOrDefault(name, new SeerClass());
     }
 
+    public static void useAvailableAbilityAsMob(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide() && getPathway(livingEntity) != null && livingEntity instanceof Mob mob) {
+            List<Item> abilities = getAbilities(livingEntity);
+
+            // Check if we have any abilities
+            if (abilities == null || abilities.isEmpty()) {
+                return;
+            }
+
+            // Select a random ability from the list
+            Random random = new Random();
+            Item randomItem = abilities.get(random.nextInt(abilities.size()));
+
+            // Check if the selected item is a SimpleAbilityItem
+            if (randomItem instanceof SimpleAbilityItem simpleAbilityItem) {
+                if (livingEntity.hasEffect(ModEffects.STUN.get())) {
+                    return;
+                }
+
+                // Check if the mob can use this ability
+                if (!SimpleAbilityItem.checkAll(livingEntity, simpleAbilityItem.getRequiredPathway(),
+                        simpleAbilityItem.getRequiredSequence(), simpleAbilityItem.getRequiredSpirituality(), false)) {
+                    mob.setItemInHand(InteractionHand.MAIN_HAND, simpleAbilityItem.getDefaultInstance());
+                }
+
+                double entityReach = simpleAbilityItem.getEntityReach();
+                double blockReach = simpleAbilityItem.getBlockReach();
+                boolean successfulUse = false;
+                boolean hasEntityInteraction = false;
+                boolean hasBlockInteraction = false;
+                boolean hasGeneralAbility = false;
+
+                try {
+                    Method entityMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbilityOnEntity", ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class);hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity", ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class));
+                } catch (NoSuchMethodException ignored) {}
+                try {
+                    Method blockMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbilityOnBlock", UseOnContext.class);
+                    hasBlockInteraction = !blockMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnBlock", UseOnContext.class));
+                } catch (NoSuchMethodException ignored) {}
+
+                try {
+                    Method generalMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbility", Level.class, Player.class, InteractionHand.class);
+                    hasGeneralAbility = !generalMethod.equals(Ability.class.getDeclaredMethod("useAbility", Level.class, Player.class, InteractionHand.class));
+                } catch (NoSuchMethodException ignored) {}
+                if (hasEntityInteraction) {
+                    LivingEntity target = mob.getTarget();
+                    if (target != null && target.distanceTo(mob) <= entityReach) {
+                        InteractionResult result = simpleAbilityItem.useMobAbilityOnEntity(livingEntity.level(), mob, target);
+                        if (result != InteractionResult.PASS) {
+                            successfulUse = true;
+                        }
+                    }
+                }
+
+                if (!successfulUse && hasBlockInteraction) {
+                    Vec3 eyePosition = livingEntity.getEyePosition();
+                    Vec3 lookVector = livingEntity.getLookAngle();
+                    Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
+                    BlockHitResult blockHit = livingEntity.level().clip(new ClipContext(eyePosition, reachVector,
+                            ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, livingEntity));
+                    if (blockHit.getType() != HitResult.Type.MISS) {
+                        InteractionResult result = simpleAbilityItem.useMobAbilityOnBlock(livingEntity.level(), mob, blockHit.getBlockPos());
+                        if (result != InteractionResult.PASS) {
+                            successfulUse = true;
+                        }
+                    }
+                }
+
+                String itemName = simpleAbilityItem.getDescription().getString();
+                if ((hasEntityInteraction || hasBlockInteraction) && !hasGeneralAbility) {
+                    if (successfulUse) {
+                        System.out.println("Used " + itemName);
+                    } else {
+                        System.out.println("Missed " + itemName);
+                    }
+                } else if (!hasEntityInteraction && !hasBlockInteraction) {
+                    simpleAbilityItem.useMobAbility(mob.level(), mob);
+                    System.out.println("Used " + itemName);
+                } else if (successfulUse) {
+                    System.out.println("Used " + itemName);
+                } else {
+                    simpleAbilityItem.useMobAbility(mob.level(), mob);
+                    System.out.println("Used " + itemName);
+                }
+            }
+        }
+    }
 
     public static void removeTags(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {

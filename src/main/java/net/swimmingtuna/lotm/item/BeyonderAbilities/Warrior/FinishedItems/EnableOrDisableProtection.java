@@ -28,7 +28,7 @@ public class EnableOrDisableProtection extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -38,12 +38,14 @@ public class EnableOrDisableProtection extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void enableOrDisableLightning(Player player) {
+    private void enableOrDisableLightning(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean protection = tag.getBoolean("warriorProtection");
             tag.putBoolean("warriorProtection", !protection);
-            player.displayClientMessage(Component.literal("Protection effect turned " + (protection ? "off" : "on")).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.BOLD), true);
+            if (player instanceof Player pPlayer) {
+                pPlayer.displayClientMessage(Component.literal("Protection effect turned " + (protection ? "off" : "on")).withStyle(ChatFormatting.BLUE).withStyle(ChatFormatting.BOLD), true);
+            }
         }
     }
 

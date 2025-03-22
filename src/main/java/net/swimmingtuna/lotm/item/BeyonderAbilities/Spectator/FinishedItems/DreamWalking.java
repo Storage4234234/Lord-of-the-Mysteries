@@ -62,7 +62,7 @@ public class DreamWalking extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -73,7 +73,7 @@ public class DreamWalking extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void dreamWalk(LivingEntity interactionTarget, Player player) {
+    public static void dreamWalk(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide()) {
             double x = interactionTarget.getX();
             double y = interactionTarget.getY();

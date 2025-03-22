@@ -53,7 +53,7 @@ public class EnableDisableRipple extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -63,12 +63,14 @@ public class EnableDisableRipple extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void enableOrDisableDangerSense(Player player) {
+    public static void enableOrDisableDangerSense(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean ripple = tag.getBoolean("monsterRipple");
             tag.putBoolean("monsterRipple", !ripple);
-            player.displayClientMessage(Component.literal("Ripple of Chaos " + (ripple ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
+            if (player instanceof Player pPlayer) {
+                pPlayer.displayClientMessage(Component.literal("Ripple of Chaos " + (ripple ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
+            }
         }
     }
 

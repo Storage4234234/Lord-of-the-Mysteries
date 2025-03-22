@@ -29,7 +29,7 @@ public class SirenSongStrengthen extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -39,7 +39,7 @@ public class SirenSongStrengthen extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private static void sirenSongStrengthen(Player player, Level level) {
+    private static void sirenSongStrengthen(LivingEntity player, Level level) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             if (tag.getInt("sirenSongStrengthen") == 0) {

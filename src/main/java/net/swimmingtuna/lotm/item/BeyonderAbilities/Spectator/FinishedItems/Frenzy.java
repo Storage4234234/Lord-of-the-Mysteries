@@ -76,7 +76,7 @@ public class Frenzy extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -87,10 +87,9 @@ public class Frenzy extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void frenzy(Player player, Level level, BlockPos targetPos, int dreamIntoRealityValue) {
+    private void frenzy(LivingEntity player, Level level, BlockPos targetPos, int dreamIntoRealityValue) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getSequence();
+            int sequence = BeyonderUtil.getSequence(player);
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.FRENZY.get());
             float damage = (float) (17 - (sequence * 0.75));
             int duration = 250 - (sequence * 12) * dreamIntoRealityValue;

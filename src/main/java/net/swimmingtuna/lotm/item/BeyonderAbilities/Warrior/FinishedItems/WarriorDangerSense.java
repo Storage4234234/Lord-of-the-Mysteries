@@ -28,7 +28,7 @@ public class WarriorDangerSense extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -59,7 +59,6 @@ public class WarriorDangerSense extends SimpleAbilityItem {
                 Vec3 directionToPlayer = otherPlayer.position().subtract(livingEntity.position()).normalize();
                 Vec3 lookAngle = livingEntity.getLookAngle();
                 double horizontalAngle = Math.atan2(directionToPlayer.x, directionToPlayer.z) - Math.atan2(lookAngle.x, lookAngle.z);
-
                 String horizontalDirection;
                 if (Math.abs(horizontalAngle) < Math.PI / 4) {
                     horizontalDirection = "in front of";

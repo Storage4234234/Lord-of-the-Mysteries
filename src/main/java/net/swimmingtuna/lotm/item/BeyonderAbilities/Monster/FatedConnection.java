@@ -7,6 +7,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -30,7 +32,7 @@ public class FatedConnection extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -40,7 +42,7 @@ public class FatedConnection extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public void createIncarnation(Player player) {
+    public void createIncarnation(LivingEntity player) { //marked
         if (!player.level().isClientSide()) {
             ItemStack stack = player.getOffhandItem();
             if (stack.getItem() == Items.GOLD_NUGGET) {
@@ -51,7 +53,9 @@ public class FatedConnection extends SimpleAbilityItem {
                 if (stack.isEmpty()) {
                     player.setItemInHand(InteractionHand.OFF_HAND, luckyCoin);
                 } else {
-                    player.getInventory().add(luckyCoin);
+                    if (player instanceof Player pPlayer) {
+                        pPlayer.getInventory().add(luckyCoin);
+                    }
                 }
                 player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 1.0F, 1.0F);
             }

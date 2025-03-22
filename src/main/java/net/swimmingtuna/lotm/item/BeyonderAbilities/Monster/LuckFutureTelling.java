@@ -63,7 +63,7 @@ public class LuckFutureTelling extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             if (!checkAll(player)) {
                 return InteractionResult.FAIL;
@@ -76,7 +76,7 @@ public class LuckFutureTelling extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             if (!checkAll(player)) {
                 return InteractionResult.FAIL;
@@ -88,7 +88,7 @@ public class LuckFutureTelling extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void luckFutureTell(Player pPlayer, LivingEntity interactionTarget) {
+    public static void luckFutureTell(LivingEntity pPlayer, LivingEntity interactionTarget) {
         CompoundTag tag = interactionTarget.getPersistentData();
         int meteor = tag.getInt("luckMeteor");
         int doubleDamage = tag.getInt("luckDoubleDamage");
@@ -208,7 +208,7 @@ public class LuckFutureTelling extends SimpleAbilityItem {
         }
     }
 
-    public static void luckFutureTellPlayer(Player pPlayer) {
+    public static void luckFutureTellPlayer(LivingEntity pPlayer) {
         CompoundTag tag = pPlayer.getPersistentData();
         int meteor = tag.getInt("luckMeteor");
         int doubleDamage = tag.getInt("luckDoubleDamage");

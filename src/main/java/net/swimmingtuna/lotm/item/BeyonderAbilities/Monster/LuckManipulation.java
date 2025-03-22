@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -32,7 +33,7 @@ public class LuckManipulation extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -42,10 +43,9 @@ public class LuckManipulation extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void luckManipulation(Player player) {
+    public static void luckManipulation(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             double luck = tag.getDouble("luck");
             double misfortune = tag.getDouble("misfortune");
             Level level = player.level();
@@ -55,7 +55,7 @@ public class LuckManipulation extends SimpleAbilityItem {
             }
             int luckManipulation = tag.getInt("luckManipulationItem");
             if (luckManipulation == 1) { //regen
-                BeyonderUtil.applyMobEffect(player, MobEffects.REGENERATION, 300 - (holder.getSequence() * 30), 2, true, true);
+                BeyonderUtil.applyMobEffect(player, MobEffects.REGENERATION, 300 - (BeyonderUtil.getSequence(player) * 30), 2, true, true);
                 tag.putDouble("luck", Math.max(0, luck - 4));
             }
             if (luckManipulation == 2) { //diamonds
@@ -64,7 +64,7 @@ public class LuckManipulation extends SimpleAbilityItem {
                     ItemStack diamondBlock = new ItemStack(Items.DIAMOND_BLOCK, 2);
                     ItemEntity diamondEntity = new ItemEntity(player.level(), player.getX(), player.getY(), player.getZ(), diamonds);
                     ItemEntity diamondBlockEntity = new ItemEntity(player.level(), player.getX(), player.getY(), player.getZ(), diamondBlock);
-                    if (holder.getSequence() >= 2) {
+                    if (BeyonderUtil.getSequence(player) >= 2) {
                         player.level().addFreshEntity(diamondEntity);
                     } else player.level().addFreshEntity(diamondBlockEntity);
                 }

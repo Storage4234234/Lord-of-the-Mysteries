@@ -41,7 +41,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -51,7 +51,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void calamityIncarnation(Player player) {
+    public static void calamityIncarnation(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             int calamityIncarnation = tag.getInt("monsterCalamityIncarnationItem");

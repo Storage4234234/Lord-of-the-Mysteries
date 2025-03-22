@@ -17,6 +17,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -30,12 +31,11 @@ public class Placate extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 7, 125, true)) {
             return InteractionResult.FAIL;
         }
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (holder.getSequence() >= 4) {
+        if (BeyonderUtil.getSequence(player) >= 4) {
             removeHarmfulEffects(interactionTarget);
             addCooldown(player);
             useSpirituality(player);
@@ -49,12 +49,11 @@ public class Placate extends SimpleAbilityItem {
         }
     }
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 7, 125, true)) {
             return InteractionResult.FAIL;
         }
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (holder.getSequence() <= 4 || player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {
+        if (BeyonderUtil.getSequence(player) <= 4 || player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {
             removeHarmfulEffects(player);
             addCooldown(player);
             useSpirituality(player);

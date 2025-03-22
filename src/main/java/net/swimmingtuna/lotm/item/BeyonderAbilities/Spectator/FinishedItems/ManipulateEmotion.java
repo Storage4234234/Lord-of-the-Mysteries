@@ -31,15 +31,14 @@ public class ManipulateEmotion extends SimpleAbilityItem {
 
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player, this, 1200 / dreamIntoReality);
         useSpirituality(player, 500);
-        manipulateEmotion(player, holder.getSequence());
+        manipulateEmotion(player);
         return InteractionResult.SUCCESS;
     }
 
@@ -54,7 +53,7 @@ public class ManipulateEmotion extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    private static void manipulateEmotion(Player player, int sequence) {
+    private static void manipulateEmotion(LivingEntity player) {
         if (!player.level().isClientSide()) {
             float damage = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MANIPULATE_EMOTION.get());
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {

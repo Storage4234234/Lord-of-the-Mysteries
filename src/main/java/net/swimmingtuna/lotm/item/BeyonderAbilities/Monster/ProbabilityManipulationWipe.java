@@ -67,7 +67,7 @@ public class ProbabilityManipulationWipe extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
         if (!checkAll(player, BeyonderClassInit.MONSTER.get(), 0, 1000, true)) {
             return InteractionResult.FAIL;
         }
@@ -78,7 +78,7 @@ public class ProbabilityManipulationWipe extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack pStack, Player player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
+    public InteractionResult useAbilityOnEntity(ItemStack pStack, LivingEntity player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -94,7 +94,7 @@ public class ProbabilityManipulationWipe extends SimpleAbilityItem {
         }
     }
 
-    public static void probabilityWipeWorld(Player player) {
+    public static void probabilityWipeWorld(LivingEntity player) {
         Level level = player.level();
         if (!level.isClientSide()) {
             for (Player pPlayer : level.players()) {

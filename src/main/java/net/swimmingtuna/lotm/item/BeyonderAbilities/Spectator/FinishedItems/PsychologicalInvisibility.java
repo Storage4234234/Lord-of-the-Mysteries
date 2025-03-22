@@ -36,18 +36,18 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        psychologicalInvisibility(player);
+        psychologicalInvisibilityAbility(player);
         if (ClientShouldntRenderInvisibilityData.getShouldntRender()) {
             addCooldown(player);
         }
         return InteractionResult.SUCCESS;
     }
 
-    private static void psychologicalInvisibility(Player player) {
+    private static void psychologicalInvisibilityAbility(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean newState = !tag.getBoolean("psychologicalInvisibility");
@@ -58,11 +58,14 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
                         mob.setTarget(null);
                     }
                 }
-                player.displayClientMessage(Component.literal("You are now invisible").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN), true);
+                if (player instanceof Player pPlayer) {
+                    pPlayer.displayClientMessage(Component.literal("You are now invisible").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.GREEN), true);
+                }
             } else {
-                player.displayClientMessage(Component.literal("You are now visible").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED), true);
+                if (player instanceof Player pPlayer) {
+                    pPlayer.displayClientMessage(Component.literal("You are now visible").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.RED), true);
+                }
             }
-
             tag.putBoolean("psychologicalInvisibility", newState);
 
             UUID playerId = player.getUUID();

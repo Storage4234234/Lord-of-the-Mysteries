@@ -67,7 +67,7 @@ public class LightningRedirection extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -77,7 +77,7 @@ public class LightningRedirection extends SimpleAbilityItem {
     }
 
 
-    private void lightningRedirection(Player player, BlockPos pos) {
+    private void lightningRedirection(LivingEntity player, BlockPos pos) {
         if (!player.level().isClientSide()) {
             Level level = player.level();
             for (Entity entity : level.getEntitiesOfClass(Entity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.LIGHTNING_REDIRECTION.get())))) {
@@ -88,7 +88,7 @@ public class LightningRedirection extends SimpleAbilityItem {
             }
         }
     }
-    private void lightningRedirectionEntity(Player player,LivingEntity interactionTarget) {
+    private void lightningRedirectionEntity(LivingEntity player,LivingEntity interactionTarget) {
         if (!player.level().isClientSide()) {
             Level level = player.level();
             for (Entity entity : level.getEntitiesOfClass(Entity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.LIGHTNING_REDIRECTION.get())))) {

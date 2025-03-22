@@ -15,6 +15,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
+import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
@@ -54,25 +55,30 @@ public class TestItem extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
-            BeyonderUtil.makeAlly(interactionTarget, player);
+            BeyonderUtil.useAvailableAbilityAsMob(interactionTarget);
         }
         return InteractionResult.SUCCESS;
     }
 
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
-            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-                ItemStack stack = player.getInventory().getItem(i);
-                if (!stack.isEmpty()) {
-                    player.getCooldowns().removeCooldown(stack.getItem());
+            if (player instanceof Player pPlayer) {
+                for (int i = 0; i < pPlayer.getInventory().getContainerSize(); i++) {
+                    ItemStack stack = pPlayer.getInventory().getItem(i);
+                    if (!stack.isEmpty()) {
+                        pPlayer.getCooldowns().removeCooldown(stack.getItem());
+                    }
                 }
             }
-            tag.putInt("monsterMisfortuneManipulationGravity", 100);
+            for (PlayerMobEntity playerMobEntity : player.level().getEntitiesOfClass(PlayerMobEntity.class, player.getBoundingBox().inflate(20))) {
+                playerMobEntity.setPathway(BeyonderClassInit.SPECTATOR.get());
+                playerMobEntity.setSequence(4);
+            }
         }
 
         return InteractionResult.SUCCESS;

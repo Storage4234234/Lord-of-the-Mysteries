@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -28,7 +29,7 @@ public class Tornado extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -38,11 +39,10 @@ public class Tornado extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private static void tornado(Player pPlayer) {
+    private static void tornado(LivingEntity pPlayer) {
         if (!pPlayer.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
-            summonTornado(pPlayer, holder.getSequence());
-            holder.useSpirituality(500);
+            summonTornado(pPlayer, BeyonderUtil.getSequence(pPlayer));
+            BeyonderUtil.useSpirituality(pPlayer,500);
         }
     }
 
@@ -61,7 +61,7 @@ public class Tornado extends SimpleAbilityItem {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
 
-    public static void summonTornado(Player player, int sequence) {
+    public static void summonTornado(LivingEntity player, int sequence) {
         if (!player.level().isClientSide()) {
             TornadoEntity tornado = new TornadoEntity(player.level(), player, 0, 0, 0);
             tornado.setTornadoHeight((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.TORNADO.get()));

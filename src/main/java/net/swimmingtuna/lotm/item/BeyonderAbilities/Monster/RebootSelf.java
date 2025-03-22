@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -33,7 +34,7 @@ public class RebootSelf extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -45,14 +46,18 @@ public class RebootSelf extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void activateSpiritVision(Player player) {
+    private void activateSpiritVision(LivingEntity player) {
         if (!player.level().isClientSide()) {
             if (player.isShiftKeyDown()) {
                 saveDataReboot(player, player.getPersistentData());
-                player.displayClientMessage(Component.literal("Saved State.").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD), true);
+                if (player instanceof Player pPlayer) {
+                    pPlayer.displayClientMessage(Component.literal("Saved State.").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD), true);
+                }
             } else {
                 restoreDataReboot(player, player.getPersistentData());
-                player.displayClientMessage(Component.literal("Loaded State.").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD), true);
+                if (player instanceof Player pPlayer) {
+                    pPlayer.displayClientMessage(Component.literal("Loaded State.").withStyle(ChatFormatting.GREEN).withStyle(ChatFormatting.BOLD), true);
+                }
             }
         }
     }
@@ -67,10 +72,9 @@ public class RebootSelf extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    private static void saveDataReboot(Player player, CompoundTag tag) {
+    private static void saveDataReboot(LivingEntity player, CompoundTag tag) {
         Collection<MobEffectInstance> activeEffects = player.getActiveEffects();
         tag.putInt("monsterRebootPotionEffectsCount", activeEffects.size());
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         int i = 0;
         for (MobEffectInstance effect : activeEffects) {
             CompoundTag effectTag = new CompoundTag();
@@ -89,18 +93,19 @@ public class RebootSelf extends SimpleAbilityItem {
         tag.putInt("monsterRebootSanity", (int) sanity);
         tag.putInt("monsterRebootCorruption", (int) corruption);
         tag.putInt("monsterRebootHealth", (int) player.getHealth());
-        tag.putInt("monsterRebootSpirituality",(int) holder.getSpirituality());
+        tag.putInt("monsterRebootSpirituality", (int) BeyonderUtil.getSpirituality(player));
         List<Item> beyonderAbilities = BeyonderUtil.getAbilities(player);
-        for (Item item : beyonderAbilities) {
-            if (item != ItemInit.REBOOTSELF.get()) {
-                String itemCooldowns = item.getDescription().toString();
-                tag.putFloat("monsterRebootCooldown" + itemCooldowns, player.getCooldowns().getCooldownPercent(item, 0));
+        if (player instanceof Player pPlayer) {
+            for (Item item : beyonderAbilities) {
+                if (item != ItemInit.REBOOTSELF.get()) {
+                    String itemCooldowns = item.getDescription().toString();
+                    tag.putFloat("monsterRebootCooldown" + itemCooldowns, pPlayer.getCooldowns().getCooldownPercent(item, 0));
+                }
             }
         }
     }
 
-    private static void restoreDataReboot(Player player, CompoundTag tag) {
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+    private static void restoreDataReboot(LivingEntity player, CompoundTag tag) {
         for (MobEffectInstance activeEffect : new ArrayList<>(player.getActiveEffects())) {
             player.removeEffect(activeEffect.getEffect());
         }
@@ -124,18 +129,21 @@ public class RebootSelf extends SimpleAbilityItem {
         tag.putDouble("corruption", corruption);
         tag.putDouble("luck", luck);
         tag.putDouble("misfortune", misfortune);
-        holder.setSpirituality(spirituality);
+        BeyonderUtil.setSpirituality(player, spirituality);
         player.setHealth(Math.max(1, health));
         List<Item> beyonderAbilities = BeyonderUtil.getAbilities(player);
         for (Item item : beyonderAbilities) {
-            if (item instanceof SimpleAbilityItem simpleAbilityItem) {
-                String itemCooldowns = item.getDescription().toString();
-                float savedCooldownPercent = tag.getFloat("monsterRebootCooldown" + itemCooldowns);
-                int remainingCooldownTicks = (int) (simpleAbilityItem.getCooldown() * savedCooldownPercent);
-                player.getCooldowns().addCooldown(item, remainingCooldownTicks);
+            if (player instanceof Player pPlayer) {
+                if (item instanceof SimpleAbilityItem simpleAbilityItem) {
+                    String itemCooldowns = item.getDescription().toString();
+                    float savedCooldownPercent = tag.getFloat("monsterRebootCooldown" + itemCooldowns);
+                    int remainingCooldownTicks = (int) (simpleAbilityItem.getCooldown() * savedCooldownPercent);
+                    pPlayer.getCooldowns().addCooldown(item, remainingCooldownTicks);
+                }
             }
         }
     }
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
