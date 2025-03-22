@@ -10,6 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.entity.*;
+import net.swimmingtuna.lotm.entity.mob.BeyonderEntity;
 
 public class EntityInit {
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, LOTM.MOD_ID);
@@ -137,10 +138,11 @@ public class EntityInit {
                     .clientTrackingRange(8)
                     .build(new ResourceLocation(LOTM.MOD_ID, "player_mob").toString())
     );
+
     public static void registerEntityAttributes(EntityAttributeCreationEvent event) {
         event.put(PLAYER_MOB_ENTITY.get(), PlayerMobEntity.registerAttributes().build());
+        event.put(MobInit.MONSTER_BEYONDER_ENTITY.get(), BeyonderEntity.createAttributes().build());
     }
-
 
     public static void register(IEventBus bus) {
         ENTITIES.register(bus);

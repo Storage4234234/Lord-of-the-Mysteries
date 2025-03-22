@@ -4,20 +4,20 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.*;
+import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.entity.mob.behaviour.GroupBeyondersBehaviour;
+import net.swimmingtuna.lotm.init.MobInit;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
-import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetPlayerLookTarget;
@@ -30,21 +30,22 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class BeyonderEntity extends LivingEntity implements SmartBrainOwner<BeyonderEntity> {
+public class BeyonderEntity extends Monster implements SmartBrainOwner<BeyonderEntity> {
 
-    public BeyonderEntity(EntityType<? extends LivingEntity> pEntityType, Level pLevel, BeyonderClass beyonderClass) {
-        super(pEntityType, pLevel);
-        createAttributes();
+    public BeyonderEntity(Level pLevel, BeyonderClass beyonderClass) {
+        super(MobInit.MONSTER_BEYONDER_ENTITY.get(), pLevel);
         BeyonderUtil.setPathway(this, beyonderClass);
     }
 
-    public static AttributeSupplier createAttributes() {
+
+    public static AttributeSupplier.Builder createAttributes() {
         return Monster.createLivingAttributes()
                 .add(Attributes.MAX_HEALTH, 10)
-                .add(Attributes.MOVEMENT_SPEED, 0.250f)
-                .add(Attributes.ATTACK_DAMAGE, 2f)
                 .add(Attributes.FOLLOW_RANGE, 40.0D)
-                .add(Attributes.ARMOR, 2.0D).build();
+                .add(Attributes.ATTACK_KNOCKBACK)
+                .add(Attributes.ARMOR, 2.0D)
+                .add(Attributes.ATTACK_DAMAGE, 2f)
+                .add(Attributes.MOVEMENT_SPEED, 0.250f);
     }
 
     @Override
@@ -62,8 +63,7 @@ public class BeyonderEntity extends LivingEntity implements SmartBrainOwner<Beyo
 
     @Override
     public ItemStack getItemBySlot(EquipmentSlot equipmentSlot) {
-        //todo later
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -87,9 +87,15 @@ public class BeyonderEntity extends LivingEntity implements SmartBrainOwner<Beyo
     }
 
     @Override
+    protected void customServerAiStep() {
+        tickBrain(this);
+    }
+
+    @Override
     public BrainActivityGroup<BeyonderEntity> getCoreTasks() {
         return BrainActivityGroup.coreTasks(
-                new GroupBeyondersBehaviour<>()
+                new GroupBeyondersBehaviour<>(),
+                new MoveToWalkTarget<>()
         );
     }
 
@@ -99,17 +105,15 @@ public class BeyonderEntity extends LivingEntity implements SmartBrainOwner<Beyo
                 new FirstApplicableBehaviour<>(
                         new TargetOrRetaliate<>(),
                         new SetPlayerLookTarget<>(),
-                        new SetRandomLookTarget<>()),
-                new OneRandomBehaviour<>(
-                        new SetRandomWalkTarget<>(),
-                        new Idle<>().runFor(entity -> entity.getRandom().nextInt(30, 60))));
+                        new SetRandomLookTarget<>())
+        );
     }
 
-    @Override
+/*    @Override
     public BrainActivityGroup<BeyonderEntity> getFightTasks() {
         return BrainActivityGroup.fightTasks(
                 new InvalidateAttackTarget<>(),
                 new SetWalkTargetToAttackTarget<>(),
                 new AnimatableMeleeAttack<>(0));
-    }
+    }*/
 }

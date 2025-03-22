@@ -15,7 +15,7 @@ public class MobInit {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPE = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, LOTM.MOD_ID);
 
     public static final RegistryObject<EntityType<BeyonderEntity>> MONSTER_BEYONDER_ENTITY = ENTITY_TYPE.register("monster_bey_entity",
-            () -> EntityType.Builder.<BeyonderEntity>of((entityType, level) -> new BeyonderEntity(entityType, level, new MonsterClass()), MobCategory.MONSTER)
+            () -> EntityType.Builder.<BeyonderEntity>of((entityType, level) -> new BeyonderEntity(level, new MonsterClass()), MobCategory.MONSTER)
                     .sized(0.6f, 1.99f)
                     .build("monster_bey_entity"));
 

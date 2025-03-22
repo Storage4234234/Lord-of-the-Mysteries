@@ -8,7 +8,9 @@ import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.entity.Model.*;
 import net.swimmingtuna.lotm.entity.Renderers.*;
 import net.swimmingtuna.lotm.entity.Renderers.PlayerMobRenderer.PlayerMobRenderer;
+import net.swimmingtuna.lotm.entity.mob.MonsterBeyonderZombieRenderer;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.MobInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
 import net.swimmingtuna.lotm.particle.*;
 
@@ -65,6 +67,7 @@ public class ClientEventsEntity {
         event.registerEntityRenderer(EntityInit.DRAGON_BREATH_ENTITY.get(), DragonBreathRenderer::new);
         event.registerEntityRenderer(EntityInit.WIND_BLADE_ENTITY.get(), WindBladeRenderer::new);
         event.registerEntityRenderer(EntityInit.WIND_CUSHION_ENTITY.get(), WindCushionRenderer::new);
+        event.registerEntityRenderer(MobInit.MONSTER_BEYONDER_ENTITY.get(), MonsterBeyonderZombieRenderer::new);
     }
 
 

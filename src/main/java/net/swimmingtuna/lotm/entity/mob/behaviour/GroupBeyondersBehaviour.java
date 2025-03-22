@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
+import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.swimmingtuna.lotm.util.AllyInformation.PlayerAllyData;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
@@ -46,14 +47,6 @@ public class GroupBeyondersBehaviour<E extends LivingEntity> extends ExtendedBeh
         return this.canGroup.test(entity);
     }
 
-    protected void tick(E entity) {
-        BrainUtils.withMemory(entity, MemoryModuleType.NEAREST_LIVING_ENTITIES, (target) -> {
-            if (target.stream().findAny().isPresent()){
-                entity.moveRelative(5, target.stream().min((o1, o2) -> (int) (o1.distanceTo(entity) - o2.distanceTo(entity))).get().position());
-            }
-        });
-    }
-
     private void addAllies(List<LivingEntity> entities, E mainEntity){
         for (LivingEntity entity : entities) {
             PlayerAllyData allyData = entity.getCommandSenderWorld().getServer().getLevel(entity.getCommandSenderWorld().dimension()).getDataStorage().computeIfAbsent(PlayerAllyData::load, PlayerAllyData::create, "player_allies");
@@ -67,7 +60,9 @@ public class GroupBeyondersBehaviour<E extends LivingEntity> extends ExtendedBeh
         List<LivingEntity> groupTarget = nearbyEntities.stream().filter(
                 target -> this.canGroup.test((E) target)
                         && BeyonderUtil.getSequence(target) != -1
-                        && BeyonderUtil.getPathway(target) == BeyonderUtil.getPathway(entity)).toList();
+                        && BeyonderUtil.getPathway(target) == BeyonderUtil.getPathway(entity)
+                        && entity.distanceTo(target) > 5
+        ).toList();
 
         addAllies(groupTarget, entity);
         if (groupTarget.isEmpty()) {
@@ -75,7 +70,9 @@ public class GroupBeyondersBehaviour<E extends LivingEntity> extends ExtendedBeh
         }
         else {
             BrainUtils.setMemory(entity, MemoryModuleType.NEAREST_LIVING_ENTITIES, groupTarget);
+            BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(groupTarget.stream().findFirst().get(), 1, 5));
             BrainUtils.clearMemory(entity, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
+
         }
     }
 }

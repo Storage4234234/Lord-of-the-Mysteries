@@ -163,11 +163,6 @@ public class ModEvents {
     }
 
     @SubscribeEvent
-    public static void registerAttributes(EntityAttributeCreationEvent event){
-        event.put(MobInit.MONSTER_BEYONDER_ENTITY.get(), BeyonderEntity.createAttributes());
-    }
-
-    @SubscribeEvent
     public static void onLevelLoad(LevelEvent.Load event) {
         if (event.getLevel().dimensionType().equals(SPIRIT_WORLD_LEVEL_KEY)) {
             if (event.getLevel() instanceof ServerLevel spiritWorld) {
