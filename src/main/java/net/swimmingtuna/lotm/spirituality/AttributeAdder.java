@@ -6,6 +6,7 @@ import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.swimmingtuna.lotm.LOTM;
+import net.swimmingtuna.lotm.init.EntityInit;
 
 import java.util.function.Supplier;
 
@@ -23,6 +24,7 @@ public class AttributeAdder {
     private static void addToPlayer(EntityAttributeModificationEvent event, Supplier<Attribute>... attributes) {
         for (Supplier<Attribute> attribute : attributes) {
             event.add(EntityType.PLAYER, attribute.get());
+            event.add(EntityInit.PLAYER_MOB_ENTITY.get(), attribute.get());
         }
     }
 }

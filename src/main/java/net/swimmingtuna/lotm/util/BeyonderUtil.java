@@ -652,52 +652,38 @@ public class BeyonderUtil {
         double entityReach = ability.getEntityReach();
         double blockReach = ability.getBlockReach();
         boolean successfulUse = false;
-
-        // Check for existence of methods
         boolean hasEntityInteraction = false;
         boolean hasBlockInteraction = false;
         boolean hasGeneralAbility = false;
 
         try {
-            Method entityMethod = ability.getClass().getDeclaredMethod("useAbilityOnEntity",
-                    ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class);
-            hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity",
-                    ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class));
+            Method entityMethod = ability.getClass().getMethod("useAbilityOnEntity", ItemStack.class, LivingEntity.class, LivingEntity.class, InteractionHand.class);
+            hasEntityInteraction = !entityMethod.getDeclaringClass().equals(Ability.class);
         } catch (NoSuchMethodException ignored) {
         }
 
         try {
-            Method blockMethod = ability.getClass().getDeclaredMethod("useAbilityOnBlock", UseOnContext.class);
+            Method blockMethod = ability.getClass().getMethod("useAbilityOnBlock", UseOnContext.class);
             hasBlockInteraction = !blockMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnBlock", UseOnContext.class));
         } catch (NoSuchMethodException ignored) {
         }
 
         try {
-            Method generalMethod = ability.getClass().getDeclaredMethod("useAbility", Level.class, Player.class, InteractionHand.class);
-            hasGeneralAbility = !generalMethod.equals(Ability.class.getDeclaredMethod("useAbility", Level.class, Player.class, InteractionHand.class));
+            Method generalMethod = ability.getClass().getDeclaredMethod("useAbility", Level.class, LivingEntity.class, InteractionHand.class);
+            hasGeneralAbility = !generalMethod.equals(Ability.class.getDeclaredMethod("useAbility", Level.class, LivingEntity.class, InteractionHand.class));
         } catch (NoSuchMethodException ignored) {
         }
-
-        // Check for entity interaction
         if (hasEntityInteraction) {
             Vec3 eyePosition = player.getEyePosition();
             Vec3 lookVector = player.getLookAngle();
             Vec3 reachVector = eyePosition.add(lookVector.x * entityReach, lookVector.y * entityReach, lookVector.z * entityReach);
             AABB searchBox = player.getBoundingBox().inflate(entityReach);
-            EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(
-                    player.level(),
-                    player,
-                    eyePosition,
-                    reachVector,
-                    searchBox,
-                    entity -> !entity.isSpectator() && entity.isPickable(),
-                    0.0f
-            );
-
+            EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(player.level(), player, eyePosition, reachVector, searchBox, entity -> !entity.isSpectator() && entity.isPickable(), 0.0f);
             if (entityHit != null && entityHit.getEntity() instanceof LivingEntity livingEntity) {
                 InteractionResult result = ability.useAbilityOnEntity(player.getItemInHand(hand), player, livingEntity, hand);
                 if (result != InteractionResult.PASS) {
                     successfulUse = true;
+                    System.out.println("entityInteraction success");
                 }
             }
         }
@@ -721,11 +707,11 @@ public class BeyonderUtil {
                 InteractionResult result = ability.useAbilityOnBlock(context);
                 if (result != InteractionResult.PASS) {
                     successfulUse = true;
+                    System.out.println("blockInteraction success");
                 }
             }
         }
 
-        // Handle different cases
         if ((hasEntityInteraction || hasBlockInteraction) && !hasGeneralAbility) {
             if (successfulUse) {
                 player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
@@ -733,14 +719,11 @@ public class BeyonderUtil {
                 player.displayClientMessage(Component.literal("Missed: " + itemName).withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
             }
         } else if (!hasEntityInteraction && !hasBlockInteraction) {
-            // If it's just a general ability with no targeting
             ability.useAbility(player.level(), player, hand);
             player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
         } else if (successfulUse) {
-            // If it has both targeted and general abilities, and the targeted one succeeded
             player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
         } else {
-            // If it has both targeted and general abilities, but the targeted one missed
             ability.useAbility(player.level(), player, hand);
             player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
         }
@@ -2517,28 +2500,20 @@ public class BeyonderUtil {
     public static void useAvailableAbilityAsMob(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide() && getPathway(livingEntity) != null && livingEntity instanceof Mob mob) {
             List<Item> abilities = getAbilities(livingEntity);
-
-            // Check if we have any abilities
-            if (abilities == null || abilities.isEmpty()) {
+            if (abilities.isEmpty()) {
                 return;
             }
-
-            // Select a random ability from the list
+            LivingEntity target = mob.getTarget();
             Random random = new Random();
             Item randomItem = abilities.get(random.nextInt(abilities.size()));
-
-            // Check if the selected item is a SimpleAbilityItem
             if (randomItem instanceof SimpleAbilityItem simpleAbilityItem) {
                 if (livingEntity.hasEffect(ModEffects.STUN.get())) {
                     return;
                 }
-
-                // Check if the mob can use this ability
                 if (!SimpleAbilityItem.checkAll(livingEntity, simpleAbilityItem.getRequiredPathway(),
                         simpleAbilityItem.getRequiredSequence(), simpleAbilityItem.getRequiredSpirituality(), false)) {
                     mob.setItemInHand(InteractionHand.MAIN_HAND, simpleAbilityItem.getDefaultInstance());
                 }
-
                 double entityReach = simpleAbilityItem.getEntityReach();
                 double blockReach = simpleAbilityItem.getBlockReach();
                 boolean successfulUse = false;
@@ -2547,7 +2522,8 @@ public class BeyonderUtil {
                 boolean hasGeneralAbility = false;
 
                 try {
-                    Method entityMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbilityOnEntity", ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class);hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity", ItemStack.class, Player.class, LivingEntity.class, InteractionHand.class));
+                    Method entityMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbilityOnEntity", ItemStack.class, LivingEntity.class, LivingEntity.class, InteractionHand.class);
+                    hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity", ItemStack.class, LivingEntity.class, LivingEntity.class, InteractionHand.class));
                 } catch (NoSuchMethodException ignored) {}
                 try {
                     Method blockMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbilityOnBlock", UseOnContext.class);
@@ -2555,13 +2531,12 @@ public class BeyonderUtil {
                 } catch (NoSuchMethodException ignored) {}
 
                 try {
-                    Method generalMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbility", Level.class, Player.class, InteractionHand.class);
-                    hasGeneralAbility = !generalMethod.equals(Ability.class.getDeclaredMethod("useAbility", Level.class, Player.class, InteractionHand.class));
+                    Method generalMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbility", Level.class, LivingEntity.class, InteractionHand.class);
+                    hasGeneralAbility = !generalMethod.equals(Ability.class.getDeclaredMethod("useAbility", Level.class, LivingEntity.class, InteractionHand.class));
                 } catch (NoSuchMethodException ignored) {}
                 if (hasEntityInteraction) {
-                    LivingEntity target = mob.getTarget();
                     if (target != null && target.distanceTo(mob) <= entityReach) {
-                        InteractionResult result = simpleAbilityItem.useMobAbilityOnEntity(livingEntity.level(), mob, target);
+                        InteractionResult result = simpleAbilityItem.useAbilityOnEntity(livingEntity.getItemInHand(InteractionHand.MAIN_HAND), mob, target, InteractionHand.MAIN_HAND);
                         if (result != InteractionResult.PASS) {
                             successfulUse = true;
                         }
@@ -2575,7 +2550,14 @@ public class BeyonderUtil {
                     BlockHitResult blockHit = livingEntity.level().clip(new ClipContext(eyePosition, reachVector,
                             ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, livingEntity));
                     if (blockHit.getType() != HitResult.Type.MISS) {
-                        InteractionResult result = simpleAbilityItem.useMobAbilityOnBlock(livingEntity.level(), mob, blockHit.getBlockPos());
+                        UseOnContext context = new UseOnContext(
+                                livingEntity.level(),
+                                null,
+                                InteractionHand.MAIN_HAND,
+                                livingEntity.getItemInHand(InteractionHand.MAIN_HAND),
+                                blockHit
+                        );
+                        InteractionResult result = simpleAbilityItem.useOn(context);
                         if (result != InteractionResult.PASS) {
                             successfulUse = true;
                         }
@@ -2590,12 +2572,12 @@ public class BeyonderUtil {
                         System.out.println("Missed " + itemName);
                     }
                 } else if (!hasEntityInteraction && !hasBlockInteraction) {
-                    simpleAbilityItem.useMobAbility(mob.level(), mob);
+                    simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
                     System.out.println("Used " + itemName);
                 } else if (successfulUse) {
                     System.out.println("Used " + itemName);
                 } else {
-                    simpleAbilityItem.useMobAbility(mob.level(), mob);
+                    simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
                     System.out.println("Used " + itemName);
                 }
             }

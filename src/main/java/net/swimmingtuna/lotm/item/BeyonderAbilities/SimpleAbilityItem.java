@@ -97,6 +97,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (!level.isClientSide() && checkIfCanUseAbility(player)) {
             InteractionResult interactionResult = useAbility(level, player, hand);
+            System.out.println("use ability used");
             return new InteractionResultHolder<>(interactionResult, player.getItemInHand(hand));
         }
         return InteractionResultHolder.pass(player.getItemInHand(hand));
@@ -106,6 +107,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
         if (!level.isClientSide()) {
+            System.out.println("useOn used");
             return useAbilityOnBlock(context);
         }
         return InteractionResult.PASS;
@@ -115,6 +117,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     @Override
     public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity livingEntity, LivingEntity interactionTarget, InteractionHand usedHand) {
         if (!livingEntity.level().isClientSide()) {
+            System.out.println("useOn used");
             return interactLivingEntityLivingEntity(stack, livingEntity, interactionTarget, usedHand);
         }
         return InteractionResult.PASS;
@@ -123,46 +126,6 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     public InteractionResult interactLivingEntityLivingEntity(ItemStack pStack, LivingEntity pPlayer, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
         return InteractionResult.PASS;
     }
-
-    @Override
-    public InteractionResult useMobAbility(Level level, LivingEntity mob) {
-        if (!level.isClientSide() && checkIfCanUseAbility(mob) && !isProcessing) {
-            try {
-                isProcessing = true;
-                return Ability.super.useAbility(level, mob, InteractionHand.MAIN_HAND);
-            } finally {
-                isProcessing = false;
-            }
-        }
-        return InteractionResult.PASS;
-    }
-
-    @Override
-    public InteractionResult useMobAbilityOnBlock(Level level, LivingEntity mob, BlockPos pos) {
-        if (!level.isClientSide()) {
-            try {
-                isProcessing = true;
-                return Ability.super.useMobAbilityOnBlock(level, mob, pos);
-            } finally {
-                isProcessing = false;
-            }
-        }
-        return InteractionResult.PASS;
-    }
-
-    @Override
-    public InteractionResult useMobAbilityOnEntity(Level level, LivingEntity mob, LivingEntity target) {
-        if (!level.isClientSide() && checkIfCanUseAbility(mob)) {
-            try {
-                isProcessing = true;
-                return Ability.super.useMobAbilityOnEntity(level, mob, target);
-            } finally {
-                isProcessing = false;
-            }
-        }
-        return InteractionResult.PASS;
-    }
-
 
 
     @Override

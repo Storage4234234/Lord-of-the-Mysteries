@@ -32,7 +32,10 @@ public class ManipulateEmotion extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
-        int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
+        int dreamIntoReality = 1;
+        if (player instanceof Player pPlayer) {
+            dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
+        }
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }

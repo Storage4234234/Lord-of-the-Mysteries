@@ -24,17 +24,6 @@ public interface Ability {
         return InteractionResult.PASS;
     }
 
-    default InteractionResult useMobAbility(Level level, LivingEntity mob) {
-        return InteractionResult.PASS;
-    }
-
-    default InteractionResult useMobAbilityOnBlock(Level level, LivingEntity mob, BlockPos pos) {
-        return InteractionResult.PASS;
-    }
-
-    default InteractionResult useMobAbilityOnEntity(Level level, LivingEntity mob, LivingEntity target) {
-        return InteractionResult.PASS;
-    }
 
 
 
