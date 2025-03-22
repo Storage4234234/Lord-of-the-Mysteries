@@ -3,17 +3,20 @@ package net.swimmingtuna.lotm.entity.mob;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.Brain;
+import net.minecraft.world.entity.ai.attributes.*;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
+import net.swimmingtuna.lotm.entity.mob.behaviour.GroupBeyondersBehaviour;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.look.LookAtTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
@@ -29,9 +32,19 @@ import java.util.List;
 
 public class BeyonderEntity extends LivingEntity implements SmartBrainOwner<BeyonderEntity> {
 
-
-    public BeyonderEntity(EntityType<? extends LivingEntity> pEntityType, Level pLevel) {
+    public BeyonderEntity(EntityType<? extends LivingEntity> pEntityType, Level pLevel, BeyonderClass beyonderClass) {
         super(pEntityType, pLevel);
+        createAttributes();
+        BeyonderUtil.setPathway(this, beyonderClass);
+    }
+
+    public static AttributeSupplier createAttributes() {
+        return Monster.createLivingAttributes()
+                .add(Attributes.MAX_HEALTH, 10)
+                .add(Attributes.MOVEMENT_SPEED, 0.250f)
+                .add(Attributes.ATTACK_DAMAGE, 2f)
+                .add(Attributes.FOLLOW_RANGE, 40.0D)
+                .add(Attributes.ARMOR, 2.0D).build();
     }
 
     @Override
@@ -46,6 +59,7 @@ public class BeyonderEntity extends LivingEntity implements SmartBrainOwner<Beyo
         return List.of();
     }
 
+
     @Override
     public ItemStack getItemBySlot(EquipmentSlot equipmentSlot) {
         //todo later
@@ -56,6 +70,7 @@ public class BeyonderEntity extends LivingEntity implements SmartBrainOwner<Beyo
     public void setItemSlot(EquipmentSlot equipmentSlot, ItemStack itemStack) {
         //todo add later
     }
+
 
     @Override
     @NotNull
@@ -74,8 +89,8 @@ public class BeyonderEntity extends LivingEntity implements SmartBrainOwner<Beyo
     @Override
     public BrainActivityGroup<BeyonderEntity> getCoreTasks() {
         return BrainActivityGroup.coreTasks(
-                new LookAtTarget<>(),
-                new MoveToWalkTarget<>());
+                new GroupBeyondersBehaviour<>()
+        );
     }
 
     @Override
@@ -93,7 +108,7 @@ public class BeyonderEntity extends LivingEntity implements SmartBrainOwner<Beyo
     @Override
     public BrainActivityGroup<BeyonderEntity> getFightTasks() {
         return BrainActivityGroup.fightTasks(
-                new InvalidateAttackTarget<>(), // Cancel fighting if the target is no longer valid
+                new InvalidateAttackTarget<>(),
                 new SetWalkTargetToAttackTarget<>(),
                 new AnimatableMeleeAttack<>(0));
     }

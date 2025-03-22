@@ -80,6 +80,7 @@ public class LOTM {
         ItemInit.register(modEventBus);
         BlockInit.register(modEventBus);
         ModEffects.register(modEventBus);
+        MobInit.register(modEventBus);
         ModAttributes.register(modEventBus);
         EntityInit.register(modEventBus);
         modEventBus.addListener(EntityInit::registerEntityAttributes);

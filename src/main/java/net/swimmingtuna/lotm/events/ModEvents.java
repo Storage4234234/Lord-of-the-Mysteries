@@ -1,6 +1,8 @@
 package net.swimmingtuna.lotm.events;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.model.SkeletonModel;
+import net.minecraft.client.model.ZombieModel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -17,6 +19,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
@@ -25,6 +28,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -41,6 +45,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.beyonder.ApprenticeClass;
+import net.swimmingtuna.lotm.beyonder.MonsterClass;
 import net.swimmingtuna.lotm.beyonder.SailorClass;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
@@ -48,10 +53,9 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.client.Configs;
 import net.swimmingtuna.lotm.commands.AbilityRegisterCommand;
 import net.swimmingtuna.lotm.entity.*;
-import net.swimmingtuna.lotm.init.BeyonderClassInit;
-import net.swimmingtuna.lotm.init.EntityInit;
-import net.swimmingtuna.lotm.init.GameRuleInit;
-import net.swimmingtuna.lotm.init.ItemInit;
+import net.swimmingtuna.lotm.entity.mob.BeyonderEntity;
+import net.swimmingtuna.lotm.entity.mob.MobModelLayers;
+import net.swimmingtuna.lotm.init.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.BounceProjectiles;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.Burn;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.InvisibleHand;
@@ -153,6 +157,15 @@ public class ModEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void registerLayer(EntityRenderersEvent.RegisterLayerDefinitions rld){
+        rld.registerLayerDefinition(MobModelLayers.monster_layer, SkeletonModel::createBodyLayer);
+    }
+
+    @SubscribeEvent
+    public static void registerAttributes(EntityAttributeCreationEvent event){
+        event.put(MobInit.MONSTER_BEYONDER_ENTITY.get(), BeyonderEntity.createAttributes());
+    }
 
     @SubscribeEvent
     public static void onLevelLoad(LevelEvent.Load event) {
