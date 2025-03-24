@@ -435,6 +435,26 @@ public class ItemInit {
             () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.MONSTER, 1));
     public static final RegistryObject<Item> MONSTER_0_POTION = ITEMS.register("monster_0_potion",
             () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.MONSTER, 0));
+    public static final RegistryObject<Item> WARRIOR_9_POTION = ITEMS.register("warrior_9_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 9));
+    public static final RegistryObject<Item> WARRIOR_8_POTION = ITEMS.register("warrior_8_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 8));
+    public static final RegistryObject<Item> WARRIOR_7_POTION = ITEMS.register("warrior_7_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 7));
+    public static final RegistryObject<Item> WARRIOR_6_POTION = ITEMS.register("warrior_6_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 6));
+    public static final RegistryObject<Item> WARRIOR_5_POTION = ITEMS.register("warrior_5_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 5));
+    public static final RegistryObject<Item> WARRIOR_4_POTION = ITEMS.register("warrior_4_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 4));
+    public static final RegistryObject<Item> WARRIOR_3_POTION = ITEMS.register("warrior_3_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 3));
+    public static final RegistryObject<Item> WARRIOR_2_POTION = ITEMS.register("warrior_2_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 2));
+    public static final RegistryObject<Item> WARRIOR_1_POTION = ITEMS.register("warrior_1_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 1));
+    public static final RegistryObject<Item> WARRIOR_0_POTION = ITEMS.register("warrior_0_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 0));
     public static final RegistryObject<Item> BEYONDER_RESET_POTION = ITEMS.register("beyonder_reset_potion",
             () -> new BeyonderResetPotion(new Item.Properties().stacksTo(1)));
 
