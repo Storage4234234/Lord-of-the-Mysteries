@@ -320,17 +320,9 @@ public abstract class BeamEntity extends LOTMProjectile {
     private void calculateEndPos() {
         Vec3 direction;
         if (this.level().isClientSide) {
-            direction = new Vec3(
-                    Math.cos(this.renderYaw) * Math.cos(this.renderPitch),
-                    Math.sin(this.renderPitch),
-                    Math.sin(this.renderYaw) * Math.cos(this.renderPitch)
-            ).normalize();
+            direction = new Vec3(Math.cos(this.renderYaw) * Math.cos(this.renderPitch), Math.sin(this.renderPitch), Math.sin(this.renderYaw) * Math.cos(this.renderPitch)).normalize();
         } else {
-            direction = new Vec3(
-                    Math.cos(this.getYaw()) * Math.cos(this.getPitch()),
-                    Math.sin(this.getPitch()),
-                    Math.sin(this.getYaw()) * Math.cos(this.getPitch())
-            ).normalize();
+            direction = new Vec3(Math.cos(this.getYaw()) * Math.cos(this.getPitch()), Math.sin(this.getPitch()), Math.sin(this.getYaw()) * Math.cos(this.getPitch())).normalize();
         }
 
         Vec3 end = new Vec3(this.getX(), this.getY(), this.getZ()).add(direction.scale(this.getRange()));
@@ -343,11 +335,7 @@ public abstract class BeamEntity extends LOTMProjectile {
 
     public List<Entity> checkCollisions(Vec3 from, Vec3 to) {
         if (!(this.getOwner() instanceof LivingEntity owner)) return List.of();
-
-        // Get the collision result
         BlockHitResult result = this.level().clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-
-        // Update collision position
         if (result.getType() != HitResult.Type.MISS) {
             Vec3 pos = result.getLocation();
             this.collidePosX = pos.x;
@@ -360,14 +348,8 @@ public abstract class BeamEntity extends LOTMProjectile {
             this.collidePosZ = to.z;
             this.side = null;
         }
-
-        // Calculate the direction vector
         Vec3 dir = to.subtract(from).normalize();
-
-        // Get size for radius
         double radius = this.getSize();
-
-        // Create bounds centered on the beam path
         AABB bounds = new AABB(
                 Math.min(from.x, this.collidePosX) - radius,
                 Math.min(from.y, this.collidePosY) - radius,
@@ -376,24 +358,18 @@ public abstract class BeamEntity extends LOTMProjectile {
                 Math.max(from.y, this.collidePosY) + radius,
                 Math.max(from.z, this.collidePosZ) + radius
         );
-
-        // For block breaking and fire
         if (!this.level().isClientSide) {
             BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
-
             for (int x = (int) Math.floor(bounds.minX); x <= Math.ceil(bounds.maxX); x++) {
                 for (int y = (int) Math.floor(bounds.minY); y <= Math.ceil(bounds.maxY); y++) {
                     for (int z = (int) Math.floor(bounds.minZ); z <= Math.ceil(bounds.maxZ); z++) {
                         mutablePos.set(x, y, z);
-
-                        // Calculate distance from point to line (beam)
                         Vec3 point = new Vec3(x + 0.5, y + 0.5, z + 0.5);
                         Vec3 fromToPoint = point.subtract(from);
                         double dot = fromToPoint.dot(dir);
                         Vec3 projection = dir.scale(dot);
                         Vec3 distanceVec = fromToPoint.subtract(projection);
                         double distance = distanceVec.length();
-
                         if (distance <= radius) {
                             if (getDestroyBlocks()) {
                                 if (this.breaksBlocks() && !EXCLUDED_BLOCKS.contains(this.level().getBlockState(mutablePos).getBlock())) {
@@ -406,7 +382,6 @@ public abstract class BeamEntity extends LOTMProjectile {
                                     this.level().destroyBlock(mutablePos, false);
                                 }
                             }
-
                             if (this.causesFire()) {
                                 if (this.random.nextInt(3) == 0 &&
                                         this.level().getBlockState(mutablePos).isAir() &&
@@ -419,21 +394,98 @@ public abstract class BeamEntity extends LOTMProjectile {
                 }
             }
         }
+        double rayLength = from.distanceTo(new Vec3(this.collidePosX, this.collidePosY, this.collidePosZ));
+        double entityDetectionRadius = radius * 1.5; // Wider radius for entity detection
 
-        // Entity collision detection
+
+        AABB entityBounds  = new AABB(
+                Math.min(from.x, this.collidePosX) - radius * 0.8,
+                Math.min(from.y, this.collidePosY) - radius * 0.8,
+                Math.min(from.z, this.collidePosZ) - radius * 0.8,
+                Math.max(from.x, this.collidePosX) + radius * 0.8,
+                Math.max(from.y, this.collidePosY) + radius,
+                Math.max(from.z, this.collidePosZ) + radius * 0.8
+        );
         List<Entity> entities = new ArrayList<>();
-        for (Entity entity : this.level().getEntitiesOfClass(Entity.class, bounds)) {
-            if (entity == this.getOwner()) continue;
-
-            Vec3 nearestPoint = getNearestPointOnLine(from, to, entity.position());
-            double distance = entity.position().subtract(nearestPoint).length();
-
-            if (distance <= radius + entity.getBbWidth() / 2) {
+        for (Entity entity : this.level().getEntitiesOfClass(Entity.class, entityBounds)) {
+            if (entity == this.getOwner() || entity == this) continue;
+            AABB entityBox = entity.getBoundingBox();
+            if (rayIntersectsBox(from, to, entityBox)) {
                 entities.add(entity);
+                continue;
+            }
+            Vec3[] checkPoints = {
+                    new Vec3(entity.getX(), entity.getY(), entity.getZ()),
+                    new Vec3(entity.getX(), entity.getY() + entity.getBbHeight() * 0.3, entity.getZ()),
+                    new Vec3(entity.getX(), entity.getY() + entity.getBbHeight() * 0.6, entity.getZ()),
+                    new Vec3(entity.getX(), entity.getY() + entity.getBbHeight() * 0.45, entity.getZ())
+            };
+
+            for (Vec3 point : checkPoints) {
+                Vec3 nearestPoint = getNearestPointOnLine(from, to, point);
+                double distance = point.distanceTo(nearestPoint);
+
+                if (distance <= entityDetectionRadius) {
+                    entities.add(entity);
+                    break;
+                }
             }
         }
 
+        System.out.println("hit entity" + entities);
         return entities;
+    }
+
+    private boolean rayIntersectsBox(Vec3 rayStart, Vec3 rayEnd, AABB box) {
+        Vec3 rayDir = rayEnd.subtract(rayStart).normalize();
+
+        // Calculate intersection with each face of the box
+        double tMin = (box.minX - rayStart.x) / (rayDir.x == 0 ? 0.00001 : rayDir.x);
+        double tMax = (box.maxX - rayStart.x) / (rayDir.x == 0 ? 0.00001 : rayDir.x);
+
+        if (tMin > tMax) {
+            double temp = tMin;
+            tMin = tMax;
+            tMax = temp;
+        }
+
+        double tyMin = (box.minY - rayStart.y) / (rayDir.y == 0 ? 0.00001 : rayDir.y);
+        double tyMax = (box.maxY - rayStart.y) / (rayDir.y == 0 ? 0.00001 : rayDir.y);
+
+        if (tyMin > tyMax) {
+            double temp = tyMin;
+            tyMin = tyMax;
+            tyMax = temp;
+        }
+
+        if ((tMin > tyMax) || (tyMin > tMax)) {
+            return false;
+        }
+
+        if (tyMin > tMin) {
+            tMin = tyMin;
+        }
+
+        if (tyMax < tMax) {
+            tMax = tyMax;
+        }
+
+        double tzMin = (box.minZ - rayStart.z) / (rayDir.z == 0 ? 0.00001 : rayDir.z);
+        double tzMax = (box.maxZ - rayStart.z) / (rayDir.z == 0 ? 0.00001 : rayDir.z);
+
+        if (tzMin > tzMax) {
+            double temp = tzMin;
+            tzMin = tzMax;
+            tzMax = temp;
+        }
+
+        if ((tMin > tzMax) || (tzMin > tMax)) {
+            return false;
+        }
+
+        // Check if intersection is within ray length
+        double maxDistance = rayStart.distanceTo(rayEnd);
+        return tMin >= 0 && tMin <= maxDistance;
     }
 
     private Vec3 getNearestPointOnLine(Vec3 lineStart, Vec3 lineEnd, Vec3 point) {
@@ -459,10 +511,7 @@ public abstract class BeamEntity extends LOTMProjectile {
             this.renderPitch = (float) (-RotationUtil.getTargetAdjustedXRot(owner) * Math.PI / 180.0D);
             this.setYaw((float) ((RotationUtil.getTargetAdjustedYRot(owner) + 90.0F) * Math.PI / 180.0D));
             this.setPitch((float) (-RotationUtil.getTargetAdjustedXRot(owner) * Math.PI / 180.0D));
-
             Vec3 spawn = this.calculateSpawnPos(owner);
-
-            // Corrected positioning logic
             double yOffset = (this.getFrames() <= this.getCharge()) ? 0.5 : 0.0;
             this.setPos(spawn.x, spawn.y + yOffset, spawn.z);
         }

@@ -1885,6 +1885,21 @@ public class BeyonderUtil {
         return false;
     }
 
+    public static List<LivingEntity> getAllies(LivingEntity livingEntity) {
+        List<LivingEntity> allyEntities = new ArrayList<>();
+        if (livingEntity.level() instanceof ServerLevel serverLevel) {
+            PlayerAllyData allyData = serverLevel.getDataStorage().computeIfAbsent(PlayerAllyData::load, PlayerAllyData::create, "player_allies");
+            Set<UUID> allyUUIDs = allyData.getAllies(livingEntity.getUUID());
+            for (UUID allyUUID : allyUUIDs) {
+                LivingEntity ally = getEntityFromUUID(serverLevel, allyUUID);
+                if (ally != null) {
+                    allyEntities.add(ally);
+                }
+            }
+        }
+        return allyEntities;
+    }
+
     public static void makeAlly(LivingEntity user, LivingEntity allyToBe) {
         if (user.level() instanceof ServerLevel serverLevel) {
             PlayerAllyData allyData = serverLevel.getDataStorage().computeIfAbsent(PlayerAllyData::load, PlayerAllyData::create, "player_allies");
@@ -2035,6 +2050,77 @@ public class BeyonderUtil {
     public static List<LivingEntity> checkEntitiesInLocation(LivingEntity livingEntity, float inflation, int X, int Y, int Z) {
         AABB box = new AABB(X - inflation, Y - inflation, Z - inflation, X + inflation, Y + inflation, Z + inflation);
         return livingEntity.level().getEntitiesOfClass(LivingEntity.class, box);
+    }
+
+    public static ChatFormatting ageStyle(LivingEntity livingEntity) {
+        ChatFormatting style = ChatFormatting.YELLOW;
+        if (!livingEntity.level().isClientSide()) {
+            int age = livingEntity.getPersistentData().getInt("age");
+            int sequence = getSequence(livingEntity);
+            int maxAge = 20;
+            if (sequence == 9) {
+                maxAge = 40;
+            } else if (sequence == 8) {
+                maxAge = 80;
+            } else if (sequence == 7) {
+                maxAge = 150;
+            } else if (sequence == 6) {
+                maxAge = 230;
+            } else if (sequence == 5) {
+                maxAge = 330;
+            } else if (sequence == 4) {
+                maxAge = 550;
+            } else if (sequence == 3) {
+                maxAge = 700;
+            } else if (sequence == 2) {
+                maxAge = 1000;
+            } else if (sequence == 1) {
+                maxAge = 1600;
+            } else if (sequence == 0) {
+                maxAge = 3000;
+            }
+            boolean tenPercent = age >= maxAge * 0.1;
+            boolean twentyPercent = age >= maxAge * 0.2;
+            boolean thirtyPercent = age >= maxAge * 0.3;
+            boolean fortyPercent = age >= maxAge * 0.4;
+            boolean fiftyPercent = age >= maxAge * 0.5;
+            boolean sixtyPercent = age >= maxAge * 0.6;
+            boolean seventyPercent = age >= maxAge * 0.7;
+            boolean eightyPercent = age >= maxAge * 0.8;
+            boolean ninetyPercent = age >= maxAge * 0.9;
+            boolean oneHundredPercent = age >= maxAge;
+            if (tenPercent) {
+                style = ChatFormatting.YELLOW;
+            }
+            if (twentyPercent) {
+                style = ChatFormatting.YELLOW;
+            }
+            if (thirtyPercent) {
+                style = ChatFormatting.YELLOW;
+            }
+            if (fortyPercent) {
+                style = ChatFormatting.RED;
+            }
+            if (fiftyPercent) {
+                style = ChatFormatting.RED;
+            }
+            if (sixtyPercent) {
+                style = ChatFormatting.RED;
+            }
+            if (seventyPercent) {
+                style = ChatFormatting.DARK_RED;
+            }
+            if (eightyPercent) {
+                style = ChatFormatting.DARK_RED;
+            }
+            if (ninetyPercent) {
+                style = ChatFormatting.DARK_RED;
+            }
+            if (oneHundredPercent) {
+                style = ChatFormatting.DARK_RED;
+            }
+        }
+        return style;
     }
 
     public static void ageHandlerTick(LivingEvent.LivingTickEvent event) {

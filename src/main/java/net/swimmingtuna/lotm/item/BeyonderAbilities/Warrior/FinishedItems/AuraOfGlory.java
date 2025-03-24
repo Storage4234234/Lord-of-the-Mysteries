@@ -80,7 +80,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
                 for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(expansionAmount))) {
                     if (!BeyonderUtil.isAllyOf(livingEntity, living) && living != livingEntity && living.tickCount % 20 == 0) {
                         living.getPersistentData().putInt("age", (int) (living.getPersistentData().getInt("age") + BeyonderUtil.getDamage(livingEntity).get(ItemInit.AURAOFGLORY.get())));
-                        living.sendSystemMessage(Component.literal("You are getting rapidly aged").withStyle(ChatFormatting.YELLOW));
+                        living.sendSystemMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(living)).withStyle(ChatFormatting.BOLD));
                     } else {
                         if (living.tickCount % 10 == 0) {
                             living.setHealth(living.getHealth() + 1);
@@ -116,7 +116,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
                 for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(expansionAmount))) {
                     if (!BeyonderUtil.isAllyOf(livingEntity, living) && living != livingEntity) {
                         living.getPersistentData().putInt("age", (int) (living.getPersistentData().getInt("age") + BeyonderUtil.getDamage(livingEntity).get(ItemInit.AURAOFTWILIGHT.get())));
-                        living.sendSystemMessage(Component.literal("You are getting rapidly aged").withStyle(ChatFormatting.RED));
+                        living.sendSystemMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(living)).withStyle(ChatFormatting.BOLD));
                     } else {
                         living.setHealth(living.getHealth() + 2);
                         BeyonderUtil.addSpirituality(living, 100);
