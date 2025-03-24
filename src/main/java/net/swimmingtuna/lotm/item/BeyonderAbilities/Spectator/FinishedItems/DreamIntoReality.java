@@ -46,6 +46,7 @@ public class DreamIntoReality extends SimpleAbilityItem {
             addCooldown(player);
         } else {
             useSpirituality(player);
+            addCooldown(player, this, 20);
         }
         toggleFlying(player);
         return InteractionResult.SUCCESS;
@@ -121,7 +122,7 @@ public class DreamIntoReality extends SimpleAbilityItem {
                 BeyonderUtil.useSpirituality(livingEntity, 10);
             }
         }
-        if (BeyonderUtil.getSpirituality(livingEntity) >= 15) {
+        if (BeyonderUtil.getSpirituality(livingEntity) <= 15) {
             DreamIntoReality.stopFlying(livingEntity);
         }
         if (BeyonderUtil.getSequence(livingEntity) == 2) {

@@ -134,6 +134,7 @@ import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedIte
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.Gigantification.warriorGiant;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.WarriorDangerSense.warriorDangerSense;
 import static net.swimmingtuna.lotm.util.BeyonderUtil.*;
+import static net.swimmingtuna.lotm.util.effect.BattleHypnotismEffect.battleHypnotismTickCheck;
 import static net.swimmingtuna.lotm.util.effect.StunEffect.livingNoMoveEffect;
 import static net.swimmingtuna.lotm.world.worldgen.dimension.DimensionInit.SPIRIT_WORLD_LEVEL_KEY;
 
@@ -338,7 +339,7 @@ public class ModEvents {
             envisionKingdom(livingEntity, level);
             SwordOfTwilight.twilightSwordTick(event);
             if (tag.getInt("inTwilight") == 0) {
-
+                battleHypnotismTickCheck(event);
                 dreamIntoReality(livingEntity);
                 acidicRainTick(livingEntity);
                 lightningStorm(livingEntity);
@@ -726,12 +727,12 @@ public class ModEvents {
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         int sequence = holder.getSequence();
         if (holder.getCurrentClass() != null) {
-            player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(holder.getCurrentClass().maxHealth().get(sequence));
+            BeyonderHolder.updateMaxHealthModifier(player, holder.getCurrentClass().maxHealth().get(sequence));
+            player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(holder.getCurrentClass().maxHealth().get(sequence)); //health
             player.setHealth(player.getMaxHealth());
-
         }
         if (!persistentData.contains("keysClicked")) {
-            byte[] keysClicked = new byte[5]; // Use appropriate size
+            byte[] keysClicked = new byte[5];
             persistentData.putByteArray("keysClicked", keysClicked);
         }
 

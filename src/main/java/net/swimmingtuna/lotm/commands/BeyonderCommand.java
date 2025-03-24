@@ -11,12 +11,18 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Abilities;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.ClearAbilitiesS2C;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
@@ -88,8 +94,100 @@ public class BeyonderCommand {
                             return 1;
                         })
                 )
-        );
+                .then(Commands.literal("kit")
+                        .then(Commands.literal("low")
+                                .executes(context -> {
+                                    Player player = context.getSource().getPlayerOrException();
+                                    Inventory inventory = player.getInventory();
+                                    player.setItemSlot(EquipmentSlot.HEAD, createArmorLow(Items.IRON_HELMET.getDefaultInstance()));
+                                    player.setItemSlot(EquipmentSlot.CHEST, createArmorLow(Items.IRON_CHESTPLATE.getDefaultInstance()));
+                                    player.setItemSlot(EquipmentSlot.LEGS, createArmorLow(Items.IRON_LEGGINGS.getDefaultInstance()));
+                                    player.setItemSlot(EquipmentSlot.FEET, createArmorLow(Items.IRON_BOOTS.getDefaultInstance()));
+                                    inventory.setItem(findClosestEmptySlot(player), createSwordLow(Items.IRON_SWORD.getDefaultInstance()));
+                                    inventory.setItem(findClosestEmptySlot(player), ItemInit.BEYONDER_ABILITY_USER.get().getDefaultInstance());
+                                    return 1;
+                                }))
+                        .then(Commands.literal("mid")
+                                .executes(context -> {
+                                    Player player = context.getSource().getPlayerOrException();
+                                    Inventory inventory = player.getInventory();
+                                    player.setItemSlot(EquipmentSlot.HEAD, createArmorMid(Items.DIAMOND_HELMET.getDefaultInstance()));
+                                    player.setItemSlot(EquipmentSlot.CHEST, createArmorMid(Items.DIAMOND_CHESTPLATE.getDefaultInstance()));
+                                    player.setItemSlot(EquipmentSlot.LEGS, createArmorMid(Items.DIAMOND_LEGGINGS.getDefaultInstance()));
+                                    player.setItemSlot(EquipmentSlot.FEET, createArmorMid(Items.DIAMOND_BOOTS.getDefaultInstance()));
+                                    inventory.setItem(findClosestEmptySlot(player), createSwordMid(Items.DIAMOND_SWORD.getDefaultInstance()));
+                                    inventory.setItem(findClosestEmptySlot(player), ItemInit.BEYONDER_ABILITY_USER.get().getDefaultInstance());
+                                    return 1;
+                                }))
+                        .then(Commands.literal("high")
+                                .executes(context -> {
+                                    Player player = context.getSource().getPlayerOrException();
+                                    Inventory inventory = player.getInventory();
+                                    player.setItemSlot(EquipmentSlot.HEAD, createArmorHigh(Items.NETHERITE_HELMET.getDefaultInstance()));
+                                    player.setItemSlot(EquipmentSlot.CHEST, createArmorHigh(Items.NETHERITE_CHESTPLATE.getDefaultInstance()));
+                                    player.setItemSlot(EquipmentSlot.LEGS, createArmorHigh(Items.NETHERITE_LEGGINGS.getDefaultInstance()));
+                                    player.setItemSlot(EquipmentSlot.FEET, createArmorHigh(Items.NETHERITE_BOOTS.getDefaultInstance()));
+                                    inventory.setItem(findClosestEmptySlot(player), createSwordHigh(Items.NETHERITE_SWORD.getDefaultInstance()));
+                                    inventory.setItem(findClosestEmptySlot(player), ItemInit.BEYONDER_ABILITY_USER.get().getDefaultInstance());
+                                    return 1;
+                                }))
+                ));
     }
 
+    private static ItemStack createSwordLow(ItemStack sword) {
+        sword.enchant(Enchantments.SHARPNESS, 1);
+        sword.enchant(Enchantments.UNBREAKING, 3);
+        return sword;
+    }
+    private static ItemStack createSwordMid(ItemStack sword) {
+        sword.enchant(Enchantments.SHARPNESS, 3);
+        sword.enchant(Enchantments.UNBREAKING, 3);
+        return sword;
+    }
+    private static ItemStack createSwordHigh(ItemStack sword) {
+        sword.enchant(Enchantments.SHARPNESS, 5);
+        sword.enchant(Enchantments.UNBREAKING, 3);
+        return sword;
+    }
+
+    private static ItemStack createArmorLow(ItemStack armor) {
+        armor.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 1);
+        armor.enchant(Enchantments.UNBREAKING, 1);
+        return armor;
+    }
+    private static ItemStack createArmorMid(ItemStack armor) {
+        armor.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 3);
+        armor.enchant(Enchantments.UNBREAKING, 2);
+        return armor;
+    }
+    private static ItemStack createArmorHigh(ItemStack armor) {
+        armor.enchant(Enchantments.ALL_DAMAGE_PROTECTION, 4);
+        armor.enchant(Enchantments.UNBREAKING, 3);
+        return armor;
+    }
+
+    public static int findClosestEmptySlot(Player player) {
+        Inventory inventory = player.getInventory();
+        int selectedSlot = player.getInventory().selected;
+        if (inventory.getItem(selectedSlot).isEmpty()) {
+            return selectedSlot;
+        }
+        for (int distance = 1; distance < 9; distance++) {
+            int rightSlot = (selectedSlot + distance) % 9;
+            if (inventory.getItem(rightSlot).isEmpty()) {
+                return rightSlot;
+            }
+            int leftSlot = (selectedSlot - distance + 9) % 9;
+            if (inventory.getItem(leftSlot).isEmpty()) {
+                return leftSlot;
+            }
+        }
+        for (int i = 9; i < 36; i++) {
+            if (inventory.getItem(i).isEmpty()) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }
 

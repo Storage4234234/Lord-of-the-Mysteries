@@ -7,6 +7,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
@@ -24,6 +26,7 @@ import net.swimmingtuna.lotm.util.CapabilitySyncer.network.EntityCapabilityStatu
 import net.swimmingtuna.lotm.util.CapabilitySyncer.network.SimpleEntityCapabilityStatusPacket;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = LOTM.MOD_ID)
@@ -31,6 +34,7 @@ public class BeyonderHolder extends PlayerCapability {
     public static final int SEQUENCE_MIN = 0;
     public static final int SEQUENCE_MAX = 9;
     private static final String REGISTERED_ABILITIES_KEY = "RegisteredAbilities";
+    private static final UUID HEALTH_MODIFIER_UUID = UUID.fromString("a3a90fac-39d0-4b75-9990-8211f70e0a0f");
     private final RandomSource random;
     private int currentSequence = -1;
     @Nullable private BeyonderClass currentClass = null;
@@ -63,8 +67,14 @@ public class BeyonderHolder extends PlayerCapability {
         this.spirituality = 100;
         this.maxSpirituality = 100;
         this.spiritualityRegen = 1;
-        this.player.setHealth(20);
-        this.player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(20);
+        @Nullable AttributeInstance healthAttribute = this.player.getAttribute(Attributes.MAX_HEALTH);
+        if (healthAttribute != null) {
+            if (healthAttribute.getModifier(HEALTH_MODIFIER_UUID) != null) {
+                healthAttribute.removeModifier(HEALTH_MODIFIER_UUID);
+            }
+            this.player.setHealth(20);
+            healthAttribute.setBaseValue(20);
+        }
         CompoundTag persistentData = this.player.getPersistentData();
         if (persistentData.contains(REGISTERED_ABILITIES_KEY)) {
             persistentData.remove(REGISTERED_ABILITIES_KEY);
@@ -82,7 +92,7 @@ public class BeyonderHolder extends PlayerCapability {
         this.spirituality = this.maxSpirituality;
         this.mentalStrength = this.currentClass.mentalStrength().get(this.currentSequence);
         this.spiritualityRegen = this.currentClass.spiritualityRegen().get(this.currentSequence);
-        this.player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(this.currentClass.maxHealth().get(sequence));
+        updateMaxHealthModifier(this.player, this.currentClass.maxHealth().get(sequence));
         this.player.setHealth(this.player.getMaxHealth());
         updateTracking();
 
@@ -240,6 +250,18 @@ public class BeyonderHolder extends PlayerCapability {
 
     public boolean currentClassMatches(BeyonderClass beyonderClass) {
         return this.currentClass == beyonderClass;
+    }
+
+    public static void updateMaxHealthModifier(@Nullable Player player, double maxHealth) {
+        if (player == null) return;
+        @Nullable AttributeInstance healthAttribute = player.getAttribute(Attributes.MAX_HEALTH);
+        if (healthAttribute == null) return;
+        if (healthAttribute.getModifier(HEALTH_MODIFIER_UUID) != null) {
+            healthAttribute.removeModifier(HEALTH_MODIFIER_UUID);
+        }
+        AttributeModifier healthModifier = new AttributeModifier(HEALTH_MODIFIER_UUID, "Beyonder Class Health Modifier", maxHealth - 20.0, AttributeModifier.Operation.ADDITION);
+        healthAttribute.addPermanentModifier(healthModifier);
+        player.setHealth(player.getMaxHealth());
     }
 
 }
