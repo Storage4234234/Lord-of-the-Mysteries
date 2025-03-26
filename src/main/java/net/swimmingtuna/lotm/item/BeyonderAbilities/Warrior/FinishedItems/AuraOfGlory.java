@@ -117,8 +117,9 @@ public class AuraOfGlory extends SimpleAbilityItem {
                     if (!BeyonderUtil.isAllyOf(livingEntity, living) && living != livingEntity) {
                         living.getPersistentData().putInt("age", (int) (living.getPersistentData().getInt("age") + BeyonderUtil.getDamage(livingEntity).get(ItemInit.AURAOFTWILIGHT.get())));
                         if (living instanceof Player player) {
-                            player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);
-                        }                    } else {
+                            player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD), true);
+                        }
+                    } else {
                         living.setHealth(living.getHealth() + 2);
                         BeyonderUtil.addSpirituality(living, 100);
                         if (living instanceof Player player) {
@@ -150,7 +151,6 @@ public class AuraOfGlory extends SimpleAbilityItem {
             }
         }
     }
-
 
 
     @Override

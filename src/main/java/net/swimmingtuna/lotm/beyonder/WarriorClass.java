@@ -256,163 +256,10 @@ public class WarriorClass implements BeyonderClass {
         return ChatFormatting.DARK_RED;
     }
 
-    public static void warriorDamageNegation(LivingHurtEvent event) {
-        LivingEntity livingEntity = event.getEntity();
-        DamageSource source = event.getSource();
-        Entity entitySource = source.getEntity();
-        if (!livingEntity.level().isClientSide()) {
-            // boolean isWearingDawnArmor =
-            //boolean isWearingSilverArmor =
-            boolean isGiant = livingEntity.getPersistentData().getBoolean("warriorGiant");
-            boolean isHoGGiant = livingEntity.getPersistentData().getBoolean("handOfGodGiant");
-            boolean isTwilightGiant = livingEntity.getPersistentData().getBoolean("twilightGiant");
-            boolean isPhysical = BeyonderUtil.isPhysicalDamage(source);
-            boolean isSupernatural = BeyonderUtil.isSupernaturalDamage(source);
-            float amount = event.getAmount();
-            int sequence = -1;
-            if (livingEntity instanceof Player player) {
-                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                sequence = holder.getSequence();
-            } else if (livingEntity instanceof PlayerMobEntity player) {
-                sequence = player.getCurrentSequence();
-            }
-            //if wearing silver armor, if damage is under 25 HP, it's damage is reduced by 80%
-            boolean isWarrior = BeyonderUtil.currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.WARRIOR.get());
-            if (hasFullSilverArmor(livingEntity) || hasFullDawnArmor(livingEntity)) {
-                if (hasFullSilverArmor(livingEntity)) {
-                    if (event.getAmount() <= 25) {
-                        event.setAmount(0);
-                    } else {
-                        event.setAmount(amount * 0.33f);
-                    }
-                } else if (hasFullDawnArmor(livingEntity)) {
-                    if (livingEntity.tickCount % 2 == 0) {
-                        BeyonderUtil.useSpirituality(livingEntity, 2);
-                    }
-                    if (event.getAmount() <= 10) {
-                        event.setAmount(0);
-                    } else if (isSupernatural) {
-                        event.setAmount(amount / 2);
-                    }
-                }
-            }
-            if (isWarrior) {
-                if (sequence == 8) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.75));
-                    }
-                } else if (sequence == 7) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.75));
-                    } else if (isPhysical) {
-                        event.setAmount((float) (amount * 0.7));
-                    }
-                } else if (sequence == 6) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.7));
-                    } else if (isPhysical) {
-                        if (!isGiant) {
-                            event.setAmount((float) (amount * 0.6));
-                        } else {
-                            if (event.getAmount() <= 5) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.45));
-                            }
-                        }
-                    }
-                } else if (sequence == 5) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.7));
-                    } else if (isPhysical) {
-                        if (!isGiant) {
-                            event.setAmount((float) (amount * 0.5));
-                        } else {
-                            if (event.getAmount() <= 7) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.35));
-                            }
-                        }
-                    }
-                } else if (sequence == 4) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.6));
-                    } else if (isPhysical) {
-                        if (!isGiant) {
-                            event.setAmount((float) (amount * 0.45));
-                        } else {
-                            if (event.getAmount() <= 10) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.35));
-                            }
-                        }
-                    }
-                } else if (sequence == 3 || sequence == 2) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.6));
-                    } else if (isPhysical) {
-                        if (!isGiant) {
-                            event.setAmount((float) (amount * 0.4));
-                        } else {
-                            if (amount <= 15) {
-                                event.setCanceled(true);
-                            } else {
-                                event.setAmount((float) (amount * 0.35));
-                            }
-                        }
-                    }
-                } else if (sequence == 1) {
-                    if (isSupernatural) {
-                        if (isHoGGiant) {
-                            if (event.getAmount() <= 20) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.3));
-                            }
-                        }
-                    } else if (isPhysical) {
-                        if (isHoGGiant) {
-                            if (event.getAmount() <= 20) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.275));
-                            }
-                        } else {
-                            event.setAmount((float) (amount * 0.35));
-                        }
-                    }
-                } else if (sequence == 0) {
-                    if (isSupernatural) {
-                        if (isTwilightGiant) {
-                            if (event.getAmount() <= 25) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.2));
-                            }
-                        } else {
-                            event.setAmount((float) (amount * 0.5));
-                        }
-                    } else if (isPhysical) {
-                        if (isHoGGiant) {
-                            if (event.getAmount() <= 25) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.2));
-                            }
-                        } else {
-                            event.setAmount((float) (amount * 0.35));
-                        }
-                    }
-                }
-            }
-        }
-    }
+
     public static void newWarriorDamageNegation(LivingHurtEvent event) {
         LivingEntity livingEntity = event.getEntity();
         DamageSource source = event.getSource();
-        Entity entitySource = source.getEntity();
         if (!livingEntity.level().isClientSide()) {
             boolean isGiant = livingEntity.getPersistentData().getBoolean("warriorGiant");
             boolean isHoGGiant = livingEntity.getPersistentData().getBoolean("handOfGodGiant");
@@ -539,6 +386,8 @@ public class WarriorClass implements BeyonderClass {
                     if (isSupernatural) {
                         if (isHoGGiant) {
                             supernaturalReduction += 0.63f;
+                        } else {
+                            supernaturalReduction += 0.42f;
                         }
                     } else if (isPhysical) {
                         if (isHoGGiant) {
@@ -558,7 +407,7 @@ public class WarriorClass implements BeyonderClass {
                         if (isTwilightGiant) {
                             physicalReduction += 0.6f;
                         } else {
-                            physicalReduction += 0.49f;
+                            physicalReduction += 0.5f;
                         }
                     }
                 }

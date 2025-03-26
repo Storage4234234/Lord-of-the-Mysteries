@@ -266,7 +266,6 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                                 EquipmentSlot slot = EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, slotIndex);
                                 if (slot != null) {
                                     livingEntity.setItemSlot(slot, armorStack);
-                                    System.out.println("set as original armor");
                                 }
                             }
                             tag.remove("mercuryArmorStorage");

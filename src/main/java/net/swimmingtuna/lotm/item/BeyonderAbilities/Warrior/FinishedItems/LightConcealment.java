@@ -76,7 +76,7 @@ public class LightConcealment extends SimpleAbilityItem {
                     velocityX *= speed;
                     velocityY *= speed;
                     velocityZ *= speed;
-                    if (player == livingEntity) {
+                    if (player == livingEntity || BeyonderUtil.isAllyOf(player, livingEntity)) {
                         SendParticleS2C packet = new SendParticleS2C(
                                 ParticleTypes.END_ROD,
                                 x, y, z,
