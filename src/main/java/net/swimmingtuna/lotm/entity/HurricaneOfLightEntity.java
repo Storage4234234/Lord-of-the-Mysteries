@@ -1,11 +1,13 @@
 package net.swimmingtuna.lotm.entity;
 
 import com.mojang.serialization.DataResult;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -14,6 +16,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -337,12 +340,15 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
                 if (this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
                     if (!BeyonderUtil.isAllyOf(owner, livingEntity) && getAge()) {
                         livingEntity.getPersistentData().putInt("age", livingEntity.getPersistentData().getInt("age") + 40);
+                        if (livingEntity instanceof Player player) {
+                            player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);
+                        }
                     }
                 }
                 livingEntity.addEffect(new MobEffectInstance(ModEffects.ARMOR_WEAKNESS.get(), 200, amplifier, true, true));
             }
             if (BeyonderUtil.isPurifiable(livingEntity)) {
-                livingEntity.hurt(livingEntity.damageSources().magic(), ((float) getHurricaneRadius() * damageMultiplier / 2) / 3);
+                livingEntity.hurt(livingEntity.damageSources().magic(), ((float) getHurricaneRadius() * damageMultiplier / 2) / 5);
             }
         }
     }

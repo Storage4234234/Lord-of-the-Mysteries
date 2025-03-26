@@ -22,7 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -41,7 +40,7 @@ public class DreamWeaving extends SimpleAbilityItem {
     private final Lazy<Multimap<Attribute, AttributeModifier>> lazyAttributeMap = Lazy.of(this::createAttributeMap);
 
     public DreamWeaving(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 3, 250, 0,150,150);
+        super(properties, BeyonderClassInit.SPECTATOR, 3, 250, 0, 150, 150);
     }
 
     @SuppressWarnings("deprecation")
@@ -61,7 +60,6 @@ public class DreamWeaving extends SimpleAbilityItem {
         attributeBuilder.put(ForgeMod.BLOCK_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_BLOCK_REACH, "Reach modifier", 150, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with blocks, p much useless for this item
         return attributeBuilder.build();
     }
-
 
 
     @Override
@@ -90,9 +88,8 @@ public class DreamWeaving extends SimpleAbilityItem {
         if (!level.isClientSide()) {
             for (int i = 0; i < numberOfMobs; i++) {
                 Mob mob = mobEntityType.create(level);
-                AttributeInstance maxHp = mob.getAttribute(Attributes.MAX_HEALTH);
                 spawnEntityInRadius(mob, level, x, y, z);
-                maxHp.setBaseValue(551);
+                BeyonderHolder.updateMaxHealthModifier(mob, 551);
                 mob.getPersistentData().putUUID("dreamWeavingUUID", interactionTarget.getUUID());
                 mob.setTarget(entity);
             }
@@ -101,21 +98,25 @@ public class DreamWeaving extends SimpleAbilityItem {
 
     public static void dreamWeaving(LivingEntity entity) {
         //DREAM WEAVING
-        AttributeInstance maxHp = entity.getAttribute(Attributes.MAX_HEALTH);
-        if (entity instanceof Player || maxHp.getBaseValue() != 551) {
-            return;
-        }
-        int deathTimer = entity.getPersistentData().getInt("DeathTimer");
-        entity.getPersistentData().putInt("DeathTimer", deathTimer + 1);
-        if (deathTimer >= 300) {
-            if (entity.getPersistentData().contains("dreamWeavingUUID")) {
-                UUID targetUUID = entity.getPersistentData().getUUID("dreamWeavingUUID");
-                LivingEntity livingEntity = BeyonderUtil.getEntityFromUUID(entity.level(), targetUUID);
-                if (livingEntity.isAlive() && entity instanceof Mob mob) {
-                    mob.setTarget(livingEntity);
+        if (entity != null) {
+            AttributeInstance maxHp = entity.getAttribute(Attributes.MAX_HEALTH);
+            if (maxHp != null) {
+                if (entity instanceof Player || maxHp.getBaseValue() != 551) {
+                    return;
+                }
+                int deathTimer = entity.getPersistentData().getInt("DeathTimer");
+                entity.getPersistentData().putInt("DeathTimer", deathTimer + 1);
+                if (deathTimer >= 300) {
+                    if (entity.getPersistentData().contains("dreamWeavingUUID")) {
+                        UUID targetUUID = entity.getPersistentData().getUUID("dreamWeavingUUID");
+                        LivingEntity livingEntity = BeyonderUtil.getEntityFromUUID(entity.level(), targetUUID);
+                        if (livingEntity.isAlive() && entity instanceof Mob mob) {
+                            mob.setTarget(livingEntity);
+                        }
+                    }
+                    entity.remove(Entity.RemovalReason.KILLED);
                 }
             }
-            entity.remove(Entity.RemovalReason.KILLED);
         }
     }
 
@@ -130,6 +131,7 @@ public class DreamWeaving extends SimpleAbilityItem {
             level.addFreshEntity(entity);
         }
     }
+
     public void dreamWeave(LivingEntity player, LivingEntity interactionTarget) {
         Level level = player.level();
         if (!level.isClientSide()) {
@@ -147,6 +149,7 @@ public class DreamWeaving extends SimpleAbilityItem {
             }
         }
     }
+
     private static final List<EntityType<? extends Mob>> MOB_TYPES = List.of(
             EntityType.ZOMBIE,
             EntityType.SKELETON,
@@ -159,6 +162,7 @@ public class DreamWeaving extends SimpleAbilityItem {
             EntityType.WITHER,
             EntityType.PHANTOM
     );
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);

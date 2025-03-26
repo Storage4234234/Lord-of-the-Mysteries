@@ -91,13 +91,26 @@ public class SailorClass implements BeyonderClass {
             if (player instanceof ServerPlayer serverPlayer) {
                 serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(serverPlayer.getAbilities()));
             }
-
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, dolhpinsGrace + 2, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, speed + 1, false, false);
-            applyMobEffect(player,MobEffects.DIG_SPEED, 300, haste + 1, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, resistance + 1, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, strength + 2, false, false);
-            applyMobEffect(player,MobEffects.REGENERATION, 300, regeneration + 2, false, false);
+            if (sequenceLevel <= 4) {
+                applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, dolhpinsGrace + 2, false, false);
+                applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, speed + 1, false, false);
+                applyMobEffect(player, MobEffects.DIG_SPEED, 300, haste + 1, false, false);
+                applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, resistance + 1, false, false);
+                applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, strength + 2, false, false);
+                applyMobEffect(player, MobEffects.REGENERATION, 300, regeneration + 2, false, false);
+            } else if (sequenceLevel <= 6) {
+                applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, dolhpinsGrace + 1, false, false);
+                applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, speed + 1, false, false);
+                applyMobEffect(player, MobEffects.DIG_SPEED, 300, haste + 1, false, false);
+                applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, resistance + 1, false, false);
+                applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, strength + 1, false, false);
+                applyMobEffect(player, MobEffects.REGENERATION, 300, regeneration + 1, false, false);
+            } else {
+                applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, dolhpinsGrace + 1, false, false);
+                applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, speed + 1, false, false);
+                applyMobEffect(player, MobEffects.DIG_SPEED, 300, haste + 1, false, false);
+                applyMobEffect(player, MobEffects.REGENERATION, 300, regeneration + 1, false, false);
+            }
         }
         if (!player.level().isRaining() && !sailorFlight1) {
             playerAbilites.setFlyingSpeed(0.05F);

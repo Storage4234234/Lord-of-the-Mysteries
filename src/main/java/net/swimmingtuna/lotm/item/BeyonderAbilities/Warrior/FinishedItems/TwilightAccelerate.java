@@ -137,6 +137,9 @@ public class TwilightAccelerate extends SimpleAbilityItem {
                 }
                 if (Math.random() > 0.95) {
                     tag.putInt("age", tag.getInt("age") + 20);
+                    if (livingEntity instanceof Player player) {
+                        player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);
+                    }
                 }
                 for (MobEffectInstance mobEffect : livingEntity.getActiveEffects()) {
                     int currentDuration = mobEffect.getDuration();

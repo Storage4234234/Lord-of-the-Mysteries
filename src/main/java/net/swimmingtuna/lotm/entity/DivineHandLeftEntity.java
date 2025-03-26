@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.entity;
 
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
@@ -12,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -55,6 +57,9 @@ public class DivineHandLeftEntity extends AbstractHurtingProjectile implements G
                 if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
                     CompoundTag tag = livingEntity.getPersistentData();
                     tag.putInt("age", tag.getInt("age") + 100);
+                    if (livingEntity instanceof Player player) {
+                        player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);
+                    }
                     tag.putInt("monsterMisfortuneManipulationGravity", 200);
                     owner.sendSystemMessage(Component.literal(livingEntity.getName() + "hit"));
                 }
@@ -150,6 +155,9 @@ public class DivineHandLeftEntity extends AbstractHurtingProjectile implements G
                 if (this.getOwner() instanceof LivingEntity owner && livingEntity != owner) {
                     CompoundTag tag = livingEntity.getPersistentData();
                     tag.putInt("age", tag.getInt("age") + 70);
+                    if (livingEntity instanceof Player player) {
+                        player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);
+                    }
                     tag.putInt("monsterMisfortuneManipulationGravity", 200);
                     this.discard();
                 }

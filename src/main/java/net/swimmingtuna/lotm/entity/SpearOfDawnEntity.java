@@ -72,7 +72,7 @@ public class SpearOfDawnEntity extends AbstractHurtingProjectile implements GeoE
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
             float scale = scaleData.getScale();
             if (hitEntity instanceof LivingEntity livingEntity && this.getOwner() != null) {
-                livingEntity.hurt(BeyonderUtil.genericSource(this.getOwner()), scale * 25);
+                livingEntity.hurt(BeyonderUtil.genericSource(this.getOwner()), scale * 13);
                 this.discard();
             }
         }

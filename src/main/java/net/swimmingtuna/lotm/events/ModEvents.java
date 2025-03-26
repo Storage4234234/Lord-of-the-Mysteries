@@ -1,6 +1,7 @@
 package net.swimmingtuna.lotm.events;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -17,10 +18,12 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -686,6 +689,11 @@ public class ModEvents {
                         player.drop(drop, true);
                     }
                 }
+            }
+            if (entity.getType().toString().contains("vessel_of_calamity")) {
+                BlockPos pos = entity.blockPosition();
+                ItemEntity netherstar = new ItemEntity(entity.level(), pos.getX(), pos.getY(), pos.getZ(), Items.NETHER_STAR.getDefaultInstance());
+                entity.level().addFreshEntity(netherstar);
             }
         }
     }

@@ -24,8 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -40,7 +38,7 @@ import java.util.List;
 public class Nightmare extends SimpleAbilityItem {
 
     public Nightmare(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 5, 100, 110,35,35 );
+        super(properties, BeyonderClassInit.SPECTATOR, 5, 100, 110, 35, 35);
     }
 
     @Override
@@ -94,7 +92,7 @@ public class Nightmare extends SimpleAbilityItem {
             int sequence = BeyonderUtil.getSequence(player);
             int dir = (int) dreamIntoReality.getValue();
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.NIGHTMARE.get());
-            float damagePlayer = ((float) (40.0 * dir) - (sequence * 2));
+            float damagePlayer = ((float) (65.0 * dir) - (sequence * 2));
             float damageMob = ((float) (20.0 * dir) - (sequence));
             int duration = 300 - (sequence * 20);
             AABB boundingBox = new AABB(targetPos).inflate(radius);
@@ -115,7 +113,7 @@ public class Nightmare extends SimpleAbilityItem {
                             BeyonderUtil.applyMentalDamage(player, livingEntity, damagePlayer);
                             nightmareAttribute.setBaseValue(0);
                         }
-                        player.sendSystemMessage(Component.literal(playerName + "'s nightmare value is:" + (int) nightmareAttribute.getValue()).withStyle(BeyonderUtil.getStyle(player)));
+                        player.sendSystemMessage(Component.literal(playerName + "'s nightmare value is: " + (int) nightmareAttribute.getValue()).withStyle(BeyonderUtil.getStyle(player)));
 
                     } else {
                         BeyonderUtil.applyMentalDamage(player, livingEntity, damageMob);
@@ -128,8 +126,8 @@ public class Nightmare extends SimpleAbilityItem {
     public static void nightmareTick(LivingEntity livingEntity) {
         if (livingEntity instanceof Player player) {
             AttributeInstance nightmareAttribute = player.getAttribute(ModAttributes.NIGHTMARE.get());
-            CompoundTag playerPersistentData = player.getPersistentData();
-            int nightmareTimer = playerPersistentData.getInt("NightmareTimer");
+            CompoundTag tag = player.getPersistentData();
+            int nightmareTimer = tag.getInt("NightmareTimer");
             int matterAccelerationBlockTimer = player.getPersistentData().getInt("matterAccelerationBlockTimer");
             if (matterAccelerationBlockTimer >= 1) {
                 player.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
@@ -143,7 +141,7 @@ public class Nightmare extends SimpleAbilityItem {
             } else {
                 nightmareTimer = 0;
             }
-            playerPersistentData.putInt("NightmareTimer", nightmareTimer);
+            tag.putInt("NightmareTimer", nightmareTimer);
         }
     }
 
@@ -156,6 +154,7 @@ public class Nightmare extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);

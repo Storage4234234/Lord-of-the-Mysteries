@@ -80,44 +80,14 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
     @Override
     public boolean hurtEnemy(ItemStack pStack, LivingEntity pTarget, LivingEntity pAttacker) {
         pTarget.getPersistentData().putInt("age", pTarget.getPersistentData().getInt("age") + 900);
+        if (pTarget instanceof Player player) {
+            player.displayClientMessage(Component.literal("You were rapidly aged").withStyle(BeyonderUtil.ageStyle(pTarget)).withStyle(ChatFormatting.BOLD),true);
+        }
         return super.hurtEnemy(pStack, pTarget, pAttacker);
     }
 
-    @Override
-    public boolean onEntitySwing(ItemStack stack, LivingEntity livingEntity) {
-        if (!livingEntity.level().isClientSide()) {
-            Vec3 lookVec = livingEntity.getLookAngle();
-            Vec3 lookScale = lookVec.scale(10);
-            Vec3 entityPos = livingEntity.position();
-            Vec3 particlePos = entityPos.add(lookScale);
-            LivingEntity closestTarget = null;
-            double closestAngle = Double.MAX_VALUE;
-            for (LivingEntity target : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(200))) {
-                if (target != livingEntity) {
-                    Vec3 toTargetVec = target.position().subtract(entityPos).normalize();
-                    double dotProduct = lookVec.dot(toTargetVec);
-                    double angle = Math.toDegrees(Math.acos(dotProduct));
-                    if (angle < closestAngle && angle < 10.0) {
-                        closestAngle = angle;
-                        closestTarget = target;
-                    }
-                }
-            }
-            if (closestTarget != null && entityPos.distanceTo(closestTarget.position()) >= 1) {
-                removeItemFromSlot(livingEntity, stack);
-                closestTarget.getPersistentData().putUUID("twilightSwordOwnerUUID", livingEntity.getUUID());
-                closestTarget.getPersistentData().putInt("twilightSwordSpawnTick", 21);
-                livingEntity.getPersistentData().putInt("returnSwordOfTwilight", 21);
-                Random random = new Random();
-                double offsetX = closestTarget.getX() + (random.nextDouble() - 0.5) * 2;
-                double offsetY = closestTarget.getY() + (random.nextDouble() - 0.5) * 2;
-                double offsetZ = closestTarget.getZ() + (random.nextDouble() - 0.5) * 2;
-                //LOTMNetworkHandler.sendToAllPlayers(new SendParticleS2C(ParticleInit.VOID_BREAK_PARTICLE.get(), particlePos.x, particlePos.y, particlePos.z, 0,0,0));
-                //LOTMNetworkHandler.sendToAllPlayers(new SendParticleS2C(ParticleInit.VOID_BREAK_PARTICLE.get(), offsetX, offsetY, offsetZ, 0,0,0));
-            }
-        }
-        return true;
-    }
+
+
 
     public static void twilightSwordTick(LivingEvent.LivingTickEvent event) {
         LivingEntity livingEntity = event.getEntity();

@@ -34,7 +34,7 @@ public class LightOfDawn extends SimpleAbilityItem {
 
 
     public LightOfDawn(Properties properties) {
-        super(properties, BeyonderClassInit.WARRIOR, 6, 0, 20);
+        super(properties, BeyonderClassInit.WARRIOR, 6, 0, 500);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class LightOfDawn extends SimpleAbilityItem {
     public static void sunriseGleam(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             int sequence = BeyonderUtil.getSequence(livingEntity);
-            int maxLifetime = 500 - (sequence * 50); // Reduced lifetime for higher sequences
+            int maxLifetime = 500 - (sequence * 50);
             float maxRadius = BeyonderUtil.getDamage(livingEntity).get(ItemInit.LIGHTOFDAWN.get());
             livingEntity.getPersistentData().putInt("lightOfDawnCounter", maxLifetime);
             int numberOfRays = 30 - (sequence * 4);

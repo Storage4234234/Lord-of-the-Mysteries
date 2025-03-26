@@ -128,7 +128,9 @@ public class EyeOfDemonHunting extends SimpleAbilityItem {
                 EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(entity.level(), entity, eyePosition, reachVector, searchBox, livingEntity -> !livingEntity.isSpectator() && livingEntity.isPickable(), 0.0f);
                 if (entityHit != null && entityHit.getEntity() instanceof LivingEntity livingEntity && !BeyonderUtil.isAllyOf(entity, livingEntity)) {
                     BeyonderClass pathway = BeyonderUtil.getPathway(livingEntity);
-                    if (pathway != null) {
+                    int sequence = BeyonderUtil.getSequence(entity);
+                    int hitSequence = BeyonderUtil.getSequence(livingEntity);
+                    if (pathway != null && hitSequence >= sequence) {
                         if (pathway == BeyonderClassInit.SPECTATOR.get()) {
                             livingEntity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 100, 1, true, true));
                         } else if (pathway == BeyonderClassInit.SAILOR.get()) {

@@ -1,14 +1,17 @@
 package net.swimmingtuna.lotm.entity;
 
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -116,7 +119,7 @@ public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements 
                 this.discard();
             }
             AABB aabb;
-            if (this.tickCount == 12 && this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
+            if (this.tickCount == 14 && this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
                 int caseInt = this.getPersistentData().getInt("swordOfTwilightCase");
                 if (caseInt == 0) {
                     aabb = new AABB(this.getX() + (scale * 0.66) - 5, this.getY() + (scale) - 5, this.getZ() - (scale * 1.1), this.getX() + (scale * 0.66) + 5, this.getY() + (scale * 2) + 5, this.getZ() + (scale  * 1.1));
@@ -124,6 +127,9 @@ public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements 
                         if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
                             CompoundTag tag = livingEntity.getPersistentData();
                             tag.putInt("age", tag.getInt("age") + 800);
+                            if (livingEntity instanceof Player player) {
+                                player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);
+                            }
                             livingEntity.hurt(BeyonderUtil.genericSource(owner), 80);
                             livingEntity.getPersistentData().putInt("inTwilight", Math.max(tag.getInt("inTwilight"), 25));
                         }
@@ -134,6 +140,9 @@ public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements 
                         if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
                             CompoundTag tag = livingEntity.getPersistentData();
                             tag.putInt("age", tag.getInt("age") + 800);
+                            if (livingEntity instanceof Player player) {
+                                player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);
+                            }
                             livingEntity.hurt(BeyonderUtil.genericSource(owner), 80);
                             livingEntity.getPersistentData().putInt("inTwilight", Math.max(tag.getInt("inTwilight"), 25));
                         }
@@ -144,6 +153,9 @@ public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements 
                         if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
                             CompoundTag tag = livingEntity.getPersistentData();
                             tag.putInt("age", tag.getInt("age") + 800);
+                            if (livingEntity instanceof Player player) {
+                                player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);
+                            }
                             livingEntity.hurt(BeyonderUtil.genericSource(owner), 80);
                             livingEntity.getPersistentData().putInt("inTwilight", Math.max(tag.getInt("inTwilight"), 25));
                         }
@@ -155,6 +167,9 @@ public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements 
                         if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
                             CompoundTag tag = livingEntity.getPersistentData();
                             tag.putInt("age", tag.getInt("age") + 800);
+                            if (livingEntity instanceof Player player) {
+                                player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);
+                            }
                             livingEntity.hurt(BeyonderUtil.genericSource(owner), 80);
                             livingEntity.getPersistentData().putInt("inTwilight", Math.max(tag.getInt("inTwilight"), 25));
                         }

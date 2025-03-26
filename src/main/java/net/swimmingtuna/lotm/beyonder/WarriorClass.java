@@ -146,80 +146,73 @@ public class WarriorClass implements BeyonderClass {
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 1, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 0, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 0, false, false);
                     speed = 1;
                     strength = 1;
                     resistance = 0;
-                    regen = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 6) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 0, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 0, false, false);
                     speed = 1;
                     strength = 2;
                     resistance = 0;
-                    regen = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 5) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 0, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 1, false, false);
                     speed = 1;
                     strength = 2;
-                    resistance = 1;
-                    regen = 1;
+                    resistance = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 4) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
-                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 2, false, false);
                     speed = 2;
                     strength = 3;
-                    resistance = 1;
-                    regen = 2;
+                    resistance = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 3) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
-                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 2, false, false);
                     speed = 2;
                     strength = 3;
-                    resistance = 1;
-                    regen = 2;
+                    resistance = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 2) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
-                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 2, false, false);
                     speed = 2;
                     strength = 3;
-                    resistance = 2;
-                    regen = 2;
+                    resistance = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 1) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
-                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 2, false, false);
                     speed = 2;
                     strength = 3;
-                    resistance = 2;
-                    regen = 2;
+                    resistance = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 0) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 2, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     speed = 2;
                     strength = 3;
-                    resistance = 2;
-                    regen = 2;
+                    resistance = 0;
+                    regen = -1;
                 }
             }
         }
@@ -277,8 +270,6 @@ public class WarriorClass implements BeyonderClass {
             boolean isSupernatural = BeyonderUtil.isSupernaturalDamage(source);
             float amount = event.getAmount();
             int sequence = -1;
-
-
             if (livingEntity instanceof Player player) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                 sequence = holder.getSequence();

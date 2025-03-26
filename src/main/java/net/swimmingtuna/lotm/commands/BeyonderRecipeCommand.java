@@ -10,10 +10,13 @@ import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.world.worlddata.BeyonderRecipeData;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static net.swimmingtuna.lotm.util.BeyonderUtil.registerAllRecipes;
 
 public class BeyonderRecipeCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
@@ -120,9 +123,7 @@ public class BeyonderRecipeCommand {
             ServerLevel level = context.getSource().getLevel();
             BeyonderRecipeData recipeData = BeyonderRecipeData.getInstance(level);
             recipeData.clearRecipes();
-            loadMonsterRecipes(context);
-            loadSailorRecipes(context);
-            loadSpectatorRecipes(context);
+            registerAllRecipes(context);
             context.getSource().sendSuccess(() -> Component.literal("Successfully loaded all modpack recipes!")
                     .withStyle(ChatFormatting.GREEN), true);
             return 1;
@@ -166,7 +167,7 @@ public class BeyonderRecipeCommand {
         executeRecipeCommand(context, "/beyonderrecipe add lotm:spectator_2_potion terramity:fortunes_favor soulsweapons:lord_soul_day_stalker soulsweapons:lord_soul_night_prowler");
     }
 
-    private static void executeRecipeCommand(CommandContext<CommandSourceStack> context, String command) {
+    public static void executeRecipeCommand(CommandContext<CommandSourceStack> context, String command) {
         try {
             context.getSource().getServer().getCommands().performPrefixedCommand(
                     context.getSource(), command.substring(1)); // Remove the leading '/' from command

@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -252,7 +253,7 @@ public class BeyonderHolder extends PlayerCapability {
         return this.currentClass == beyonderClass;
     }
 
-    public static void updateMaxHealthModifier(@Nullable Player player, double maxHealth) {
+    public static void updateMaxHealthModifier(@Nullable LivingEntity player, double maxHealth) {
         if (player == null) return;
         @Nullable AttributeInstance healthAttribute = player.getAttribute(Attributes.MAX_HEALTH);
         if (healthAttribute == null) return;

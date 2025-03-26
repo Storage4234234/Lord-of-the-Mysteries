@@ -82,7 +82,7 @@ public class TwilightLight extends SimpleAbilityItem {
                     living.getPersistentData().putInt("age", living.getPersistentData().getInt("age") + 4);
                     if (living instanceof Player player) {
                         if (player.tickCount % 10 == 0) {
-                            player.displayClientMessage(Component.literal("You are being rapidly aged").withStyle(ChatFormatting.RED), true);
+                            player.displayClientMessage(Component.literal("You are being rapidly aged").withStyle(BeyonderUtil.ageStyle(living)).withStyle(ChatFormatting.BOLD), true);
                         }
                     }
                 }
