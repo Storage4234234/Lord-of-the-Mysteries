@@ -26,8 +26,11 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.init.BlockEntityInit;
 import net.swimmingtuna.lotm.init.ItemInit;
+import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderCharacteristic;
+import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderPotion;
 import net.swimmingtuna.lotm.screen.PotionCauldronMenu;
 import net.swimmingtuna.lotm.world.worlddata.BeyonderRecipeData;
 import org.jetbrains.annotations.NotNull;
@@ -139,7 +142,6 @@ public class PotionCauldronBlockEntity extends BlockEntity implements MenuProvid
                     break;
                 }
             }
-
             if (this.getBlockState().getBlock() instanceof PotionCauldron potionCauldron) {
                 potionCauldron.updateLitState(level, pos, hasItems);
             }
@@ -165,16 +167,53 @@ public class PotionCauldronBlockEntity extends BlockEntity implements MenuProvid
         }
         BeyonderRecipeData recipeData = BeyonderRecipeData.getInstance(level);
         List<ItemStack> inputIngredients = new ArrayList<>();
+        ItemStack beyonderCharacteristic = null;
         for (int i = INPUT_SLOT_1; i <= INPUT_SLOT_5; i++) {
             ItemStack ingredient = this.itemHandler.getStackInSlot(i);
             if (!ingredient.isEmpty()) {
-                inputIngredients.add(ingredient);
+                if (ingredient.getItem() instanceof BeyonderCharacteristic) {
+                    beyonderCharacteristic = ingredient;
+                } else {
+                    inputIngredients.add(ingredient);
+                }
             }
         }
-        for (Map.Entry<ItemStack, List<ItemStack>> recipeEntry : recipeData.getBeyonderRecipes().entrySet()) {
-            List<ItemStack> recipeIngredients = recipeEntry.getValue();
+        for (Map.Entry<ItemStack, BeyonderRecipeData.RecipeIngredients> recipeEntry : recipeData.getBeyonderRecipes().entrySet()) {
+            List<ItemStack> recipeIngredients = new ArrayList<>();
+            recipeIngredients.addAll(recipeEntry.getValue().getMainIngredients());
+            recipeIngredients.addAll(recipeEntry.getValue().getSupplementaryIngredients());
             if (ingredientsMatch(inputIngredients, recipeIngredients)) {
                 return true;
+            }
+        }
+        if (beyonderCharacteristic != null) {
+            BeyonderClass pathway = ((BeyonderCharacteristic)beyonderCharacteristic.getItem()).getPathway(beyonderCharacteristic);
+            int sequence = ((BeyonderCharacteristic)beyonderCharacteristic.getItem()).getSequence(beyonderCharacteristic);
+            for (Map.Entry<ItemStack, BeyonderRecipeData.RecipeIngredients> recipeEntry : recipeData.getBeyonderRecipes().entrySet()) {
+                if (recipeEntry.getKey().getItem() instanceof BeyonderPotion beyonderPotion) {
+                    if (pathway == beyonderPotion.getBeyonderClass() && sequence == beyonderPotion.getSequence()) {
+                        List<ItemStack> supplementaryIngredients = recipeEntry.getValue().getSupplementaryIngredients();
+                        if (!supplementaryIngredients.isEmpty()) {
+                            List<ItemStack> remainingSupplementaryIngredients = new ArrayList<>(supplementaryIngredients);
+                            for (ItemStack suppIngredient : supplementaryIngredients) {
+                                boolean ingredientFound = false;
+                                for (ItemStack inputIngredient : inputIngredients) {
+                                    if (inputIngredient.getItem() == suppIngredient.getItem()) {
+                                        ingredientFound = true;
+                                        remainingSupplementaryIngredients.remove(suppIngredient);
+                                        break;
+                                    }
+                                }
+                                if (!ingredientFound) {
+                                    break;
+                                }
+                            }
+                            if (remainingSupplementaryIngredients.isEmpty()) {
+                                return true;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -202,44 +241,77 @@ public class PotionCauldronBlockEntity extends BlockEntity implements MenuProvid
         return true;
     }
 
-    private void craftItem(ServerLevel level) {
+    public void craftItem(ServerLevel level) {
         if (level == null) {
             return;
         }
         BeyonderRecipeData recipeData = BeyonderRecipeData.getInstance(level);
         List<ItemStack> inputIngredients = new ArrayList<>();
+        ItemStack beyonderCharacteristic = null;
         for (int i = INPUT_SLOT_1; i <= INPUT_SLOT_5; i++) {
             ItemStack ingredient = this.itemHandler.getStackInSlot(i);
             if (!ingredient.isEmpty()) {
-                inputIngredients.add(ingredient);
+                if (ingredient.getItem() instanceof BeyonderCharacteristic) {
+                    beyonderCharacteristic = ingredient;
+                } else {
+                    inputIngredients.add(ingredient);
+                }
             }
         }
-        for (Map.Entry<ItemStack, List<ItemStack>> recipeEntry : recipeData.getBeyonderRecipes().entrySet()) {
-            List<ItemStack> recipeIngredients = recipeEntry.getValue();
+        for (Map.Entry<ItemStack, BeyonderRecipeData.RecipeIngredients> recipeEntry : recipeData.getBeyonderRecipes().entrySet()) {
+            List<ItemStack> recipeIngredients = new ArrayList<>();
+            recipeIngredients.addAll(recipeEntry.getValue().getMainIngredients());
+            recipeIngredients.addAll(recipeEntry.getValue().getSupplementaryIngredients());
             if (ingredientsMatch(inputIngredients, recipeIngredients)) {
-                this.itemHandler.setStackInSlot(OUTPUT_SLOT, recipeEntry.getKey().copy());
-                for (int i = INPUT_SLOT_1; i <= INPUT_SLOT_5; i++) {
-                    this.itemHandler.setStackInSlot(i, ItemStack.EMPTY);
-                }
+                craftPotionWithIngredients(recipeEntry, inputIngredients);
                 return;
+            }
+        }
+        if (beyonderCharacteristic != null) {
+            BeyonderClass pathway = ((BeyonderCharacteristic)beyonderCharacteristic.getItem()).getPathway(beyonderCharacteristic);
+            int sequence = ((BeyonderCharacteristic)beyonderCharacteristic.getItem()).getSequence(beyonderCharacteristic);
+            for (Map.Entry<ItemStack, BeyonderRecipeData.RecipeIngredients> recipeEntry : recipeData.getBeyonderRecipes().entrySet()) {
+                ItemStack recipePotion = recipeEntry.getKey();
+                if (recipePotion.getItem() instanceof BeyonderPotion beyonderPotion) {
+                    if (pathway == beyonderPotion.getBeyonderClass() && sequence == beyonderPotion.getSequence()) {
+                        craftPotionWithCharacteristic(recipeEntry, beyonderCharacteristic);
+                        return;
+                    }
+                }
             }
         }
         ejectAllItems();
     }
 
-    private boolean canInsertAmountIntoOutputSlot(int count) {
-        return this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + count <= this.itemHandler.getStackInSlot(OUTPUT_SLOT).getMaxStackSize();
+    private void craftPotionWithIngredients(Map.Entry<ItemStack, BeyonderRecipeData.RecipeIngredients> recipeEntry, List<ItemStack> inputIngredients) {
+        this.itemHandler.setStackInSlot(OUTPUT_SLOT, recipeEntry.getKey().copy());
+        for (int i = INPUT_SLOT_1; i <= INPUT_SLOT_5; i++) {
+            ItemStack ingredient = this.itemHandler.getStackInSlot(i);
+            if (inputIngredients.stream().anyMatch(inputIngredient ->
+                    inputIngredient.getItem() == ingredient.getItem())) {
+                this.itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+            }
+        }
     }
 
-    private boolean canInsertItemIntoOutputSlot(Item item) {
-        return this.itemHandler.getStackInSlot(OUTPUT_SLOT).isEmpty() || this.itemHandler.getStackInSlot(OUTPUT_SLOT).is(item);
-    }
-
-    private void craftItem() {
-        ItemStack result = new ItemStack(ItemInit.SPECTATOR_0_POTION.get(), 1);
-        this.itemHandler.extractItem(INPUT_SLOT_1, 1, false);
-        this.itemHandler.setStackInSlot(OUTPUT_SLOT, new ItemStack(result.getItem(),
-                this.itemHandler.getStackInSlot(OUTPUT_SLOT).getCount() + result.getCount()));
+    private void craftPotionWithCharacteristic(Map.Entry<ItemStack, BeyonderRecipeData.RecipeIngredients> recipeEntry, ItemStack beyonderCharacteristic) {
+        this.itemHandler.setStackInSlot(OUTPUT_SLOT, recipeEntry.getKey().copy());
+        for (int i = INPUT_SLOT_1; i <= INPUT_SLOT_5; i++) {
+            if (this.itemHandler.getStackInSlot(i) == beyonderCharacteristic) {
+                this.itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+                break;
+            }
+        }
+        List<ItemStack> supplementaryIngredients = recipeEntry.getValue().getSupplementaryIngredients();
+        for (ItemStack suppIngredient : supplementaryIngredients) {
+            for (int i = INPUT_SLOT_1; i <= INPUT_SLOT_5; i++) {
+                ItemStack slotItem = this.itemHandler.getStackInSlot(i);
+                if (!slotItem.isEmpty() && slotItem.getItem() == suppIngredient.getItem()) {
+                    this.itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+                    break;
+                }
+            }
+        }
     }
 
     private void ejectAllItems() {

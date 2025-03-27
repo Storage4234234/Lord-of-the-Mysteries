@@ -17,7 +17,9 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderCharacteristic;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 
@@ -81,6 +83,13 @@ public class TestItem extends SimpleAbilityItem {
                 playerMobEntity.setMaxSpirituality(10000);
                 playerMobEntity.setSpiritualityRegen(50);
             }
+            ItemStack stack = new ItemStack(ItemInit.BEYONDER_CHARACTERISTIC.get());
+            if (player.isShiftKeyDown()) {
+                BeyonderCharacteristic.setData(stack, BeyonderClassInit.SPECTATOR.get(), 0, false, 1);
+            } else {
+                BeyonderCharacteristic.setData(stack, BeyonderClassInit.SPECTATOR.get(), 1, false, 1);
+            }
+            player.setItemInHand(InteractionHand.OFF_HAND, stack);
         }
 
         return InteractionResult.SUCCESS;

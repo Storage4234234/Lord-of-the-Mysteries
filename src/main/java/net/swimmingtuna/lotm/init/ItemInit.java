@@ -516,7 +516,7 @@ public class ItemInit {
             () -> new LightningStrikeRune(new Item.Properties().stacksTo(1)));
 
     //OTHER
-    public static final RegistryObject<Item> BEYONDER_CHARACTERISTICS = ITEMS.register("beyondercharacteristics",
+    public static final RegistryObject<Item> BEYONDER_CHARACTERISTIC = ITEMS.register("beyondercharacteristics",
             () -> new BeyonderCharacteristic(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> BEYONDER_ABILITY_USER = ITEMS.register("beyonderabilityuser",
             () -> new BeyonderAbilityUser(new Item.Properties().stacksTo(1)));

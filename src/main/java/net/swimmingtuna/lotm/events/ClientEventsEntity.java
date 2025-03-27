@@ -129,12 +129,12 @@ public class ClientEventsEntity {
                 }
             }
             return 0xFFFFFF;
-        }, ItemInit.BEYONDER_CHARACTERISTICS.get());
+        }, ItemInit.BEYONDER_CHARACTERISTIC.get());
     }
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        ItemProperties.register(ItemInit.BEYONDER_CHARACTERISTICS.get(),
+        ItemProperties.register(ItemInit.BEYONDER_CHARACTERISTIC.get(),
                 new ResourceLocation("random_beyonder"),
                 (stack, level, entity, seed) -> stack.hasTag() ? (float) stack.getTag().getInt("texture") : 0.0F);
     }

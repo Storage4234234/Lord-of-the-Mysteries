@@ -68,4 +68,12 @@ public class BeyonderPotion extends Item {
 
         return super.use(level, player, hand);
     }
+
+    public BeyonderClass getBeyonderClass() {
+        return beyonderClassSupplier.get();
+    }
+
+    public int getSequence() {
+        return sequence;
+    }
 }

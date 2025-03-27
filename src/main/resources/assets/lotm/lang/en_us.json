@@ -42,6 +42,7 @@
   "item.lotm.swordoftwilight": "Sword of Twilight",
 
 
+
   "lotm.effect.awe": "Awe",
   "lotm.effect.bleeding": "Bleeding",
   "lotm.effect.stun": "Stun",
@@ -366,8 +367,9 @@
 
 
 
-
   "item.lotm.beyonder_reset_potion": "Beyonder Reset Potion",
+  "item.lotm.beyondercharacteristics": "Beyonder Characteristic",
+
 
   "key.category.lotm.mystery": "LOTM",
   "key.lotm.spirit_traversal_key": "Spirit World Traversal",
