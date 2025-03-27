@@ -328,26 +328,6 @@ public class ProphesizeDemise extends SimpleAbilityItem {
             }
         }
     }
-
-    @SubscribeEvent
-    public static void handlePlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        Player player = event.getEntity();
-        if (!player.level().isClientSide()) {
-            CompoundTag persistentData = player.getPersistentData();
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            LOTMNetworkHandler.sendToPlayer(new SyncSequencePacketS2C(holder.getSequence()), (ServerPlayer) player);
-            if (persistentData.contains("DemiseCounter")) {
-                int demiseCounter = persistentData.getInt("DemiseCounter");
-                if (!persistentData.contains("EntityDemise") || persistentData.getInt("EntityDemise") == 0) {
-                    player.getPersistentData().putInt("EntityDemise", demiseCounter);
-                }
-            } else {
-                if (!persistentData.contains("EntityDemise") || persistentData.getInt("EntityDemise") == 0) {
-                    player.getPersistentData().putInt("EntityDemise", 0);
-                }
-            }
-        }
-    }
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);

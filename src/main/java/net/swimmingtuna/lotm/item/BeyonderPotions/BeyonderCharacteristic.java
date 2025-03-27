@@ -21,6 +21,7 @@ public class BeyonderCharacteristic extends Item {
         super(pProperties);
     }
 
+
     public static void setData(ItemStack stack, BeyonderClass pathway, int sequence, boolean previousSequence, int texture){
         CompoundTag tag = stack.getOrCreateTag();
         tag.putString("pathway", BeyonderUtil.getPathwayName(pathway));

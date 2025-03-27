@@ -68,11 +68,13 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.BattleHypnotism;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeDemise;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
+import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderCharacteristic;
 import net.swimmingtuna.lotm.item.OtherItems.SwordOfTwilight;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.item.SealedArtifacts.WintryBlade;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.RemoveInvisibiltyS2C;
+import net.swimmingtuna.lotm.networking.packet.SyncSequencePacketS2C;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.AllyInformation.PlayerAllyData;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
@@ -653,9 +655,10 @@ public class ModEvents {
     @SubscribeEvent
     public static void deathEvent(LivingDeathEvent event) {
         LivingEntity entity = event.getEntity();
+        Level level = entity.level();
         CompoundTag tag = entity.getPersistentData();
+        int sequence = BeyonderUtil.getSequence(entity);
         if (!entity.level().isClientSide()) {
-
             if (entity instanceof Player pPlayer) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
                 ProbabilityManipulationWipe.wipeProbablility(tag);
@@ -734,16 +737,28 @@ public class ModEvents {
         CompoundTag persistentData = player.getPersistentData();
         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         int sequence = holder.getSequence();
-        if (holder.getCurrentClass() != null) {
-            BeyonderHolder.updateMaxHealthModifier(player, holder.getCurrentClass().maxHealth().get(sequence));
-            player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(holder.getCurrentClass().maxHealth().get(sequence)); //health
-            player.setHealth(player.getMaxHealth());
+        if (!player.level().isClientSide()) {
+            LOTMNetworkHandler.sendToPlayer(new SyncSequencePacketS2C(holder.getSequence()), (ServerPlayer) player);
+            if (persistentData.contains("DemiseCounter")) {
+                int demiseCounter = persistentData.getInt("DemiseCounter");
+                if (!persistentData.contains("EntityDemise") || persistentData.getInt("EntityDemise") == 0) {
+                    player.getPersistentData().putInt("EntityDemise", demiseCounter);
+                }
+            } else {
+                if (!persistentData.contains("EntityDemise") || persistentData.getInt("EntityDemise") == 0) {
+                    player.getPersistentData().putInt("EntityDemise", 0);
+                }
+            }
+            if (holder.getCurrentClass() != null) {
+                BeyonderHolder.updateMaxHealthModifier(player, holder.getCurrentClass().maxHealth().get(sequence));
+                player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(holder.getCurrentClass().maxHealth().get(sequence));
+                player.setHealth(player.getMaxHealth());
+            }
+            if (!persistentData.contains("keysClicked")) {
+                byte[] keysClicked = new byte[5];
+                persistentData.putByteArray("keysClicked", keysClicked);
+            }
         }
-        if (!persistentData.contains("keysClicked")) {
-            byte[] keysClicked = new byte[5];
-            persistentData.putByteArray("keysClicked", keysClicked);
-        }
-
     }
 
     @SubscribeEvent

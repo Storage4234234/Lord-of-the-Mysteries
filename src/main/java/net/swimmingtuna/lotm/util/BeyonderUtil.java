@@ -2307,6 +2307,17 @@ public class BeyonderUtil {
         return getSequence(livingEntity) != -1;
     }
 
+    public static void resetPathway(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide()) {
+            if (livingEntity instanceof Player player) {
+                BeyonderHolderAttacher.getHolderUnwrap(player).removePathway();
+            } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
+                playerMobEntity.setPathway(null);
+                playerMobEntity.setSequence(-1);
+            }
+        }
+    }
+
     public static boolean isSmeltable(ItemStack itemStack, Level world) {
         SimpleContainer container = new SimpleContainer(itemStack);
         return world.getRecipeManager().getRecipeFor(RecipeType.SMELTING, container, world).isPresent();
