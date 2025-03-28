@@ -2586,7 +2586,11 @@ public class BeyonderUtil {
     }
 
     public static void removePathway(LivingEntity living) {
-        BeyonderUtil.setPathwayAndSequence(living, null, -1);
+        if (living instanceof Player player) {
+            BeyonderHolderAttacher.getHolderUnwrap(player).removePathway();
+        } else {
+            setPathwayAndSequence(living, null, -1);
+        }
         ScaleTypes.BASE.getScaleData(living).setScale(1);
         if (living instanceof Player player) {
             Abilities playerAbilities = player.getAbilities();

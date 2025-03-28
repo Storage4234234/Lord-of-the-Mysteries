@@ -51,8 +51,8 @@ public class BeyonderHolder extends PlayerCapability {
 
     @SubscribeEvent
     public static void onTick(TickEvent.PlayerTickEvent event) {
-        if (!event.player.level().isClientSide && event.phase == TickEvent.Phase.END) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(event.player);
+        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(event.player);
+        if (!event.player.level().isClientSide && event.phase == TickEvent.Phase.END && event.player.isAlive() && holder.getSequence() != -1) {
             holder.regenSpirituality(event.player);
             if (holder.getCurrentClass() != null) {
                 holder.getCurrentClass().tick(event.player, holder.getSequence());
@@ -73,8 +73,6 @@ public class BeyonderHolder extends PlayerCapability {
             if (healthAttribute.getModifier(HEALTH_MODIFIER_UUID) != null) {
                 healthAttribute.removeModifier(HEALTH_MODIFIER_UUID);
             }
-            this.player.setHealth(20);
-            healthAttribute.setBaseValue(20);
         }
         CompoundTag persistentData = this.player.getPersistentData();
         if (persistentData.contains(REGISTERED_ABILITIES_KEY)) {

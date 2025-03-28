@@ -654,49 +654,66 @@ public class ModEvents {
 
     @SubscribeEvent
     public static void deathEvent(LivingDeathEvent event) {
-        LivingEntity entity = event.getEntity();
-        Level level = entity.level();
-        CompoundTag tag = entity.getPersistentData();
-        int sequence = BeyonderUtil.getSequence(entity);
-        if (!entity.level().isClientSide()) {
-            if (entity instanceof Player pPlayer) {
+        LivingEntity livingEntity = event.getEntity();
+        Level level = livingEntity.level();
+        CompoundTag tag = livingEntity.getPersistentData();
+        int sequence = BeyonderUtil.getSequence(livingEntity);
+        BeyonderClass pathway = BeyonderUtil.getPathway(livingEntity);
+        if (!livingEntity.level().isClientSide()) {
+            if (livingEntity instanceof Player pPlayer) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
                 ProbabilityManipulationWipe.wipeProbablility(tag);
+            }
+            if (BeyonderUtil.isBeyonder(livingEntity) && !event.isCanceled()) {
+                boolean dropCharacteristic = level.getLevelData().getGameRules().getBoolean(GameRuleInit.SHOULD_DROP_CHARACTERISTIC);
+                boolean resetSequence = level.getLevelData().getGameRules().getBoolean(GameRuleInit.RESET_SEQUENCE);
+                if (dropCharacteristic) {
+                    ItemStack stack = new ItemStack(ItemInit.BEYONDER_CHARACTERISTIC.get());
+                    BeyonderCharacteristic.setData(stack, pathway,sequence, false, 1);
+                    ItemEntity itemEntity = new ItemEntity(level, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), stack);
+                    livingEntity.level().addFreshEntity(itemEntity);
+                    if (!resetSequence) {
+                        if (sequence == 9) {
+                            BeyonderUtil.resetPathway(livingEntity);
+                        } else {
+                            BeyonderUtil.setSequence(livingEntity, sequence + 1);
+                        }
+                    } else {
+                        BeyonderUtil.removePathway(livingEntity);
+                    }
+                }
             }
             CycleOfFate.cycleOfFateDeath(event);
 
 
-            //AQUEOUS LIGHT DROWN
             AqueousLightDrown.lightDeathEvent(event);
             CorruptionAndLuckHandler.onPlayerDeath(event);
 
-            //STORM SEAL
             if (tag.getInt("inStormSeal") >= 1) {
                 event.setCanceled(true);
-                entity.setHealth(5.0f);
+                livingEntity.setHealth(5.0f);
             }
-            if (entity instanceof Player player) {
-
-                byte[] keysClicked = new byte[5]; // Example size; match this to the intended array size
+            if (livingEntity instanceof Player player) {
+                byte[] keysClicked = new byte[5];
                 player.getPersistentData().putByteArray("keysClicked", keysClicked);
 
             }
-            if (entity instanceof Player && entity.getCommandSenderWorld().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
+            if (livingEntity instanceof Player && livingEntity.getCommandSenderWorld().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
                 DamageSource source = event.getSource();
                 Entity trueSource = source.getEntity();
                 if (trueSource instanceof Player player) {
                     ItemStack stack = player.getUseItem();
                     int looting = stack.getEnchantmentLevel(Enchantments.MOB_LOOTING);
-                    ItemStack drop = getDrop(entity, source, looting);
+                    ItemStack drop = getDrop(livingEntity, source, looting);
                     if (!drop.isEmpty()) {
                         player.drop(drop, true);
                     }
                 }
             }
-            if (entity.getType().toString().contains("vessel_of_calamity")) {
-                BlockPos pos = entity.blockPosition();
-                ItemEntity netherstar = new ItemEntity(entity.level(), pos.getX(), pos.getY(), pos.getZ(), Items.NETHER_STAR.getDefaultInstance());
-                entity.level().addFreshEntity(netherstar);
+            if (livingEntity.getType().toString().contains("vessel_of_calamity")) {
+                BlockPos pos = livingEntity.blockPosition();
+                ItemEntity netherstar = new ItemEntity(livingEntity.level(), pos.getX(), pos.getY(), pos.getZ(), Items.NETHER_STAR.getDefaultInstance());
+                livingEntity.level().addFreshEntity(netherstar);
             }
         }
     }
@@ -749,7 +766,7 @@ public class ModEvents {
                     player.getPersistentData().putInt("EntityDemise", 0);
                 }
             }
-            if (holder.getCurrentClass() != null) {
+            if (holder.getCurrentClass() != null && holder.getSequence() != - 1) {
                 BeyonderHolder.updateMaxHealthModifier(player, holder.getCurrentClass().maxHealth().get(sequence));
                 player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(holder.getCurrentClass().maxHealth().get(sequence));
                 player.setHealth(player.getMaxHealth());
