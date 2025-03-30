@@ -28,6 +28,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.PsychologicalInvisibility;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.MercuryLiqueficationC2S;
 import net.swimmingtuna.lotm.networking.packet.SendDustParticleS2C;
@@ -75,7 +76,6 @@ public class MercuryLiquefication extends SimpleAbilityItem {
         }
     }
 
-    public static final Map<UUID, Boolean> lastSentStates = new HashMap<>();
 
     public static void mercuryLiqueficationTick(LivingEvent.LivingTickEvent event) {
         LivingEntity livingEntity = event.getEntity();
@@ -89,10 +89,10 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                 BeyonderUtil.useSpirituality(livingEntity, 10);
             }
             UUID playerId = livingEntity.getUUID();
-            Boolean lastState = lastSentStates.get(playerId);
+            Boolean lastState = PsychologicalInvisibility.lastSentInvisibilityStates.get(playerId);
             if (lastState == null || lastState != currentState) {
                 LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(currentState, playerId));
-                lastSentStates.put(playerId, currentState);
+                PsychologicalInvisibility.lastSentInvisibilityStates.put(playerId, currentState);
             }
             Vec3 lookVec = livingEntity.getLookAngle();
             Random random = new Random();

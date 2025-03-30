@@ -29,6 +29,9 @@ public class SyncShouldntRenderInvisibilityPacketS2C {
     public static void handle(SyncShouldntRenderInvisibilityPacketS2C msg, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
+            System.out.println("method called");
+            new Exception("Debug call stack").printStackTrace();
+
             ClientShouldntRenderInvisibilityData.setShouldntRender(msg.shouldntRender, msg.playerUUID);
         });
         context.setPacketHandled(true);

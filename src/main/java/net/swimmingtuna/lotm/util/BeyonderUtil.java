@@ -2655,14 +2655,6 @@ public class BeyonderUtil {
         }
     }
 
-    public static void disableAbilities(LivingEntity livingEntity) {
-        CompoundTag tag = livingEntity.getPersistentData();
-        if (!livingEntity.level().isClientSide()) {
-            LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(false, livingEntity.getUUID()));
-
-        }
-    }
-
     public static int chatFormatingToInt(ChatFormatting color) {
         return COLOR_MAP.getOrDefault(color, 0xFFFFFF);
     }

@@ -81,7 +81,6 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
         if (living.level().isClientSide()) {
             return;
         }
-
         CompoundTag tag = living.getPersistentData();
         if (tag.getBoolean("psychologicalInvisibility")) {
             tag.putBoolean("psychologicalInvisibility", false);
@@ -123,7 +122,7 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
                     }
                 });
                 for (Mob mob : livingEntity.level().getEntitiesOfClass(Mob.class, livingEntity.getBoundingBox().inflate(40))) {
-                    if (mob.getTarget() == livingEntity) {
+                    if (mob.getTarget() == livingEntity && mob.getLastAttacker() != livingEntity) {
                         mob.setTarget(null);
                     }
                 }

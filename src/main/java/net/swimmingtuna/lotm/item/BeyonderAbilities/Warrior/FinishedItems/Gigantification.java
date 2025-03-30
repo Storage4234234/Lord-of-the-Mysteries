@@ -108,9 +108,9 @@ public class Gigantification extends SimpleAbilityItem {
             if (destroyBlocks && (isGiant || isHoGGiant || isTwilightGiant)) {
                 int radius = (int) (scale + 2);
                 if (isHoGGiant) {
-                    radius *= 2;
+                    radius = (int) ((scale + 2) * 0.8);
                 } else if (isTwilightGiant) {
-                    radius *= 4;
+                    radius = (int) ((scale + 2) * 0.6);
                 }
                 BlockPos playerPos = entity.blockPosition();
                 Level level = entity.level();

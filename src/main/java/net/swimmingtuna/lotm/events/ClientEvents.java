@@ -92,7 +92,11 @@ public class ClientEvents {
         LivingEntity entity = event.getEntity();
         if (ClientShouldntRenderInvisibilityData.getShouldntRender() && entity.getUUID().equals(ClientShouldntRenderInvisibilityData.getLivingUUID())) {
             event.setCanceled(true);
-            return; // Skip further processing
+            if (event.getRenderer().shadowRadius == 1.0f) {
+                event.getRenderer().shadowRadius = 0.0f;
+            }
+        } else if (event.getRenderer().shadowRadius == 0.0f) {
+            event.getRenderer().shadowRadius = 1.0f;
         }
 
     }
