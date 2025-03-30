@@ -275,7 +275,6 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                         living.getPersistentData().putInt("mercuryArmorForm", 0);
                     } else {
                         tag.putInt("mercuryArmorEquipped", 10);
-                        System.out.println("put as 10");
                     }
                 }
             }

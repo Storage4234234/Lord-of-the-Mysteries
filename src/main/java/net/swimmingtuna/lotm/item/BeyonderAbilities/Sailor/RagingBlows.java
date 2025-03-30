@@ -62,7 +62,6 @@ public class RagingBlows extends SimpleAbilityItem {
         boolean sailorLightning = tag.getBoolean("SailorLightning");
         int ragingBlows = tag.getInt("ragingBlows");
         int ragingBlowsRadius = (27 - (sequence * 3));
-        float damage = BeyonderUtil.getDamage(livingEntity).get(ItemInit.RAGING_BLOWS.get());
         if (ragingBlows >= 1) {
             RagingBlows.spawnRagingBlowsParticles(livingEntity);
             tag.putInt("ragingBlows", ragingBlows + 1);
@@ -73,6 +72,7 @@ public class RagingBlows extends SimpleAbilityItem {
             Vec3 playerPos = livingEntity.position();
             for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, new AABB(playerPos.x - ragingBlowsRadius, playerPos.y - ragingBlowsRadius, playerPos.z - ragingBlowsRadius, playerPos.x + ragingBlowsRadius, playerPos.y + ragingBlowsRadius, playerPos.z + ragingBlowsRadius))) {
                 if (entity != livingEntity && playerLookVector.dot(entity.position().subtract(playerPos)) > 0 && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
+                    float damage = BeyonderUtil.getDamage(livingEntity).get(ItemInit.RAGING_BLOWS.get());
                     entity.hurt(entity.damageSources().generic(), damage);
                     double ragingBlowsX = livingEntity.getX() - entity.getX();
                     double ragingBlowsZ = livingEntity.getZ() - entity.getZ();

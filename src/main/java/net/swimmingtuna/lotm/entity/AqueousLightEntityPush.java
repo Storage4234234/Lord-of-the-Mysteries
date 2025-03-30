@@ -146,7 +146,6 @@ public class AqueousLightEntityPush extends AbstractHurtingProjectile {
             }
         }
         ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
-        System.out.println("scale is " + scaleData.getScale());
 
     }
 }

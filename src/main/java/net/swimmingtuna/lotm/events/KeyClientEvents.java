@@ -36,7 +36,6 @@ public class KeyClientEvents {
         public static void onClientChatReceived(ClientChatReceivedEvent event) {
             Component message = event.getMessage();
             String rawMessage = message.getString();
-            System.out.println("Received client message: " + rawMessage);
 
         }
         @SubscribeEvent

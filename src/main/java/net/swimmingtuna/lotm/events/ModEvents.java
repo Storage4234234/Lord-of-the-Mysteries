@@ -67,6 +67,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.TsunamiSeal;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.BattleHypnotism;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeDemise;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.PsychologicalInvisibility;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderCharacteristic;
 import net.swimmingtuna.lotm.item.OtherItems.SwordOfTwilight;
@@ -91,7 +92,7 @@ import java.util.Map;
 
 import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.apprenticeWindSlowFall;
 import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.trickmasterBounceHitProjectiles;
-import static net.swimmingtuna.lotm.beyonder.MonsterClass.*;
+import net.swimmingtuna.lotm.beyonder.MonsterClass;
 import static net.swimmingtuna.lotm.beyonder.WarriorClass.newWarriorDamageNegation;
 import static net.swimmingtuna.lotm.beyonder.WarriorClass.twilightTick;
 import static net.swimmingtuna.lotm.blocks.MonsterDomainBlockEntity.domainDrops;
@@ -135,10 +136,8 @@ import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedIte
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.MentalPlague.mentalPlague;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.Nightmare.nightmareTick;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeTeleportPlayer.prophesizeTeleportation;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.PsychologicalInvisibility.*;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.Gigantification.warriorGiant;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.WarriorDangerSense.warriorDangerSense;
-import static net.swimmingtuna.lotm.util.BeyonderUtil.*;
 import static net.swimmingtuna.lotm.util.effect.BattleHypnotismEffect.battleHypnotismTickCheck;
 import static net.swimmingtuna.lotm.util.effect.StunEffect.livingNoMoveEffect;
 import static net.swimmingtuna.lotm.world.worldgen.dimension.DimensionInit.SPIRIT_WORLD_LEVEL_KEY;
@@ -259,7 +258,7 @@ public class ModEvents {
             return;
         }
         if (!player.level().isClientSide() && holder.currentClassMatches(BeyonderClassInit.MONSTER) && sequence <= 8 && player.tickCount % 5 == 0) {
-            checkForProjectiles(player);
+            MonsterClass.checkForProjectiles(player);
         }
         if (!player.level().isClientSide() && player.tickCount % 20 == 0) {
             //boolean x = ClientAntiConcealmentData.getAntiConceal();
@@ -279,14 +278,14 @@ public class ModEvents {
                 }
 
             }
-            int currentCooldown = getCooldown(serverPlayer);
+            int currentCooldown = BeyonderUtil.getCooldown(serverPlayer);
             if (currentCooldown >= 1) {
                 currentCooldown--;
-                setCooldown(serverPlayer, currentCooldown);
+                BeyonderUtil.setCooldown(serverPlayer, currentCooldown);
             }
         }
         BeyonderUtil.copyAbilityTick(player);
-        abilityCooldownsServerTick(event);
+        BeyonderUtil.abilityCooldownsServerTick(event);
 
     }
 
@@ -330,16 +329,13 @@ public class ModEvents {
     }
 
 
-
     @SubscribeEvent
     public static void handleLivingTick(LivingEvent.LivingTickEvent event) {
         LivingEntity livingEntity = event.getEntity();
         CompoundTag tag = livingEntity.getPersistentData();
         Level level = livingEntity.level();
-        if (!livingEntity.level().isClientSide()) {
-            if (livingEntity.level() instanceof ServerLevel serverLevel) {
-                CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
-            }
+        if (level instanceof ServerLevel serverLevel) {
+            CorruptionAndLuckHandler.corruptionAndLuckManagers(serverLevel, livingEntity);
             twilightTick(event);
             envisionKingdom(livingEntity, level);
             SwordOfTwilight.twilightSwordTick(event);
@@ -366,23 +362,23 @@ public class ModEvents {
                 manipulateMovement(livingEntity);
                 envisionBarrier(livingEntity);
                 consciousnessStroll(livingEntity);
-                projectileEvent(livingEntity);
+                BeyonderUtil.projectileEvent(livingEntity);
                 prophesizeTeleportation(livingEntity);
                 calamityIncarnationTornado(livingEntity);
                 windManipulationGuide(livingEntity);
                 windManipulationSense(livingEntity);
                 sailorLightningTravel(livingEntity);
-                psychologicalInvisibility(livingEntity);
+                PsychologicalInvisibility.psychologicalInvisibility(livingEntity);
                 monsterDomainIntHandler(livingEntity);
                 nightmareTick(livingEntity);
-                calamityUndeadArmy(livingEntity);
+                MonsterClass.calamityUndeadArmy(livingEntity);
                 calamityLightningStorm(livingEntity);
                 warriorDangerSense(livingEntity);
-                calamityExplosion(livingEntity);
-                decrementMonsterAttackEvent(livingEntity);
+                MonsterClass.calamityExplosion(livingEntity);
+                MonsterClass.decrementMonsterAttackEvent(livingEntity);
                 onChaosWalkerCombat(livingEntity);
-                monsterLuckPoisonAttacker(livingEntity);
-                monsterLuckIgnoreMobs(livingEntity);
+                MonsterClass.monsterLuckPoisonAttacker(livingEntity);
+                MonsterClass.monsterLuckIgnoreMobs(livingEntity);
                 monsterDangerSense(event);
                 GlobeOfTwilight.globeOfTwilightTick(event);
                 SilverRapier.mercuryTick(event);
@@ -406,7 +402,7 @@ public class ModEvents {
                 EyeOfDemonHunting.demonHunterAntiConcealment(event);
                 apprenticeWindSlowFall(event);
                 livingNoMoveEffect(event);
-                psychologicalInvisibilityHurtTick(livingEntity);
+                PsychologicalInvisibility.psychologicalInvisibilityHurtTick(livingEntity);
                 //sendSpiritWorldPackets(entity);
                 WintryBlade.wintryBladeTick(event);
                 warriorGiant(livingEntity);
@@ -415,7 +411,7 @@ public class ModEvents {
                 ProbabilityManipulationInfiniteMisfortune.testEvent(event);
                 probabilityManipulationWorld(livingEntity);
                 CycleOfFate.tickEvent(event);
-                dodgeProjectiles(livingEntity);
+                MonsterClass.dodgeProjectiles(livingEntity);
                 MisfortuneManipulation.livingTickMisfortuneManipulation(event);
                 FalseProphecy.falseProphecyTick(livingEntity);
                 AuraOfChaos.auraOfChaos(event);
@@ -426,7 +422,7 @@ public class ModEvents {
                 Gigantification.gigantificationDestroyBlocks(event);
                 LightOfDawn.sunriseGleamTick(event);
                 doubleProphecyDamageHelper(event);
-                showMonsterParticles(livingEntity);
+                MonsterClass.showMonsterParticles(livingEntity);
                 LuckDenial.luckDenial(livingEntity);
                 MonsterCalamityIncarnation.calamityTickEvent(event);
                 dreamWeaving(livingEntity);
@@ -545,7 +541,7 @@ public class ModEvents {
                 }
 
                 if (entity instanceof LivingEntity living) {
-                    monsterDodgeAttack(event);
+                    MonsterClass.monsterDodgeAttack(event);
                     int stoneImmunity = tag.getInt("luckStoneDamageImmunity");
                     int stoneDamage = tag.getInt("luckStoneDamage");
                     int meteorDamage = tag.getInt("luckMeteorDamage");
@@ -604,7 +600,7 @@ public class ModEvents {
                 }
                 //SAILOR FLIGHT
                 if (entity instanceof Player player) {
-                    psychologicalInvisibilityHurt(event);
+                    PsychologicalInvisibility.psychologicalInvisibilityHurt(event);
                     BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                     int flightCancel = tag.getInt("sailorFlightDamageCancel");
                     if (!player.level().isClientSide()) {
@@ -664,12 +660,12 @@ public class ModEvents {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(pPlayer);
                 ProbabilityManipulationWipe.wipeProbablility(tag);
             }
-            if (BeyonderUtil.isBeyonder(livingEntity) && !event.isCanceled()) {
+            if (BeyonderUtil.isBeyonder(livingEntity) && !event.isCanceled() && livingEntity instanceof Player) {
                 boolean dropCharacteristic = level.getLevelData().getGameRules().getBoolean(GameRuleInit.SHOULD_DROP_CHARACTERISTIC);
                 boolean resetSequence = level.getLevelData().getGameRules().getBoolean(GameRuleInit.RESET_SEQUENCE);
                 if (dropCharacteristic) {
                     ItemStack stack = new ItemStack(ItemInit.BEYONDER_CHARACTERISTIC.get());
-                    BeyonderCharacteristic.setData(stack, pathway,sequence, false, 1);
+                    BeyonderCharacteristic.setData(stack, pathway, sequence, false, 1);
                     ItemEntity itemEntity = new ItemEntity(level, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), stack);
                     livingEntity.level().addFreshEntity(itemEntity);
                     if (!resetSequence) {
@@ -766,7 +762,7 @@ public class ModEvents {
                     player.getPersistentData().putInt("EntityDemise", 0);
                 }
             }
-            if (holder.getCurrentClass() != null && holder.getSequence() != - 1) {
+            if (holder.getCurrentClass() != null && holder.getSequence() != -1) {
                 BeyonderHolder.updateMaxHealthModifier(player, holder.getCurrentClass().maxHealth().get(sequence));
                 player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(holder.getCurrentClass().maxHealth().get(sequence));
                 player.setHealth(player.getMaxHealth());

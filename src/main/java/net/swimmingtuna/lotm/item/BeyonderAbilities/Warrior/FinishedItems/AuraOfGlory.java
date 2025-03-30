@@ -61,7 +61,6 @@ public class AuraOfGlory extends SimpleAbilityItem {
         boolean twilight = tag.getBoolean("auraOfTwilight");
         int expansionAmount = tag.getInt("warriorAuraMaxAmount");
         if (!livingEntity.level().isClientSide() && (glory || twilight)) {
-            System.out.println(expansionAmount);
             if (glory) {
                 if (expansionAmount <= 151) {
                     tag.putInt("warriorAuraMaxAmount", expansionAmount + 10);

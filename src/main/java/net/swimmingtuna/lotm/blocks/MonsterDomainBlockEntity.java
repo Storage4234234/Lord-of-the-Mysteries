@@ -414,7 +414,6 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
         tag.putBoolean("isBad", isBad);
         if (ownerUUID != null) {
             tag.putUUID("ownerUUID", ownerUUID);
-            System.out.println("Saving UUID: " + ownerUUID);
         }
     }
 
@@ -426,7 +425,6 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
         isBad = tag.getBoolean("isBad");
         if (tag.contains("ownerUUID")) {
             ownerUUID = tag.getUUID("ownerUUID");
-            System.out.println("Loading UUID: " + ownerUUID);
         }
     }
 

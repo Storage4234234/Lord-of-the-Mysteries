@@ -438,8 +438,6 @@ public abstract class BeamEntity extends LOTMProjectile {
                 }
             }
         }
-
-        System.out.println("hit entity" + entities);
         return entities;
     }
 

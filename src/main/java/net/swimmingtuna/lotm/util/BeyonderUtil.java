@@ -98,6 +98,7 @@ import virtuoel.pehkui.api.ScaleTypes;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static net.swimmingtuna.lotm.commands.BeyonderRecipeCommand.executeRecipeCommand;
 import static net.swimmingtuna.lotm.init.DamageTypeInit.MENTAL_DAMAGE;
@@ -111,20 +112,26 @@ public class BeyonderUtil {
     private static final Map<UUID, SimpleAbilityItem> pendingAbilityCopies = new HashMap<>();
 
     public static Projectile getProjectiles(LivingEntity livingEntity) {
+        // Early return if on client side
         if (livingEntity.level().isClientSide()) {
             return null;
         }
-        List<Projectile> projectiles = livingEntity.level().getEntitiesOfClass(Projectile.class, livingEntity.getBoundingBox().inflate(50));
-        for (Projectile projectile : projectiles) {
-            CompoundTag tag = projectile.getPersistentData();
-            int x = tag.getInt("windDodgeProjectilesCounter");
-            if (x == 0) {
-                if (projectile.getOwner() == livingEntity && projectile.tickCount > 6 && projectile.tickCount < 100) {
-                    return projectile;
-                }
+        Level level = livingEntity.level();
+        AABB boundingBox = livingEntity.getBoundingBox().inflate(50);
+        Predicate<Projectile> projectilePredicate = projectile -> {
+            if (projectile.tickCount <= 6 || projectile.tickCount >= 100) {
+                return false;
             }
-        }
-        return null;
+            if (projectile.getOwner() != livingEntity) {
+                return false;
+            }
+
+            CompoundTag tag = projectile.getPersistentData();
+            return tag.getInt("windDodgeProjectilesCounter") == 0;
+        };
+        return level.getEntitiesOfClass(Projectile.class, boundingBox, projectilePredicate).stream()
+                .findFirst()
+                .orElse(null);
     }
 
     public static void projectileEvent(LivingEntity living) {
@@ -686,7 +693,6 @@ public class BeyonderUtil {
                 InteractionResult result = ability.useAbilityOnEntity(player.getItemInHand(hand), player, livingEntity, hand);
                 if (result != InteractionResult.PASS) {
                     successfulUse = true;
-                    System.out.println("entityInteraction success");
                 }
             }
         }
@@ -710,28 +716,22 @@ public class BeyonderUtil {
                 InteractionResult result = ability.useAbilityOnBlock(context);
                 if (result != InteractionResult.PASS) {
                     successfulUse = true;
-                    System.out.println("blockInteraction success");
                 }
             }
         }
 
         if ((hasEntityInteraction || hasBlockInteraction) && !hasGeneralAbility) {
             if (successfulUse) {
-                System.out.println("successful use 1st");
                 player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
             } else {
-                System.out.println("missed use 1st");
                 player.displayClientMessage(Component.literal("Missed: " + itemName).withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
             }
         } else if (!hasEntityInteraction && !hasBlockInteraction) {
             ability.useAbility(player.level(), player, hand);
-            System.out.println("successful use 2nd");
             player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
         } else if (successfulUse) {
-            System.out.println("successful use 3rd");
             player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
         } else {
-            System.out.println("successful use 4th");
             ability.useAbility(player.level(), player, hand);
             player.displayClientMessage(Component.literal("Used: " + itemName).withStyle(getStyle(player)), true);
         }
@@ -1547,7 +1547,7 @@ public class BeyonderUtil {
         // Monster Potions
         executeRecipeCommand(server, "/beyonderrecipe add lotm:monster_9_potion ingredients 2 bossominium:flower_of_genesis bossominium:redstone_hard_drive minecraft:rotten_flesh alexscaves:charred_remnant bosses_of_mass_destruction:soul_star");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:monster_8_potion ingredients 2 legendary_monsters:frozen_rune legendary_monsters:crystal_of_sandstorm mutantmonsters:hulk_hammer alexscaves:sweet_tooth minecraft:netherite_scrap");
-        executeRecipeCommand(server, "/beyonderrecipe add lotm:monster_7_potion ingredients 2 alexscaves:pure_darkness bossominium:soul_eye arphex:giant_spinneret the_deep_void:ash_pile bossominium:dead_charm");
+        executeRecipeCommand(server, "/beyonderrecipe add lotm:monster_7_potion ingredients 2 alexscaves:pure_darkness bossominium:soul_eye arphex:giant_spinneret macabre:mortis_essence bossominium:dead_charm");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:monster_6_potion ingredients 2 minecraft:nether_star bosses_of_mass_destruction:void_thorn kom:nectra_egg cataclysm:monstrous_horn illageandspillage:bag_of_horrors");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:monster_5_potion ingredients 2 soulsweapons:chaos_crown cataclysm:witherite_ingot kom:anglospike arphex:crusher_claw alexscaves:immortal_embryo");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:monster_4_potion ingredients 2 iceandfire:dragon_skull_fire cataclysm:ignitium_ingot eeeabsmobs:guardian_core mythsandlegends:umbras_whisper macabre:gargamaw_heart");
@@ -1558,7 +1558,7 @@ public class BeyonderUtil {
         // Sailor Potions
         executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_9_potion ingredients 2 bossominium:rusted_trident mowziesmobs:sol_visage aquamirae:fin arphex:roach_nymph arphex:fly_appendage");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_8_potion ingredients 2 bossominium:mossy_stone_tablet alexsmobs:warped_muscle iceandfire:sea_serpent_fang minecraft:prismarine_shard mutantmonsters:endersoul_hand");
-        executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_7_potion ingredients 2 eeeabsmobs:heart_of_pagan mowziesmobs:ice_crystal aquamirae:abyssal_amethyst the_deep_void:tendrils arphex:necrotic_fang");
+        executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_7_potion ingredients 2 eeeabsmobs:heart_of_pagan mowziesmobs:ice_crystal aquamirae:abyssal_amethyst arphex:mantis_machete arphex:necrotic_fang");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_6_potion ingredients 2 illageandspillage:spellbound_book kom:caligan_saw arphex:oversized_stinger minecraft:dragon_egg bosses_of_mass_destruction:void_thorn");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_5_potion ingredients 2 aquamirae:frozen_key soulsweapons:essence_of_eventide cataclysm:gauntlet_of_guard alexscaves:immortal_embryo arphex:void_geode_shard");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_4_potion ingredients 2 iceandfire:dragon_skull_ice alexscaves:tectonic_shard cataclysm:abyssal_egg macabre:baal_heart soulsweapons:darkin_blade");
@@ -1571,8 +1571,8 @@ public class BeyonderUtil {
         executeRecipeCommand(server, "/beyonderrecipe add lotm:spectator_8_potion ingredients 2 arphex:mangled_spider_flesh bossominium:the_golden_eye born_in_chaos_v1:seedof_chaos born_in_chaos_v1:spider_mandible alexscaves:heavy_bone");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:spectator_7_potion ingredients 2 bossominium:pure_pearl deeperdarker:soul_crystal arphex:mantis_machete mutantmonsters:endersoul_hand legendary_monsters:withered_bone");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:spectator_6_potion ingredients 2 illageandspillage:spellbound_book bossominium:ancient_scrap born_in_chaos_v1:lifestealer_bone arphex:abyssal_shard bossominium:all_seeing_crystal");
-        executeRecipeCommand(server, "/beyonderrecipe add lotm:spectator_5_potion ingredients 2 kom:sigil_of_revival soulsweapons:lord_soul_rose minecraft:nether_star cataclysm:witherite_ingot the_deep_void:void_matter");
-        executeRecipeCommand(server, "/beyonderrecipe add lotm:spectator_4_potion ingredients 2 iceandfire:dragon_skull_lightning sleepy_hollows:spectral_essence the_deep_void:stalker_scythe_claw mythsandlegends:umbras_whisper macabre:gomoria_heart");
+        executeRecipeCommand(server, "/beyonderrecipe add lotm:spectator_5_potion ingredients 2 kom:sigil_of_revival soulsweapons:lord_soul_rose minecraft:nether_star cataclysm:witherite_ingot animatedmobsmod:ender_spectre");
+        executeRecipeCommand(server, "/beyonderrecipe add lotm:spectator_4_potion ingredients 2 lotm:spectator_4_potion iceandfire:dragon_skull_lightning sleepy_hollows:spectral_essence arphex:void_geode_shard eeeabsmobs:guardian_core macabre:gomoria_heart");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:spectator_3_potion ingredients 1 iceandfire:dragon_skull_fire born_in_chaos_v1:lord_pumpkinheads_lamp arphex:fire_opal");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:spectator_2_potion ingredients 1 terramity:fortunes_favor soulsweapons:lord_soul_day_stalker soulsweapons:lord_soul_night_prowler minecraft:spyglass");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:spectator_1_potion ingredients 1 terramity:music_sheet_of_the_omnipotent_ultra_sniffer minecraft:emerald_block");
@@ -2311,7 +2311,7 @@ public class BeyonderUtil {
     }
 
     public static boolean isBeyonder(LivingEntity livingEntity) {
-        return getSequence(livingEntity) != -1;
+        return getSequence(livingEntity) != -1 && getPathway(livingEntity) != null;
     }
 
     public static void resetPathway(LivingEntity livingEntity) {
@@ -2745,18 +2745,13 @@ public class BeyonderUtil {
                 String itemName = simpleAbilityItem.getDescription().getString();
                 if ((hasEntityInteraction || hasBlockInteraction) && !hasGeneralAbility) {
                     if (successfulUse) {
-                        System.out.println("Used " + itemName);
                     } else {
-                        System.out.println("Missed " + itemName);
                     }
                 } else if (!hasEntityInteraction && !hasBlockInteraction) {
                     simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
-                    System.out.println("Used " + itemName);
                 } else if (successfulUse) {
-                    System.out.println("Used " + itemName);
                 } else {
                     simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
-                    System.out.println("Used " + itemName);
                 }
             }
         }

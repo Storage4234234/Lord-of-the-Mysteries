@@ -222,7 +222,7 @@ public class BeyonderRecipeCommand {
     public static void executeRecipeCommand(CommandContext<CommandSourceStack> context, String command) {
         try {
             context.getSource().getServer().getCommands().performPrefixedCommand(
-                    context.getSource(), command.substring(1)); // Remove the leading '/' from command
+                    context.getSource(), command.substring(1));
         } catch (Exception e) {
             context.getSource().sendFailure(Component.literal("Failed to execute recipe: " + command)
                     .withStyle(ChatFormatting.RED));
