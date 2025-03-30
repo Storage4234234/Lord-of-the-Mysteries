@@ -312,7 +312,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             }
             double distanceRatio = distance / effectiveRadius;
             float damageMultiplier = (0.5f + (float) entityRelativeHeight * 0.5f) * (distanceRatio > 1.0 ? 0.7f : 1.0f);
-            livingEntity.hurt(BeyonderUtil.genericSource(owner), ((float) getHurricaneRadius() * damageMultiplier / 2) / 3);
+            livingEntity.hurt(BeyonderUtil.genericSource(owner), ((float) getHurricaneRadius() * damageMultiplier / 2) / 6);
 
             if (this.tickCount % 15 == 0) {
                 if (getDestroyArmor()) {
@@ -325,7 +325,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
                 }
 
                 if (BeyonderUtil.isPurifiable(livingEntity)) {
-                    livingEntity.hurt(BeyonderUtil.magicSource(owner), ((float) getHurricaneRadius() * damageMultiplier / 2) / 3);
+                    livingEntity.hurt(BeyonderUtil.magicSource(owner), ((float) getHurricaneRadius() * damageMultiplier / 2) / 6);
                 }
             }
         } else {
@@ -335,7 +335,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             }
             double distanceRatio = distance / effectiveRadius;
             float damageMultiplier = (0.5f + (float) entityRelativeHeight * 0.5f) * (distanceRatio > 1.0 ? 0.7f : 1.0f);
-            livingEntity.hurt(livingEntity.damageSources().generic(), ((float) getHurricaneRadius() * damageMultiplier / 2) / 3);
+            livingEntity.hurt(livingEntity.damageSources().generic(), ((float) getHurricaneRadius() * damageMultiplier / 2) / 6);
             if (this.tickCount % 15 == 0) {
                 if (this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
                     if (!BeyonderUtil.isAllyOf(owner, livingEntity) && getAge()) {
@@ -348,7 +348,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
                 livingEntity.addEffect(new MobEffectInstance(ModEffects.ARMOR_WEAKNESS.get(), 200, amplifier, true, true));
             }
             if (BeyonderUtil.isPurifiable(livingEntity)) {
-                livingEntity.hurt(livingEntity.damageSources().magic(), ((float) getHurricaneRadius() * damageMultiplier / 2) / 5);
+                livingEntity.hurt(livingEntity.damageSources().magic(), ((float) getHurricaneRadius() * damageMultiplier / 2) / 4);
             }
         }
     }

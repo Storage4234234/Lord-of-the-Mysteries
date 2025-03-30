@@ -110,7 +110,7 @@ public class DawnArmory extends SimpleAbilityItem {
         LivingEntity entity = event.getEntity();
         if (entity.tickCount % 20 == 0 && !entity.level().isClientSide() && (BeyonderUtil.getPathway(entity) == BeyonderClassInit.WARRIOR.get() || BeyonderUtil.sequenceAbleCopy(entity)) && BeyonderUtil.getSequence(entity) <= 6) {
             if (hasFullDawnArmor(entity)) {
-                BeyonderUtil.useSpirituality(entity, 15);
+                BeyonderUtil.useSpirituality(entity, 25);
             }
         }
     }
@@ -125,7 +125,7 @@ public class DawnArmory extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use, remove your current armor and conjure a set of dawn armor from light. If equipped, all damage lower than 10 will be ignored, and all supernatural damage will be halved. Use again to remove the armor."));
-        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("20 per second").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("25 per second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(getClassText(this.requiredSequence, this.requiredClass.get()));

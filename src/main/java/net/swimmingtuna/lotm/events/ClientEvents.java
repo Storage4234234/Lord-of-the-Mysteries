@@ -98,7 +98,6 @@ public class ClientEvents {
         } else if (event.getRenderer().shadowRadius == 0.0f) {
             event.getRenderer().shadowRadius = 1.0f;
         }
-
     }
 
 

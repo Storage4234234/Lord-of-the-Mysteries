@@ -112,7 +112,6 @@ public class BeyonderUtil {
     private static final Map<UUID, SimpleAbilityItem> pendingAbilityCopies = new HashMap<>();
 
     public static Projectile getProjectiles(LivingEntity livingEntity) {
-        // Early return if on client side
         if (livingEntity.level().isClientSide()) {
             return null;
         }
@@ -499,69 +498,69 @@ public class BeyonderUtil {
                 abilityNames.add(ItemInit.PROBABILITYINFINITEFORTUNE.get());
                 abilityNames.add(ItemInit.PROBABILITYINFINITEMISFORTUNE.get());
             }
-            if (currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.WARRIOR.get())) {
-                if (sequence <= 6) {
-                    abilityNames.add(ItemInit.GIGANTIFICATION.get());
-                    abilityNames.add(ItemInit.LIGHTOFDAWN.get());
-                    abilityNames.add(ItemInit.DAWNARMORY.get());
-                    abilityNames.add(ItemInit.DAWNWEAPONRY.get());
-                }
-                if (sequence <= 5) {
-                    abilityNames.add(ItemInit.ENABLEDISABLEPROTECTION.get());
-                }
-                if (sequence <= 4) {
-                    abilityNames.add(ItemInit.EYEOFDEMONHUNTING.get());
-                    abilityNames.add(ItemInit.WARRIORDANGERSENSE.get());
-                }
-                if (sequence <= 3) {
-                    abilityNames.add(ItemInit.MERCURYLIQUEFICATION.get());
-                    abilityNames.add(ItemInit.SILVERSWORDMANIFESTATION.get());
-                    abilityNames.add(ItemInit.SILVERRAPIER.get());
-                    abilityNames.add(ItemInit.SILVERARMORY.get());
-                    abilityNames.add(ItemInit.LIGHTCONCEALMENT.get());
-                }
-                if (sequence <= 2) {
-                    abilityNames.add(ItemInit.BEAMOFGLORY.get());
-                    abilityNames.add(ItemInit.AURAOFGLORY.get());
-                    abilityNames.add(ItemInit.TWILIGHTSWORD.get());
-                    abilityNames.add(ItemInit.MERCURYCAGE.get());
-                }
-                if (sequence <= 1) {
-                    abilityNames.add(ItemInit.DIVINEHANDLEFT.get());
-                    abilityNames.add(ItemInit.DIVINEHANDRIGHT.get());
-                    abilityNames.add(ItemInit.TWILIGHTMANIFESTATION.get());
-                }
-                if (sequence <= 0) {
-                    abilityNames.add(ItemInit.AURAOFTWILIGHT.get());
-                    abilityNames.add(ItemInit.TWILIGHTFREEZE.get());
-                    abilityNames.add(ItemInit.TWILIGHTACCELERATE.get());
-                    abilityNames.add(ItemInit.GLOBEOFTWILIGHT.get());
-                    abilityNames.add(ItemInit.BEAMOFTWILIGHT.get());
-                    abilityNames.add(ItemInit.TWILIGHTLIGHT.get());
-                }
+        }
+        if (currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.WARRIOR.get())) {
+            if (sequence <= 6) {
+                abilityNames.add(ItemInit.GIGANTIFICATION.get());
+                abilityNames.add(ItemInit.LIGHTOFDAWN.get());
+                abilityNames.add(ItemInit.DAWNARMORY.get());
+                abilityNames.add(ItemInit.DAWNWEAPONRY.get());
             }
-            if (currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.APPRENTICE.get())) {
-                if (sequence <= 9) {
-                    abilityNames.add(ItemInit.CREATEDOOR.get());
-                }
-                if (sequence <= 8) {
-                    abilityNames.add(ItemInit.TRICKBURN.get());
-                    abilityNames.add(ItemInit.TRICKBOUNCE.get());
-                    abilityNames.add(ItemInit.TRICKFREEZE.get());
-                    abilityNames.add(ItemInit.TRICKTUMBLE.get());
-                    abilityNames.add(ItemInit.TRICKWINDPULL.get());
-                    abilityNames.add(ItemInit.TRICKWINDPUSH.get());
-                }
-                if (sequence <= 6) {
-                    abilityNames.add(ItemInit.RECORDSCRIBE.get());
-                }
-                if (sequence <= 5) {
-                    abilityNames.add(ItemInit.TRAVELDOOR.get());
-                    abilityNames.add(ItemInit.TRAVELDOORHOME.get());
-                    abilityNames.add(ItemInit.INVISIBLEHAND.get());
-                }
+            if (sequence <= 5) {
+                abilityNames.add(ItemInit.ENABLEDISABLEPROTECTION.get());
+            }
+            if (sequence <= 4) {
+                abilityNames.add(ItemInit.EYEOFDEMONHUNTING.get());
+                abilityNames.add(ItemInit.WARRIORDANGERSENSE.get());
+            }
+            if (sequence <= 3) {
+                abilityNames.add(ItemInit.MERCURYLIQUEFICATION.get());
+                abilityNames.add(ItemInit.SILVERSWORDMANIFESTATION.get());
+                abilityNames.add(ItemInit.SILVERRAPIER.get());
+                abilityNames.add(ItemInit.SILVERARMORY.get());
+                abilityNames.add(ItemInit.LIGHTCONCEALMENT.get());
+            }
+            if (sequence <= 2) {
+                abilityNames.add(ItemInit.BEAMOFGLORY.get());
+                abilityNames.add(ItemInit.AURAOFGLORY.get());
+                abilityNames.add(ItemInit.TWILIGHTSWORD.get());
+                abilityNames.add(ItemInit.MERCURYCAGE.get());
+            }
+            if (sequence <= 1) {
+                abilityNames.add(ItemInit.DIVINEHANDLEFT.get());
+                abilityNames.add(ItemInit.DIVINEHANDRIGHT.get());
+                abilityNames.add(ItemInit.TWILIGHTMANIFESTATION.get());
+            }
+            if (sequence <= 0) {
+                abilityNames.add(ItemInit.AURAOFTWILIGHT.get());
+                abilityNames.add(ItemInit.TWILIGHTFREEZE.get());
+                abilityNames.add(ItemInit.TWILIGHTACCELERATE.get());
+                abilityNames.add(ItemInit.GLOBEOFTWILIGHT.get());
+                abilityNames.add(ItemInit.BEAMOFTWILIGHT.get());
+                abilityNames.add(ItemInit.TWILIGHTLIGHT.get());
+            }
+        }
+        if (currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.APPRENTICE.get())) {
+            if (sequence <= 9) {
+                abilityNames.add(ItemInit.CREATEDOOR.get());
+            }
+            if (sequence <= 8) {
+                abilityNames.add(ItemInit.TRICKBURN.get());
+                abilityNames.add(ItemInit.TRICKBOUNCE.get());
+                abilityNames.add(ItemInit.TRICKFREEZE.get());
+                abilityNames.add(ItemInit.TRICKTUMBLE.get());
+                abilityNames.add(ItemInit.TRICKWINDPULL.get());
+                abilityNames.add(ItemInit.TRICKWINDPUSH.get());
+            }
+            if (sequence <= 6) {
+                abilityNames.add(ItemInit.RECORDSCRIBE.get());
+            }
+            if (sequence <= 5) {
+                abilityNames.add(ItemInit.TRAVELDOOR.get());
+                abilityNames.add(ItemInit.TRAVELDOORHOME.get());
+                abilityNames.add(ItemInit.INVISIBLEHAND.get());
+            }
 
-            }
         }
         return abilityNames;
     }
@@ -1181,7 +1180,7 @@ public class BeyonderUtil {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.BEAMOFTWILIGHT.get())));
             } else if (heldItem.getItem() instanceof BeamOfTwilight) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.AURAOFTWILIGHT.get())));
-            }  else if (heldItem.getItem() instanceof TravelDoor) {
+            } else if (heldItem.getItem() instanceof TravelDoor) {
                 LOTMNetworkHandler.sendToServer(new TravelDoorC2S());
             }
         }
@@ -1605,8 +1604,7 @@ public class BeyonderUtil {
             } else if (sequence == 7) {
                 player.sendSystemMessage(Component.literal("No abilities to register"));
             }
-        }
-        else if (isSpectator) {
+        } else if (isSpectator) {
             if (sequence == 9) {
                 player.sendSystemMessage(Component.literal("No abilities to register"));
             } else if (sequence >= 8) {
@@ -2694,16 +2692,19 @@ public class BeyonderUtil {
                 try {
                     Method entityMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbilityOnEntity", ItemStack.class, LivingEntity.class, LivingEntity.class, InteractionHand.class);
                     hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity", ItemStack.class, LivingEntity.class, LivingEntity.class, InteractionHand.class));
-                } catch (NoSuchMethodException ignored) {}
+                } catch (NoSuchMethodException ignored) {
+                }
                 try {
                     Method blockMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbilityOnBlock", UseOnContext.class);
                     hasBlockInteraction = !blockMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnBlock", UseOnContext.class));
-                } catch (NoSuchMethodException ignored) {}
+                } catch (NoSuchMethodException ignored) {
+                }
 
                 try {
                     Method generalMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbility", Level.class, LivingEntity.class, InteractionHand.class);
                     hasGeneralAbility = !generalMethod.equals(Ability.class.getDeclaredMethod("useAbility", Level.class, LivingEntity.class, InteractionHand.class));
-                } catch (NoSuchMethodException ignored) {}
+                } catch (NoSuchMethodException ignored) {
+                }
                 if (hasEntityInteraction) {
                     if (target != null && target.distanceTo(mob) <= entityReach) {
                         InteractionResult result = simpleAbilityItem.useAbilityOnEntity(livingEntity.getItemInHand(InteractionHand.MAIN_HAND), mob, target, InteractionHand.MAIN_HAND);

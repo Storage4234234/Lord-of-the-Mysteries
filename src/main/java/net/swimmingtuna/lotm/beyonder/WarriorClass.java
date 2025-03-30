@@ -290,7 +290,7 @@ public class WarriorClass implements BeyonderClass {
                 if (livingEntity.tickCount % 2 == 0) {
                     BeyonderUtil.useSpirituality(livingEntity, 2);
                 }
-                if (originalAmount <= 10) {
+                if (originalAmount <= 10 - (sequence)) {
                     event.setAmount(0);
                     return;
                 }
@@ -329,7 +329,7 @@ public class WarriorClass implements BeyonderClass {
                 physicalReduction += 0.5f;
                 supernaturalReduction += 0.2f;
             } else if (hasFullDawnArmor(livingEntity) && isSupernatural) {
-                supernaturalReduction += 0.4f;
+                supernaturalReduction += (0.4f) - (sequence * 0.05f);
             }
             if (isWarrior) {
                 if (sequence == 8) {
