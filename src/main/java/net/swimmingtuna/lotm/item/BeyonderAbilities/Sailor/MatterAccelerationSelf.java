@@ -24,7 +24,7 @@ import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoor;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.LuckGifting;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocationBlink;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocation;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -132,7 +132,7 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
                 livingEntity.getPersistentData().putInt("tyrantSelfAcceleration", 0);
             }
         }
-        if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof EnvisionLocationBlink && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.SPECTATOR.get())) {
+        if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof EnvisionLocation && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.SPECTATOR.get())) {
             livingEntity.getPersistentData().putInt("BlinkDistance", blinkDistance + 5);
             if (livingEntity instanceof Player player) {
                 player.displayClientMessage(Component.literal("Blink Distance is " + blinkDistance).withStyle(BeyonderUtil.getStyle(livingEntity)), true);

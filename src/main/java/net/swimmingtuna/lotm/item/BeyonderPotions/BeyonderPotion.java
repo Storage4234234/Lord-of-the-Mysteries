@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -37,35 +38,29 @@ public class BeyonderPotion extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (level.isClientSide) return InteractionResultHolder.pass(itemStack);
-        player.getPersistentData().putInt("failedPotion",1);
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (holder.getCurrentClass() != null && holder.getCurrentClass() != beyonderClassSupplier.get()) {
-            return InteractionResultHolder.fail(itemStack);
+        if (BeyonderUtil.currentPathwayAndSequenceMatchesNoException(player, beyonderClassSupplier.get(), sequence + 1)) {
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+            MobEffectInstance blindnessEffect = new MobEffectInstance(MobEffects.BLINDNESS, effectDurations.get(sequence), 1);
+            blindnessEffect.setCurativeItems(List.of());
+            MobEffectInstance slownessEffect = new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, effectDurations.get(sequence), 4);
+            slownessEffect.setCurativeItems(List.of());
+            MobEffectInstance nauseaEffect = new MobEffectInstance(MobEffects.CONFUSION, effectDurations.get(sequence), 1);
+            nauseaEffect.setCurativeItems(List.of());
+            MobEffectInstance poisonEffect = new MobEffectInstance(MobEffects.POISON, effectDurations.get(sequence), 20);
+            poisonEffect.setCurativeItems(List.of());
+            player.addEffect(blindnessEffect);
+            player.addEffect(slownessEffect);
+            player.addEffect(nauseaEffect);
+            player.addEffect(poisonEffect);
+            holder.setPathwayAndSequence(beyonderClassSupplier.get(), sequence);
+            level.playSound(null, player.getOnPos(), SoundEvents.PORTAL_AMBIENT, SoundSource.PLAYERS, 0.5f, level.random.nextFloat() * 0.1F + 0.9F);
+            player.sendSystemMessage(Component.translatable("item.lotm.beholder_potion.alert", holder.getCurrentClass().sequenceNames().get(holder.getSequence())).withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.BOLD));
+            player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(beyonderClassSupplier.get().maxHealth().get(sequence));
+            if (!player.getAbilities().instabuild) {
+                itemStack.shrink(1);
+            }
+            CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) player, itemStack);
         }
-        if (holder.getSequence() != -1 && holder.getSequence() < sequence) {
-            return InteractionResultHolder.fail(itemStack);
-        }
-        MobEffectInstance blindnessEffect = new MobEffectInstance(MobEffects.BLINDNESS, effectDurations.get(sequence), 1);
-        blindnessEffect.setCurativeItems(List.of());
-        MobEffectInstance slownessEffect = new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, effectDurations.get(sequence), 4);
-        slownessEffect.setCurativeItems(List.of());
-        MobEffectInstance nauseaEffect = new MobEffectInstance(MobEffects.CONFUSION, effectDurations.get(sequence), 1);
-        nauseaEffect.setCurativeItems(List.of());
-        MobEffectInstance poisonEffect = new MobEffectInstance(MobEffects.POISON, effectDurations.get(sequence), 20);
-        poisonEffect.setCurativeItems(List.of());
-        player.addEffect(blindnessEffect);
-        player.addEffect(slownessEffect);
-        player.addEffect(nauseaEffect);
-        player.addEffect(poisonEffect);
-        holder.setPathwayAndSequence(beyonderClassSupplier.get(), sequence);
-        level.playSound(null, player.getOnPos(), SoundEvents.PORTAL_AMBIENT, SoundSource.PLAYERS, 0.5f, level.random.nextFloat() * 0.1F + 0.9F);
-        player.sendSystemMessage(Component.translatable("item.lotm.beholder_potion.alert", holder.getCurrentClass().sequenceNames().get(holder.getSequence())).withStyle(ChatFormatting.AQUA).withStyle(ChatFormatting.BOLD));
-        player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(beyonderClassSupplier.get().maxHealth().get(sequence));
-        if (!player.getAbilities().instabuild) {
-            itemStack.shrink(1);
-        }
-        CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer) player, itemStack);
-
         return super.use(level, player, hand);
     }
 

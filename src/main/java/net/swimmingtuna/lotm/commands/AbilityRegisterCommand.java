@@ -261,8 +261,8 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput LLRLL lotm:prophesizedemise");
                     excecuteAbilityCommand(context, "/abilityput RRLLL lotm:meteorshower");
                     excecuteAbilityCommand(context, "/abilityput RLRRR lotm:envisionhealth");
+                    excecuteAbilityCommand(context, "/abilityput LLRRL lotm:envisionlocation");
                     excecuteAbilityCommand(context, "/abilityput RLLRR lotm:envisionbarrier");
-                    excecuteAbilityCommand(context, "/abilityput LLRRL lotm:envisionlocationblink");
                     excecuteAbilityCommand(context, "/abilityput RLRLR lotm:dreamweaving");
                 }
             } else if (BeyonderUtil.currentPathwayMatchesNoException(player, BeyonderClassInit.MONSTER.get())) {
@@ -442,6 +442,101 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput LRLLR lotm:lightningredirection");
                     excecuteAbilityCommand(context, "/abilityput RLLLL lotm:tyranny");
                     excecuteAbilityCommand(context, "/abilityput RLLLR lotm:stormseal");
+                }
+            }  else if (BeyonderUtil.currentPathwayMatchesNoException(player, BeyonderClassInit.WARRIOR.get())) {
+                if (sequence == 9) {
+                    player.sendSystemMessage(Component.literal("No abilities to register"));
+                } else if (sequence == 8) {
+                    player.sendSystemMessage(Component.literal("No abilities to register"));
+                } else if (sequence == 7) {
+                    player.sendSystemMessage(Component.literal("No abilities to register"));
+                } else if (sequence == 6) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dawnarmory");
+                } else if (sequence == 5) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");
+                } else if (sequence == 4) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");
+                    excecuteAbilityCommand(context, "/abilityput LRLRL lotm:eyeofdemonhunting");
+                    excecuteAbilityCommand(context, "/abilityput LRRLR lotm:warriordangersense");
+                } else if (sequence == 3) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");
+                    excecuteAbilityCommand(context, "/abilityput LRLRL lotm:eyeofdemonhunting");
+                    excecuteAbilityCommand(context, "/abilityput LRRLR lotm:warriordangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:mercuryliquefication");
+                    excecuteAbilityCommand(context, "/abilityput LRLLR lotm:silverswordmanifestation");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:silverrapier");
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:silverarmory");
+                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:lightconcealment");
+                } else if (sequence == 2) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");
+                    excecuteAbilityCommand(context, "/abilityput LRLRL lotm:eyeofdemonhunting");
+                    excecuteAbilityCommand(context, "/abilityput LRRLR lotm:warriordangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:mercuryliquefication");
+                    excecuteAbilityCommand(context, "/abilityput LRLLR lotm:silverswordmanifestation");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:silverrapier");
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:silverarmory");
+                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:lightconcealment");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:beamofglory");
+                    excecuteAbilityCommand(context, "/abilityput LRLLL lotm:auraofglory");
+                    excecuteAbilityCommand(context, "/abilityput RLRLL lotm:twilightsword");
+                    excecuteAbilityCommand(context, "/abilityput RLRLR lotm:mercurycage");
+                } else if (sequence == 1) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");
+                    excecuteAbilityCommand(context, "/abilityput LRLRL lotm:eyeofdemonhunting");
+                    excecuteAbilityCommand(context, "/abilityput LRRLR lotm:warriordangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:mercuryliquefication");
+                    excecuteAbilityCommand(context, "/abilityput LRLLR lotm:silverswordmanifestation");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:silverrapier");
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:silverarmory");
+                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:lightconcealment");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:beamofglory");
+                    excecuteAbilityCommand(context, "/abilityput LRLLL lotm:auraofglory");
+                    excecuteAbilityCommand(context, "/abilityput RLRLL lotm:twilightsword");
+                    excecuteAbilityCommand(context, "/abilityput RLRLR lotm:mercurycage");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:divinehandright");
+                    excecuteAbilityCommand(context, "/abilityput RLLRR lotm:divinehandleft");
+                    excecuteAbilityCommand(context, "/abilityput LLRLR lotm:twilightmanifestation");
+                } else if (sequence == 0) {
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
+                    excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");
+                    excecuteAbilityCommand(context, "/abilityput LRLRL lotm:eyeofdemonhunting");
+                    excecuteAbilityCommand(context, "/abilityput LRRLR lotm:warriordangersense");
+                    excecuteAbilityCommand(context, "/abilityput RRRRR lotm:mercuryliquefication");
+                    excecuteAbilityCommand(context, "/abilityput LRLLR lotm:silverswordmanifestation");
+                    excecuteAbilityCommand(context, "/abilityput RRRLL lotm:silverrapier");
+                    excecuteAbilityCommand(context, "/abilityput RLRRL lotm:silverarmory");
+                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:lightconcealment");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:beamoftwilight");
+                    excecuteAbilityCommand(context, "/abilityput LRLLL lotm:auraoftwilight");
+                    excecuteAbilityCommand(context, "/abilityput RLRLL lotm:twilightsword");
+                    excecuteAbilityCommand(context, "/abilityput RLRLR lotm:mercurycage");
+                    excecuteAbilityCommand(context, "/abilityput LRRLL lotm:divinehandright");
+                    excecuteAbilityCommand(context, "/abilityput RLLRR lotm:divinehandleft");
+                    excecuteAbilityCommand(context, "/abilityput LLRLR lotm:twilightmanifestation");
+
+                    excecuteAbilityCommand(context, "/abilityput RLRRR lotm:twilightfreeze");
+                    excecuteAbilityCommand(context, "/abilityput RLLLL lotm:twilightlight");
+                    excecuteAbilityCommand(context, "/abilityput RRLRR lotm:twilightaccelerate");
+                    excecuteAbilityCommand(context, "/abilityput LRRRR lotm:globeoftwilight");
                 }
             }
         }

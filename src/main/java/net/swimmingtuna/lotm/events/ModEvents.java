@@ -44,6 +44,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.beyonder.ApprenticeClass;
+import net.swimmingtuna.lotm.beyonder.MonsterClass;
 import net.swimmingtuna.lotm.beyonder.SailorClass;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
@@ -92,7 +93,6 @@ import java.util.Map;
 
 import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.apprenticeWindSlowFall;
 import static net.swimmingtuna.lotm.beyonder.ApprenticeClass.trickmasterBounceHitProjectiles;
-import net.swimmingtuna.lotm.beyonder.MonsterClass;
 import static net.swimmingtuna.lotm.beyonder.WarriorClass.newWarriorDamageNegation;
 import static net.swimmingtuna.lotm.beyonder.WarriorClass.twilightTick;
 import static net.swimmingtuna.lotm.blocks.MonsterDomainBlockEntity.domainDrops;
@@ -663,21 +663,39 @@ public class ModEvents {
             if (BeyonderUtil.isBeyonder(livingEntity) && !event.isCanceled() && livingEntity instanceof Player) {
                 boolean dropCharacteristic = level.getLevelData().getGameRules().getBoolean(GameRuleInit.SHOULD_DROP_CHARACTERISTIC);
                 boolean resetSequence = level.getLevelData().getGameRules().getBoolean(GameRuleInit.RESET_SEQUENCE);
+                boolean safetyNet = level.getLevelData().getGameRules().getBoolean(GameRuleInit.PATHWAY_SAFETY_NET);
                 if (dropCharacteristic) {
-                    ItemStack stack = new ItemStack(ItemInit.BEYONDER_CHARACTERISTIC.get());
-                    BeyonderCharacteristic.setData(stack, pathway, sequence, false, 1);
-                    ItemEntity itemEntity = new ItemEntity(level, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), stack);
-                    livingEntity.level().addFreshEntity(itemEntity);
-                    if (!resetSequence) {
-                        if (sequence == 9) {
-                            BeyonderUtil.resetPathway(livingEntity);
+                    if (!safetyNet) {
+                        ItemStack stack = new ItemStack(ItemInit.BEYONDER_CHARACTERISTIC.get());
+                        BeyonderCharacteristic.setData(stack, pathway, sequence, false, 1);
+                        ItemEntity itemEntity = new ItemEntity(level, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), stack);
+                        livingEntity.level().addFreshEntity(itemEntity);
+                        if (!resetSequence) {
+                            if (sequence == 9) {
+                                BeyonderUtil.resetPathway(livingEntity);
+                            } else {
+                                BeyonderUtil.setSequence(livingEntity, sequence + 1);
+                            }
                         } else {
-                            BeyonderUtil.setSequence(livingEntity, sequence + 1);
+                            BeyonderUtil.removePathway(livingEntity);
                         }
-                    } else {
-                        BeyonderUtil.removePathway(livingEntity);
+                    } else if (sequence != 8 && sequence != 4) {
+                        ItemStack stack = new ItemStack(ItemInit.BEYONDER_CHARACTERISTIC.get());
+                        BeyonderCharacteristic.setData(stack, pathway, sequence, false, 1);
+                        ItemEntity itemEntity = new ItemEntity(level, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), stack);
+                        livingEntity.level().addFreshEntity(itemEntity);
+                        if (!resetSequence) {
+                            if (sequence == 9) {
+                                BeyonderUtil.resetPathway(livingEntity);
+                            } else {
+                                BeyonderUtil.setSequence(livingEntity, sequence + 1);
+                            }
+                        } else {
+                            BeyonderUtil.removePathway(livingEntity);
+                        }
                     }
                 }
+
             }
             CycleOfFate.cycleOfFateDeath(event);
 

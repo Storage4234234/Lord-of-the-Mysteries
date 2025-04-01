@@ -50,7 +50,7 @@ public class Nightmare extends SimpleAbilityItem {
         }
         addCooldown(player);
         useSpirituality(player);
-        nightmare(player, pContext.getLevel(), pContext.getClickedPos());
+        nightmareNew(player, pContext.getClickedPos());
         return InteractionResult.SUCCESS;
     }
 
@@ -85,6 +85,31 @@ public class Nightmare extends SimpleAbilityItem {
         return attributeBuilder.build();
     }
 
+    public static void nightmareNew(LivingEntity livingEntity, BlockPos targetPos) {
+        AttributeInstance dreamIntoReality = livingEntity.getAttribute(ModAttributes.DIR.get());
+        int sequence = BeyonderUtil.getSequence(livingEntity);
+        Level level = livingEntity.level();
+        int dir = (int) dreamIntoReality.getValue();
+        double radius = BeyonderUtil.getDamage(livingEntity).get(ItemInit.NIGHTMARE.get());
+        float damagePlayer = ((float) (65.0 * dir) - (sequence * 2));
+        int duration = 300 - (sequence * 20);
+        AABB boundingBox = new AABB(targetPos).inflate(radius);
+        level.getEntitiesOfClass(LivingEntity.class, boundingBox, LivingEntity::isAlive).forEach(living -> {
+           String name = living.getDisplayName().getString();
+           CompoundTag tag = living.getPersistentData();
+           if (living != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, living)) {
+               living.addEffect(new MobEffectInstance(MobEffects.DARKNESS, duration, 1, false, false));
+               if (tag.getInt("NightmareTimer") < 300) {
+                   int addToAmount = sequence < 3 ? 200 : 100;
+                   tag.putInt("NightmareTimer", addToAmount);
+                   livingEntity.sendSystemMessage(Component.literal(name + "'s nightmare value is " + tag.getInt("NightmareTimer" + " / 300")));
+               } else {
+                   tag.putInt("NightmareTimer", 0);
+                   BeyonderUtil.applyMentalDamage(livingEntity, living, damagePlayer);
+               }
+           }
+        });
+    }
 
     private void nightmare(LivingEntity player, Level level, BlockPos targetPos) {
         if (!player.level().isClientSide()) {

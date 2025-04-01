@@ -9,6 +9,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -242,6 +243,8 @@ public class WarriorClass implements BeyonderClass {
         items.put(1, ItemInit.DIVINEHANDLEFT.get());
         items.put(1, ItemInit.DIVINEHANDRIGHT.get());
         items.put(1, ItemInit.TWILIGHTMANIFESTATION.get());
+        items.remove(0, ItemInit.AURAOFGLORY.get());
+        items.remove(0, ItemInit.BEAMOFGLORY.get());
         items.put(0, ItemInit.AURAOFTWILIGHT.get());
         items.put(0, ItemInit.TWILIGHTFREEZE.get());
         items.put(0, ItemInit.TWILIGHTACCELERATE.get());
@@ -260,6 +263,8 @@ public class WarriorClass implements BeyonderClass {
     public static void newWarriorDamageNegation(LivingHurtEvent event) {
         LivingEntity livingEntity = event.getEntity();
         DamageSource source = event.getSource();
+        Entity entitySource = source.getEntity();
+        boolean isBeyonder = entitySource instanceof LivingEntity living && BeyonderUtil.isBeyonder(living);
         if (!livingEntity.level().isClientSide()) {
             boolean isGiant = livingEntity.getPersistentData().getBoolean("warriorGiant");
             boolean isHoGGiant = livingEntity.getPersistentData().getBoolean("handOfGodGiant");
@@ -290,9 +295,10 @@ public class WarriorClass implements BeyonderClass {
                 if (livingEntity.tickCount % 2 == 0) {
                     BeyonderUtil.useSpirituality(livingEntity, 2);
                 }
-                if (originalAmount <= 10 - (sequence)) {
-                    event.setAmount(0);
-                    return;
+                float maxDamageAmount = isBeyonder ? 10 - (sequence) : 5 - ((float) sequence / 2);
+                if (originalAmount <= maxDamageAmount) {
+                    physicalReduction += 0.75f;
+                    supernaturalReduction += 0.75f;
                 }
             }
             if (isWarrior && isPhysical) {
@@ -411,6 +417,10 @@ public class WarriorClass implements BeyonderClass {
                         }
                     }
                 }
+            }
+            if (!isBeyonder && (!(entitySource instanceof Projectile projectile && projectile.getOwner() != null && projectile.getOwner() instanceof Player))) {
+                physicalReduction *= 0.5f;
+                supernaturalReduction *= 0.5f;
             }
             if (isPhysical) {
                 float finalReduction = Math.min(physicalReduction, 0.7f);

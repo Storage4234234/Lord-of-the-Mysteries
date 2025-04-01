@@ -52,7 +52,6 @@ public class CreativeTabInit {
                         event.accept(ItemInit.ENVISION_KINGDOM.get());
                         event.accept(ItemInit.ENVISION_LIFE.get());
                         event.accept(ItemInit.ENVISION_LOCATION.get());
-                        event.accept(ItemInit.ENVISION_LOCATION_BLINK.get());
                         event.accept(ItemInit.ENVISION_WEATHER.get());
                         event.accept(ItemInit.RAGING_BLOWS.get());
                         event.accept(ItemInit.ENABLE_OR_DISABLE_LIGHTNING.get());

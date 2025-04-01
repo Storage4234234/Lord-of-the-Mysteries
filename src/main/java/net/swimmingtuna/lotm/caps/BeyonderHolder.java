@@ -154,13 +154,15 @@ public class BeyonderHolder extends PlayerCapability {
     }
 
     public void setSequence(int currentSequence) {
-        this.currentSequence = currentSequence;
-        this.maxSpirituality = this.currentClass.spiritualityLevels().get(currentSequence);
-        this.spiritualityRegen = this.currentClass.spiritualityRegen().get(currentSequence);
-        this.spirituality = this.maxSpirituality;
-        updateTracking();
+        if (this.currentClass != null) {
+            this.currentSequence = currentSequence;
+            this.maxSpirituality = this.currentClass.spiritualityLevels().get(currentSequence);
+            this.spiritualityRegen = this.currentClass.spiritualityRegen().get(currentSequence);
+            this.spirituality = this.maxSpirituality;
+            updateTracking();
 
-        LOTMNetworkHandler.sendToPlayer(new SyncSequencePacketS2C(this.currentSequence), (ServerPlayer) player);
+            LOTMNetworkHandler.sendToPlayer(new SyncSequencePacketS2C(this.currentSequence), (ServerPlayer) player);
+        }
     }
 
     public void incrementSequence() {

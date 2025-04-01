@@ -5,9 +5,12 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -85,7 +88,7 @@ public class FateReincarnation extends SimpleAbilityItem {
                 }
                 if (x >= 7100) {
                     scaleData.setScale(0.2f);
-                    removePathway(livingEntity);
+                    removePathwayForMonster(livingEntity);
                 } else if (x >= 6900) {
                     scaleData.setScale(0.25f);
                     setPathwayAndSequence(livingEntity,BeyonderClassInit.MONSTER.get(), 9);
@@ -176,5 +179,22 @@ public class FateReincarnation extends SimpleAbilityItem {
             y--;
         }
         return y;
+    }
+
+    public static void removePathwayForMonster(LivingEntity living) {
+        if (living instanceof Player player) {
+            BeyonderHolderAttacher.getHolderUnwrap(player).removePathway();
+        } else {
+            setPathwayAndSequence(living, null, -1);
+        }
+        if (living instanceof Player player) {
+            Abilities playerAbilities = player.getAbilities();
+            playerAbilities.setFlyingSpeed(0.05F);
+            playerAbilities.setWalkingSpeed(0.1F);
+            player.onUpdateAbilities();
+            if (player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
+            }
+        }
     }
 }

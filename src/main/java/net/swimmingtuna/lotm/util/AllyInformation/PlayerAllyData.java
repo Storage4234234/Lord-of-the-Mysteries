@@ -34,7 +34,7 @@ public class PlayerAllyData extends SavedData {
     }
 
     public boolean areAllies(UUID living1, UUID living2) {
-        return getAllies(living1).contains(living2);
+        return getAllies(living1).contains(living2) && getAllies(living2).contains(living1);
     }
 
     @Override

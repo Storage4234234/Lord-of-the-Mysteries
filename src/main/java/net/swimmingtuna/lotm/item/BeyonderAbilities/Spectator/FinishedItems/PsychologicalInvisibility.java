@@ -41,7 +41,7 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         psychologicalInvisibilityAbility(player);
-        if (ClientShouldntRenderInvisibilityData.getShouldntRender()) {
+        if (ClientShouldntRenderInvisibilityData.getShouldntRender(player.getUUID())) {
             addCooldown(player);
         }
         return InteractionResult.SUCCESS;
@@ -95,7 +95,7 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use, hypnotize all entities around you to hide your presence. If you get hit enough times in a close period of time, you will be turned visible again."));
-        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("2% of your max spirituality per second").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("2% of your max spirituality per second (Max of 20/s)").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("12 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
@@ -127,7 +127,7 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
                     }
                 }
                 livingEntity.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 11, 1, false, false));
-                BeyonderUtil.useSpirituality(livingEntity, BeyonderUtil.getMaxSpirituality(livingEntity) / 100);
+                BeyonderUtil.useSpirituality(livingEntity, Math.min(10, BeyonderUtil.getMaxSpirituality(livingEntity) / 100));
             }
             UUID playerId = livingEntity.getUUID();
             Boolean lastState = lastSentInvisibilityStates.get(playerId);

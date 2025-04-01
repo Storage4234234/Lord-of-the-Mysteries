@@ -136,6 +136,7 @@ public class SailorClass implements BeyonderClass {
             applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 0, false, false);
             applyMobEffect(player,MobEffects.DIG_SPEED, 300, 0, false, false);
             applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 0, false, false);
+            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
             applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
             dolhpinsGrace = 0;
             regeneration = -1;

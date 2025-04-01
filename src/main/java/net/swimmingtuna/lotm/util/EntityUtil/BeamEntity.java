@@ -202,11 +202,11 @@ public abstract class BeamEntity extends LOTMProjectile {
                 // Handle entity collisions and effects
                 for (Entity entity : entities) {
                     if (entity == owner) continue;
-                    if (getIsDragonBreath() && this.getOwner() != null && entity instanceof LivingEntity livingEntity) {
-                        BeyonderUtil.applyMentalDamage((LivingEntity) this.getOwner(), livingEntity, this.getDamage());
+                    if (getIsDragonBreath() && this.getOwner() != null && this.getOwner() instanceof LivingEntity livingOwner && entity instanceof LivingEntity livingEntity && !BeyonderUtil.isAllyOf(livingOwner, livingEntity)) {
+                        BeyonderUtil.applyMentalDamage(livingOwner, livingEntity, this.getDamage());
                     } else if (getIsDragonBreath() && this.getOwner() == null && entity instanceof LivingEntity livingEntity){
                         livingEntity.hurt(livingEntity.damageSources().magic(), getDamage());
-                    } if (getIsTwilight() && entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity pOwner) {
+                    } if (getIsTwilight() && entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity pOwner && !BeyonderUtil.isAllyOf(pOwner, livingEntity)) {
                         int age = livingEntity.getPersistentData().getInt("age");
                         livingEntity.hurt(BeyonderUtil.genericSource(owner), 10);
                         if (livingEntity instanceof Player player) {
@@ -214,8 +214,7 @@ public abstract class BeamEntity extends LOTMProjectile {
                         }
                         livingEntity.getPersistentData().putInt("age", (age + (30 - BeyonderUtil.getSequence(pOwner))) * 9);
                     }
-
-                    if (entity instanceof LivingEntity livingEntity && getIsDragonBreath()) {
+                    if (entity instanceof LivingEntity livingEntity && getIsDragonBreath() && this.getOwner() != null && this.getOwner() instanceof LivingEntity livingOwner && !BeyonderUtil.isAllyOf(livingOwner, livingEntity)) {
                         livingEntity.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), getFrenzyTime(), 1, false, false));
                     }
 

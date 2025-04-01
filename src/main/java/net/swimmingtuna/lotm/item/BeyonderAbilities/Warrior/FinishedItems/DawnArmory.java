@@ -110,7 +110,7 @@ public class DawnArmory extends SimpleAbilityItem {
         LivingEntity entity = event.getEntity();
         if (entity.tickCount % 20 == 0 && !entity.level().isClientSide() && (BeyonderUtil.getPathway(entity) == BeyonderClassInit.WARRIOR.get() || BeyonderUtil.sequenceAbleCopy(entity)) && BeyonderUtil.getSequence(entity) <= 6) {
             if (hasFullDawnArmor(entity)) {
-                BeyonderUtil.useSpirituality(entity, 25);
+                BeyonderUtil.useSpirituality(entity, 40 - (BeyonderUtil.getSequence(entity) * 3));
             }
         }
     }

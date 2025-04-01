@@ -94,7 +94,7 @@ public class SwordOfDawn extends SwordItem implements GeoItem {
                 BlockHitResult blockHit = pPlayer.level().clip(new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, pPlayer));
                 if (blockHit.getType() == HitResult.Type.MISS && BeyonderUtil.getSpirituality(pPlayer) >= 350) {
                     HurricaneOfLightEntity.summonHurricaneOfLightDawn(pPlayer);
-                    BeyonderUtil.useSpirituality(pPlayer, 350);
+                    BeyonderUtil.useSpirituality(pPlayer, 1000 - (BeyonderUtil.getSequence(pPlayer) * 115));
                     pPlayer.getCooldowns().addCooldown(this, 400);
                 }
             } else if (pPlayer.isShiftKeyDown() && BeyonderUtil.getSequence(pPlayer) <= 5) {

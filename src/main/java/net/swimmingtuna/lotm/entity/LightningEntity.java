@@ -248,6 +248,27 @@ public class LightningEntity extends AbstractHurtingProjectile {
             this.positions.add(newPos);
         }
 
+        if (!this.level().isClientSide()) {
+            float detectionRadius = getDamage() * 0.25f;
+            AABB detectionBox = new AABB(lastPos.x - detectionRadius, lastPos.y - detectionRadius, lastPos.z - detectionRadius, lastPos.x + detectionRadius, lastPos.y + detectionRadius, lastPos.z + detectionRadius
+            );
+
+            List<Entity> nearbyEntities = this.level().getEntities(this, detectionBox);
+            boolean foundValidTarget = false;
+            for (Entity entity : nearbyEntities) {
+                if (entity instanceof LivingEntity && entity != this.owner) {
+                    foundValidTarget = true;
+                    explodeLightningBlock(BlockPos.containing(lastPos), getDamage() * 0.25);
+                    this.discard();
+                    break;
+                }
+            }
+
+            if (foundValidTarget) {
+                return;
+            }
+        }
+
         boolean hasExploded = false;
 
         for (int i = 0; i < this.positions.size() - 1 && !hasExploded; i++) {
@@ -262,7 +283,7 @@ public class LightningEntity extends AbstractHurtingProjectile {
                     for (BlockPos blockPos : BlockPos.betweenClosed(new BlockPos((int) checkArea.minX, (int) checkArea.minY, (int) checkArea.minZ), new BlockPos((int) checkArea.maxX, (int) checkArea.maxY, (int) checkArea.maxZ))) {
                         if (!this.level().getBlockState(blockPos).isAir() && !this.level().getBlockState(blockPos).getBlock().equals(Blocks.WATER)) {
                             Vec3 hitPos = currentPos;
-                            explodeLightningBlock(BlockPos.containing(hitPos), getDamage() * 0.1);
+                            explodeLightningBlock(BlockPos.containing(hitPos), getDamage() * 0.25);
                             hasExploded = true;
                             this.discard();
                             break;
@@ -298,7 +319,7 @@ public class LightningEntity extends AbstractHurtingProjectile {
             if (branchOut) {
                 if (this.tickCount == getMaxLength()) {
                     Vec3 pos = new Vec3(lastPos.x, lastPos.y, lastPos.z);
-                    this.explodeLightningBlock(BlockPos.containing(pos), getDamage() * 0.1);
+                    this.explodeLightningBlock(BlockPos.containing(pos), getDamage() * 0.25);
                 }
                 LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), this.level());
                 lightningEntity.setSpeed(8.0f);

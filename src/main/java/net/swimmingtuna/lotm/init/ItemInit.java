@@ -269,8 +269,6 @@ public class ItemInit {
             () -> new EnvisionKingdom(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ENVISION_LOCATION = ITEMS.register("envisionlocation",
             () -> new EnvisionLocation(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> ENVISION_LOCATION_BLINK = ITEMS.register("envisionlocationblink",
-            () -> new EnvisionLocationBlink(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ALTERATION = ITEMS.register("alteration",
             () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ENVISION_HEALTH = ITEMS.register("envisionhealth",

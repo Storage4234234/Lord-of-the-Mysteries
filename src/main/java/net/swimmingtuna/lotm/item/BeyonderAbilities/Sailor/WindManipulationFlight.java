@@ -65,7 +65,6 @@ public class WindManipulationFlight extends SimpleAbilityItem {
             Abilities playerAbilities = pPlayer.getAbilities();
             if (!playerAbilities.instabuild) {
                 playerAbilities.mayfly = true;
-                playerAbilities.flying = true;
                 playerAbilities.setFlyingSpeed(0.1F);
             }
             pPlayer.onUpdateAbilities();
@@ -119,10 +118,8 @@ public class WindManipulationFlight extends SimpleAbilityItem {
         Vec3 lookVector = livingEntity.getLookAngle();
         CompoundTag tag = livingEntity.getPersistentData();
         if (tag.getBoolean("sailorFlight1")) {
-            if (BeyonderUtil.getSpirituality(livingEntity) >= 3) {
-                BeyonderUtil.useSpirituality(livingEntity,3);
-            } else {
-                WindManipulationFlight.stopFlying(livingEntity);
+            if (livingEntity instanceof Player player && player.getAbilities().flying) {
+                BeyonderUtil.useSpirituality(player, 3);
             }
         }
         int flightCancel = tag.getInt("sailorFlightDamageCancel");

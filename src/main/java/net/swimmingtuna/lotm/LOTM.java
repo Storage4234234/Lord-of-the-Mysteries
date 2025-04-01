@@ -202,7 +202,6 @@ public class LOTM {
             event.accept(ItemInit.ENVISION_DEATH);
             event.accept(ItemInit.ENVISION_KINGDOM);
             event.accept(ItemInit.ENVISION_LOCATION);
-            event.accept(ItemInit.ENVISION_LOCATION_BLINK);
             event.accept(ItemInit.ENVISION_HEALTH);
             event.accept(ItemInit.HORNBEAM_ESSENTIALS_OIL);
             event.accept(ItemInit.DEEP_SEA_MARLINS_BLOOD);

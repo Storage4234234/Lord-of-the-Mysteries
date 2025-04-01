@@ -3,15 +3,21 @@ package net.swimmingtuna.lotm.beyonder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.init.ItemInit;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SpectatorClass implements BeyonderClass {
     @Override
@@ -62,16 +68,19 @@ public class SpectatorClass implements BeyonderClass {
             if (sequenceLevel == 6) {
                 applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 0, false, false);
                 applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
+                applyMobEffect(player,MobEffects.FIRE_RESISTANCE, 300, 0, false, false);
             } else if (sequenceLevel == 5) {
                 applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 0, false, false);
-
+                applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
+                applyMobEffect(player,MobEffects.FIRE_RESISTANCE, 300, 0, false, false);
             } else if (sequenceLevel == 4) {
                 applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 1, false, false);
                 applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
-
+                applyMobEffect(player,MobEffects.FIRE_RESISTANCE, 300, 0, false, false);
             } else if (sequenceLevel == 3) {
                 applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 1, false, false);
                 applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
+                applyMobEffect(player,MobEffects.FIRE_RESISTANCE, 300, 0, false, false);
             } else if (sequenceLevel == 2) {
                 applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 2, false, false);
                 applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
@@ -89,6 +98,8 @@ public class SpectatorClass implements BeyonderClass {
             }
         }
     }
+
+
     @Override
     public Multimap<Integer, Item> getItems() {
         HashMultimap<Integer, Item> items = HashMultimap.create();
@@ -125,7 +136,6 @@ public class SpectatorClass implements BeyonderClass {
         items.put(0, ItemInit.ENVISION_DEATH.get());
         items.put(0, ItemInit.ENVISION_HEALTH.get());
         items.put(0, ItemInit.ENVISION_LOCATION.get());
-        items.put(0, ItemInit.ENVISION_LOCATION_BLINK.get());
         items.put(0, ItemInit.ENVISION_WEATHER.get());
         items.put(0, ItemInit.ENVISION_KINGDOM.get());
 
