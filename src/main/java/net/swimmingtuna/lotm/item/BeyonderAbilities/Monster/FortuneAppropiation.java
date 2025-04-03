@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -40,7 +39,7 @@ public class FortuneAppropiation extends SimpleAbilityItem {
     private void appropiateFortune(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(BeyonderUtil.getDamage(livingEntity).get(ItemInit.FORTUNEAPPROPIATION.get())))) {
-                if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
+                if (entity != livingEntity && !BeyonderUtil.areAllies(livingEntity, entity)) {
                     CompoundTag tag = entity.getPersistentData();
                     CompoundTag livingTag = livingEntity.getPersistentData();
 

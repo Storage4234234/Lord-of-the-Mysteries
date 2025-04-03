@@ -226,7 +226,7 @@ public class BeyonderUtil {
         Vec3 projectilePos = projectile.position();
         List<LivingEntity> nearbyEntities = projectile.level().getEntitiesOfClass(LivingEntity.class, projectile.getBoundingBox().inflate(maxValue));
         for (LivingEntity entity : nearbyEntities) {
-            if (entity != owner && !entity.level().isClientSide() && (owner instanceof LivingEntity living && !BeyonderUtil.isAllyOf(living, entity))) {
+            if (entity != owner && !entity.level().isClientSide() && (owner instanceof LivingEntity living && !BeyonderUtil.areAllies(living, entity))) {
                 double distance = entity.distanceToSqr(projectilePos);
                 if (distance < maxValue && distance > minValue && distance < closestDistance) {
                     closestDistance = distance;
@@ -685,16 +685,47 @@ public class BeyonderUtil {
         if (hasEntityInteraction) {
             Vec3 eyePosition = player.getEyePosition();
             Vec3 lookVector = player.getLookAngle();
-            Vec3 reachVector = eyePosition.add(lookVector.x * entityReach, lookVector.y * entityReach, lookVector.z * entityReach);
+            Vec3 reachVector = eyePosition.add(lookVector.scale(entityReach));
             AABB searchBox = player.getBoundingBox().inflate(entityReach);
-            EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(player.level(), player, eyePosition, reachVector, searchBox, entity -> !entity.isSpectator() && entity.isPickable(), 0.0f);
+            EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(player.level(), player, eyePosition, reachVector, searchBox,
+                    entity -> !entity.isSpectator() && entity.isPickable(), 0.1f);
+
             if (entityHit != null && entityHit.getEntity() instanceof LivingEntity livingEntity) {
-                InteractionResult result = ability.useAbilityOnEntity(player.getItemInHand(hand), player, livingEntity, hand);
-                if (result != InteractionResult.PASS) {
-                    successfulUse = true;
+                if (player.level().isEmptyBlock(livingEntity.blockPosition().above())) {
+                    InteractionResult result = ability.useAbilityOnEntity(player.getItemInHand(hand), player, livingEntity, hand);
+                    if (result != InteractionResult.PASS) {
+                        successfulUse = true;
+                    }
+                }
+            } else {
+                List<LivingEntity> possibleTargets = player.level().getEntitiesOfClass(LivingEntity.class, searchBox,
+                        entity -> !entity.isSpectator() && entity.isPickable() && entity != player);
+
+                LivingEntity bestTarget = null;
+                double bestDotProduct = 0.9915;
+                for (LivingEntity target : possibleTargets) {
+                    Vec3 toEntity = target.getEyePosition().subtract(eyePosition).normalize();
+                    double dotProduct = toEntity.dot(lookVector);
+                    if (dotProduct > bestDotProduct) {
+                        BlockHitResult hitResult = player.level().clip(new ClipContext(
+                                eyePosition, target.getEyePosition(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+
+                        if (hitResult.getType() == HitResult.Type.MISS && player.level().isEmptyBlock(target.blockPosition().above())) {
+                            bestTarget = target;
+                            bestDotProduct = dotProduct;
+                        }
+                    }
+                }
+                if (bestTarget != null) {
+                    InteractionResult result = ability.useAbilityOnEntity(player.getItemInHand(hand), player, bestTarget, hand);
+                    if (result != InteractionResult.PASS) {
+                        successfulUse = true;
+                    }
                 }
             }
         }
+
+
 
         // Check for block interaction
         if (!successfulUse && hasBlockInteraction) {
@@ -1983,7 +2014,7 @@ public class BeyonderUtil {
 
     }
 
-    public static boolean isAllyOf(LivingEntity livingEntity, LivingEntity ally) {
+    public static boolean areAllies(LivingEntity livingEntity, LivingEntity ally) {
         if (livingEntity.level() instanceof ServerLevel serverLevel) {
             PlayerAllyData allyData = serverLevel.getDataStorage().computeIfAbsent(PlayerAllyData::load, PlayerAllyData::create, "player_allies");
             return allyData.areAllies(livingEntity.getUUID(), ally.getUUID());
@@ -2195,6 +2226,57 @@ public class BeyonderUtil {
             boolean eightyPercent = age >= maxAge * 0.8;
             boolean ninetyPercent = age >= maxAge * 0.9;
             boolean oneHundredPercent = age >= maxAge;
+            if (tenPercent) {
+                style = ChatFormatting.YELLOW;
+            }
+            if (twentyPercent) {
+                style = ChatFormatting.YELLOW;
+            }
+            if (thirtyPercent) {
+                style = ChatFormatting.YELLOW;
+            }
+            if (fortyPercent) {
+                style = ChatFormatting.RED;
+            }
+            if (fiftyPercent) {
+                style = ChatFormatting.RED;
+            }
+            if (sixtyPercent) {
+                style = ChatFormatting.RED;
+            }
+            if (seventyPercent) {
+                style = ChatFormatting.DARK_RED;
+            }
+            if (eightyPercent) {
+                style = ChatFormatting.DARK_RED;
+            }
+            if (ninetyPercent) {
+                style = ChatFormatting.DARK_RED;
+            }
+            if (oneHundredPercent) {
+                style = ChatFormatting.DARK_RED;
+            }
+        }
+        return style;
+    }
+
+
+
+    public static ChatFormatting corruptionStyle(LivingEntity livingEntity) {
+        ChatFormatting style = ChatFormatting.YELLOW;
+        if (!livingEntity.level().isClientSide()) {
+            int corruption = livingEntity.getPersistentData().getInt("corruption");
+            int maxCorruption = 100;
+            boolean tenPercent = corruption >= maxCorruption * 0.1;
+            boolean twentyPercent = corruption >= maxCorruption * 0.2;
+            boolean thirtyPercent = corruption >= maxCorruption * 0.3;
+            boolean fortyPercent = corruption >= maxCorruption * 0.4;
+            boolean fiftyPercent = corruption >= maxCorruption * 0.5;
+            boolean sixtyPercent = corruption >= maxCorruption * 0.6;
+            boolean seventyPercent = corruption >= maxCorruption * 0.7;
+            boolean eightyPercent = corruption >= maxCorruption * 0.8;
+            boolean ninetyPercent = corruption >= maxCorruption * 0.9;
+            boolean oneHundredPercent = corruption >= maxCorruption;
             if (tenPercent) {
                 style = ChatFormatting.YELLOW;
             }
@@ -2926,6 +3008,8 @@ public class BeyonderUtil {
             tag.putInt("sailorTsunami", 0);
             tag.putInt("sailorTsunamiSeal", 0);
             tag.putInt("sailorSphere", 0);
+            tag.putInt("mercuryLiqueficationTrapped", 0);
+            tag.putInt("sailorSeal", 0);
             tag.putBoolean("sailorFlight1", false);
             tag.putInt("sailorFlight", 0);
             tag.putInt("sailorFlightDamageCancel", 0);

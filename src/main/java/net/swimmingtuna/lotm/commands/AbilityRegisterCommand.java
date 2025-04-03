@@ -313,7 +313,7 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput RRRRR lotm:auraofchaos");
                     excecuteAbilityCommand(context, "/abilityput RRRLL lotm:chaoswalkercombat");
                     excecuteAbilityCommand(context, "/abilityput LRRRR lotm:enabledisableripple");
-                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:whispersofcorruption");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:whisperofcorruption");
                     excecuteAbilityCommand(context, "/abilityput LRRRR lotm:misfortuneimplosion");
                 } else if (sequence == 1) {
                     excecuteAbilityCommand(context, "/abilityput RLRRL lotm:monsterdangersense");
@@ -326,7 +326,7 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput RRRRR lotm:auraofchaos");
                     excecuteAbilityCommand(context, "/abilityput RRRLL lotm:chaoswalkercombat");
                     excecuteAbilityCommand(context, "/abilityput LRRRR lotm:enabledisableripple");
-                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:whispersofcorruption");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:whisperofcorruption");
                     excecuteAbilityCommand(context, "/abilityput LRRRR lotm:misfortuneimplosion");
                     excecuteAbilityCommand(context, "/abilityput RLLLL lotm:rebootself");
                     excecuteAbilityCommand(context, "/abilityput RRRLR lotm:cycleoffate");
@@ -342,7 +342,7 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput RRRRR lotm:auraofchaos");
                     excecuteAbilityCommand(context, "/abilityput RRRLL lotm:chaoswalkercombat");
                     excecuteAbilityCommand(context, "/abilityput LRRRR lotm:enabledisableripple");
-                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:whispersofcorruption");
+                    excecuteAbilityCommand(context, "/abilityput RRRRL lotm:whisperofcorruption");
                     excecuteAbilityCommand(context, "/abilityput LRRRR lotm:misfortuneimplosion");
                     excecuteAbilityCommand(context, "/abilityput RLLLL lotm:rebootself");
                     excecuteAbilityCommand(context, "/abilityput RRRLR lotm:cycleoffate");
@@ -451,23 +451,23 @@ public class AbilityRegisterCommand {
                 } else if (sequence == 7) {
                     player.sendSystemMessage(Component.literal("No abilities to register"));
                 } else if (sequence == 6) {
-                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gigantification");
                     excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
                     excecuteAbilityCommand(context, "/abilityput RRRRR lotm:dawnarmory");
                 } else if (sequence == 5) {
-                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gigantification");
                     excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
                     excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
                     excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");
                 } else if (sequence == 4) {
-                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gigantification");
                     excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
                     excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
                     excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");
                     excecuteAbilityCommand(context, "/abilityput LRLRL lotm:eyeofdemonhunting");
                     excecuteAbilityCommand(context, "/abilityput LRRLR lotm:warriordangersense");
                 } else if (sequence == 3) {
-                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gigantification");
                     excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
                     excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
                     excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");
@@ -479,7 +479,7 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput RLRRL lotm:silverarmory");
                     excecuteAbilityCommand(context, "/abilityput LLRRR lotm:lightconcealment");
                 } else if (sequence == 2) {
-                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gigantification");
                     excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
                     excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
                     excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");
@@ -495,7 +495,7 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput RLRLL lotm:twilightsword");
                     excecuteAbilityCommand(context, "/abilityput RLRLR lotm:mercurycage");
                 } else if (sequence == 1) {
-                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gigantification");
                     excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
                     excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
                     excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");
@@ -514,7 +514,7 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput RLLRR lotm:divinehandleft");
                     excecuteAbilityCommand(context, "/abilityput LLRLR lotm:twilightmanifestation");
                 } else if (sequence == 0) {
-                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gignatification");
+                    excecuteAbilityCommand(context, "/abilityput LLLLL lotm:gigantification");
                     excecuteAbilityCommand(context, "/abilityput LLLLR lotm:lightofdawn");
                     excecuteAbilityCommand(context, "/abilityput RRRRL lotm:dawnarmory");
                     excecuteAbilityCommand(context, "/abilityput RRLLL lotm:enabledisableprotection");

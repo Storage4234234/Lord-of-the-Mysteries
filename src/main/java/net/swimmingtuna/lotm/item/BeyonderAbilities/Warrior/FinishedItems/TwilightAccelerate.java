@@ -79,7 +79,7 @@ public class TwilightAccelerate extends SimpleAbilityItem {
     public static void saveDataReboot(LivingEntity livingEntity,LivingEntity target) {
         if (!livingEntity.level().isClientSide() && !target.level().isClientSide()) {
             CompoundTag tag = target.getPersistentData();
-            if (livingEntity == target || BeyonderUtil.isAllyOf(livingEntity, target)) {
+            if (livingEntity == target || BeyonderUtil.areAllies(livingEntity, target)) {
                 tag.putInt("twilightAgeAccelerate", (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TWILIGHTACCELERATE.get()));
             } else {
                 tag.putInt("twilightAgeAccelerateEnemy", (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TWILIGHTACCELERATE.get()) / 2);

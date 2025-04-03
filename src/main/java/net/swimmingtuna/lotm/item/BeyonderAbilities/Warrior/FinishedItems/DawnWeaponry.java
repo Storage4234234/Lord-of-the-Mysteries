@@ -21,12 +21,12 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ModArmorMaterials;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Random;
 
 public class DawnWeaponry extends SimpleAbilityItem {
 
@@ -160,6 +160,18 @@ public class DawnWeaponry extends SimpleAbilityItem {
             }
         }
         return true;
+    }
+
+    public static void removeDawnArmor(LivingEntity livingEntity) {
+        if (BeyonderUtil.currentPathwayAndSequenceMatches(livingEntity, BeyonderClassInit.WARRIOR.get(), 6)) return;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+                ItemStack itemStack = livingEntity.getItemBySlot(slot);
+                if (itemStack.getItem() instanceof ArmorItem armor && armor.getMaterial() == ModArmorMaterials.DAWN) {
+                    livingEntity.setItemSlot(slot, ItemStack.EMPTY);
+                }
+            }
+        }
     }
 
     public static boolean hasFullSilverArmor(LivingEntity entity) {

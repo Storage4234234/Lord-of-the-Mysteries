@@ -77,7 +77,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
             }
             if (glory) {
                 for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(expansionAmount))) {
-                    if (!BeyonderUtil.isAllyOf(livingEntity, living) && living != livingEntity && living.tickCount % 20 == 0) {
+                    if (!BeyonderUtil.areAllies(livingEntity, living) && living != livingEntity && living.tickCount % 20 == 0) {
                         living.getPersistentData().putInt("age", (int) (living.getPersistentData().getInt("age") + BeyonderUtil.getDamage(livingEntity).get(ItemInit.AURAOFGLORY.get())));
                         living.sendSystemMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(living)).withStyle(ChatFormatting.BOLD));
                     } else {
@@ -99,7 +99,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
                 }
                 for (Projectile projectile : livingEntity.level().getEntitiesOfClass(Projectile.class, livingEntity.getBoundingBox().inflate(expansionAmount * 0.66))) {
                     if (projectile.getOwner() != null && projectile.getOwner() instanceof LivingEntity owner) {
-                        if (owner != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, owner)) {
+                        if (owner != livingEntity && !BeyonderUtil.areAllies(livingEntity, owner)) {
                             projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.5).x(), projectile.getDeltaMovement().y() - 0.1, projectile.getDeltaMovement().scale(0.5).z());
                             projectile.hurtMarked = true;
                             projectile.getPersistentData().putInt("age", projectile.getPersistentData().getInt("age") + 5);
@@ -110,10 +110,15 @@ public class AuraOfGlory extends SimpleAbilityItem {
                         projectile.discard();
                     }
                 }
-                BeyonderUtil.useSpirituality(livingEntity, 240);
+                if (BeyonderUtil.getSpirituality(livingEntity) <= 12) {
+                    BeyonderUtil.useSpirituality(livingEntity, 12);
+                } else {
+                    livingEntity.sendSystemMessage(Component.literal("Your aura of glory was turned off due to lack of spirutality").withStyle(ChatFormatting.RED));
+                    tag.putBoolean("auraOfGlory", false);
+                }
             } else if (twilight && livingEntity.tickCount % 20 == 0) {
                 for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(expansionAmount))) {
-                    if (!BeyonderUtil.isAllyOf(livingEntity, living) && living != livingEntity) {
+                    if (!BeyonderUtil.areAllies(livingEntity, living) && living != livingEntity) {
                         living.getPersistentData().putInt("age", (int) (living.getPersistentData().getInt("age") + BeyonderUtil.getDamage(livingEntity).get(ItemInit.AURAOFTWILIGHT.get())));
                         if (living instanceof Player player) {
                             player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD), true);
@@ -135,7 +140,7 @@ public class AuraOfGlory extends SimpleAbilityItem {
                 }
                 for (Projectile projectile : livingEntity.level().getEntitiesOfClass(Projectile.class, livingEntity.getBoundingBox().inflate(expansionAmount * 0.66))) {
                     if (projectile.getOwner() != null && projectile.getOwner() instanceof LivingEntity owner) {
-                        if (owner != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, owner)) {
+                        if (owner != livingEntity && !BeyonderUtil.areAllies(livingEntity, owner)) {
                             projectile.setDeltaMovement(projectile.getDeltaMovement().scale(0.3).x(), projectile.getDeltaMovement().y() - 0.2, projectile.getDeltaMovement().scale(0.3).z());
                             projectile.hurtMarked = true;
                             projectile.getPersistentData().putInt("age", projectile.getPersistentData().getInt("age") + 10);
@@ -146,7 +151,12 @@ public class AuraOfGlory extends SimpleAbilityItem {
                         projectile.discard();
                     }
                 }
-                BeyonderUtil.useSpirituality(livingEntity, 350);
+                if (BeyonderUtil.getSpirituality(livingEntity) >= 17) {
+                    BeyonderUtil.useSpirituality(livingEntity, 17);
+                } else {
+                    tag.putBoolean("auraOfTwilight", false);
+                    livingEntity.sendSystemMessage(Component.literal("Your aura of twilight was turned off due to lack of spirutality").withStyle(ChatFormatting.RED));
+                }
             }
         }
     }

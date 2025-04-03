@@ -7,7 +7,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -44,7 +43,7 @@ public class EnvisionDeath extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             double radius = 300;
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
+                if (entity != player && !BeyonderUtil.areAllies(player, entity)) {
                     int entityHealth = (int) entity.getHealth();
                     if (entityHealth <= BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_DEATH.get())) {
                         entity.hurt(entity.damageSources().magic(), 40 + (5 * dir));

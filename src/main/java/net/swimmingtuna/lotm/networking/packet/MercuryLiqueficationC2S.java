@@ -37,7 +37,7 @@ public class MercuryLiqueficationC2S {
             Level level = player.level();
             if (!level.isClientSide() && currentState && BeyonderUtil.getSequence(player) <= 2 && player.getMainHandItem().isEmpty()) {
                 for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(damage * 5.0f))) {
-                    if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
+                    if (livingEntity != player && !BeyonderUtil.areAllies(player, livingEntity)) {
                         MercuryEntity mercuryEntity = new MercuryEntity(EntityInit.MERCURY_ENTITY.get(), level);
                         mercuryEntity.setSpeed(Math.max(1, (int) damage / 4));
                         mercuryEntity.setHarmTime((int) damage * 25);

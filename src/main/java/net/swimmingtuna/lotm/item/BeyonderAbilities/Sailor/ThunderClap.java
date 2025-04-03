@@ -10,13 +10,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -50,7 +47,7 @@ public class ThunderClap extends SimpleAbilityItem {
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.THUNDER_CLAP.get());
             int duration = 100 - (sequence * 20);
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
+                if (entity != player && !BeyonderUtil.areAllies(player, entity)) {
                     entity.addEffect((new MobEffectInstance(ModEffects.STUN.get(), duration, 1, false, false)));
                 }
             }

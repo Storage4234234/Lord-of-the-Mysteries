@@ -55,7 +55,7 @@ public class MisfortuneImplosion extends SimpleAbilityItem {
             }
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEIMPLOSION.get());
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
+                if (entity != player && !BeyonderUtil.areAllies(player, entity)) {
                     CompoundTag tag = entity.getPersistentData();
                     double misfortune = tag.getDouble("misfortune");
                     Random random = new Random();

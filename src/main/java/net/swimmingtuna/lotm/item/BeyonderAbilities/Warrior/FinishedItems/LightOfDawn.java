@@ -12,7 +12,6 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -91,7 +90,7 @@ public class LightOfDawn extends SimpleAbilityItem {
                         entity.hurt(BeyonderUtil.magicSource(entity), 15.0f - sequence);
                         entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 2, true, true));
                         entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 2, true, true));
-                    } else if (BeyonderUtil.isAllyOf(livingEntity, entity) || entity == livingEntity) {
+                    } else if (BeyonderUtil.areAllies(livingEntity, entity) || entity == livingEntity) {
                         entity.heal(3.0f);
                         List<MobEffectInstance> effectsToUpdate = new ArrayList<>();
                         for (MobEffectInstance effect : entity.getActiveEffects()) {

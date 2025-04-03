@@ -17,7 +17,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.init.ParticleInit;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -26,8 +25,6 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
-
-import java.util.List;
 
 public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements GeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
@@ -124,7 +121,7 @@ public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements 
                 if (caseInt == 0) {
                     aabb = new AABB(this.getX() + (scale * 0.66) - 5, this.getY() + (scale) - 5, this.getZ() - (scale * 1.1), this.getX() + (scale * 0.66) + 5, this.getY() + (scale * 2) + 5, this.getZ() + (scale  * 1.1));
                     for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, aabb)) {
-                        if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                        if (livingEntity != owner && !BeyonderUtil.areAllies(owner, livingEntity)) {
                             CompoundTag tag = livingEntity.getPersistentData();
                             tag.putInt("age", tag.getInt("age") + 800);
                             if (livingEntity instanceof Player player) {
@@ -137,7 +134,7 @@ public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements 
                 } else if (caseInt == 1) {
                     aabb = new AABB(this.getX() - (scale * 0.66) - 5, this.getY() + (scale) - 5, this.getZ() - (scale * 1.1), this.getX() - (scale * 0.66) + 5, this.getY() + (scale * 2) + 5, this.getZ() + (scale  * 1.1));
                     for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, aabb)) {
-                        if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                        if (livingEntity != owner && !BeyonderUtil.areAllies(owner, livingEntity)) {
                             CompoundTag tag = livingEntity.getPersistentData();
                             tag.putInt("age", tag.getInt("age") + 800);
                             if (livingEntity instanceof Player player) {
@@ -150,7 +147,7 @@ public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements 
                 } else if (caseInt == 2) {
                     aabb = new AABB(this.getX() - (scale * 1.1),this.getY() + (scale) - 5, this.getZ() - (scale * 0.66) - 5, this.getX() + (scale * 1.1), this.getY() + (scale * 2) + 5, this.getZ() - (scale * 0.66) + 5);
                     for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, aabb)) {
-                        if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                        if (livingEntity != owner && !BeyonderUtil.areAllies(owner, livingEntity)) {
                             CompoundTag tag = livingEntity.getPersistentData();
                             tag.putInt("age", tag.getInt("age") + 800);
                             if (livingEntity instanceof Player player) {
@@ -164,7 +161,7 @@ public class SwordOfTwilightEntity extends AbstractHurtingProjectile implements 
                 } else if (caseInt == 3) {
                     aabb = new AABB(this.getX() - (scale * 0.66) - 5, this.getY() + (scale) - 5, this.getZ() - (scale * 1.1), this.getX() - (scale * 0.66) + 5, this.getY() + (scale * 2) + 5, this.getZ() + (scale * 1.1));
                     for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, aabb)) {
-                        if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                        if (livingEntity != owner && !BeyonderUtil.areAllies(owner, livingEntity)) {
                             CompoundTag tag = livingEntity.getPersistentData();
                             tag.putInt("age", tag.getInt("age") + 800);
                             if (livingEntity instanceof Player player) {

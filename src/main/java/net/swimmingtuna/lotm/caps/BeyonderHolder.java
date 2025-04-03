@@ -74,6 +74,7 @@ public class BeyonderHolder extends PlayerCapability {
                 healthAttribute.removeModifier(HEALTH_MODIFIER_UUID);
             }
         }
+        this.player.setHealth(this.player.getMaxHealth());
         CompoundTag persistentData = this.player.getPersistentData();
         if (persistentData.contains(REGISTERED_ABILITIES_KEY)) {
             persistentData.remove(REGISTERED_ABILITIES_KEY);

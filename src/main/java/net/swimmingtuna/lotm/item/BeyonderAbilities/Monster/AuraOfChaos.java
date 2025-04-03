@@ -101,7 +101,7 @@ public class AuraOfChaos extends SimpleAbilityItem {
                     CompoundTag persistentData = livingEntity.getPersistentData();
                     Random random = new Random();
                     int randomInt = random.nextInt(350);
-                    if (livingEntity != entity && !BeyonderUtil.isAllyOf(player, livingEntity) && entity.tickCount % 200 == 0) {
+                    if (livingEntity != entity && !BeyonderUtil.areAllies(player, livingEntity) && entity.tickCount % 200 == 0) {
                         if (randomInt >= 95 && randomInt <= 100) {
                             int random1 = (int) ((Math.random() * 200) - 100);
                             MeteorEntity.summonMeteorAtPositionWithScale(entity,  livingEntity.getX() + random1, livingEntity.getY() - 25,livingEntity.getZ() + random1, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), 6 );

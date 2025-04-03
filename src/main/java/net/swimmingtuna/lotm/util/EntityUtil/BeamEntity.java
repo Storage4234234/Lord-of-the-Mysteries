@@ -202,11 +202,11 @@ public abstract class BeamEntity extends LOTMProjectile {
                 // Handle entity collisions and effects
                 for (Entity entity : entities) {
                     if (entity == owner) continue;
-                    if (getIsDragonBreath() && this.getOwner() != null && this.getOwner() instanceof LivingEntity livingOwner && entity instanceof LivingEntity livingEntity && !BeyonderUtil.isAllyOf(livingOwner, livingEntity)) {
+                    if (getIsDragonBreath() && this.getOwner() != null && this.getOwner() instanceof LivingEntity livingOwner && entity instanceof LivingEntity livingEntity && !BeyonderUtil.areAllies(livingOwner, livingEntity)) {
                         BeyonderUtil.applyMentalDamage(livingOwner, livingEntity, this.getDamage());
                     } else if (getIsDragonBreath() && this.getOwner() == null && entity instanceof LivingEntity livingEntity){
                         livingEntity.hurt(livingEntity.damageSources().magic(), getDamage());
-                    } if (getIsTwilight() && entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity pOwner && !BeyonderUtil.isAllyOf(pOwner, livingEntity)) {
+                    } if (getIsTwilight() && entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity pOwner && !BeyonderUtil.areAllies(pOwner, livingEntity)) {
                         int age = livingEntity.getPersistentData().getInt("age");
                         livingEntity.hurt(BeyonderUtil.genericSource(owner), 10);
                         if (livingEntity instanceof Player player) {
@@ -214,7 +214,7 @@ public abstract class BeamEntity extends LOTMProjectile {
                         }
                         livingEntity.getPersistentData().putInt("age", (age + (30 - BeyonderUtil.getSequence(pOwner))) * 9);
                     }
-                    if (entity instanceof LivingEntity livingEntity && getIsDragonBreath() && this.getOwner() != null && this.getOwner() instanceof LivingEntity livingOwner && !BeyonderUtil.isAllyOf(livingOwner, livingEntity)) {
+                    if (entity instanceof LivingEntity livingEntity && getIsDragonBreath() && this.getOwner() != null && this.getOwner() instanceof LivingEntity livingOwner && !BeyonderUtil.areAllies(livingOwner, livingEntity)) {
                         livingEntity.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), getFrenzyTime(), 1, false, false));
                     }
 
@@ -381,8 +381,8 @@ public abstract class BeamEntity extends LOTMProjectile {
                                 if (this.breaksBlocks() && !EXCLUDED_BLOCKS.contains(this.level().getBlockState(mutablePos).getBlock())) {
                                     this.level().destroyBlock(mutablePos, false);
                                 }
-                            } else if (this.tickCount % 5 == 0 && getIsTwilight()) {
-                                if (this.level().getBlockState(mutablePos) != Blocks.DIRT.defaultBlockState() && this.level().getBlockState(mutablePos) != Blocks.AIR.defaultBlockState() && this.level().getBlockState(mutablePos) != Blocks.BEDROCK.defaultBlockState()) {
+                            } else if (this.tickCount % 5 == 0 && getIsTwilight() && this.level().getBlockState(mutablePos) != Blocks.BEDROCK.defaultBlockState()) {
+                                if (this.level().getBlockState(mutablePos) != Blocks.DIRT.defaultBlockState() && this.level().getBlockState(mutablePos) != Blocks.AIR.defaultBlockState()) {
                                     this.level().setBlock(mutablePos, Blocks.DIRT.defaultBlockState(), 11);
                                 } else {
                                     this.level().destroyBlock(mutablePos, false);

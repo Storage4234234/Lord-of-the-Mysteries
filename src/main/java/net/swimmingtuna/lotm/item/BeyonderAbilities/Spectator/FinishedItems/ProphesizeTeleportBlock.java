@@ -89,7 +89,7 @@ public class ProphesizeTeleportBlock extends SimpleAbilityItem {
     private void teleportEntities(Player player, Level level, BlockPos targetPos, int sequence, int dir) {
         double radius = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.PROPHESIZE_TELEPORT_BLOCK.get());
         for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-            if (entity != player && !entity.level().isClientSide() && !BeyonderUtil.isAllyOf(player, entity)) {
+            if (entity != player && !entity.level().isClientSide() && !BeyonderUtil.areAllies(player, entity)) {
                 entity.getPersistentData().putInt("prophesizeTeleportationCounter", (int) (300 * Math.random()));
                 entity.getPersistentData().putInt("prophesizeTeleportX", (int) targetPos.getX());
                 entity.getPersistentData().putInt("prophesizeTeleportY", (int) targetPos.getY() + 1);

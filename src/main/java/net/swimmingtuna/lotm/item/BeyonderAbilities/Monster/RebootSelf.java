@@ -94,6 +94,7 @@ public class RebootSelf extends SimpleAbilityItem {
         tag.putInt("monsterRebootCorruption", (int) corruption);
         tag.putInt("monsterRebootHealth", (int) player.getHealth());
         tag.putInt("monsterRebootSpirituality", (int) BeyonderUtil.getSpirituality(player));
+        tag.putInt("monsterRebootAgeDecay", tag.getInt("ageDecay"));
         List<Item> beyonderAbilities = BeyonderUtil.getAbilities(player);
         if (player instanceof Player pPlayer) {
             for (Item item : beyonderAbilities) {
@@ -117,6 +118,7 @@ public class RebootSelf extends SimpleAbilityItem {
         int health = tag.getInt("monsterRebootHealth");
         int spirituality = tag.getInt("monsterRebootSpirituality");
         int effectCount = tag.getInt("monsterRebootPotionEffectsCount");
+        int ageDecay = tag.getInt("monsterRebootAgeDecay");
         for (int i = 0; i < effectCount; i++) {
             CompoundTag effectTag = tag.getCompound("monsterRebootPotionEffect_" + i);
             MobEffectInstance effect = MobEffectInstance.load(effectTag);
@@ -124,6 +126,7 @@ public class RebootSelf extends SimpleAbilityItem {
                 player.addEffect(effect);
             }
         }
+        tag.putInt("ageDecay", ageDecay);
         tag.putInt("age", age);
         tag.putDouble("sanity", sanity);
         tag.putDouble("corruption", corruption);

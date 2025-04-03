@@ -22,8 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -93,7 +91,7 @@ public class PsycheStorm extends SimpleAbilityItem {
             int duration = 200 - (sequence * 20);
             AABB boundingBox = new AABB(targetPos).inflate(radius);
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, LivingEntity::isAlive).forEach(livingEntity -> {
-                if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
+                if (livingEntity != player && !BeyonderUtil.areAllies(player, livingEntity)) {
                     double corruption = livingEntity.getPersistentData().getDouble("corruption");
                     BeyonderUtil.applyMentalDamage(player, livingEntity, damage);
                     livingEntity.getPersistentData().putDouble("corruption", corruption + corruptionAddition);

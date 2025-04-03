@@ -186,7 +186,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
     public static void equipSilverArmor(LivingEntity user, LivingEntity targetEntity) {
         if (targetEntity.level().isClientSide()) return;
         if (user.getPersistentData().getBoolean("mercuryLiquefication")) {
-            if (BeyonderUtil.isAllyOf(user, targetEntity)) {
+            if (BeyonderUtil.areAllies(user, targetEntity)) {
                 if (user != targetEntity) {
                     long currentTime = System.currentTimeMillis();
                     if (currentTime - lastActivationTime >= COOLDOWN_MS) {

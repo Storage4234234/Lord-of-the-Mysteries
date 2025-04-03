@@ -55,7 +55,7 @@ public class SwordOfTwilight extends SwordItem implements GeoItem {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int itemSlot, boolean isSelected) {
         if (entity instanceof LivingEntity livingEntity && !level.isClientSide()) {
             if (livingEntity.tickCount % 20 == 0 && !livingEntity.level().isClientSide()) {
-                if (!BeyonderUtil.currentPathwayAndSequenceMatches(livingEntity, BeyonderClassInit.WARRIOR.get(), 1)) {
+                if (!BeyonderUtil.currentPathwayAndSequenceMatches(livingEntity, BeyonderClassInit.WARRIOR.get(), 2)) {
                     removeItemFromSlot(livingEntity, stack);
                 } else {
                     if (BeyonderUtil.getSpirituality(livingEntity) >= 150) {

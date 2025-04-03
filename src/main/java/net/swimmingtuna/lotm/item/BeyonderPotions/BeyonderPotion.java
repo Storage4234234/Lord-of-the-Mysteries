@@ -38,7 +38,8 @@ public class BeyonderPotion extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         if (level.isClientSide) return InteractionResultHolder.pass(itemStack);
-        if (BeyonderUtil.currentPathwayAndSequenceMatchesNoException(player, beyonderClassSupplier.get(), sequence + 1)) {
+
+        if (BeyonderUtil.currentPathwayAndSequenceMatchesNoException(player, beyonderClassSupplier.get(), sequence + 1) || (sequence == 9 && BeyonderUtil.getPathway(player) == null)) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             MobEffectInstance blindnessEffect = new MobEffectInstance(MobEffects.BLINDNESS, effectDurations.get(sequence), 1);
             blindnessEffect.setCurativeItems(List.of());

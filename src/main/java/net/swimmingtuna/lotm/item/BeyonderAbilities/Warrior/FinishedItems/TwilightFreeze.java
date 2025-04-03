@@ -76,7 +76,7 @@ public class TwilightFreeze extends SimpleAbilityItem {
 
     public static void saveDataReboot(LivingEntity livingEntity, LivingEntity target, CompoundTag tag) {
         if (!livingEntity.level().isClientSide()) {
-            if (livingEntity == target || BeyonderUtil.isAllyOf(livingEntity, target)) {
+            if (livingEntity == target || BeyonderUtil.areAllies(livingEntity, target)) {
                 Collection<MobEffectInstance> activeEffects = target.getActiveEffects();
                 tag.putInt("twilightFreezeCooldown", (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TWILIGHTFREEZE.get()));
                 tag.putInt("twilightPotionEffectsCount", activeEffects.size());

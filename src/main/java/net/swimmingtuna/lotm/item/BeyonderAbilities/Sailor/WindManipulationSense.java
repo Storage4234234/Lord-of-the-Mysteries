@@ -94,7 +94,7 @@ public class WindManipulationSense extends SimpleAbilityItem {
         BeyonderUtil.useSpirituality(livingEntity, 1);
         double radius = 100 - (BeyonderUtil.getSequence(livingEntity) * 10);
         for (Player otherPlayer : livingEntity.level().getEntitiesOfClass(Player.class, livingEntity.getBoundingBox().inflate(radius))) {
-            if (otherPlayer == livingEntity || BeyonderUtil.isAllyOf(livingEntity, otherPlayer)) {
+            if (otherPlayer == livingEntity || BeyonderUtil.areAllies(livingEntity, otherPlayer)) {
                 continue;
             }
             Vec3 directionToPlayer = otherPlayer.position().subtract(livingEntity.position()).normalize();

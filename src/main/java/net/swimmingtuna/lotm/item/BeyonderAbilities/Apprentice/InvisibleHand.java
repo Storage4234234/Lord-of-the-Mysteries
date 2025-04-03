@@ -142,7 +142,7 @@ public class InvisibleHand extends SimpleAbilityItem {
                         double y = blockHit.getLocation().y();
                         double z = blockHit.getLocation().z();
                         target.teleportTo(x, y, z);
-                        if (BeyonderUtil.isAllyOf(livingEntity, target)) {
+                        if (BeyonderUtil.areAllies(livingEntity, target)) {
                             target.fallDistance = 0;
                         } else {
                             target.fallDistance = (float) (target.getY() - target.level().getHeight(Heightmap.Types.WORLD_SURFACE, (int) x, (int) y));

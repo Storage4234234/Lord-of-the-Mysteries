@@ -72,7 +72,7 @@ public class EnableOrDisableProtection extends SimpleAbilityItem {
             if (tag.getBoolean("warriorProtection")) {
                 int sequence = BeyonderUtil.getSequence(entity);
                 for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(300 - (sequence * 45)))) {
-                    if (BeyonderUtil.isAllyOf(entity, livingEntity) && livingEntity != entity) {
+                    if (BeyonderUtil.areAllies(entity, livingEntity) && livingEntity != entity) {
                         livingEntity.getPersistentData().putInt("guardianProtectionTimer", 10);
                         livingEntity.getPersistentData().putUUID("guardianProtection", entity.getUUID());
                     }

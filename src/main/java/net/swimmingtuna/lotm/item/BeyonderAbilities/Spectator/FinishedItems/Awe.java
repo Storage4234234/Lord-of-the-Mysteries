@@ -8,13 +8,10 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -53,7 +50,7 @@ public class Awe extends SimpleAbilityItem {
             float damage = (float) (17.0 * (Math.max(1, dir * 0.5)) - (sequence * 1.2));
             int duration = (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.AWE.get());
             for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(radius))) {
-                if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
+                if (entity != livingEntity && !BeyonderUtil.areAllies(livingEntity, entity)) {
                     entity.addEffect((new MobEffectInstance(ModEffects.AWE.get(), duration, 1, false, false)));
                     BeyonderUtil.applyMentalDamage(livingEntity, entity, damage);
                 }

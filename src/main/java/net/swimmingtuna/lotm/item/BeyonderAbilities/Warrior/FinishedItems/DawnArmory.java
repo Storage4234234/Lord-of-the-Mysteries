@@ -113,6 +113,7 @@ public class DawnArmory extends SimpleAbilityItem {
                 BeyonderUtil.useSpirituality(entity, 40 - (BeyonderUtil.getSequence(entity) * 3));
             }
         }
+        DawnWeaponry.removeDawnArmor(entity);
     }
 
     private static ItemStack createEnchantedArmor(ItemStack armor) {

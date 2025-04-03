@@ -69,6 +69,9 @@ public class CorruptionAndLuckHandler {
                 tag.putDouble("corruption", corruption - 1);
             }
             if (corruption >= 1) {
+                if (livingEntity instanceof Player player && player.tickCount % 20 == 0) {
+                    player.displayClientMessage(Component.literal("You're corrupted with a value of " + corruption + " / 100").withStyle(BeyonderUtil.corruptionStyle(livingEntity)), true);
+                }
                 spawnCorruptionParticles(livingEntity, corruption);
             }
             if (livingEntity.tickCount % 20 == 0) {

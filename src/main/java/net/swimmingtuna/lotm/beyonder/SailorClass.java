@@ -34,12 +34,12 @@ import net.swimmingtuna.lotm.util.BeyonderUtil;
 import java.util.List;
 
 public class SailorClass implements BeyonderClass {
-    private int dolhpinsGrace;
-    private int speed;
-    private int strength;
-    private int haste;
-    private int resistance;
-    private int regeneration;
+    public static int dolhpinsGrace;
+    public static int speed;
+    public static int strength;
+    public static int haste;
+    public static int resistance;
+    public static int regeneration;
 
     @Override
     public List<String> sequenceNames() {

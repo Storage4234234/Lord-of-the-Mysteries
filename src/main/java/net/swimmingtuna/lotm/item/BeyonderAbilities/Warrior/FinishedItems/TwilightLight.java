@@ -78,7 +78,7 @@ public class TwilightLight extends SimpleAbilityItem {
                 tag.putInt("twilightLightArea", 0);
             }
             for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(y))) {
-                if (living != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, living)) {
+                if (living != livingEntity && !BeyonderUtil.areAllies(livingEntity, living)) {
                     living.getPersistentData().putInt("age", living.getPersistentData().getInt("age") + 4);
                     if (living instanceof Player player) {
                         if (player.tickCount % 10 == 0) {

@@ -87,9 +87,8 @@ public class ExtremeColdness extends SimpleAbilityItem {
             AABB areaOfEffect = livingEntity.getBoundingBox().inflate(extremeColdness);
             List<LivingEntity> entities = livingEntity.level().getEntitiesOfClass(LivingEntity.class, areaOfEffect);
             for (LivingEntity entity : entities) {
-                if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
-                    int affectedBySailorExtremeColdness = entity.getPersistentData().getInt("affectedBySailorExtremeColdness");
-                    entity.getPersistentData().putInt("affectedBySailorExtremeColdness", affectedBySailorExtremeColdness + 1);
+                if (entity != livingEntity && !BeyonderUtil.areAllies(livingEntity, entity) && entity.getPersistentData().getInt("affectedBySailorExtremeColdness") == 0) {
+                    entity.getPersistentData().putInt("affectedBySailorExtremeColdness", 20);
                     entity.setTicksFrozen(1);
                 }
             }
@@ -98,7 +97,7 @@ public class ExtremeColdness extends SimpleAbilityItem {
                 if (!(entity instanceof LivingEntity)) {
                     int affectedBySailorColdness = entity.getPersistentData().getInt("affectedBySailorColdness");
                     entity.getPersistentData().putInt("affectedBySailorColdness", affectedBySailorColdness + 1);
-                    if (affectedBySailorColdness == 10) {
+                    if (affectedBySailorColdness >= 1 && entity.tickCount % 10 == 0 ) {
                         entity.setDeltaMovement(entity.getDeltaMovement().x() / 5, entity.getDeltaMovement().y() / 5, entity.getDeltaMovement().z() / 5);
                         entity.hurtMarked = true;
                         entity.getPersistentData().putInt("affectedBySailorColdness", 0);
@@ -136,7 +135,8 @@ public class ExtremeColdness extends SimpleAbilityItem {
         CompoundTag tag = entity.getPersistentData();
         if (!entity.level().isClientSide()) {
             int affectedBySailorExtremeColdness = tag.getInt("affectedBySailorExtremeColdness");
-            if (!entity.level().isClientSide()) {
+            if (!entity.level().isClientSide() && affectedBySailorExtremeColdness >= 1) {
+                tag.putInt("affectedBySailorExtremeColdness", affectedBySailorExtremeColdness - 1);
                 if (entity instanceof Player player) {
                     player.setTicksFrozen(3);
                 }
@@ -152,7 +152,6 @@ public class ExtremeColdness extends SimpleAbilityItem {
                 if (affectedBySailorExtremeColdness >= 20) {
                     entity.addEffect(new MobEffectInstance(ModEffects.AWE.get(), 100, 1, false, false));
                     tag.putInt("affectedBySailorExtremeColdness", 0);
-                    affectedBySailorExtremeColdness = 0;
                     entity.hurt(entity.damageSources().freeze(), 30);
                 }
             }

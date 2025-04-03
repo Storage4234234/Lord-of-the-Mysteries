@@ -264,7 +264,7 @@ public class ServerEvents {
                 }
             }
             if (targetPlayer != null) {
-                if(BeyonderUtil.isAllyOf(targetPlayer, event.getPlayer())){
+                if(BeyonderUtil.areAllies(targetPlayer, event.getPlayer())){
                     int x = (int)targetPlayer.getX();
                     int y = (int)targetPlayer.getY();
                     int z = (int)targetPlayer.getZ();

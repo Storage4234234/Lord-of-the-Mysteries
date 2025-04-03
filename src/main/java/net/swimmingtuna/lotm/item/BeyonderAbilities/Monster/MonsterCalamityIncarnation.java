@@ -269,7 +269,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
             if (entity instanceof Player player) {
                 int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getSequence();
                 for (LivingEntity livingEntity : entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate((150 - (sequence * 20)) + (enhancement * 40)))) {
-                    if (livingEntity != entity && !BeyonderUtil.isAllyOf(entity, livingEntity)) {
+                    if (livingEntity != entity && !BeyonderUtil.areAllies(entity, livingEntity)) {
                         if (sequence >= 4) {
                             livingEntity.addEffect(new MobEffectInstance(MobEffects.WITHER, 40, 2 + enhancement, false, false));
                             livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, enhancement, false, false));

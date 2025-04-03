@@ -248,7 +248,7 @@ public class LightningEntity extends AbstractHurtingProjectile {
             this.positions.add(newPos);
         }
 
-        if (!this.level().isClientSide()) {
+        if (!this.level().isClientSide() && this.tickCount >= 2) {
             float detectionRadius = getDamage() * 0.25f;
             AABB detectionBox = new AABB(lastPos.x - detectionRadius, lastPos.y - detectionRadius, lastPos.z - detectionRadius, lastPos.x + detectionRadius, lastPos.y + detectionRadius, lastPos.z + detectionRadius
             );
@@ -270,35 +270,36 @@ public class LightningEntity extends AbstractHurtingProjectile {
         }
 
         boolean hasExploded = false;
-
-        for (int i = 0; i < this.positions.size() - 1 && !hasExploded; i++) {
-            Vec3 pos1 = this.positions.get(i);
-            Vec3 pos2 = this.positions.get(i + 1);
-            double distance = pos1.distanceTo(pos2);
-            Vec3 direction = pos2.subtract(pos1).normalize();
-            for (double d = 0; d < distance && !hasExploded; d += 3.0) {
-                Vec3 currentPos = pos1.add(direction.scale(d));
-                AABB checkArea = createBoundingBox(currentPos);
-                if (!this.level().isClientSide()) {
-                    for (BlockPos blockPos : BlockPos.betweenClosed(new BlockPos((int) checkArea.minX, (int) checkArea.minY, (int) checkArea.minZ), new BlockPos((int) checkArea.maxX, (int) checkArea.maxY, (int) checkArea.maxZ))) {
-                        if (!this.level().getBlockState(blockPos).isAir() && !this.level().getBlockState(blockPos).getBlock().equals(Blocks.WATER)) {
-                            Vec3 hitPos = currentPos;
-                            explodeLightningBlock(BlockPos.containing(hitPos), getDamage() * 0.25);
-                            hasExploded = true;
-                            this.discard();
-                            break;
+        if (this.tickCount >= 2) {
+            for (int i = 0; i < this.positions.size() - 1 && !hasExploded; i++) {
+                Vec3 pos1 = this.positions.get(i);
+                Vec3 pos2 = this.positions.get(i + 1);
+                double distance = pos1.distanceTo(pos2);
+                Vec3 direction = pos2.subtract(pos1).normalize();
+                for (double d = 0; d < distance && !hasExploded; d += 3.0) {
+                    Vec3 currentPos = pos1.add(direction.scale(d));
+                    AABB checkArea = createBoundingBox(currentPos);
+                    if (!this.level().isClientSide()) {
+                        for (BlockPos blockPos : BlockPos.betweenClosed(new BlockPos((int) checkArea.minX, (int) checkArea.minY, (int) checkArea.minZ), new BlockPos((int) checkArea.maxX, (int) checkArea.maxY, (int) checkArea.maxZ))) {
+                            if (!this.level().getBlockState(blockPos).isAir() && !this.level().getBlockState(blockPos).getBlock().equals(Blocks.WATER)) {
+                                Vec3 hitPos = currentPos;
+                                explodeLightningBlock(BlockPos.containing(hitPos), getDamage() * 0.25);
+                                hasExploded = true;
+                                this.discard();
+                                break;
+                            }
                         }
                     }
+                    double offsetX = random.nextGaussian() * 1;
+                    double offsetY = random.nextGaussian() * 1;
+                    double offsetZ = random.nextGaussian() * 1;
+                    if (level() instanceof ServerLevel serverLevel) {
+                        serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, checkArea.minX + offsetX, checkArea.minY + offsetY, checkArea.minZ + offsetZ, 0, 0, 0, 0, 0);
+                        serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, checkArea.minX + offsetX, checkArea.minY + offsetY, checkArea.minZ + offsetZ, 0, 0, 0, 0, 0);
+                    }
                 }
-                double offsetX = random.nextGaussian() * 1;
-                double offsetY = random.nextGaussian() * 1;
-                double offsetZ = random.nextGaussian() * 1;
-                if (level() instanceof ServerLevel serverLevel) {
-                    serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, checkArea.minX + offsetX, checkArea.minY + offsetY, checkArea.minZ + offsetZ, 0, 0, 0, 0, 0);
-                    serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, checkArea.minX + offsetX, checkArea.minY + offsetY, checkArea.minZ + offsetZ, 0, 0, 0, 0, 0);
-                }
+                if (hasExploded) break;
             }
-            if (hasExploded) break;
         }
 
         this.setPos(startPos.x, startPos.y, startPos.z);
@@ -502,7 +503,7 @@ public class LightningEntity extends AbstractHurtingProjectile {
             if (entity instanceof LivingEntity livingEntity) {
                 if (this.getOwner() == null) {
                     if (!BeyonderUtil.isBeyonderCapable(livingEntity)) {
-                        livingEntity.hurt(livingEntity.damageSources().lightningBolt(), (float) (Math.max((double) getDamage() / 5, getDamage() - (entity.distanceToSqr(hitPos.getCenter())))));
+                        livingEntity.hurt(livingEntity.damageSources().lightningBolt(), (float) ((Math.max((double) getDamage() / 5, getDamage() - (entity.distanceToSqr(hitPos.getCenter()))))) * 1.5f);
                     } else {
                         livingEntity.hurt(livingEntity.damageSources().lightningBolt(), (float) (Math.max((double) getDamage() / 5, (getDamage() - (entity.distanceToSqr(hitPos.getCenter()))) * 2)));
                     }

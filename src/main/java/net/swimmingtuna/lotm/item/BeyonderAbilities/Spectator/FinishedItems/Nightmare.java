@@ -97,12 +97,12 @@ public class Nightmare extends SimpleAbilityItem {
         level.getEntitiesOfClass(LivingEntity.class, boundingBox, LivingEntity::isAlive).forEach(living -> {
            String name = living.getDisplayName().getString();
            CompoundTag tag = living.getPersistentData();
-           if (living != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, living)) {
+           if (living != livingEntity && !BeyonderUtil.areAllies(livingEntity, living)) {
                living.addEffect(new MobEffectInstance(MobEffects.DARKNESS, duration, 1, false, false));
                if (tag.getInt("NightmareTimer") < 300) {
                    int addToAmount = sequence < 3 ? 200 : 100;
                    tag.putInt("NightmareTimer", addToAmount);
-                   livingEntity.sendSystemMessage(Component.literal(name + "'s nightmare value is " + tag.getInt("NightmareTimer" + " / 300")));
+                   livingEntity.sendSystemMessage(Component.literal(name + "'s nightmare value is " + tag.getInt("NightmareTimer") + " / 300"));
                } else {
                    tag.putInt("NightmareTimer", 0);
                    BeyonderUtil.applyMentalDamage(livingEntity, living, damagePlayer);
@@ -124,7 +124,7 @@ public class Nightmare extends SimpleAbilityItem {
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, entity -> entity.isAlive()).forEach(livingEntity -> {
                 AttributeInstance nightmareAttribute = livingEntity.getAttribute(ModAttributes.NIGHTMARE.get());
                 String playerName = livingEntity.getDisplayName().getString();
-                if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
+                if (livingEntity != player && !BeyonderUtil.areAllies(player, livingEntity)) {
                     livingEntity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, duration, 1, false, false));
                     if (livingEntity instanceof Player) {
                         if (nightmareAttribute.getValue() < 3) {

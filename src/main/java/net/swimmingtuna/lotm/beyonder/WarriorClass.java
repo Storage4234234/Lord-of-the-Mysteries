@@ -422,11 +422,12 @@ public class WarriorClass implements BeyonderClass {
                 physicalReduction *= 0.5f;
                 supernaturalReduction *= 0.5f;
             }
+            float maxReduction = Math.max(0.3f, Math.min(0.7f, (10 - sequence) * 0.075f));
             if (isPhysical) {
-                float finalReduction = Math.min(physicalReduction, 0.7f);
+                float finalReduction = Math.min(physicalReduction, maxReduction);
                 event.setAmount(amount * (1.0f - finalReduction));
             } else if (isSupernatural) {
-                float finalReduction = Math.min(supernaturalReduction, 0.7f);
+                float finalReduction = Math.min(supernaturalReduction, maxReduction);
                 event.setAmount(amount * (1.0f - finalReduction));
             }
         }

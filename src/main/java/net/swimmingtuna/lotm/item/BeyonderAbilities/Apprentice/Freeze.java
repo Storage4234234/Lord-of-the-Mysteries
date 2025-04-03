@@ -12,7 +12,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -68,7 +67,7 @@ public class Freeze extends SimpleAbilityItem {
     public static void freezeAura(LivingEntity livingEntity) {
         int damage =(int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TRICKFREEZE.get());
         for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(damage))) {
-            if (living != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, living)) {
+            if (living != livingEntity && !BeyonderUtil.areAllies(livingEntity, living)) {
                 living.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TRICKFREEZE.get()) / 3, 2, false, false));
             }
         }

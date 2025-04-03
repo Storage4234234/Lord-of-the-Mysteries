@@ -9,9 +9,11 @@ import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -28,6 +30,7 @@ import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 import static net.swimmingtuna.lotm.util.BeyonderUtil.removePathway;
@@ -61,6 +64,47 @@ public class FateReincarnation extends SimpleAbilityItem {
                 player.getPersistentData().putBoolean("monsterReincarnation", true);
             } else {
                 player.getPersistentData().putBoolean("monsterReincarnation", false);
+            }
+        }
+    }
+
+    private static void restoreDataReboot(LivingEntity player, CompoundTag tag) {
+        for (MobEffectInstance activeEffect : new ArrayList<>(player.getActiveEffects())) {
+            player.removeEffect(activeEffect.getEffect());
+        }
+        int age = tag.getInt("monsterRebootAge");
+        int sanity = tag.getInt("monsterRebootSanity");
+        int luck = tag.getInt("monsterRebootLuck");
+        int misfortune = tag.getInt("monsterRebootMisfortune");
+        int corruption = tag.getInt("monsterRebootCorruption");
+        int health = tag.getInt("monsterRebootHealth");
+        int spirituality = tag.getInt("monsterRebootSpirituality");
+        int effectCount = tag.getInt("monsterRebootPotionEffectsCount");
+        int ageDecay = tag.getInt("monsterRebootAgeDecay");
+        for (int i = 0; i < effectCount; i++) {
+            CompoundTag effectTag = tag.getCompound("monsterRebootPotionEffect_" + i);
+            MobEffectInstance effect = MobEffectInstance.load(effectTag);
+            if (effect != null) {
+                player.addEffect(effect);
+            }
+        }
+        tag.putInt("ageDecay", ageDecay);
+        tag.putInt("age", age);
+        tag.putDouble("sanity", sanity);
+        tag.putDouble("corruption", corruption);
+        tag.putDouble("luck", luck);
+        tag.putDouble("misfortune", misfortune);
+        BeyonderUtil.setSpirituality(player, spirituality);
+        player.setHealth(Math.max(1, health));
+        List<Item> beyonderAbilities = BeyonderUtil.getAbilities(player);
+        for (Item item : beyonderAbilities) {
+            if (player instanceof Player pPlayer) {
+                if (item instanceof SimpleAbilityItem simpleAbilityItem) {
+                    String itemCooldowns = item.getDescription().toString();
+                    float savedCooldownPercent = tag.getFloat("monsterRebootCooldown" + itemCooldowns);
+                    int remainingCooldownTicks = (int) (simpleAbilityItem.getCooldown() * savedCooldownPercent);
+                    pPlayer.getCooldowns().addCooldown(item, remainingCooldownTicks);
+                }
             }
         }
     }
@@ -122,7 +166,7 @@ public class FateReincarnation extends SimpleAbilityItem {
                 }
                 if (x >= 7140) {
                     scaleData.setScale(0.2f);
-                    removePathway(livingEntity);
+                    removePathwayForMonster(livingEntity);
                 }
                 if (x >= 7010 && x <= 7139) {
                     scaleData.setScale(0.25f);

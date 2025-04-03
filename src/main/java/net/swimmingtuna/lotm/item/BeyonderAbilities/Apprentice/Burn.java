@@ -52,7 +52,7 @@ public class Burn extends SimpleAbilityItem {
                     float scale = ScaleTypes.BASE.getScaleData(projectile).getScale();
                     int minDistanceToAlly = Integer.MAX_VALUE;
                     for (LivingEntity living : projectile.level().getEntitiesOfClass(LivingEntity.class, projectile.getBoundingBox().inflate(100))) {
-                        if (living == livingEntity || BeyonderUtil.isAllyOf(livingEntity, living)) {
+                        if (living == livingEntity || BeyonderUtil.areAllies(livingEntity, living)) {
                             int currentDistance = (int) projectile.distanceTo(living);
                             minDistanceToAlly = Math.min(minDistanceToAlly, currentDistance);
                         }

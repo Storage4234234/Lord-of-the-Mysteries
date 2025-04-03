@@ -14,7 +14,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -56,7 +55,7 @@ public class LuckChanneling extends SimpleAbilityItem {
                         if (living == player) {
                             living.getPersistentData().putDouble("luck", newLuck / 2);
                             luckBottleAmount += (newLuck);
-                        } else if (!BeyonderUtil.isAllyOf(player, living)) {
+                        } else if (!BeyonderUtil.areAllies(player, living)) {
                             luckBottleAmount += newLuck;
                             living.getPersistentData().putDouble("luck", 0);
                         }

@@ -85,7 +85,9 @@ public class MeteorEntity extends AbstractHurtingProjectile {
                     this.explodeMeteorBlock(hitPos, radius, scale);
                 }
             }
-            Objects.requireNonNull(this.getOwner()).getPersistentData().putInt("calamityIncarnationInMeteor", 0);
+            if (this.getOwner() != null) {
+                this.getOwner().getPersistentData().putInt("calamityIncarnationInMeteor", 0);
+            }
             explodeMeteorBlock(hitPos, radius, scale);
             this.discard();
         }

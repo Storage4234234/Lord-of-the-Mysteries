@@ -216,7 +216,7 @@ public class TsunamiSeal extends SimpleAbilityItem {
         );
         player.level().getEntitiesOfClass(LivingEntity.class, tsunamiAABB).forEach(livingEntity -> {
             if (livingEntity != player) {
-                if (livingEntity.getMaxHealth() >= 100 || livingEntity instanceof Player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
+                if (livingEntity.getMaxHealth() >= 100 || livingEntity instanceof Player && !BeyonderUtil.areAllies(player, livingEntity)) {
                     player.getPersistentData().putInt("sailorTsunamiSeal", 0);
                     livingEntity.getPersistentData().putInt("sailorSeal", 1200);
                     livingEntity.getPersistentData().putInt("sailorSealX", (int) livingEntity.getX());

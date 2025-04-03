@@ -163,6 +163,20 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
                     interactionTarget.spawnAtLocation(armorPiece);
                     interactionTarget.setItemSlot(randomArmorSlot, ItemStack.EMPTY);
                 }
+                if (sequence <= 2) {
+                    if (!equippedArmor.isEmpty()) {
+                        EquipmentSlot randomArmorSlot = equippedArmor.get(random.nextInt(equippedArmor.size()));
+                        ItemStack armorPiece = interactionTarget.getItemBySlot(randomArmorSlot);
+                        interactionTarget.spawnAtLocation(armorPiece);
+                        interactionTarget.setItemSlot(randomArmorSlot, ItemStack.EMPTY);
+                    }
+                }
+                double x = interactionTarget.getX() - player.getX();
+                double y = interactionTarget.getY() - player.getY();
+                double z = interactionTarget.getZ() - player.getZ();
+                double magnitude = Math.sqrt(x * x + y * y + z * z);
+                interactionTarget.setDeltaMovement(x / magnitude * 4, y / magnitude * 4, z / magnitude * 4);
+                interactionTarget.hurtMarked = true;
             } else if (misfortuneManipulation == 8) {
                 tag.putInt("luckIgnoreAbility", tag.getInt("luckIgnoreAbility") + 1);
             } else if (misfortuneManipulation == 9) {

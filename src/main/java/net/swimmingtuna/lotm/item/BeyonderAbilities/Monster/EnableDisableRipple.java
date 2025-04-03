@@ -106,7 +106,7 @@ public class EnableDisableRipple extends SimpleAbilityItem {
             }
             for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENABLEDISABLERIPPLE.get())))) {
                 Random random = new Random();
-                if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity) && livingEntity.getMaxHealth() >= 15) {
+                if (livingEntity != player && !BeyonderUtil.areAllies(player, livingEntity) && livingEntity.getMaxHealth() >= 15) {
                     int randomInt = random.nextInt(14);
                     if (randomInt == 0) {
                         livingEntity.hurt(livingEntity.damageSources().generic(), livingEntity.getMaxHealth() / (10 - enhancement));

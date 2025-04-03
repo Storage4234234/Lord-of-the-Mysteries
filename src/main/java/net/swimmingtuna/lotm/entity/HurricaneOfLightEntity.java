@@ -317,8 +317,8 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             if (this.tickCount % 15 == 0) {
                 if (getDestroyArmor()) {
                     for (ItemStack armor : livingEntity.getArmorSlots()) {
-                        if (!armor.isEmpty()) {
-                            armor.hurtAndBreak(30, livingEntity, (player) -> player.broadcastBreakEvent(Objects.requireNonNull(armor.getEquipmentSlot())));
+                        if (!armor.isEmpty() && armor.getEquipmentSlot() != null) {
+                            armor.hurtAndBreak(30, livingEntity, (player) -> player.broadcastBreakEvent(armor.getEquipmentSlot()));
                         }
                     }
                     livingEntity.addEffect(new MobEffectInstance(ModEffects.ARMOR_WEAKNESS.get(), 200, amplifier, true, true));
@@ -338,7 +338,7 @@ public class HurricaneOfLightEntity extends AbstractHurtingProjectile {
             livingEntity.hurt(livingEntity.damageSources().generic(), ((float) getHurricaneRadius() * damageMultiplier / 2) / 6);
             if (this.tickCount % 15 == 0) {
                 if (this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
-                    if (!BeyonderUtil.isAllyOf(owner, livingEntity) && getAge()) {
+                    if (!BeyonderUtil.areAllies(owner, livingEntity) && getAge()) {
                         livingEntity.getPersistentData().putInt("age", livingEntity.getPersistentData().getInt("age") + 40);
                         if (livingEntity instanceof Player player) {
                             player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);

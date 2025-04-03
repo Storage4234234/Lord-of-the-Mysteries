@@ -54,7 +54,7 @@ public class DivineHandLeftEntity extends AbstractHurtingProjectile implements G
         if (!this.level().isClientSide()) {
             Entity entity = pResult.getEntity();
             if (entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity owner ) {
-                if (livingEntity != owner && !BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                if (livingEntity != owner && !BeyonderUtil.areAllies(owner, livingEntity)) {
                     CompoundTag tag = livingEntity.getPersistentData();
                     tag.putInt("age", tag.getInt("age") + 100);
                     if (livingEntity instanceof Player player) {

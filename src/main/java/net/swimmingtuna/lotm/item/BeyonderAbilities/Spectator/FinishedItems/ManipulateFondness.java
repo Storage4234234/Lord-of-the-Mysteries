@@ -8,7 +8,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -54,7 +53,7 @@ public class ManipulateFondness extends SimpleAbilityItem {
     private static void manipulateFondness(LivingEntity player) {
         if (!player.level().isClientSide()) {
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
-                if (entity != player && entity.hasEffect(ModEffects.MANIPULATION.get()) && !BeyonderUtil.isAllyOf(player, entity)) {
+                if (entity != player && entity.hasEffect(ModEffects.MANIPULATION.get()) && !BeyonderUtil.areAllies(player, entity)) {
                     entity.addEffect(new MobEffectInstance(ModEffects.BATTLEHYPNOTISM.get(),(int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MANIPULATE_FONDNESS.get()), 1, false, false));
                     for (Mob mob : entity.level().getEntitiesOfClass(Mob.class, entity.getBoundingBox().inflate(50))) {
                         mob.setTarget(entity);

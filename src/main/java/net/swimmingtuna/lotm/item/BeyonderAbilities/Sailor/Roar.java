@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.entity.RoarEntity;
@@ -55,7 +56,7 @@ public class Roar extends SimpleAbilityItem {
                     forEach(pos -> {
                         if (isInCone(startPos, lookVec, new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5), 0.5) && startPos.distanceTo(new Vec3(pos.getX(), pos.getY(), pos.getZ())) <= 10) {
                             BlockState state = player.level().getBlockState(pos);
-                            if (!state.isAir() && state.getDestroySpeed(player.level(), pos) >= 0) {
+                            if (!state.isAir() && state.getDestroySpeed(player.level(), pos) >= 0 && state.getBlock() != Blocks.BEDROCK) {
                                 player.level().destroyBlock(pos, false);
                             }
                         }

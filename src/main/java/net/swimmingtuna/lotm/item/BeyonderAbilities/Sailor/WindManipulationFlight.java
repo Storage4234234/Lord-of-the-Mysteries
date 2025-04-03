@@ -77,8 +77,10 @@ public class WindManipulationFlight extends SimpleAbilityItem {
         if (!player.level().isClientSide()) {
             boolean canFly = player.getPersistentData().getBoolean("sailorFlight1");
             if (canFly) {
+                player.sendSystemMessage(Component.literal("Wind Manipulation (Flight) turned off").withStyle(ChatFormatting.RED));
                 stopFlying(player);
             } else {
+                player.sendSystemMessage(Component.literal("Wind Manipulation (Flight) turned on").withStyle(ChatFormatting.GREEN));
                 startFlying(player);
             }
         }

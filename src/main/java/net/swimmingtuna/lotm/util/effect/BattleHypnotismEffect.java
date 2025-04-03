@@ -40,7 +40,7 @@ public class BattleHypnotismEffect extends MobEffect {
             return;
         } else if (event.getEntity() instanceof Mob mob && mob.getTarget() != null && mob.getTarget().is(event.getEntity())) {
             for (LivingEntity living : mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(10))) {
-                if (living instanceof Player && !BeyonderUtil.isAllyOf(mob, living)) {
+                if (living instanceof Player && !BeyonderUtil.areAllies(mob, living)) {
                     mob.setTarget(living);
                 }
             }

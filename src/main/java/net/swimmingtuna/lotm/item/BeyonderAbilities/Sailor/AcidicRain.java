@@ -8,7 +8,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -70,7 +69,7 @@ public class AcidicRain extends SimpleAbilityItem {
 
 
         for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(radius1))) {
-            if (entity == livingEntity || BeyonderUtil.isAllyOf(livingEntity, entity)) {
+            if (entity == livingEntity || BeyonderUtil.areAllies(livingEntity, entity)) {
                 continue;
             }
             if (entity.hasEffect(MobEffects.POISON)) {
