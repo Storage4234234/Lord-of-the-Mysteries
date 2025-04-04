@@ -92,7 +92,9 @@ public class TwilightFreeze extends SimpleAbilityItem {
                 double sanity = tag.getDouble("sanity");
                 double corruption = tag.getDouble("corruption");
                 int age = tag.getInt("age");
+                int ageDecay = tag.getInt("ageDecay");
                 tag.putInt("twilightAge", age);
+                tag.putInt("twilightAgeDecay", ageDecay);
                 tag.putInt("twilightLuck", (int) luck);
                 tag.putInt("twilightMisfortune", (int) misfortune);
                 tag.putInt("twilightSanity", (int) sanity);
@@ -109,6 +111,7 @@ public class TwilightFreeze extends SimpleAbilityItem {
         for (MobEffectInstance activeEffect : new ArrayList<>(player.getActiveEffects())) {
             player.removeEffect(activeEffect.getEffect());
         }
+        int ageDecay = tag.getInt("twilightAgeDecay");
         int age = tag.getInt("twilightAge");
         int sanity = tag.getInt("twilightSanity");
         int luck = tag.getInt("twilightLuck");
@@ -124,6 +127,7 @@ public class TwilightFreeze extends SimpleAbilityItem {
                 player.addEffect(effect);
             }
         }
+        tag.putInt("ageDecay", ageDecay);
         tag.putInt("age", age);
         tag.putDouble("sanity", sanity);
         tag.putDouble("corruption", corruption);

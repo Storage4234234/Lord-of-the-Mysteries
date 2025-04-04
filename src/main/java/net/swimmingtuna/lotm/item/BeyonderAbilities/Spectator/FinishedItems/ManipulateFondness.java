@@ -8,6 +8,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -15,12 +16,14 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 public class ManipulateFondness extends SimpleAbilityItem {
 
@@ -67,5 +70,24 @@ public class ManipulateFondness extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        int mobTotalHP = 0;
+        if (target != null && target.hasEffect(ModEffects.MANIPULATION.get())) {
+            int sequence = BeyonderUtil.getSequence(livingEntity);
+            double dreamIntoReality = 1;
+            if (livingEntity instanceof Player) {
+                dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
+            }
+            for (Mob mob : target.level().getEntitiesOfClass(Mob.class, target.getBoundingBox().inflate((20 - sequence) * dreamIntoReality))) {
+                mobTotalHP += (int) (mob.getMaxHealth() / 10);
+                if (mobTotalHP >= 100) {
+                    mobTotalHP = 100;
+                    break;
+                }
+            }
+        } return mobTotalHP;
     }
 }

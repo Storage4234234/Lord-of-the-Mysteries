@@ -92,4 +92,13 @@ public class ApplyManipulation extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
+
+    @Override
+    public int getPriority(LivingEntity user, LivingEntity target) {
+        if (target != null && !target.hasEffect(ModEffects.MANIPULATION.get())) {
+            return 35;
+        } else {
+            return 0;
+        }
+    }
 }

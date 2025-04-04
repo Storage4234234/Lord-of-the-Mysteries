@@ -69,4 +69,13 @@ public class EnvisionDeath extends SimpleAbilityItem {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        float damage = BeyonderUtil.getDamage(livingEntity).get(this);
+        if (target != null && target.getHealth() <= damage) {
+            return 100;
+        } else {
+            return 15;
+        }
+    }
 }

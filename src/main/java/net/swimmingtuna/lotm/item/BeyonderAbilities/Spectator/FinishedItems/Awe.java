@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 public class Awe extends SimpleAbilityItem {
 
@@ -70,5 +72,18 @@ public class Awe extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        double dreamIntoReality = 1;
+        if (livingEntity instanceof Player) {
+            dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
+        }
+        if (target != null && target.distanceTo(livingEntity) <= (18 - BeyonderUtil.getSequence(livingEntity)) * dreamIntoReality) {
+            return (int) (100 - (target.distanceTo(livingEntity) * 2));
+        } else {
+            return 0;
+        }
     }
 }

@@ -1297,6 +1297,19 @@ public class BeyonderUtil {
         }
     }
 
+    public static int getCooldownsForAbility(LivingEntity livingEntity, Item ability) {
+        int cooldown = 0;
+        for (Item item : getAbilities(livingEntity)) {
+            if (item == ability && item instanceof SimpleAbilityItem simpleAbilityItem) {
+                if (livingEntity instanceof Player player) {
+                    int currentCooldown = (int) player.getCooldowns().getCooldownPercent(item, 0);
+                    cooldown = simpleAbilityItem.getCooldown() * (100 - currentCooldown) / 100;
+                }
+            }
+        }
+        return cooldown;
+    }
+
     public static Map<Item, Float> getDamage(LivingEntity livingEntity) {
         Map<Item, Float> damageMap = new HashMap<>();
         Level level = livingEntity.level();
@@ -1305,7 +1318,7 @@ public class BeyonderUtil {
             enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
         }
         double dreamIntoReality;
-        if (livingEntity instanceof Player player) {
+        if (livingEntity instanceof Player) {
             dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
         } else {
             dreamIntoReality = 1;
@@ -2376,8 +2389,8 @@ public class BeyonderUtil {
                 }
             }
             if (age >= 1) {
-                if (livingEntity.tickCount % 1200 == 0) {
-                    tag.putInt("age", Math.max(0, age - sequence));
+                if (livingEntity.tickCount % 20 == 0) {
+                    tag.putInt("age", Math.max(0, age - (10 - sequence)));
                 }
                 if (oneHundredPercent) {
                     tag.putInt("age", 0);

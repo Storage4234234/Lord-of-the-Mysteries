@@ -35,6 +35,7 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
     protected final int cooldown;
     protected final double entityReach;
     protected final double blockReach;
+    protected final int priority = 0;
 
     protected SimpleAbilityItem(Properties properties, BeyonderClass requiredClass, int requiredSequence, int requiredSpirituality, int cooldown) {
         this(properties, () -> requiredClass, requiredSequence, requiredSpirituality, cooldown, 3.0, 4.5);
@@ -56,6 +57,11 @@ public abstract class SimpleAbilityItem extends Item implements Ability {
         this.cooldown = cooldown;
         this.entityReach = entityReach;
         this.blockReach = blockReach;
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return priority;
     }
 
     @Override

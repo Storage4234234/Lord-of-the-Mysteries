@@ -65,4 +65,13 @@ public class EnvisionHealth extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getHealth() <= 25) {
+            return 85;
+        } else {
+            return 25;
+        }
+    }
 }

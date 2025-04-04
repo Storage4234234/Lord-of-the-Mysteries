@@ -46,6 +46,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
+import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.client.Configs;
 import net.swimmingtuna.lotm.entity.EntityGoals.PlayerMobGoals;
 import net.swimmingtuna.lotm.init.EntityInit;
@@ -512,7 +513,9 @@ public class PlayerMobEntity extends Monster implements RangedAttackMob, Crossbo
 
     public void setPathway (BeyonderClass classToBeSet) {
         this.requiredClass = classToBeSet;
+        BeyonderHolder.updateMaxHealthModifier(this, classToBeSet.maxHealth().get(getCurrentSequence()));
     }
+
     public void setSpirituality(int spirituality) {
         this.entityData.set(SPIRITUALITY, spirituality);
     }

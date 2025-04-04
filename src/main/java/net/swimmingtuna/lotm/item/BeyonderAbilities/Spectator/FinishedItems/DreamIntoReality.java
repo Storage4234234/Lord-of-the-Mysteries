@@ -154,4 +154,15 @@ public class DreamIntoReality extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && ((float) BeyonderUtil.getMaxSpirituality(livingEntity) / BeyonderUtil.getSpirituality(livingEntity) >= 0.5f) && BeyonderUtil.getSequence(livingEntity) <= 4 && BeyonderUtil.getSequence(livingEntity) != -1) {
+            return  55;
+        } else if (livingEntity.getPersistentData().getBoolean("CanFly") && BeyonderUtil.getSpirituality(livingEntity) <= 1000) {
+            return  100;
+        } else {
+            return 0;
+        }
+    }
 }

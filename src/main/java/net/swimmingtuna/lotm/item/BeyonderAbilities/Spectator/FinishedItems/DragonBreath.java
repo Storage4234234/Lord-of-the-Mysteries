@@ -57,4 +57,13 @@ public class DragonBreath extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return 65;
+        } else {
+            return 0;
+        }
+    }
 }

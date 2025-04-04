@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -18,6 +19,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
@@ -79,10 +81,31 @@ public class DreamWalking extends SimpleAbilityItem {
             double y = interactionTarget.getY();
             double z = interactionTarget.getZ();
             player.teleportTo(x, y, z);
+            player.getPersistentData().putInt("dreamWalkingDeaggro", 5);
+        }
+    }
+
+    public static void dreamWalkingTick(LivingEvent.LivingTickEvent event) {
+        if (!event.getEntity().level().isClientSide() && event.getEntity().getPersistentData().getInt("dreamWalkingDeaggro") >= 1) {
+            event.getEntity().getPersistentData().putInt("dreamWalkingDeaggro", event.getEntity().getPersistentData().getInt("dreamWalkingDeaggro") - 1);
+            for (Mob mob : event.getEntity().level().getEntitiesOfClass(Mob.class, event.getEntity().getBoundingBox().inflate(5))) {
+                if (mob.getTarget() == event.getEntity()) {
+                    mob.setTarget(null);
+                }
+            }
         }
     }
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && target.getHealth() < livingEntity.getHealth()) {
+            return 80;
+        } else {
+            return 20;
+        }
     }
 }

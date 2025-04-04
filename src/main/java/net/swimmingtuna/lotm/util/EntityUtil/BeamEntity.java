@@ -204,15 +204,22 @@ public abstract class BeamEntity extends LOTMProjectile {
                     if (entity == owner) continue;
                     if (getIsDragonBreath() && this.getOwner() != null && this.getOwner() instanceof LivingEntity livingOwner && entity instanceof LivingEntity livingEntity && !BeyonderUtil.areAllies(livingOwner, livingEntity)) {
                         BeyonderUtil.applyMentalDamage(livingOwner, livingEntity, this.getDamage());
-                    } else if (getIsDragonBreath() && this.getOwner() == null && entity instanceof LivingEntity livingEntity){
+                    } else if (getIsDragonBreath() && this.getOwner() == null && entity instanceof LivingEntity livingEntity) {
                         livingEntity.hurt(livingEntity.damageSources().magic(), getDamage());
-                    } if (getIsTwilight() && entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity pOwner && !BeyonderUtil.areAllies(pOwner, livingEntity)) {
+                    }
+                    if (getIsTwilight() && entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity pOwner && !BeyonderUtil.areAllies(pOwner, livingEntity)) {
                         int age = livingEntity.getPersistentData().getInt("age");
                         livingEntity.hurt(BeyonderUtil.genericSource(owner), 10);
-                        if (livingEntity instanceof Player player) {
-                            player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);
+                        if (this.tickCount % 3 == 0) {
+                            if (livingEntity instanceof Player player) {
+                                player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD), true);
+                            }
+                            if (BeyonderUtil.getSequence(pOwner) != 0) {
+                                livingEntity.getPersistentData().putInt("age", (age + (30 - BeyonderUtil.getSequence(pOwner))) * 9);
+                            } else {
+                                livingEntity.getPersistentData().putInt("age", (age + (50)));
+                            }
                         }
-                        livingEntity.getPersistentData().putInt("age", (age + (30 - BeyonderUtil.getSequence(pOwner))) * 9);
                     }
                     if (entity instanceof LivingEntity livingEntity && getIsDragonBreath() && this.getOwner() != null && this.getOwner() instanceof LivingEntity livingOwner && !BeyonderUtil.areAllies(livingOwner, livingEntity)) {
                         livingEntity.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), getFrenzyTime(), 1, false, false));
@@ -404,7 +411,7 @@ public abstract class BeamEntity extends LOTMProjectile {
         double entityDetectionRadius = radius * 1.5; // Wider radius for entity detection
 
 
-        AABB entityBounds  = new AABB(
+        AABB entityBounds = new AABB(
                 Math.min(from.x, this.collidePosX) - radius * 0.8,
                 Math.min(from.y, this.collidePosY) - radius * 0.8,
                 Math.min(from.z, this.collidePosZ) - radius * 0.8,

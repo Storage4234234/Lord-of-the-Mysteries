@@ -32,7 +32,7 @@ public class EnvisionBarrier extends SimpleAbilityItem {
 
     private final Map<BlockPos, BlockState> replacedBlocks = new HashMap<>();
     private final List<BlockPos> replacedAirBlocks = new ArrayList<>();
-    private BlockPos domeCenter = null;
+    public static BlockPos domeCenter = null;
 
     public EnvisionBarrier(Properties properties) {
         super(properties, BeyonderClassInit.SPECTATOR, 0, 0, 100);
@@ -136,5 +136,22 @@ public class EnvisionBarrier extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getHealth() <= 20) {
+            if (EnvisionBarrier.domeCenter == null) {
+                if (target == null) {
+                    livingEntity.getPersistentData().putInt("BarrierRadius", 10);
+                } else {
+                    livingEntity.getPersistentData().putInt("BarrierRadius", (int) Math.max(0, target.distanceTo(livingEntity) - 5));
+                }
+                return 80;
+            }
+        } else if (EnvisionBarrier.domeCenter != null) {
+            return 100;
+        }
+        return 0;
     }
 }

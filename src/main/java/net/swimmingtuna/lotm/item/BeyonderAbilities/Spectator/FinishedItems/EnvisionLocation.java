@@ -114,4 +114,16 @@ public class EnvisionLocation extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && target.getHealth() <= livingEntity.getHealth()) {
+            livingEntity.getPersistentData().putInt("BlinkDistance", (int) target.distanceTo(livingEntity));
+           return (int) (100 - (target.getHealth()));
+        } else if (livingEntity.getHealth() <= 20) {
+            livingEntity.getPersistentData().putInt("BlinkDistance", 100);
+            return  80;
+        }
+        return 10;
+    }
 }

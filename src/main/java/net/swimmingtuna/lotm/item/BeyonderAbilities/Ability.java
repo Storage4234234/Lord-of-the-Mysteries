@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 public interface Ability {
 
@@ -35,5 +36,8 @@ public interface Ability {
     }
     default float getDamage() {
         return 0.0f;
+    }
+    default int getPriority(LivingEntity user, @Nullable LivingEntity target) {
+        return 0;
     }
 }

@@ -30,12 +30,13 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 public class MindReading extends SimpleAbilityItem {
 
 
     public MindReading(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 8, 20, 60,12,12);
+        super(properties, BeyonderClassInit.SPECTATOR, 8, 20, 60, 12, 12);
     }
 
     @Override
@@ -115,9 +116,22 @@ public class MindReading extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        double dreamIntoReality = 1;
+        if (livingEntity instanceof Player) {
+            dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
+        }
+        if (target != null && dreamIntoReality >= 1) {
+            return 15;
+        }
+        return 0;
     }
 }
 

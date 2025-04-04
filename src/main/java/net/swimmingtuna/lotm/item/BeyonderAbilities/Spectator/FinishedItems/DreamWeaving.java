@@ -167,4 +167,9 @@ public class DreamWeaving extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return 35;
+    }
 }

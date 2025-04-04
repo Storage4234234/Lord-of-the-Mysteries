@@ -169,4 +169,17 @@ public class PsychologicalInvisibility extends SimpleAbilityItem {
         }
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getPersistentData().getBoolean("psychologicalInvisibility") && target == null) {
+            return 100;
+        } else if (!livingEntity.getPersistentData().getBoolean("psychologicalInvisibility")) {
+            if (target == null) {
+                return 50;
+            } else {
+                return 100;
+            }
+        }
+        return 0;
+    }
 }

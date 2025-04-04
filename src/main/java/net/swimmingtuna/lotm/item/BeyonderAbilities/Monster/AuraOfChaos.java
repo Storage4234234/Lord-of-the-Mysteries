@@ -84,7 +84,6 @@ public class AuraOfChaos extends SimpleAbilityItem {
         if (tag.getBoolean("monsterAuraOfChaos")) {
             if (entity instanceof Player player) {
                 BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                int sequence = holder.getSequence();
                 if (player.tickCount % 20 == 0) {
                     if (holder.getSpirituality() >= 150) {
                         holder.useSpirituality(150);
@@ -101,23 +100,23 @@ public class AuraOfChaos extends SimpleAbilityItem {
                     CompoundTag persistentData = livingEntity.getPersistentData();
                     Random random = new Random();
                     int randomInt = random.nextInt(350);
-                    if (livingEntity != entity && !BeyonderUtil.areAllies(player, livingEntity) && entity.tickCount % 200 == 0) {
+                    if (livingEntity != entity && !BeyonderUtil.areAllies(player, livingEntity) && entity.tickCount % 200 == 0 && (BeyonderUtil.getSequence(livingEntity) < 8 && BeyonderUtil.getSequence(livingEntity) != -1 || BeyonderUtil.isBeyonderCapable(livingEntity))) {
                         if (randomInt >= 95 && randomInt <= 100) {
                             int random1 = (int) ((Math.random() * 200) - 100);
-                            MeteorEntity.summonMeteorAtPositionWithScale(entity,  livingEntity.getX() + random1, livingEntity.getY() - 25,livingEntity.getZ() + random1, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), 6 );
+                            MeteorEntity.summonMeteorAtPositionWithScale(entity,  livingEntity.getX() + random1, livingEntity.getY() - 25,livingEntity.getZ() + random1, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), 6 + enhancement );
                         } else if (randomInt >= 89 && randomInt <= 94) {
                             TornadoEntity tornadoEntity = new TornadoEntity(EntityInit.TORNADO_ENTITY.get(), level);
                             tornadoEntity.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
                             tornadoEntity.setTornadoPickup(true);
-                            tornadoEntity.setTornadoLifecount(150);
+                            tornadoEntity.setTornadoLifecount(125 + (enhancement * 25));
                             tornadoEntity.setOwner(entity);
                             tornadoEntity.setTornadoRadius(25);
                             tornadoEntity.setTornadoHeight(50);
                             entity.level().addFreshEntity(tornadoEntity);
                         } else if (randomInt >= 80 && randomInt <= 88) {
-                            persistentData.putInt("luckDoubleDamage", persistentData.getInt("luckDoubleDamage") + 1);
+                            persistentData.putInt("luckDoubleDamage", persistentData.getInt("luckDoubleDamage") + enhancement);
                         } else if (randomInt >= 75 && randomInt <= 87) {
-                            BeyonderUtil.applyMobEffect(livingEntity, MobEffects.POISON, 200, 3, false, false);
+                            BeyonderUtil.applyMobEffect(livingEntity, MobEffects.POISON, 200 * enhancement, 3, false, false);
                         } else if (randomInt >= 60 && randomInt <= 74) {
                             Zombie zombie = new Zombie(EntityType.ZOMBIE, player.level());
                             ItemStack netheriteHelmet = new ItemStack(Items.NETHERITE_HELMET);
@@ -143,27 +142,27 @@ public class AuraOfChaos extends SimpleAbilityItem {
                             zombie.setItemSlot(EquipmentSlot.MAINHAND, netheriteSword);
                             zombie.setBaby(true);
                             zombie.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 100000, 3, true, true));
-                            zombie.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100000, 3, false, false));
+                            zombie.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100000, 3 + enhancement, false, false));
                             zombie.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100000, 2, false, false));
                             zombie.getAttribute(Attributes.MAX_HEALTH).setBaseValue(100);
                             zombie.teleportTo(entity.getX(), entity.getY(), entity.getZ());
                             zombie.setTarget(livingEntity);
                             entity.level().addFreshEntity(zombie);
                         } else if (randomInt >= 40 && randomInt <= 59) {
-                            livingEntity.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 40, 1, false, false));
+                            livingEntity.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 30 + (enhancement * 10), 1, false, false));
                         } else if (randomInt >= 20 && randomInt <= 39) {
                             LightningBolt lightningBolt = new LightningBolt(EntityType.LIGHTNING_BOLT, player.level());
                             lightningBolt.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
-                            lightningBolt.setDamage(15.0f);
+                            lightningBolt.setDamage(20.0f + (enhancement * 5));
                             entity.level().addFreshEntity(lightningBolt);
                         } else {
                             if (livingEntity instanceof Player ppPlayer) {
-                                ppPlayer.getPersistentData().putInt("cantUseAbility", ppPlayer.getPersistentData().getInt("cantUseAbility") + 1);
+                                ppPlayer.getPersistentData().putInt("cantUseAbility", ppPlayer.getPersistentData().getInt("cantUseAbility") + enhancement);
                             } else {
-                                livingEntity.hurt(livingEntity.damageSources().magic(), 15);
+                                livingEntity.hurt(livingEntity.damageSources().magic(), 15 + (enhancement * 5));
                             }
                         }
-                        livingEntity.getPersistentData().putDouble("misfortune", livingEntity.getPersistentData().getDouble("misfortune") + 3);
+                        livingEntity.getPersistentData().putDouble("misfortune", livingEntity.getPersistentData().getDouble("misfortune") + (3 * enhancement));
 
                     }
                 }

@@ -62,4 +62,20 @@ public class Discern extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        int priority = 0;
+        for (Item item : BeyonderUtil.getAbilities(livingEntity)) {
+            int cooldown = BeyonderUtil.getCooldownsForAbility(livingEntity, item);
+            if (cooldown != 0) {
+                priority +=  cooldown / 20;
+            }
+            if (priority >= 100) {
+                priority = 100;
+                break;
+            }
+        }
+        return priority;
+    }
 }

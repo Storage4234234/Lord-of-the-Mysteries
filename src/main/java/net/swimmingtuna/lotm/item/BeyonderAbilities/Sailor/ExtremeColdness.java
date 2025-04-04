@@ -83,7 +83,6 @@ public class ExtremeColdness extends SimpleAbilityItem {
                 extremeColdness = 0;
             }
             tag.putInt("sailorExtremeColdness", extremeColdness + 1);
-
             AABB areaOfEffect = livingEntity.getBoundingBox().inflate(extremeColdness);
             List<LivingEntity> entities = livingEntity.level().getEntitiesOfClass(LivingEntity.class, areaOfEffect);
             for (LivingEntity entity : entities) {

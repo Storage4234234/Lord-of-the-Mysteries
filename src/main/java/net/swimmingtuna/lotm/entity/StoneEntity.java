@@ -172,7 +172,7 @@ public class StoneEntity extends AbstractArrow {
                         this.discard();
                     }
                 }
-                if (this.tickCount >= 480) {
+                if (this.tickCount >= 160) {
                     this.discard();
                 }
             }

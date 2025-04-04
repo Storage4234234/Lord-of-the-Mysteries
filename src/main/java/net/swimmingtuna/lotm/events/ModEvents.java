@@ -67,6 +67,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.StormSeal;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.TsunamiSeal;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.BattleHypnotism;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.DreamWalking;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeDemise;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.PsychologicalInvisibility;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
@@ -411,6 +412,7 @@ public class ModEvents {
                 ProbabilityManipulationInfiniteMisfortune.testEvent(event);
                 probabilityManipulationWorld(livingEntity);
                 CycleOfFate.tickEvent(event);
+                DreamWalking.dreamWalkingTick(event);
                 MonsterClass.dodgeProjectiles(livingEntity);
                 MisfortuneManipulation.livingTickMisfortuneManipulation(event);
                 FalseProphecy.falseProphecyTick(livingEntity);

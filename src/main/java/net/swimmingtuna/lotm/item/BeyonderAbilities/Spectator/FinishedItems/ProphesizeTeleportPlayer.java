@@ -80,4 +80,9 @@ public class ProphesizeTeleportPlayer extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return (int) Math.min(100, livingEntity.getHealth() * 2);
+    }
 }
