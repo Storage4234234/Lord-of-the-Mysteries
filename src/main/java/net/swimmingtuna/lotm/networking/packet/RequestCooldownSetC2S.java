@@ -1,5 +1,6 @@
 package net.swimmingtuna.lotm.networking.packet;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -23,7 +24,14 @@ public class RequestCooldownSetC2S {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (player != null) {
-                setCooldown(player, 2);
+                if (player.getServer() != null) {
+                    boolean isIntegratedServer = player.getServer().isSingleplayer();
+                    int cooldownValue = isIntegratedServer ? 2 : 1;
+                    setCooldown(player, cooldownValue);
+                    setCooldown(player, 2);
+                } else {
+                    setCooldown(player, 2);
+                }
             }
         });
         context.setPacketHandled(true);

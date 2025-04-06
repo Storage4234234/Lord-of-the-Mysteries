@@ -32,17 +32,23 @@ public class ApplyManipulation extends SimpleAbilityItem {
     private final Lazy<Multimap<Attribute, AttributeModifier>> lazyAttributeMap = Lazy.of(this::createAttributeMap);
 
     public ApplyManipulation(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 4, 50, 10,50,50);
+        super(properties, BeyonderClassInit.SPECTATOR, 4, 50, 10,80,50);
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        useSpirituality(player);
-        addCooldown(player);
-        applyManipulation(interactionTarget, player);
+        if (!player.level().isClientSide()) {
+            useSpirituality(player);
+            addCooldown(player);
+            if (!interactionTarget.hasEffect(ModEffects.MANIPULATION.get())) {
+                applyManipulation(interactionTarget, player);
+            } else {
+                player.sendSystemMessage(Component.literal("You're already manipulating " + interactionTarget.getName().getString()).withStyle(BeyonderUtil.getStyle(player)));
+            }
+        }
         return InteractionResult.SUCCESS;
     }
 
@@ -58,8 +64,8 @@ public class ApplyManipulation extends SimpleAbilityItem {
     private Multimap<Attribute, AttributeModifier> createAttributeMap() {
         ImmutableMultimap.Builder<Attribute, AttributeModifier> attributeBuilder = ImmutableMultimap.builder();
         attributeBuilder.putAll(super.getDefaultAttributeModifiers(EquipmentSlot.MAINHAND));
-        attributeBuilder.put(ForgeMod.ENTITY_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_ENTITY_REACH, "Reach modifier", 50, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with entities
-        attributeBuilder.put(ForgeMod.BLOCK_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_BLOCK_REACH, "Reach modifier", 50, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with blocks, p much useless for this item
+        attributeBuilder.put(ForgeMod.ENTITY_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_ENTITY_REACH, "Reach modifier", 80, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with entities
+        attributeBuilder.put(ForgeMod.BLOCK_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_BLOCK_REACH, "Reach modifier", 80, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with blocks, p much useless for this item
         return attributeBuilder.build();
     }
     @Override
@@ -74,7 +80,7 @@ public class ApplyManipulation extends SimpleAbilityItem {
     }
 
 
-    private static void applyManipulation(LivingEntity interactionTarget, Player player) {
+    private static void applyManipulation(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide()) {
             if (!interactionTarget.hasEffect(ModEffects.MANIPULATION.get())) {
                 interactionTarget.addEffect(new MobEffectInstance(ModEffects.MANIPULATION.get(), 600, 1, false, false));
@@ -85,5 +91,14 @@ public class ApplyManipulation extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity user, LivingEntity target) {
+        if (target != null && !target.hasEffect(ModEffects.MANIPULATION.get())) {
+            return 35;
+        } else {
+            return 0;
+        }
     }
 }

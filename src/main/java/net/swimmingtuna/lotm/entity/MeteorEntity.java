@@ -85,7 +85,9 @@ public class MeteorEntity extends AbstractHurtingProjectile {
                     this.explodeMeteorBlock(hitPos, radius, scale);
                 }
             }
-            Objects.requireNonNull(this.getOwner()).getPersistentData().putInt("calamityIncarnationInMeteor", 0);
+            if (this.getOwner() != null) {
+                this.getOwner().getPersistentData().putInt("calamityIncarnationInMeteor", 0);
+            }
             explodeMeteorBlock(hitPos, radius, scale);
             this.discard();
         }
@@ -134,7 +136,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
     }
 
 
-    public static void summonMultipleMeteors(Player player) {
+    public static void summonMultipleMeteors(LivingEntity player) {
         if (!player.level().isClientSide()) {
             double scatterRadius = 100.0;
             double randomX, randomY, randomZ;
@@ -154,9 +156,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
             meteorEntity.teleportTo(meteorSpawnPos.getX(), meteorSpawnPos.getY(), meteorSpawnPos.getZ());
             meteorEntity.setOwner(player);
             meteorEntity.noPhysics = true;
-
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int scalecheck = 10 - holder.getSequence() * 2;
+            int scalecheck = 10 - BeyonderUtil.getSequence(player) * 2;
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(meteorEntity);
             scaleData.setScale(scalecheck);
             scaleData.markForSync(true);

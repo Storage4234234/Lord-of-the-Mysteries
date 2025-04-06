@@ -131,7 +131,7 @@ public class GuardianBoxEntity extends Entity {
                         pPlayer.displayClientMessage(Component.literal(this.getDamage() + " / " + this.getMaxHealth()).withStyle(ChatFormatting.YELLOW), true);
                     }
                     for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getMaxSize() + 3))) {
-                        if (BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                        if (BeyonderUtil.areAllies(owner, livingEntity)) {
                             //possible logic in the future
                         } else {
                             if (livingEntity != owner && this.tickCount % 10 == 0) {
@@ -164,7 +164,7 @@ public class GuardianBoxEntity extends Entity {
                         }
                     }
                     for (Projectile projectile : this.level().getEntitiesOfClass(Projectile.class, this.getBoundingBox().inflate(getMaxSize() + 3))) {
-                        if (projectile.getOwner() == null || (projectile.getOwner() instanceof LivingEntity living && !BeyonderUtil.isAllyOf(owner, living) && !projectile.getOwner().getUUID().equals(ownerUUID))) {
+                        if (projectile.getOwner() == null || (projectile.getOwner() instanceof LivingEntity living && !BeyonderUtil.areAllies(owner, living) && !projectile.getOwner().getUUID().equals(ownerUUID))) {
                             int sequence = 900;
                             if (projectile.getOwner() instanceof LivingEntity living) {
                                 sequence = BeyonderUtil.getSequence(living);
@@ -190,7 +190,7 @@ public class GuardianBoxEntity extends Entity {
                         double centerZ = this.getZ();
                         double teleportDistance = getMaxSize() + 10;
                         for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getMaxSize() + 3))) {
-                            if (!BeyonderUtil.isAllyOf(owner, livingEntity) && livingEntity != owner) {
+                            if (!BeyonderUtil.areAllies(owner, livingEntity) && livingEntity != owner) {
                                 double dx = livingEntity.getX() - centerX;
                                 double dy = livingEntity.getY() - centerY;
                                 double dz = livingEntity.getZ() - centerZ;
@@ -246,7 +246,7 @@ public class GuardianBoxEntity extends Entity {
             if (entity.getPersistentData().contains("divineHandUUID")) {
                 UUID divineHandUUID = entity.getPersistentData().getUUID("divineHandUUID");
                 LivingEntity divineEntity = BeyonderUtil.getEntityFromUUID(entity.level(), divineHandUUID);
-                if (divineEntity != null && divineEntity.isAlive() && divineEntity != entity) {
+                if (divineEntity != null && divineEntity.isAlive() && divineEntity != entity && BeyonderUtil.areAllies(divineEntity, entity)) {
                     divineEntity.hurt(event.getSource(), event.getAmount());
                     event.setAmount(0);
                 }

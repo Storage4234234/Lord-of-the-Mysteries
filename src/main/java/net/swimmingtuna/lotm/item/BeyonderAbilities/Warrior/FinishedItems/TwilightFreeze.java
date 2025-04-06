@@ -40,7 +40,7 @@ public class TwilightFreeze extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -52,7 +52,7 @@ public class TwilightFreeze extends SimpleAbilityItem {
 
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -76,7 +76,7 @@ public class TwilightFreeze extends SimpleAbilityItem {
 
     public static void saveDataReboot(LivingEntity livingEntity, LivingEntity target, CompoundTag tag) {
         if (!livingEntity.level().isClientSide()) {
-            if (livingEntity == target || BeyonderUtil.isAllyOf(livingEntity, target)) {
+            if (livingEntity == target || BeyonderUtil.areAllies(livingEntity, target)) {
                 Collection<MobEffectInstance> activeEffects = target.getActiveEffects();
                 tag.putInt("twilightFreezeCooldown", (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TWILIGHTFREEZE.get()));
                 tag.putInt("twilightPotionEffectsCount", activeEffects.size());
@@ -92,7 +92,9 @@ public class TwilightFreeze extends SimpleAbilityItem {
                 double sanity = tag.getDouble("sanity");
                 double corruption = tag.getDouble("corruption");
                 int age = tag.getInt("age");
+                int ageDecay = tag.getInt("ageDecay");
                 tag.putInt("twilightAge", age);
+                tag.putInt("twilightAgeDecay", ageDecay);
                 tag.putInt("twilightLuck", (int) luck);
                 tag.putInt("twilightMisfortune", (int) misfortune);
                 tag.putInt("twilightSanity", (int) sanity);
@@ -109,6 +111,7 @@ public class TwilightFreeze extends SimpleAbilityItem {
         for (MobEffectInstance activeEffect : new ArrayList<>(player.getActiveEffects())) {
             player.removeEffect(activeEffect.getEffect());
         }
+        int ageDecay = tag.getInt("twilightAgeDecay");
         int age = tag.getInt("twilightAge");
         int sanity = tag.getInt("twilightSanity");
         int luck = tag.getInt("twilightLuck");
@@ -124,6 +127,7 @@ public class TwilightFreeze extends SimpleAbilityItem {
                 player.addEffect(effect);
             }
         }
+        tag.putInt("ageDecay", ageDecay);
         tag.putInt("age", age);
         tag.putDouble("sanity", sanity);
         tag.putDouble("corruption", corruption);
@@ -167,6 +171,32 @@ public class TwilightFreeze extends SimpleAbilityItem {
         attributeBuilder.put(ForgeMod.ENTITY_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_ENTITY_REACH, "Reach modifier", 200, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with entities
         attributeBuilder.put(ForgeMod.BLOCK_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_BLOCK_REACH, "Reach modifier", 200, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with blocks, p much useless for this item
         return attributeBuilder.build();
+    }
+
+    public static void removeTwilightFreezeEffect(LivingEntity living) {
+        if (living.level().isClientSide()) {
+            return;
+        }
+        CompoundTag playerTag = living.getPersistentData();
+        clearTwilightFreezeData(playerTag);
+    }
+
+    private static void clearTwilightFreezeData(CompoundTag tag) {
+        tag.putInt("twilightFreezeCooldown", 0);
+        tag.putInt("inTwilight", 0);
+        tag.remove("twilightAge");
+        tag.remove("twilightLuck");
+        tag.remove("twilightMisfortune");
+        tag.remove("twilightSanity");
+        tag.remove("twilightCorruption");
+        tag.remove("twilightHealth");
+        tag.remove("twilightSpirituality");
+        int effectCount = tag.getInt("twilightPotionEffectsCount");
+        for (int i = 0; i < effectCount; i++) {
+            tag.remove("twilightPotionEffect_" + i);
+        }
+        tag.remove("twilightPotionEffectsCount");
+        tag.remove("twilightFreezeHolder");
     }
 
 

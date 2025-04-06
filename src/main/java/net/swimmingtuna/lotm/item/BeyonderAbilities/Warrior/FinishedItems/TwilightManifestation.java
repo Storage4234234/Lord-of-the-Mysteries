@@ -9,7 +9,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -35,7 +34,7 @@ public class TwilightManifestation extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -68,7 +67,7 @@ public class TwilightManifestation extends SimpleAbilityItem {
                     living.getPersistentData().putDouble("twilightManifestationZ", living.getDeltaMovement().z());
                     living.getPersistentData().putInt("twilightManifestationTimer", 200);
                 } else {
-                    if (living != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, living)) {
+                    if (living != livingEntity && !BeyonderUtil.areAllies(livingEntity, living)) {
                         living.addEffect(new MobEffectInstance(ModEffects.STUN.get(), 10, 1, false, false));
                     }
                 }
@@ -80,7 +79,7 @@ public class TwilightManifestation extends SimpleAbilityItem {
                     projectile.getPersistentData().putDouble("twilightManifestationY", livingEntity.getDeltaMovement().y());
                     projectile.getPersistentData().putDouble("twilightManifestationZ", livingEntity.getDeltaMovement().z());
                 } else {
-                    if (projectile.getOwner() != null && projectile.getOwner() instanceof LivingEntity owner && owner != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, owner)) {
+                    if (projectile.getOwner() != null && projectile.getOwner() instanceof LivingEntity owner && owner != livingEntity && !BeyonderUtil.areAllies(livingEntity, owner)) {
                         projectile.setDeltaMovement(0, 0, 0);
                         projectile.teleportTo(projectile.getX(), projectile.getY(), projectile.getZ());
                     }

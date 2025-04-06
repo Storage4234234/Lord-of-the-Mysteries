@@ -35,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 public class BattleHypnotism extends SimpleAbilityItem {
 
@@ -118,5 +119,25 @@ public class BattleHypnotism extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        int mobTotalHP = 0;
+        if (target != null) {
+            int sequence = BeyonderUtil.getSequence(livingEntity);
+            double dreamIntoReality = 1;
+            if (livingEntity instanceof Player) {
+                dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
+            }
+            for (Mob mob : target.level().getEntitiesOfClass(Mob.class, target.getBoundingBox().inflate((20 - sequence) * dreamIntoReality))) {
+                mobTotalHP += (int) (mob.getMaxHealth() / 10);
+                if (mobTotalHP >= 100) {
+                    mobTotalHP = 100;
+                    break;
+                }
+            }
+        }
+        return mobTotalHP;
     }
 }

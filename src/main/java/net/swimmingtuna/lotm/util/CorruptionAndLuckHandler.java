@@ -69,6 +69,9 @@ public class CorruptionAndLuckHandler {
                 tag.putDouble("corruption", corruption - 1);
             }
             if (corruption >= 1) {
+                if (livingEntity instanceof Player player && player.tickCount % 20 == 0) {
+                    player.displayClientMessage(Component.literal("You're corrupted with a value of " + corruption + " / 100").withStyle(BeyonderUtil.corruptionStyle(livingEntity)), true);
+                }
                 spawnCorruptionParticles(livingEntity, corruption);
             }
             if (livingEntity.tickCount % 20 == 0) {
@@ -505,37 +508,37 @@ public class CorruptionAndLuckHandler {
                     SpamClass.sendMonsterMessage(pPlayer);
                 }
                 if (sequence == 7) {
-                    if (livingEntity.tickCount % 300 == 0) {
+                    if (livingEntity.tickCount % 200 == 0) {
                         tag.putDouble("luck", Math.max(0, lotmLuckValue + 1));
                     }
                 }
                 if (sequence == 6) {
-                    if (livingEntity.tickCount % 275 == 0) {
+                    if (livingEntity.tickCount % 175 == 0) {
                         tag.putDouble("luck", Math.max(0, lotmLuckValue + 1));
                     }
                 }
                 if (sequence == 5) {
-                    if (livingEntity.tickCount % 225 == 0) {
-                        tag.putDouble("luck", Math.max(0, lotmLuckValue + 1));
-                    }
-                }
-                if (sequence == 4) {
                     if (livingEntity.tickCount % 160 == 0) {
                         tag.putDouble("luck", Math.max(0, lotmLuckValue + 1));
                     }
                 }
+                if (sequence == 4) {
+                    if (livingEntity.tickCount % 100 == 0) {
+                        tag.putDouble("luck", Math.max(0, lotmLuckValue + 1));
+                    }
+                }
                 if (sequence == 3) {
-                    if (livingEntity.tickCount % 130 == 0) {
+                    if (livingEntity.tickCount % 80 == 0) {
                         tag.putDouble("luck", Math.max(0, lotmLuckValue + 1));
                     }
                 }
                 if (sequence == 2) {
-                    if (livingEntity.tickCount % 75 == 0) {
+                    if (livingEntity.tickCount % 50 == 0) {
                         tag.putDouble("luck", Math.max(0, lotmLuckValue + 1));
                     }
                 }
                 if (sequence == 1) {
-                    if (livingEntity.tickCount % 50 == 0) {
+                    if (livingEntity.tickCount % 35 == 0) {
                         tag.putDouble("luck", Math.max(0, lotmLuckValue + 1));
                     }
                 }

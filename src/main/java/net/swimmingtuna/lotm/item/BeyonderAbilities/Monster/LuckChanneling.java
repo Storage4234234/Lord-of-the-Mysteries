@@ -14,7 +14,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -32,7 +31,7 @@ public class LuckChanneling extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -42,23 +41,23 @@ public class LuckChanneling extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void channelLuck(Player player) {
-        if (!player.level().isClientSide()) {
+    private void channelLuck(LivingEntity livingEntity) { //marked
+        if (!livingEntity.level().isClientSide() && livingEntity instanceof Player player) {
             ItemStack stack = player.getOffhandItem();
             if (stack.getItem() == Items.GLASS_BOTTLE) {
                 double luck = player.getPersistentData().getDouble("luck");
                 ItemStack luckBottle = new ItemStack(ItemInit.LUCKBOTTLEITEM.get());
-                int sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getSequence();
+                int sequence = BeyonderUtil.getSequence(player);
                 if (sequence <= 2) {
                     double luckBottleAmount = 0;
-                    for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.LUCKCHANNELING.get())))) {
-                        double newLuck = livingEntity.getPersistentData().getDouble("luck");
-                        if (livingEntity == player) {
-                            livingEntity.getPersistentData().putDouble("luck", newLuck / 2);
+                    for (LivingEntity living : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.LUCKCHANNELING.get())))) {
+                        double newLuck = living.getPersistentData().getDouble("luck");
+                        if (living == player) {
+                            living.getPersistentData().putDouble("luck", newLuck / 2);
                             luckBottleAmount += (newLuck);
-                        } else if (!BeyonderUtil.isAllyOf(player, livingEntity)) {
+                        } else if (!BeyonderUtil.areAllies(player, living)) {
                             luckBottleAmount += newLuck;
-                            livingEntity.getPersistentData().putDouble("luck", 0);
+                            living.getPersistentData().putDouble("luck", 0);
                         }
                     }
                     LuckBottleItem.setLuckAmount(luckBottle, (int) luckBottleAmount);

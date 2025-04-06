@@ -52,7 +52,7 @@ public class EyeOfDemonHunting extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -126,9 +126,11 @@ public class EyeOfDemonHunting extends SimpleAbilityItem {
                 Vec3 reachVector = eyePosition.add(lookVector.x * 35, lookVector.y * 35, lookVector.z * 35);
                 AABB searchBox = entity.getBoundingBox().inflate(150);
                 EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(entity.level(), entity, eyePosition, reachVector, searchBox, livingEntity -> !livingEntity.isSpectator() && livingEntity.isPickable(), 0.0f);
-                if (entityHit != null && entityHit.getEntity() instanceof LivingEntity livingEntity && !BeyonderUtil.isAllyOf(entity, livingEntity)) {
+                if (entityHit != null && entityHit.getEntity() instanceof LivingEntity livingEntity && !BeyonderUtil.areAllies(entity, livingEntity)) {
                     BeyonderClass pathway = BeyonderUtil.getPathway(livingEntity);
-                    if (pathway != null) {
+                    int sequence = BeyonderUtil.getSequence(entity);
+                    int hitSequence = BeyonderUtil.getSequence(livingEntity);
+                    if (pathway != null && hitSequence >= sequence) {
                         if (pathway == BeyonderClassInit.SPECTATOR.get()) {
                             livingEntity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 100, 1, true, true));
                         } else if (pathway == BeyonderClassInit.SAILOR.get()) {

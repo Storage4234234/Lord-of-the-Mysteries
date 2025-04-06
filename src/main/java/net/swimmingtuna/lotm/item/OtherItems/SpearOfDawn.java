@@ -99,14 +99,14 @@ public class SpearOfDawn extends SwordItem implements GeoItem {
     @Override
     public void releaseUsing(ItemStack stack, Level level, LivingEntity livingEntity, int pTimeCharged) {
         if (!level.isClientSide) {
-            SpearOfDawnEntity silverLight = new SpearOfDawnEntity(EntityInit.SPEAR_OF_DAWN_ENTITY.get(), level);
+            SpearOfDawnEntity spearOfDawn = new SpearOfDawnEntity(EntityInit.SPEAR_OF_DAWN_ENTITY.get(), level);
             Vec3 lookVec = livingEntity.getLookAngle().normalize().scale(10);
-            silverLight.setDeltaMovement(lookVec);
-            silverLight.setOwner(livingEntity);
-            silverLight.hurtMarked = true;
-            silverLight.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
-            BeyonderUtil.setScale(silverLight, BeyonderUtil.getDamage(livingEntity).get(ItemInit.SPEAROFDAWN.get()));
-            livingEntity.level().addFreshEntity(silverLight);
+            spearOfDawn.setDeltaMovement(lookVec);
+            spearOfDawn.setOwner(livingEntity);
+            spearOfDawn.hurtMarked = true;
+            spearOfDawn.teleportTo(livingEntity.getX(), livingEntity.getY(), livingEntity.getZ());
+            BeyonderUtil.setScale(spearOfDawn, BeyonderUtil.getDamage(livingEntity).get(ItemInit.SPEAROFDAWN.get()));
+            livingEntity.level().addFreshEntity(spearOfDawn);
             removeItemFromSlot(livingEntity, stack);
         }
     }

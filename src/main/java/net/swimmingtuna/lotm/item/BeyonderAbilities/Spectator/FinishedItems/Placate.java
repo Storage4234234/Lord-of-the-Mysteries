@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -17,10 +18,12 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Placate extends SimpleAbilityItem {
@@ -30,12 +33,11 @@ public class Placate extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 7, 125, true)) {
             return InteractionResult.FAIL;
         }
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (holder.getSequence() >= 4) {
+        if (BeyonderUtil.getSequence(player) >= 4) {
             removeHarmfulEffects(interactionTarget);
             addCooldown(player);
             useSpirituality(player);
@@ -49,12 +51,11 @@ public class Placate extends SimpleAbilityItem {
         }
     }
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 7, 125, true)) {
             return InteractionResult.FAIL;
         }
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (holder.getSequence() <= 4 || player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {
+        if (BeyonderUtil.getSequence(player) <= 4 || player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {
             removeHarmfulEffects(player);
             addCooldown(player);
             useSpirituality(player);
@@ -117,5 +118,18 @@ public class Placate extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        int basePriority = 0;
+        Collection<MobEffectInstance> activeEffects = livingEntity.getActiveEffects();
+        int harmfulEffectsCount = 0;
+        for (MobEffectInstance effect : activeEffects) {
+            if (effect.getEffect().getCategory() == MobEffectCategory.HARMFUL) {
+                harmfulEffectsCount++;
+            }
+        }
+        return Math.min(100, basePriority + (harmfulEffectsCount * 20));
     }
 }

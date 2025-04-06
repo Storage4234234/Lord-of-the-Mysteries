@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -25,8 +26,9 @@ public class ChaosAmplification extends SimpleAbilityItem {
     public ChaosAmplification(Properties properties) {
         super(properties, BeyonderClassInit.MONSTER, 1, 2000, 1200);
     }
+
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -48,7 +50,7 @@ public class ChaosAmplification extends SimpleAbilityItem {
         super.inventoryTick(stack, level, entity, itemSlot, isSelected);
     }
 
-    private void changeChaosAmplification(Player player) {
+    private void changeChaosAmplification(LivingEntity player) {
         int value = player.getPersistentData().getInt("calamityEnhancementItemValue");
         if (!player.level().isClientSide() && player.level() instanceof ServerLevel serverLevel) {
             CalamityEnhancementData data = CalamityEnhancementData.getInstance(serverLevel);

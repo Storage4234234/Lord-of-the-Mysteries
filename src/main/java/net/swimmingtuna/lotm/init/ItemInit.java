@@ -18,6 +18,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.TwilightSword;
+import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderCharacteristic;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderPotion;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderResetPotion;
 import net.swimmingtuna.lotm.item.OtherItems.*;
@@ -268,8 +269,6 @@ public class ItemInit {
             () -> new EnvisionKingdom(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ENVISION_LOCATION = ITEMS.register("envisionlocation",
             () -> new EnvisionLocation(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> ENVISION_LOCATION_BLINK = ITEMS.register("envisionlocationblink",
-            () -> new EnvisionLocationBlink(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ALTERATION = ITEMS.register("alteration",
             () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ENVISION_HEALTH = ITEMS.register("envisionhealth",
@@ -434,6 +433,26 @@ public class ItemInit {
             () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.MONSTER, 1));
     public static final RegistryObject<Item> MONSTER_0_POTION = ITEMS.register("monster_0_potion",
             () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.MONSTER, 0));
+    public static final RegistryObject<Item> WARRIOR_9_POTION = ITEMS.register("warrior_9_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 9));
+    public static final RegistryObject<Item> WARRIOR_8_POTION = ITEMS.register("warrior_8_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 8));
+    public static final RegistryObject<Item> WARRIOR_7_POTION = ITEMS.register("warrior_7_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 7));
+    public static final RegistryObject<Item> WARRIOR_6_POTION = ITEMS.register("warrior_6_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 6));
+    public static final RegistryObject<Item> WARRIOR_5_POTION = ITEMS.register("warrior_5_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 5));
+    public static final RegistryObject<Item> WARRIOR_4_POTION = ITEMS.register("warrior_4_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 4));
+    public static final RegistryObject<Item> WARRIOR_3_POTION = ITEMS.register("warrior_3_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 3));
+    public static final RegistryObject<Item> WARRIOR_2_POTION = ITEMS.register("warrior_2_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 2));
+    public static final RegistryObject<Item> WARRIOR_1_POTION = ITEMS.register("warrior_1_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 1));
+    public static final RegistryObject<Item> WARRIOR_0_POTION = ITEMS.register("warrior_0_potion",
+            () -> new BeyonderPotion(new Item.Properties().stacksTo(1), BeyonderClassInit.WARRIOR, 0));
     public static final RegistryObject<Item> BEYONDER_RESET_POTION = ITEMS.register("beyonder_reset_potion",
             () -> new BeyonderResetPotion(new Item.Properties().stacksTo(1)));
 
@@ -495,6 +514,8 @@ public class ItemInit {
             () -> new LightningStrikeRune(new Item.Properties().stacksTo(1)));
 
     //OTHER
+    public static final RegistryObject<Item> BEYONDER_CHARACTERISTIC = ITEMS.register("beyondercharacteristics",
+            () -> new BeyonderCharacteristic(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> BEYONDER_ABILITY_USER = ITEMS.register("beyonderabilityuser",
             () -> new BeyonderAbilityUser(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> TEST_ITEM = ITEMS.register("testitem",

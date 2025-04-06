@@ -49,7 +49,7 @@ public class ProphesizeDemise extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -92,7 +92,7 @@ public class ProphesizeDemise extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public void prophesizeDemise(Player player,LivingEntity interactionTarget) {
+    public void prophesizeDemise(LivingEntity player, LivingEntity interactionTarget) {
         if (!interactionTarget.level().isClientSide() && !player.level().isClientSide()) {
             if (BeyonderUtil.isBeyonderCapable(interactionTarget)) {
                 if (player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {
@@ -328,28 +328,16 @@ public class ProphesizeDemise extends SimpleAbilityItem {
             }
         }
     }
-
-    @SubscribeEvent
-    public static void handlePlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        Player player = event.getEntity();
-        if (!player.level().isClientSide()) {
-            CompoundTag persistentData = player.getPersistentData();
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            LOTMNetworkHandler.sendToPlayer(new SyncSequencePacketS2C(holder.getSequence()), (ServerPlayer) player);
-            if (persistentData.contains("DemiseCounter")) {
-                int demiseCounter = persistentData.getInt("DemiseCounter");
-                if (!persistentData.contains("EntityDemise") || persistentData.getInt("EntityDemise") == 0) {
-                    player.getPersistentData().putInt("EntityDemise", demiseCounter);
-                }
-            } else {
-                if (!persistentData.contains("EntityDemise") || persistentData.getInt("EntityDemise") == 0) {
-                    player.getPersistentData().putInt("EntityDemise", 0);
-                }
-            }
-        }
-    }
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return (int) (100 - livingEntity.getHealth());
+        }
+        return 0;
     }
 }

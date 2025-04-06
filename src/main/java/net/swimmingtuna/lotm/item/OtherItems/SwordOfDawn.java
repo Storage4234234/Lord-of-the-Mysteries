@@ -92,9 +92,9 @@ public class SwordOfDawn extends SwordItem implements GeoItem {
                 Vec3 lookVector = pPlayer.getLookAngle();
                 Vec3 reachVector = eyePosition.add(lookVector.x * 5, lookVector.y * 5, lookVector.z * 5);
                 BlockHitResult blockHit = pPlayer.level().clip(new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, pPlayer));
-                if (blockHit.getType() == HitResult.Type.MISS) {
+                if (blockHit.getType() == HitResult.Type.MISS && BeyonderUtil.getSpirituality(pPlayer) >= 350) {
                     HurricaneOfLightEntity.summonHurricaneOfLightDawn(pPlayer);
-                    BeyonderUtil.useSpirituality(pPlayer, 200);
+                    BeyonderUtil.useSpirituality(pPlayer, 1000 - (BeyonderUtil.getSequence(pPlayer) * 115));
                     pPlayer.getCooldowns().addCooldown(this, 400);
                 }
             } else if (pPlayer.isShiftKeyDown() && BeyonderUtil.getSequence(pPlayer) <= 5) {

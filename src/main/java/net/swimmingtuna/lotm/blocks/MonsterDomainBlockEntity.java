@@ -75,16 +75,12 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
                     BlockState targetBlock = level.getBlockState(mutablePos);
                     boolean blockWasProcessed = false;
                     if (!(targetBlock.getBlock() instanceof AirBlock)) {
-
-                        // Process dirt to grass conversion
                         if (targetBlock.getBlock() == Blocks.DIRT && Earthquake.isOnSurface(level, mutablePos)) {
                             if (level.random.nextInt(100) <= (multiplier) && level.random.nextInt() != 0) {
                                 level.setBlock(mutablePos, Blocks.GRASS_BLOCK.defaultBlockState(), 3);
                             }
                             blockWasProcessed = true;
                         }
-
-                        // Process diamond ore generation
                         if (mutablePos.getY() <= 15 && mutablePos.getY() >= 5) {
                             if (targetBlock.getBlock() == Blocks.DEEPSLATE || targetBlock.getBlock() == Blocks.STONE) {
                                 if (level.random.nextInt(1000) <= (multiplier) && level.random.nextInt() != 0) {
@@ -93,8 +89,6 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
                                 blockWasProcessed = true;
                             }
                         }
-
-                        // Process first iron ore generation layer
                         if (mutablePos.getY() <= 40 && mutablePos.getY() >= 10) {
                             if (targetBlock.getBlock() == Blocks.DEEPSLATE || targetBlock.getBlock() == Blocks.STONE) {
                                 if (level.random.nextInt(300) <= (multiplier) && level.random.nextInt() != 0) {
@@ -103,8 +97,6 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
                                 blockWasProcessed = true;
                             }
                         }
-
-                        // Process second iron ore generation layer
                         if (mutablePos.getY() <= 25 && mutablePos.getY() >= 10) {
                             if (targetBlock.getBlock() == Blocks.DEEPSLATE || targetBlock.getBlock() == Blocks.STONE) {
                                 if (level.random.nextInt(500) <= (multiplier) && level.random.nextInt() != 0) {
@@ -113,8 +105,6 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
                                 blockWasProcessed = true;
                             }
                         }
-
-                        // Process crops
                         if (targetBlock.getBlock() instanceof CropBlock cropBlock) {
                             IntegerProperty ageProperty = cropBlock.getAgeProperty();
                             int currentAge = targetBlock.getValue(ageProperty);
@@ -130,14 +120,12 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
                     }
                     currentZ++;
                 }
-                currentZ = -getRadius();  // Reset Z and increment Y
+                currentZ = -getRadius();
                 currentY++;
             }
-            currentY = -30;  // Reset Y and increment X
+            currentY = -30;
             currentX++;
         }
-
-        // Reset everything when we've finished the area
         if (currentX > getRadius()) {
             currentX = -getRadius();
             currentY = -30;
@@ -306,17 +294,8 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
         }
 
         ticks++;
-        AABB affectedArea = new AABB(
-                worldPosition.getX() - radius,
-                worldPosition.getY() - radius,
-                worldPosition.getZ() - radius,
-                worldPosition.getX() + radius,
-                worldPosition.getY() + radius,
-                worldPosition.getZ() + radius
-        );
-
+        AABB affectedArea = new AABB(worldPosition.getX() - radius, worldPosition.getY() - radius, worldPosition.getZ() - radius, worldPosition.getX() + radius, worldPosition.getY() + radius, worldPosition.getZ() + radius);
         List<LivingEntity> livingEntities = level.getEntitiesOfClass(LivingEntity.class, affectedArea);
-
         int multiplier;
         Player owner = getOwner();
         if (owner != null) {
@@ -325,8 +304,9 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
             int maxRadius = 250 - (beyonderHolder.getSequence() * 45);
             multiplier = Math.max(1, (maxRadius / safeRadius) / 2);
         } else multiplier = 1;
-
-        // Process entities based on ally status
+        if (!BeyonderUtil.currentPathwayAndSequenceMatches(owner, BeyonderClassInit.MONSTER.get(), 4)) {
+            this.level.setBlock(this.getBlockPos(), Blocks.AIR.defaultBlockState(), 3);
+        }
         for (LivingEntity entity : livingEntities) {
             boolean isAlly = isAllyOfOwner(entity);
             if (entity instanceof Mob mob) {
@@ -434,7 +414,6 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
         tag.putBoolean("isBad", isBad);
         if (ownerUUID != null) {
             tag.putUUID("ownerUUID", ownerUUID);
-            System.out.println("Saving UUID: " + ownerUUID);
         }
     }
 
@@ -446,7 +425,6 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
         isBad = tag.getBoolean("isBad");
         if (tag.contains("ownerUUID")) {
             ownerUUID = tag.getUUID("ownerUUID");
-            System.out.println("Loading UUID: " + ownerUUID);
         }
     }
 
@@ -473,7 +451,7 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
         return this.isBad;
     }
 
-    public void setOwner(Player player) {
+    public void setOwner(LivingEntity player) {
         this.ownerUUID = player.getUUID();
         setChanged();
     }
@@ -483,7 +461,7 @@ public class MonsterDomainBlockEntity extends BlockEntity implements TickableBlo
         return level.getPlayerByUUID(ownerUUID);
     }
 
-    public static List<MonsterDomainBlockEntity> getDomainsOwnedBy(Level level, Player player) {
+    public static List<MonsterDomainBlockEntity> getDomainsOwnedBy(Level level, LivingEntity player) {
         List<MonsterDomainBlockEntity> ownedDomains = new ArrayList<>();
 
         ServerLevel serverLevel = (ServerLevel) level;

@@ -24,7 +24,7 @@ import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoor;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.LuckGifting;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocationBlink;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocation;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,18 +41,18 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         int matterAccelerationDistance = player.getPersistentData().getInt("tyrantSelfAcceleration");
         if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 0, matterAccelerationDistance * 10, true)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player);
         useSpirituality(player, matterAccelerationDistance * 10);
-        matterAccelerationSelf(player);
+        matterAccelerationSelfAbility(player);
         return InteractionResult.SUCCESS;
     }
 
-    public void matterAccelerationSelf(Player player) {
+    public void matterAccelerationSelfAbility(LivingEntity player) {
         Level level = player.level();
         int blinkDistance = player.getPersistentData().getInt("tyrantSelfAcceleration");
         Vec3 lookVector = player.getLookAngle();
@@ -101,7 +101,7 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
             AABB boundingBox = new AABB(pos).inflate(1); // Adjust size as needed
             List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, boundingBox);
             for (LivingEntity entity : entities) {
-                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
+                if (entity != player && !BeyonderUtil.areAllies(player, entity)) {
                     entity.hurt(level.damageSources().lightningBolt(), BeyonderUtil.getDamage(player).get(ItemInit.MATTER_ACCELERATION_SELF.get())); // Adjust damage amount as needed
                 }
             }
@@ -119,18 +119,11 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
         int blinkDistance = livingEntity.getPersistentData().getInt("BlinkDistance");
         int luckGiftingAmount = livingEntity.getPersistentData().getInt("monsterLuckGifting");
         int doorBlinkDistance = livingEntity.getPersistentData().getInt("travelBlinkDistance");
+
         if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof MatterAccelerationSelf && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.SAILOR.get())) {
-            matterAccelerationDistance += 50;
-            livingEntity.getPersistentData().putInt("tyrantSelfAcceleration", matterAccelerationDistance);
+            livingEntity.getPersistentData().putInt("tyrantSelfAcceleration", matterAccelerationDistance + 50);
             if (livingEntity instanceof Player player) {
                 player.displayClientMessage(Component.literal("Matter Acceleration Distance is " + matterAccelerationDistance).withStyle(BeyonderUtil.getStyle(livingEntity)), true);
-            }
-        }
-        if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof EnvisionLocationBlink && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.SPECTATOR.get())) {
-            blinkDistance += 5;
-            livingEntity.getPersistentData().putInt("BlinkDistance", blinkDistance);
-            if (livingEntity instanceof Player player) {
-                player.displayClientMessage(Component.literal("Blink Distance is " + blinkDistance).withStyle(BeyonderUtil.getStyle(livingEntity)), true);
             }
             if (matterAccelerationDistance >= 1001) {
                 if (livingEntity instanceof Player player) {
@@ -138,30 +131,36 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
                 }
                 livingEntity.getPersistentData().putInt("tyrantSelfAcceleration", 0);
             }
+        }
+        if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof EnvisionLocation && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.SPECTATOR.get())) {
+            livingEntity.getPersistentData().putInt("BlinkDistance", blinkDistance + 5);
+            if (livingEntity instanceof Player player) {
+                player.displayClientMessage(Component.literal("Blink Distance is " + blinkDistance).withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+            }
             if (blinkDistance >= 201) {
                 if (livingEntity instanceof Player player) {
                     player.displayClientMessage(Component.literal("Blink Distance is 0").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
                 }
                 livingEntity.getPersistentData().putInt("BlinkDistance", 0);
             }
-            //LUCK GIFTING
-            if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof LuckGifting && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.MONSTER.get())) {
-                livingEntity.getPersistentData().putInt("monsterLuckGifting", luckGiftingAmount + 1);
-                if (livingEntity instanceof Player player) {
-                    player.displayClientMessage(Component.literal("Luck Gifting Amount is " + luckGiftingAmount).withStyle(BeyonderUtil.getStyle(livingEntity)), true);
-                }
-                if (luckGiftingAmount >= BeyonderUtil.getDamage(livingEntity).get(ItemInit.LUCKGIFTING.get())) {
-                    if (livingEntity instanceof Player player) {
-                        player.displayClientMessage(Component.literal("Luck Gifting Amount is 0").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
-                    }
-                    livingEntity.getPersistentData().putInt("monsterLuckGifting", 0);
-                }
+        }
+        //LUCK GIFTING
+        if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof LuckGifting && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.MONSTER.get())) {
+            livingEntity.getPersistentData().putInt("monsterLuckGifting", luckGiftingAmount + 1);
+            if (livingEntity instanceof Player player) {
+                player.displayClientMessage(Component.literal("Luck Gifting Amount is " + luckGiftingAmount).withStyle(BeyonderUtil.getStyle(livingEntity)), true);
             }
-            if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof TravelDoor && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.APPRENTICE.get())) {
-                livingEntity.getPersistentData().putInt("travelBlinkDistance", doorBlinkDistance + 2);
+            if (luckGiftingAmount >= BeyonderUtil.getDamage(livingEntity).get(ItemInit.LUCKGIFTING.get())) {
                 if (livingEntity instanceof Player player) {
-                    player.displayClientMessage(Component.literal("Blink Distance is " + doorBlinkDistance).withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                    player.displayClientMessage(Component.literal("Luck Gifting Amount is 0").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
                 }
+                livingEntity.getPersistentData().putInt("monsterLuckGifting", 0);
+            }
+        }
+        if (livingEntity.isShiftKeyDown() && livingEntity.getMainHandItem().getItem() instanceof TravelDoor && BeyonderUtil.currentPathwayMatches(livingEntity, BeyonderClassInit.APPRENTICE.get())) {
+            livingEntity.getPersistentData().putInt("travelBlinkDistance", doorBlinkDistance + 10);
+            if (livingEntity instanceof Player player) {
+                player.displayClientMessage(Component.literal("Blink Distance is " + doorBlinkDistance).withStyle(BeyonderUtil.getStyle(livingEntity)), true);
             }
         }
     }

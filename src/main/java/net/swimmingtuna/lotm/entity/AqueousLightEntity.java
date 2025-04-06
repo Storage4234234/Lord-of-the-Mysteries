@@ -85,7 +85,7 @@ public class AqueousLightEntity extends AbstractHurtingProjectile {
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide && !this.level().dimension().equals(Level.NETHER)) {
             this.level().broadcastEntityEvent(this, ((byte) 3));
             this.level().setBlock(blockPosition(), Blocks.WATER.defaultBlockState(), 3);
             this.discard();
@@ -111,7 +111,7 @@ public class AqueousLightEntity extends AbstractHurtingProjectile {
         return false;
     }
 
-    public static void summonEntityWithSpeed(Vec3 direction, Vec3 initialVelocity, Vec3 eyePosition, double x, double y, double z, Player player, float scale) {
+    public static void summonEntityWithSpeed(Vec3 direction, Vec3 initialVelocity, Vec3 eyePosition, double x, double y, double z, LivingEntity player, float scale) {
         if (!player.level().isClientSide()) {
             AqueousLightEntity aqueousLightEntity = new AqueousLightEntity(player.level(), player, initialVelocity.x, initialVelocity.y, initialVelocity.z);
             aqueousLightEntity.setDeltaMovement(initialVelocity);

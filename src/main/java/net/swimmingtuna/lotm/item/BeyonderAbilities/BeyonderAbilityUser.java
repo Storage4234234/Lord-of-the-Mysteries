@@ -44,8 +44,11 @@ public class BeyonderAbilityUser extends SimpleAbilityItem {
     }
 
     public static void resetClicks(Player player) {
-        player.getPersistentData().putByteArray("keysClicked", new byte[5]);
-        player.displayClientMessage(Component.empty(), true);
+        if (player.getPersistentData().getBoolean("shouldSendAbilityUserResetMessage")) {
+            player.getPersistentData().putByteArray("keysClicked", new byte[5]);
+            player.displayClientMessage(Component.empty(), true);
+            player.getPersistentData().putBoolean("shouldSendAbilityUserResetMessage", false);
+        }
     }
 
     @Override
@@ -53,6 +56,9 @@ public class BeyonderAbilityUser extends SimpleAbilityItem {
         if (livingEntity instanceof Player player) {
             if (player.tickCount % 4 == 0 && !livingEntity.level().isClientSide() && !(player.getMainHandItem().getItem() instanceof BeyonderAbilityUser)) {
                 resetClicks(player);
+            }
+            if (player.getMainHandItem().getItem() instanceof BeyonderAbilityUser && !player.getPersistentData().getBoolean("shouldSendAbilityUserResetMessage")) {
+                player.getPersistentData().putBoolean("shouldSendAbilityUserResetMessage", true);
             }
         }
     }

@@ -36,7 +36,7 @@ public class LightConcealment extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -76,7 +76,7 @@ public class LightConcealment extends SimpleAbilityItem {
                     velocityX *= speed;
                     velocityY *= speed;
                     velocityZ *= speed;
-                    if (player == livingEntity) {
+                    if (player == livingEntity || BeyonderUtil.areAllies(player, livingEntity)) {
                         SendParticleS2C packet = new SendParticleS2C(
                                 ParticleTypes.END_ROD,
                                 x, y, z,

@@ -26,8 +26,7 @@ public class NonVisibleS2C {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player != null) {
-                player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 200, 0)); // 10 seconds of invisibility
-                System.out.println("packet worked");
+                player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 200, 0));
             }
         });
         ctx.get().setPacketHandled(true);

@@ -12,7 +12,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -36,7 +35,7 @@ public class RagingBlows extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -46,7 +45,7 @@ public class RagingBlows extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void ragingBlows(Player player) {
+    public static void ragingBlows(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag persistentData = player.getPersistentData();
             int ragingBlows = persistentData.getInt("ragingBlows");
@@ -62,7 +61,6 @@ public class RagingBlows extends SimpleAbilityItem {
         boolean sailorLightning = tag.getBoolean("SailorLightning");
         int ragingBlows = tag.getInt("ragingBlows");
         int ragingBlowsRadius = (27 - (sequence * 3));
-        float damage = BeyonderUtil.getDamage(livingEntity).get(ItemInit.RAGING_BLOWS.get());
         if (ragingBlows >= 1) {
             RagingBlows.spawnRagingBlowsParticles(livingEntity);
             tag.putInt("ragingBlows", ragingBlows + 1);
@@ -72,7 +70,8 @@ public class RagingBlows extends SimpleAbilityItem {
             Vec3 playerLookVector = livingEntity.getViewVector(1.0F);
             Vec3 playerPos = livingEntity.position();
             for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, new AABB(playerPos.x - ragingBlowsRadius, playerPos.y - ragingBlowsRadius, playerPos.z - ragingBlowsRadius, playerPos.x + ragingBlowsRadius, playerPos.y + ragingBlowsRadius, playerPos.z + ragingBlowsRadius))) {
-                if (entity != livingEntity && playerLookVector.dot(entity.position().subtract(playerPos)) > 0 && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
+                if (entity != livingEntity && playerLookVector.dot(entity.position().subtract(playerPos)) > 0 && !BeyonderUtil.areAllies(livingEntity, entity)) {
+                    float damage = BeyonderUtil.getDamage(livingEntity).get(ItemInit.RAGING_BLOWS.get());
                     entity.hurt(entity.damageSources().generic(), damage);
                     double ragingBlowsX = livingEntity.getX() - entity.getX();
                     double ragingBlowsZ = livingEntity.getZ() - entity.getZ();

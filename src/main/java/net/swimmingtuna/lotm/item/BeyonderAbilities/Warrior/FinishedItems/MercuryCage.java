@@ -31,7 +31,7 @@ public class MercuryCage extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -42,7 +42,7 @@ public class MercuryCage extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack pStack, Player player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
+    public InteractionResult useAbilityOnEntity(ItemStack pStack, LivingEntity player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
         if (!checkAll(player, BeyonderClassInit.WARRIOR.get(), 2, (int) ScaleTypes.BASE.getScaleData(pInteractionTarget).getScale() * 100, false)) {
             return InteractionResult.FAIL;
         }

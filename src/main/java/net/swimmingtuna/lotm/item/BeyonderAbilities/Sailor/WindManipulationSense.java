@@ -28,22 +28,24 @@ public class WindManipulationSense extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player);
         useSpirituality(player);
-        windManipulationSense(player);
+        windManipulationSenseAbility(player);
         return InteractionResult.SUCCESS;
     }
 
-    public static void windManipulationSense(Player player) {
+    public static void windManipulationSenseAbility(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean windManipulationSense = tag.getBoolean("windManipulationSense");
             tag.putBoolean("windManipulationSense", !windManipulationSense);
-            player.displayClientMessage(Component.literal("Wind Sense Turned " + (windManipulationSense ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
+            if (player instanceof Player pPlayer) {
+                pPlayer.displayClientMessage(Component.literal("Wind Sense Turned " + (windManipulationSense ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
+            }
             int sequence = BeyonderUtil.getSequence(player);
             double radius = 100 - (sequence * 10);
             for (Player otherPlayer : player.level().getEntitiesOfClass(Player.class, player.getBoundingBox().inflate(radius))) {
@@ -92,7 +94,7 @@ public class WindManipulationSense extends SimpleAbilityItem {
         BeyonderUtil.useSpirituality(livingEntity, 1);
         double radius = 100 - (BeyonderUtil.getSequence(livingEntity) * 10);
         for (Player otherPlayer : livingEntity.level().getEntitiesOfClass(Player.class, livingEntity.getBoundingBox().inflate(radius))) {
-            if (otherPlayer == livingEntity || BeyonderUtil.isAllyOf(livingEntity, otherPlayer)) {
+            if (otherPlayer == livingEntity || BeyonderUtil.areAllies(livingEntity, otherPlayer)) {
                 continue;
             }
             Vec3 directionToPlayer = otherPlayer.position().subtract(livingEntity.position()).normalize();

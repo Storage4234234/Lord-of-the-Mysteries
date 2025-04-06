@@ -5,6 +5,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +29,7 @@ public class SilverSwordManifestation extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -38,13 +39,17 @@ public class SilverSwordManifestation extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void manifestSword(Player player) {
+    public static void manifestSword(LivingEntity player) {
         if (!player.level().isClientSide()) {
-            int selectedSlot = findClosestEmptySlot(player);
-            if (selectedSlot != -1) {
-                Inventory inventory = player.getInventory();
-                ItemStack sword = createSword(ItemInit.SWORDOFSILVER.get().getDefaultInstance());
-                inventory.setItem(selectedSlot, sword);
+            ItemStack sword = createSword(ItemInit.SWORDOFSILVER.get().getDefaultInstance());
+            if (player instanceof Player pPlayer) {
+                int selectedSlot = findClosestEmptySlot(pPlayer);
+                if (selectedSlot != -1) {
+                    Inventory inventory = pPlayer.getInventory();
+                    inventory.setItem(selectedSlot, sword);
+                }
+            } else {
+                player.setItemInHand(InteractionHand.MAIN_HAND, sword);
             }
             player.setHealth(player.getHealth() - 10.0f);
         }

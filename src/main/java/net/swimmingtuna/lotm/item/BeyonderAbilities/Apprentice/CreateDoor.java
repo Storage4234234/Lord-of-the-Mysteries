@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -49,12 +50,11 @@ public class CreateDoor extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand){
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if(!checkAll(player)){
+    public InteractionResult useAbility(Level level, LivingEntity livingEntity, InteractionHand hand){
+        if(!checkAll(livingEntity)){
             return InteractionResult.FAIL;
         }
-        checkAmount(player, holder);
+        checkAmount(livingEntity);
         return InteractionResult.SUCCESS;
     }
 
@@ -153,9 +153,9 @@ public class CreateDoor extends SimpleAbilityItem {
         }
     }
 
-    public static void checkAmount(Player player, BeyonderHolder holder){
-        if(player.isShiftKeyDown()){
-            player.displayClientMessage(Component.literal("Amount of blocks that can be opened: ").withStyle(ChatFormatting.WHITE).append(Component.literal(String.valueOf(100 - (97 * holder.getSequence() / 9))).withStyle(ChatFormatting.BLUE)), true);
+    public static void checkAmount(LivingEntity living) {
+        if(living.isShiftKeyDown() && living instanceof Player player) {
+            player.displayClientMessage(Component.literal("Amount of blocks that can be opened: ").withStyle(ChatFormatting.WHITE).append(Component.literal(String.valueOf(100 - (97 * BeyonderUtil.getSequence(living) / 9))).withStyle(ChatFormatting.BLUE)), true);
         }
     }
 

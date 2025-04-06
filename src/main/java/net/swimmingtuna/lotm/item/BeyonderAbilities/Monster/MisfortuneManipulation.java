@@ -56,7 +56,7 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             if (!checkAll(player)) {
                 return InteractionResult.FAIL;
@@ -96,19 +96,19 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    private static void manipulateMisfortune(LivingEntity interactionTarget, Player player) {
+    private static void manipulateMisfortune(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide() && !interactionTarget.level().isClientSide()) {
             CompoundTag tag = interactionTarget.getPersistentData();
             CompoundTag playerTag = player.getPersistentData();
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+            int sequence = BeyonderUtil.getSequence(player);
             int misfortuneManipulation = playerTag.getInt("misfortuneManipulationItem");
             if (misfortuneManipulation == 1) {
-                if (holder.getSequence() > 2) {
+                if (sequence > 2) {
                     summonMeteor(interactionTarget, player);
-                } else if (holder.getSequence() == 2 || holder.getSequence() == 1) {
+                } else if (sequence == 2 || sequence == 1) {
                     summonMeteor(interactionTarget, player);
                     summonMeteor(interactionTarget, player);
-                } else if (holder.getSequence() == 0) {
+                } else if (sequence == 0) {
                     summonMeteor(interactionTarget, player);
                     summonMeteor(interactionTarget, player);
                     summonMeteor(interactionTarget, player);
@@ -118,7 +118,7 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
             }
             if (misfortuneManipulation == 2) {
                 TornadoEntity tornadoEntity = new TornadoEntity(EntityInit.TORNADO_ENTITY.get(), player.level());
-                tornadoEntity.setTornadoLifecount(300 - (holder.getSequence() * 50));
+                tornadoEntity.setTornadoLifecount(300 - (sequence * 50));
                 tornadoEntity.setOwner(player);
                 tornadoEntity.setTornadoPickup(true);
                 tornadoEntity.setTornadoRadius((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEMANIPULATION.get()) * 4);
@@ -163,6 +163,20 @@ public class MisfortuneManipulation extends SimpleAbilityItem {
                     interactionTarget.spawnAtLocation(armorPiece);
                     interactionTarget.setItemSlot(randomArmorSlot, ItemStack.EMPTY);
                 }
+                if (sequence <= 2) {
+                    if (!equippedArmor.isEmpty()) {
+                        EquipmentSlot randomArmorSlot = equippedArmor.get(random.nextInt(equippedArmor.size()));
+                        ItemStack armorPiece = interactionTarget.getItemBySlot(randomArmorSlot);
+                        interactionTarget.spawnAtLocation(armorPiece);
+                        interactionTarget.setItemSlot(randomArmorSlot, ItemStack.EMPTY);
+                    }
+                }
+                double x = interactionTarget.getX() - player.getX();
+                double y = interactionTarget.getY() - player.getY();
+                double z = interactionTarget.getZ() - player.getZ();
+                double magnitude = Math.sqrt(x * x + y * y + z * z);
+                interactionTarget.setDeltaMovement(x / magnitude * 4, y / magnitude * 4, z / magnitude * 4);
+                interactionTarget.hurtMarked = true;
             } else if (misfortuneManipulation == 8) {
                 tag.putInt("luckIgnoreAbility", tag.getInt("luckIgnoreAbility") + 1);
             } else if (misfortuneManipulation == 9) {

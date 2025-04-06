@@ -5,6 +5,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +30,7 @@ public class EnvisionHealth extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 3500 / dreamIntoReality, true)) {
             return InteractionResult.FAIL;
@@ -40,7 +41,7 @@ public class EnvisionHealth extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void envisionHealth(Player player) {
+    private void envisionHealth(LivingEntity player) {
         if (!player.level().isClientSide()) {
             AttributeInstance maxHP = player.getAttribute(Attributes.MAX_HEALTH);
             double maxHealth = maxHP.getValue();
@@ -63,5 +64,14 @@ public class EnvisionHealth extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getHealth() <= 25) {
+            return 85;
+        } else {
+            return 25;
+        }
     }
 }

@@ -27,6 +27,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +44,7 @@ public class CycleOfFate extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             if (!checkAll(player)) {
                 return InteractionResult.FAIL;
@@ -83,20 +84,21 @@ public class CycleOfFate extends SimpleAbilityItem {
     }
 
 
-    private static void cycleOfFate(LivingEntity interactionTarget, Player player) {
+    private static void cycleOfFate(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide() && !interactionTarget.level().isClientSide()) {
             int spirituality = 0;
             int sequence = -1;
 
             player.getPersistentData().putInt("monsterCycleOfFateUser", 70);
             savePotionEffectsToTag(player, player.getPersistentData());
-
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             player.getPersistentData().putInt("monsterCycleOfFateUserX", (int) player.getX());
             player.getPersistentData().putInt("monsterCycleOfFateUserY", (int) player.getY());
             player.getPersistentData().putInt("monsterCycleOfFateUserZ", (int) player.getZ());
             player.getPersistentData().putInt("monsterCycleOfFateUserHealth", (int) player.getHealth());
-            player.getPersistentData().putInt("monsterCycleOfFateUserSequence", holder.getSequence());
+            player.getPersistentData().putInt("monsterCycleOfFateUserSequence", BeyonderUtil.getSequence(player));
+            player.getPersistentData().putInt("monsterCycleOfFateUserAge", player.getPersistentData().getInt("age"));
+            player.getPersistentData().putInt("monsterCycleOfFateUserAgeDecay", player.getPersistentData().getInt("ageDecay"));
+            player.getPersistentData().putInt("monsterCycleOfFateUserCorruption", player.getPersistentData().getInt("corruption"));
             if (interactionTarget instanceof Player pPlayer) {
                 spirituality = (int) BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSpirituality();
                 sequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSequence();
@@ -115,6 +117,9 @@ public class CycleOfFate extends SimpleAbilityItem {
                 interactionTarget.getPersistentData().putInt("monsterCycleOfFateHealth", (int) interactionTarget.getHealth());
                 interactionTarget.getPersistentData().putInt("monsterCycleOfFateSpirituality", spirituality);
                 interactionTarget.getPersistentData().putInt("monsterCycleOfFateSequence", sequence);
+                interactionTarget.getPersistentData().putInt("monsterCycleOfFateAge", interactionTarget.getPersistentData().getInt("age"));
+                interactionTarget.getPersistentData().putInt("monsterCycleOfFateAgeDecay", interactionTarget.getPersistentData().getInt("ageDecay"));
+                interactionTarget.getPersistentData().putInt("monsterCycleOfFateCorruption", interactionTarget.getPersistentData().getInt("corruption"));
                 for (LivingEntity entity : interactionTarget.level().getEntitiesOfClass(LivingEntity.class, interactionTarget.getBoundingBox().inflate(500))) {
                     CompoundTag tag = entity.getPersistentData();
                     if (entity != interactionTarget && entity != player) {
@@ -127,6 +132,9 @@ public class CycleOfFate extends SimpleAbilityItem {
                         tag.putInt("monsterCycleOfFateEntityY", (int) entity.getY());
                         tag.putInt("monsterCycleOfFateEntityZ", (int) entity.getZ());
                         tag.putInt("monsterCycleOfFateEntityHealth", (int) entity.getHealth());
+                        tag.putInt("monsterCycleOfFateEntityAge", tag.getInt("age"));
+                        tag.putInt("monsterCycleOfFateEntityAgeDecay", tag.getInt("ageDecay"));
+                        tag.putInt("monsterCycleOfFateEntityCorruption", tag.getInt("corruption"));
                         if (entity instanceof Player pPlayer) {
                             pSpirituality = (int) BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSpirituality();
                             pSequence = BeyonderHolderAttacher.getHolderUnwrap(pPlayer).getSequence();
@@ -159,6 +167,9 @@ public class CycleOfFate extends SimpleAbilityItem {
             int cycleSpirituality = tag.getInt("monsterCycleOfFateEntitySpirituality");
             int cycleSequence = tag.getInt("monsterCycleOfFateEntitySequence");
             int cycleHealth = tag.getInt("monsterCycleOfFateEntityHealth");
+            int cycleAge = tag.getInt("monsterCycleOfFateEntityAge");
+            int cycleAgeDecay = tag.getInt("monsterCycleOfFateEntityAgeDecay");
+            int cycleCorruption = tag.getInt("monsterCycleOfFateEntityCorruption");
             if (tag.contains("monsterCycleOfFateHolder")) {
                 Player player = entity.level().getPlayerByUUID(tag.getUUID("monsterCycleOfFateHolder"));
                 if (cycleCounter >= 1 && tag.getInt("monsterCycleOfFate") == 0 && tag.getInt("monsterCycleOfFateUser") == 0) { //for other entities caught in cycle
@@ -168,6 +179,9 @@ public class CycleOfFate extends SimpleAbilityItem {
                         event.setCanceled(true);
                         entity.teleportTo(cycleX, cycleY + 400, cycleZ);
                         entity.setHealth(cycleHealth);
+                        entity.getPersistentData().putInt("age", cycleAge);
+                        entity.getPersistentData().putInt("ageDecay", cycleAgeDecay);
+                        entity.getPersistentData().putInt("corruption", cycleCorruption);
                         if (entity instanceof Player player1) {
                             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player1);
                             holder.setSequence(cycleSequence);
@@ -185,7 +199,10 @@ public class CycleOfFate extends SimpleAbilityItem {
                         tag.putInt("monsterCycleOfFateEntitySpirituality", 0);
                         tag.putInt("monsterCycleOfFateEntitySequence", 0);
                         tag.putInt("monsterCycleOfFateEntityHealth", 0);
-                        tag.putInt("monsterCycleOfFateHolder", 0);
+                        tag.putInt("monsterCycleOfFateEntityAge", 0);
+                        tag.putInt("monsterCycleOfFateEntityAgeDecay", 0);
+                        tag.putInt("monsterCycleOfFateEntityCorruption", 0);
+                        tag.remove("monsterCycleOfFateHolder");
                     }
                 }
             }
@@ -197,6 +214,9 @@ public class CycleOfFate extends SimpleAbilityItem {
                 int userZ = tag.getInt("monsterCycleOfFateUserZ");
                 int userHealth = tag.getInt("monsterCycleOfFateUserHealth");
                 int userSequence = tag.getInt("monsterCycleOfFateUserSequence");
+                int userAge = tag.getInt("monsterCycleOfFateUserAge");
+                int userAgeDecay = tag.getInt("monsterCycleOfFateUserAgeDecay");
+                int userCorruption = tag.getInt("monsterCycleOfFateUserCorruption");
                 for (LivingEntity living : entity.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(800))) {
                     CompoundTag livingTag = living.getPersistentData();
                     int livingCounter = livingTag.getInt("monsterCycleOfFate");
@@ -219,6 +239,9 @@ public class CycleOfFate extends SimpleAbilityItem {
                         restorePotionEffectsFromTag(living, livingTag);
                         living.teleportTo(livingX, livingY, livingZ);
                         living.setHealth(livingHealth);
+                        living.getPersistentData().putInt("age", userAge);
+                        living.getPersistentData().putInt("ageDecay", userAgeDecay);
+                        living.getPersistentData().putInt("corruption", userCorruption);
                         livingTag.putInt("monsterCycleOfFate", 60);
                         tag.putInt("monsterCycleOfFateUser", 70);
                         pPlayer.teleportTo(userX, userY, userZ);
@@ -239,8 +262,14 @@ public class CycleOfFate extends SimpleAbilityItem {
                                     int entityHealth = pTag.getInt("monsterCycleOfFateEntityHealth");
                                     int entitySequence = pTag.getInt("monsterCycleOfFateEntitySequence");
                                     int entitySpirituality = pTag.getInt("monsterCycleOfFateEntitySpirituality");
+                                    int entityAge = pTag.getInt("monsterCycleOfFateEntityAge");
+                                    int entityAgeDecay = pTag.getInt("monsterCycleOfFateEntityAgeDecay");
+                                    int entityCorruption = pTag.getInt("monsterCycleOfFateEntityCorruption");
                                     pEntity.teleportTo(entityX, entityY, entityZ);
                                     pEntity.setHealth(entityHealth);
+                                    pEntity.getPersistentData().putInt("age", entityAge);
+                                    pEntity.getPersistentData().putInt("ageDecay", entityAgeDecay);
+                                    pEntity.getPersistentData().putInt("corruption", entityCorruption);
                                     if (pEntity instanceof Player player1) {
                                         BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player1);
                                         holder.setSequence(entitySequence);
@@ -271,9 +300,9 @@ public class CycleOfFate extends SimpleAbilityItem {
             int cycleZ = tag.getInt("monsterCycleOfFateEntityZ");
             boolean isDead = tag.getBoolean("monsterCycleOfFateIsDead");
             if (isDead) {
-                entity.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 20,1,false,false));
-                entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 20,1,false,false));
-                entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 20,5,false,false));
+                entity.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 20, 1, false, false));
+                entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 20, 1, false, false));
+                entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 20, 5, false, false));
                 entity.teleportTo(cycleX, cycleY + 400, cycleZ);
             }
             if (entity.tickCount % 20 == 0) {
@@ -307,7 +336,7 @@ public class CycleOfFate extends SimpleAbilityItem {
                     tag.putInt("monsterCycleOfFateX", 0);
                     tag.putInt("monsterCycleOfFateY", 0);
                     tag.putInt("monsterCycleOfFateZ", 0);
-                    tag.putInt("monsterCycleOfFateHolder", 0);
+                    tag.remove("monsterCycleOfFateHolder");
                     tag.putInt("monsterCycleOfFateHealth", 0);
                     tag.putInt("monsterCycleOfFateSpirituality", 0);
                     tag.putInt("monsterCycleOfFateSequence", 0);
@@ -326,6 +355,7 @@ public class CycleOfFate extends SimpleAbilityItem {
             }
         }
     }
+
     private static void savePotionEffectsToTag(LivingEntity entity, CompoundTag tag) {
         Collection<MobEffectInstance> activeEffects = entity.getActiveEffects();
         tag.putInt("monsterCyclePotionEffectsCount", activeEffects.size());
@@ -340,12 +370,9 @@ public class CycleOfFate extends SimpleAbilityItem {
     }
 
     private static void restorePotionEffectsFromTag(LivingEntity entity, CompoundTag tag) {
-        // Clear existing effects
         for (MobEffectInstance activeEffect : new ArrayList<>(entity.getActiveEffects())) {
             entity.removeEffect(activeEffect.getEffect());
         }
-
-        // Restore saved effects
         int effectCount = tag.getInt("monsterCyclePotionEffectsCount");
         for (int i = 0; i < effectCount; i++) {
             CompoundTag effectTag = tag.getCompound("monsterCyclePotionEffect_" + i);
@@ -355,6 +382,60 @@ public class CycleOfFate extends SimpleAbilityItem {
             }
         }
     }
+
+    public static void removeCycleEffect(LivingEntity living) {
+        if (living.level().isClientSide()) {
+            return;
+        }
+        CompoundTag playerTag = living.getPersistentData();
+        clearCycleData(playerTag);
+        for (LivingEntity entity : living.level().getEntitiesOfClass(LivingEntity.class, living.getBoundingBox().inflate(800))) {
+            CompoundTag entityTag = entity.getPersistentData();
+            if (entityTag.contains("monsterCycleOfFateHolder") && living.getUUID().equals(entityTag.getUUID("monsterCycleOfFateHolder"))) {
+                clearCycleData(entityTag);
+            }
+        }
+    }
+
+    private static void clearCycleData(CompoundTag tag) {
+        tag.putInt("monsterCycleOfFateUser", 0);
+        tag.putInt("monsterCycleOfFate", 0);
+        tag.putInt("monsterCycleOfFateEntity", 0);
+        tag.putInt("monsterCycleOfFateUserX", 0);
+        tag.putInt("monsterCycleOfFateUserY", 0);
+        tag.putInt("monsterCycleOfFateUserZ", 0);
+        tag.putInt("monsterCycleOfFateUserHealth", 0);
+        tag.putInt("monsterCycleOfFateUserSequence", 0);
+        tag.putInt("monsterCycleOfFateAge", 0);
+        tag.putInt("monsterCycleOfFateAgeDecay", 0);
+        tag.putInt("monsterCycleOfFateCorruption", 0);
+        tag.putInt("monsterCycleOfFateX", 0);
+        tag.putInt("monsterCycleOfFateY", 0);
+        tag.putInt("monsterCycleOfFateZ", 0);
+        tag.putInt("monsterCycleOfFateHealth", 0);
+        tag.putInt("monsterCycleOfFateSpirituality", 0);
+        tag.putInt("monsterCycleOfFateSequence", 0);
+        tag.putInt("monsterCycleOfFateAge", 0);
+        tag.putInt("monsterCycleOfFateAgeDecay", 0);
+        tag.putInt("monsterCycleOfFateCorruption", 0);
+        tag.putInt("monsterCycleOfFateEntityX", 0);
+        tag.putInt("monsterCycleOfFateEntityY", 0);
+        tag.putInt("monsterCycleOfFateEntityZ", 0);
+        tag.putInt("monsterCycleOfFateEntityHealth", 0);
+        tag.putInt("monsterCycleOfFateEntitySpirituality", 0);
+        tag.putInt("monsterCycleOfFateEntitySequence", 0);
+        tag.putInt("monsterCycleOfFateEntityAge", 0);
+        tag.putInt("monsterCycleOfFateEntityDecay", 0);
+        tag.putInt("monsterCycleOfFateEntityCorruption", 0);
+        tag.putBoolean("monsterCycleOfFateIsDead", false);
+        tag.remove("monsterCycleOfFateHolder");
+        int effectCount = tag.getInt("monsterCyclePotionEffectsCount");
+        for (int i = 0; i < effectCount; i++) {
+            tag.remove("monsterCyclePotionEffect_" + i);
+        }
+        tag.remove("monsterCyclePotionEffectsCount");
+    }
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);

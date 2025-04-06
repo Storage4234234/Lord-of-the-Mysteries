@@ -17,7 +17,25 @@ import java.util.Map;
 
 public class BeyonderRecipeData extends SavedData {
     private static final String RECIPES_KEY = "BeyonderRecipes";
-    private final Map<ItemStack, List<ItemStack>> beyonderRecipes = new HashMap<>();
+    private final Map<ItemStack, RecipeIngredients> beyonderRecipes = new HashMap<>();
+
+    public static class RecipeIngredients {
+        private final List<ItemStack> mainIngredients;
+        private final List<ItemStack> supplementaryIngredients;
+
+        public RecipeIngredients(List<ItemStack> mainIngredients, List<ItemStack> supplementaryIngredients) {
+            this.mainIngredients = mainIngredients;
+            this.supplementaryIngredients = supplementaryIngredients;
+        }
+
+        public List<ItemStack> getMainIngredients() {
+            return new ArrayList<>(mainIngredients);
+        }
+
+        public List<ItemStack> getSupplementaryIngredients() {
+            return new ArrayList<>(supplementaryIngredients);
+        }
+    }
 
     private BeyonderRecipeData() {}
 
@@ -29,17 +47,18 @@ public class BeyonderRecipeData extends SavedData {
         );
     }
 
-    public boolean setRecipe(ItemStack potion, List<ItemStack> ingredients) {
+    public boolean setRecipe(ItemStack potion, List<ItemStack> mainIngredients, List<ItemStack> supplementaryIngredients) {
         boolean recipeExists = beyonderRecipes.keySet().stream().anyMatch(existingPotion -> ItemStack.isSameItemSameTags(existingPotion, potion));
         if (recipeExists) {
             return false;
         }
-        beyonderRecipes.put(potion, new ArrayList<>(ingredients));
+        beyonderRecipes.put(potion, new RecipeIngredients(mainIngredients, supplementaryIngredients));
         setDirty();
         return true;
     }
+
     public boolean removeRecipe(ItemStack potion) {
-        List<ItemStack> removedRecipe = null;
+        RecipeIngredients removedRecipe = null;
         for (ItemStack existingPotion : beyonderRecipes.keySet()) {
             if (ItemStack.isSameItemSameTags(existingPotion, potion)) {
                 removedRecipe = beyonderRecipes.remove(existingPotion);
@@ -58,7 +77,7 @@ public class BeyonderRecipeData extends SavedData {
         setDirty();
     }
 
-    public Map<ItemStack, List<ItemStack>> getBeyonderRecipes() {
+    public Map<ItemStack, RecipeIngredients> getBeyonderRecipes() {
         return new HashMap<>(beyonderRecipes);
     }
 
@@ -67,32 +86,44 @@ public class BeyonderRecipeData extends SavedData {
             player.sendSystemMessage(Component.literal("No Beyonder recipes found.").withStyle(ChatFormatting.RED));
             return;
         }
-        for (Map.Entry<ItemStack, List<ItemStack>> entry : beyonderRecipes.entrySet()) {
-            StringBuilder recipeMessage = new StringBuilder("Potion: ").append(entry.getKey().getHoverName().getString()).append(" - Ingredients: ");
-            for (ItemStack ingredient : entry.getValue()) {
+        for (Map.Entry<ItemStack, RecipeIngredients> entry : beyonderRecipes.entrySet()) {
+            StringBuilder recipeMessage = new StringBuilder("Potion: ").append(entry.getKey().getHoverName().getString()).append(" - Main Ingredients: ");
+
+            for (ItemStack ingredient : entry.getValue().getMainIngredients()) {
                 recipeMessage.append(ingredient.getHoverName().getString()).append(", ");
             }
-            player.sendSystemMessage(Component.literal(recipeMessage.toString())
-                    .withStyle(ChatFormatting.WHITE)
-                    .withStyle(ChatFormatting.BOLD));
+
+            recipeMessage.append(" - Supplementary Ingredients: ");
+            for (ItemStack ingredient : entry.getValue().getSupplementaryIngredients()) {
+                recipeMessage.append(ingredient.getHoverName().getString()).append(", ");
+            }
+            player.sendSystemMessage(Component.literal(recipeMessage.toString()).withStyle(ChatFormatting.WHITE).withStyle(ChatFormatting.BOLD));
         }
     }
 
     @Override
     public CompoundTag save(CompoundTag compoundTag) {
         ListTag recipeList = new ListTag();
-        for (Map.Entry<ItemStack, List<ItemStack>> entry : beyonderRecipes.entrySet()) {
+        for (Map.Entry<ItemStack, RecipeIngredients> entry : beyonderRecipes.entrySet()) {
             CompoundTag recipeTag = new CompoundTag();
             CompoundTag potionTag = new CompoundTag();
             entry.getKey().save(potionTag);
             recipeTag.put("beyonderPotion", potionTag);
-            ListTag ingredientsTag = new ListTag();
-            for (ItemStack ingredient : entry.getValue()) {
+            ListTag mainIngredientsTag = new ListTag();
+            for (ItemStack ingredient : entry.getValue().getMainIngredients()) {
                 CompoundTag ingredientTag = new CompoundTag();
                 ingredient.save(ingredientTag);
-                ingredientsTag.add(ingredientTag);
+                mainIngredientsTag.add(ingredientTag);
             }
-            recipeTag.put("beyonderRecipe", ingredientsTag);
+            recipeTag.put("mainIngredients", mainIngredientsTag);
+            ListTag supplementaryIngredientsTag = new ListTag();
+            for (ItemStack ingredient : entry.getValue().getSupplementaryIngredients()) {
+                CompoundTag ingredientTag = new CompoundTag();
+                ingredient.save(ingredientTag);
+                supplementaryIngredientsTag.add(ingredientTag);
+            }
+            recipeTag.put("supplementaryIngredients", supplementaryIngredientsTag);
+
             recipeList.add(recipeTag);
         }
 
@@ -107,12 +138,17 @@ public class BeyonderRecipeData extends SavedData {
             for (int i = 0; i < recipeList.size(); i++) {
                 CompoundTag recipeTag = recipeList.getCompound(i);
                 ItemStack potion = ItemStack.of(recipeTag.getCompound("beyonderPotion"));
-                List<ItemStack> ingredients = new ArrayList<>();
-                ListTag ingredientsTag = recipeTag.getList("beyonderRecipe", Tag.TAG_COMPOUND);
-                for (int j = 0; j < ingredientsTag.size(); j++) {
-                    ingredients.add(ItemStack.of(ingredientsTag.getCompound(j)));
+                List<ItemStack> mainIngredients = new ArrayList<>();
+                ListTag mainIngredientsTag = recipeTag.getList("mainIngredients", Tag.TAG_COMPOUND);
+                for (int j = 0; j < mainIngredientsTag.size(); j++) {
+                    mainIngredients.add(ItemStack.of(mainIngredientsTag.getCompound(j)));
                 }
-                data.beyonderRecipes.put(potion, ingredients);
+                List<ItemStack> supplementaryIngredients = new ArrayList<>();
+                ListTag supplementaryIngredientsTag = recipeTag.getList("supplementaryIngredients", Tag.TAG_COMPOUND);
+                for (int j = 0; j < supplementaryIngredientsTag.size(); j++) {
+                    supplementaryIngredients.add(ItemStack.of(supplementaryIngredientsTag.getCompound(j)));
+                }
+                data.beyonderRecipes.put(potion, new RecipeIngredients(mainIngredients, supplementaryIngredients));
             }
         }
         return data;

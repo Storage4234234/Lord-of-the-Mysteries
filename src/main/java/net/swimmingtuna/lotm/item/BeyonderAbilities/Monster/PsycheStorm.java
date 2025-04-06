@@ -22,8 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -73,7 +71,7 @@ public class PsycheStorm extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -84,17 +82,16 @@ public class PsycheStorm extends SimpleAbilityItem {
     }
 
 
-    private void psycheStorm(Player player, Level level, BlockPos targetPos) {
+    private void psycheStorm(LivingEntity player, Level level, BlockPos targetPos) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getSequence();
+            int sequence = BeyonderUtil.getSequence(player);
             double radius = (15.0 - sequence);
             float damage = (float) (25.0 - (sequence * 2));
             int corruptionAddition = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.PSYCHESTORM.get());
             int duration = 200 - (sequence * 20);
             AABB boundingBox = new AABB(targetPos).inflate(radius);
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, LivingEntity::isAlive).forEach(livingEntity -> {
-                if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
+                if (livingEntity != player && !BeyonderUtil.areAllies(player, livingEntity)) {
                     double corruption = livingEntity.getPersistentData().getDouble("corruption");
                     BeyonderUtil.applyMentalDamage(player, livingEntity, damage);
                     livingEntity.getPersistentData().putDouble("corruption", corruption + corruptionAddition);

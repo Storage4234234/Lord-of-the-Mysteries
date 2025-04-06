@@ -38,7 +38,7 @@ public class StormSeal extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -48,7 +48,7 @@ public class StormSeal extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void stormSeal(Player player) {
+    public static void stormSeal(LivingEntity player) {
         if (!player.level().isClientSide()) {
             StormSealEntity stormSealEntity = new StormSealEntity(EntityInit.STORM_SEAL_ENTITY.get(), player.level());
             Vec3 lookVec = player.getLookAngle().normalize().scale(3.0f);
@@ -66,7 +66,6 @@ public class StormSeal extends SimpleAbilityItem {
         CompoundTag tag = entity.getPersistentData();
         if (!entity.level().isClientSide()) {
             if (tag.getInt("inStormSeal") >= 3) {
-
                 int stormSeal = tag.getInt("inStormSeal");
                 int x = tag.getInt("stormSealX");
                 int y = tag.getInt("stormSealY");

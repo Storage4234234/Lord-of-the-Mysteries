@@ -25,7 +25,7 @@ public class MonsterDangerSense extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -35,12 +35,14 @@ public class MonsterDangerSense extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void enableOrDisableDangerSense(Player player) {
+    public static void enableOrDisableDangerSense(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean monsterDangerSense = tag.getBoolean("monsterDangerSense");
             tag.putBoolean("monsterDangerSense", !monsterDangerSense);
-            player.displayClientMessage(Component.literal("Danger Sense Turned " + (monsterDangerSense ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
+            if (player instanceof Player pPlayer) {
+                pPlayer.displayClientMessage(Component.literal("Danger Sense Turned " + (monsterDangerSense ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
+            }
         }
     }
 
@@ -72,7 +74,7 @@ public class MonsterDangerSense extends SimpleAbilityItem {
         int sequence = BeyonderUtil.getSequence(livingEntity);
         double radius = 150 - sequence * 15;
         for (Player otherPlayer : livingEntity.level().getEntitiesOfClass(Player.class, livingEntity.getBoundingBox().inflate(radius))) {
-            if (otherPlayer == livingEntity || BeyonderUtil.isAllyOf(livingEntity, otherPlayer)) {
+            if (otherPlayer == livingEntity || BeyonderUtil.areAllies(livingEntity, otherPlayer)) {
                 continue;
             }
             if (otherPlayer.getMainHandItem().getItem() instanceof SimpleAbilityItem || otherPlayer.getMainHandItem().getItem() instanceof ProjectileWeaponItem || otherPlayer.getMainHandItem().getItem() instanceof SwordItem || otherPlayer.getMainHandItem().getItem() instanceof AxeItem) { //also add for sealed artifacts

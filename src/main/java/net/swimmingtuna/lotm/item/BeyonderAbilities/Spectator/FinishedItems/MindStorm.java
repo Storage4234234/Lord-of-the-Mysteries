@@ -41,7 +41,7 @@ public class MindStorm extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -81,11 +81,10 @@ public class MindStorm extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public void mindStorm(Player player, LivingEntity interactionTarget) {
+    public void mindStorm(LivingEntity player, LivingEntity interactionTarget) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-            int sequence = holder.getSequence();
+            int sequence = BeyonderUtil.getSequence(player);
             int duration = 300 - (sequence * 25);
             int damage =  (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MIND_STORM.get());
             if (dreamIntoReality.getValue() == 2) {
@@ -95,13 +94,17 @@ public class MindStorm extends SimpleAbilityItem {
             interactionTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, duration, 1, false, false));
             interactionTarget.addEffect(new MobEffectInstance(MobEffects.CONFUSION, duration, 1, false, false));
             BeyonderUtil.applyMentalDamage(player, interactionTarget, damage);
-            if (!player.isCreative()) {
-                player.getCooldowns().addCooldown(this, 200);
-            }
         }
     }
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return 80;
+        } return 15;
     }
 }

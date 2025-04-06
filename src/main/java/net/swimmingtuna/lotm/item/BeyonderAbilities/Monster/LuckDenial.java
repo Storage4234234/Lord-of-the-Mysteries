@@ -38,7 +38,7 @@ public class LuckDenial extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             if (!checkAll(player)) {
                 return InteractionResult.FAIL;
@@ -78,13 +78,12 @@ public class LuckDenial extends SimpleAbilityItem {
     }
 
 
-    private static void giftLuck(LivingEntity interactionTarget, Player player) {
+    private static void giftLuck(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide() && !interactionTarget.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             CompoundTag tag = interactionTarget.getPersistentData();
             double luck = tag.getDouble("luck");
             double misfortune = tag.getDouble("misfortune");
-            if (holder.getSequence() <= 2) {
+            if (BeyonderUtil.getSequence(player) <= 2) {
                 tag.putDouble("luckDenialTimer", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.LUCKDENIAL.get()));
                 tag.putDouble("luckDenialLuck", luck);
                 tag.putDouble("luckDenialMisfortune", misfortune);

@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
@@ -20,6 +21,7 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,13 +36,15 @@ public class LuckGifting extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             if (!checkAll(player)) {
                 return InteractionResult.FAIL;
             }
             if ((double) player.getPersistentData().getInt("monsterLuckGifting") / 2 <= player.getPersistentData().getDouble("luck")) {
-                player.displayClientMessage(Component.literal("Not enough luck").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
+                if (player instanceof Player pPlayer) {
+                    pPlayer.displayClientMessage(Component.literal("Not enough luck").withStyle(ChatFormatting.RED).withStyle(ChatFormatting.BOLD), true);
+                }
                 return InteractionResult.FAIL;
             }
             useSpirituality(player);
@@ -79,13 +83,16 @@ public class LuckGifting extends SimpleAbilityItem {
     }
 
 
-    private static void giftLuck(LivingEntity interactionTarget, Player player) {
+    private static void giftLuck(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide() && !interactionTarget.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             CompoundTag pTag = interactionTarget.getPersistentData();
             double luck = tag.getDouble("luck");
             double pLuck = pTag.getDouble("luck");
             int luckGiftingAmount = player.getPersistentData().getInt("monsterLuckGifting");
+            if (player instanceof Mob mob) {
+                luckGiftingAmount = (10 - BeyonderUtil.getSequence(player) * 5);
+            }
             tag.putDouble("luck", luck - ((double) luckGiftingAmount / 2));
             pTag.putDouble("luck", pLuck + luckGiftingAmount);
         }

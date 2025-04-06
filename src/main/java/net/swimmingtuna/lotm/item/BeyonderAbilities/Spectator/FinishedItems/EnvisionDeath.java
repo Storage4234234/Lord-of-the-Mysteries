@@ -7,7 +7,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -29,7 +28,7 @@ public class EnvisionDeath extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -40,11 +39,11 @@ public class EnvisionDeath extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void envisionDeath(Player player, int dir) {
+    private void envisionDeath(LivingEntity player, int dir) {
         if (!player.level().isClientSide()) {
             double radius = 300;
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
+                if (entity != player && !BeyonderUtil.areAllies(player, entity)) {
                     int entityHealth = (int) entity.getHealth();
                     if (entityHealth <= BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_DEATH.get())) {
                         entity.hurt(entity.damageSources().magic(), 40 + (5 * dir));
@@ -70,4 +69,13 @@ public class EnvisionDeath extends SimpleAbilityItem {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        float damage = BeyonderUtil.getDamage(livingEntity).get(this);
+        if (target != null && target.getHealth() <= damage) {
+            return 100;
+        } else {
+            return 15;
+        }
+    }
 }

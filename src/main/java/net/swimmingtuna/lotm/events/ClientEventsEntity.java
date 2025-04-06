@@ -1,18 +1,26 @@
 package net.swimmingtuna.lotm.events;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.swimmingtuna.lotm.LOTM;
+import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.entity.Model.*;
 import net.swimmingtuna.lotm.entity.Renderers.*;
 import net.swimmingtuna.lotm.entity.Renderers.PlayerMobRenderer.PlayerMobRenderer;
 import net.swimmingtuna.lotm.entity.mob.MonsterBeyonderZombieRenderer;
 import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.MobInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
 import net.swimmingtuna.lotm.particle.*;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 
 @Mod.EventBusSubscriber(modid = LOTM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientEventsEntity {
@@ -111,5 +119,26 @@ public class ClientEventsEntity {
         event.registerSpriteSet(ParticleInit.WIND_MOVE_PROJECTILES_PARTICLES.get(), WindProjectilesParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.FLASH_PARTICLE.get(), FlashParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.WIND_UNEQUIP_ARMOR_PARTICLE.get(), WindArmorParticle.Provider::new);
+    }
+
+    @SubscribeEvent
+    public static void registerItemColor(RegisterColorHandlersEvent.Item event){
+        event.register((stack, tintIndex) -> {
+            if(tintIndex == 1){
+                if(stack.hasTag() && stack.getTag().contains("pathway")){
+                    BeyonderClass pathway = BeyonderUtil.getPathwayByName(stack.getTag().getString("pathway"));
+                    ChatFormatting format = pathway.getColorFormatting();
+                    return format != null ? BeyonderUtil.chatFormatingToInt(format) : 0xFFFFFF;
+                }
+            }
+            return 0xFFFFFF;
+        }, ItemInit.BEYONDER_CHARACTERISTIC.get());
+    }
+
+    @SubscribeEvent
+    public static void onClientSetup(FMLClientSetupEvent event) {
+        ItemProperties.register(ItemInit.BEYONDER_CHARACTERISTIC.get(),
+                new ResourceLocation("random_beyonder"),
+                (stack, level, entity, seed) -> stack.hasTag() ? (float) stack.getTag().getInt("texture") : 0.0F);
     }
 }

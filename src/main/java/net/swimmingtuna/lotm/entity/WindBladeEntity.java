@@ -61,7 +61,7 @@ public class WindBladeEntity extends AbstractHurtingProjectile {
         player.level().addFreshEntity(windBladeEntity);
     }
 
-    public static void testShoot(Player player) {
+    public static void testShoot(LivingEntity player) {
         if (player.level().isClientSide()) {
             return;
         }
@@ -73,7 +73,6 @@ public class WindBladeEntity extends AbstractHurtingProjectile {
         windBladeEntity.hurtMarked = true;
         windBladeEntity.setXRot((float) direction.x);
         windBladeEntity.setYRot((float) direction.y);
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         int x = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.WIND_MANIPULATION_BLADE.get());
         if (!windBladeEntity.level().isClientSide()) {
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(windBladeEntity);

@@ -203,7 +203,6 @@ public class LOTM {
             event.accept(ItemInit.ENVISION_DEATH);
             event.accept(ItemInit.ENVISION_KINGDOM);
             event.accept(ItemInit.ENVISION_LOCATION);
-            event.accept(ItemInit.ENVISION_LOCATION_BLINK);
             event.accept(ItemInit.ENVISION_HEALTH);
             event.accept(ItemInit.HORNBEAM_ESSENTIALS_OIL);
             event.accept(ItemInit.DEEP_SEA_MARLINS_BLOOD);
@@ -281,6 +280,16 @@ public class LOTM {
             event.accept(ItemInit.MONSTER_2_POTION);
             event.accept(ItemInit.MONSTER_1_POTION);
             event.accept(ItemInit.MONSTER_0_POTION);
+            event.accept(ItemInit.WARRIOR_9_POTION);
+            event.accept(ItemInit.WARRIOR_8_POTION);
+            event.accept(ItemInit.WARRIOR_7_POTION);
+            event.accept(ItemInit.WARRIOR_6_POTION);
+            event.accept(ItemInit.WARRIOR_5_POTION);
+            event.accept(ItemInit.WARRIOR_4_POTION);
+            event.accept(ItemInit.WARRIOR_3_POTION);
+            event.accept(ItemInit.WARRIOR_2_POTION);
+            event.accept(ItemInit.WARRIOR_1_POTION);
+            event.accept(ItemInit.WARRIOR_0_POTION);
             event.accept(ItemInit.LUCKBOTTLEITEM);
             event.accept(ItemInit.RAGING_BLOWS);
             event.accept(ItemInit.AQUEOUS_LIGHT_DROWN);

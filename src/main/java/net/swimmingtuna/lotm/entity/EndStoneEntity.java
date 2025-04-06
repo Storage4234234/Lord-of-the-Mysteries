@@ -170,7 +170,7 @@ public class EndStoneEntity extends AbstractArrow {
                         entity.hurt(BeyonderUtil.genericSource(this), getDamage());
                     }
                 }
-                if (this.tickCount >= 480) {
+                if (this.tickCount >= 160) {
                     this.discard();
                 }
             }

@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -34,7 +35,7 @@ public class WaterColumn extends SimpleAbilityItem {
 
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -44,7 +45,7 @@ public class WaterColumn extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private static void waterColumn(Player player) {
+    private static void waterColumn(LivingEntity player) {
         if (!player.level().isClientSide()) {
             Level level = player.level();
             BlockPos playerPos = player.blockPosition();

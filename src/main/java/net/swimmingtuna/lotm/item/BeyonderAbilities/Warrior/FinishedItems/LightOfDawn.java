@@ -12,7 +12,6 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -34,11 +33,11 @@ public class LightOfDawn extends SimpleAbilityItem {
 
 
     public LightOfDawn(Properties properties) {
-        super(properties, BeyonderClassInit.WARRIOR, 6, 0, 20);
+        super(properties, BeyonderClassInit.WARRIOR, 6, 0, 500);
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -51,7 +50,7 @@ public class LightOfDawn extends SimpleAbilityItem {
     public static void sunriseGleam(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             int sequence = BeyonderUtil.getSequence(livingEntity);
-            int maxLifetime = 500 - (sequence * 50); // Reduced lifetime for higher sequences
+            int maxLifetime = 500 - (sequence * 50);
             float maxRadius = BeyonderUtil.getDamage(livingEntity).get(ItemInit.LIGHTOFDAWN.get());
             livingEntity.getPersistentData().putInt("lightOfDawnCounter", maxLifetime);
             int numberOfRays = 30 - (sequence * 4);
@@ -91,7 +90,7 @@ public class LightOfDawn extends SimpleAbilityItem {
                         entity.hurt(BeyonderUtil.magicSource(entity), 15.0f - sequence);
                         entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 2, true, true));
                         entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 2, true, true));
-                    } else if (BeyonderUtil.isAllyOf(livingEntity, entity) || entity == livingEntity) {
+                    } else if (BeyonderUtil.areAllies(livingEntity, entity) || entity == livingEntity) {
                         entity.heal(3.0f);
                         List<MobEffectInstance> effectsToUpdate = new ArrayList<>();
                         for (MobEffectInstance effect : entity.getActiveEffects()) {

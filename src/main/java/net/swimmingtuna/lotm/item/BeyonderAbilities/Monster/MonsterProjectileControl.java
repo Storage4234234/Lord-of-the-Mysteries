@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -23,7 +24,7 @@ public class MonsterProjectileControl extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -32,12 +33,14 @@ public class MonsterProjectileControl extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void enableOrDisableProjectileControl(Player player) {
+    public static void enableOrDisableProjectileControl(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean monsterProjectileControl = tag.getBoolean("monsterProjectileControl");
             tag.putBoolean("monsterProjectileControl", !monsterProjectileControl);
-            player.displayClientMessage(Component.literal("Projectile Movement Turned " + (monsterProjectileControl ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
+            if (player instanceof Player pPlayer) {
+                pPlayer.displayClientMessage(Component.literal("Projectile Movement Turned " + (monsterProjectileControl ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
+            }
         }
     }
 

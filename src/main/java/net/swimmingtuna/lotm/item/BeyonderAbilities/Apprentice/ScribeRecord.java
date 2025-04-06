@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -32,26 +33,26 @@ public class ScribeRecord extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (!checkAll(player)) {
+    public InteractionResult useAbility(Level level, LivingEntity living, InteractionHand hand) {
+        if (!checkAll(living)) {
             return InteractionResult.FAIL;
         }
-        openMenu(level, player, holder);
-        addCooldown(player);
-        useSpirituality(player);
+        openMenu(level, living);
+        addCooldown(living);
+        useSpirituality(living);
         return InteractionResult.SUCCESS;
     }
 
-    public void openMenu(Level level, Player player, BeyonderHolder holder){
+    public void openMenu(Level level, LivingEntity livingEntity) {
         if(!level.isClientSide){
-            NetworkHooks.openScreen((ServerPlayer) player, new MenuProvider() {
+            NetworkHooks.openScreen((ServerPlayer) livingEntity, new MenuProvider() {
                 @Override
                 public Component getDisplayName() {return Component.translatable("container.lotm.abilities");}
 
                 @Nullable
                 @Override
                 public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+                    BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
                     return new BeyonderAbilitiesItemMenu(containerId, playerInventory, holder.getCurrentClass().getAbilityItemsContainer(holder.getSequence()));
                 }
             });

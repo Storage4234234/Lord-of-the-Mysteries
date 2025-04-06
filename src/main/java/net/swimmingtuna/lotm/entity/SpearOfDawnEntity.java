@@ -71,8 +71,8 @@ public class SpearOfDawnEntity extends AbstractHurtingProjectile implements GeoE
             Entity hitEntity = result.getEntity();
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
             float scale = scaleData.getScale();
-            if (hitEntity instanceof LivingEntity livingEntity && this.getOwner() != null) {
-                livingEntity.hurt(BeyonderUtil.genericSource(this.getOwner()), scale * 25);
+            if (hitEntity instanceof LivingEntity livingEntity && this.getOwner() != null && this.getOwner() instanceof LivingEntity owner && !BeyonderUtil.areAllies(owner, livingEntity)) {
+                livingEntity.hurt(BeyonderUtil.genericSource(this.getOwner()), scale * 6);
                 this.discard();
             }
         }
@@ -176,9 +176,9 @@ public class SpearOfDawnEntity extends AbstractHurtingProjectile implements GeoE
         if (!level().isClientSide()) {
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(this);
             float scale = scaleData.getScale();
-            for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 0.6f))) {
-                if (this.getOwner() instanceof LivingEntity owner && livingEntity != owner) {
-                    livingEntity.hurt(BeyonderUtil.genericSource(this.getOwner()), scale * 18);
+            for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 0.2f))) {
+                if (this.getOwner() instanceof LivingEntity owner && livingEntity != owner && !BeyonderUtil.areAllies(livingEntity, owner)) {
+                    livingEntity.hurt(BeyonderUtil.genericSource(this.getOwner()), scale * 6);
                     this.discard();
                 }
             }

@@ -5,6 +5,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +29,7 @@ public class Discern extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 2, 1000 / dreamIntoReality, true)) {
             return InteractionResult.FAIL;
@@ -39,11 +40,11 @@ public class Discern extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void discern(Player player) {
-        if (!player.level().isClientSide()) {
+    private void discern(LivingEntity player) { //marked
+        if (!player.level().isClientSide() && player instanceof Player pPlayer) {
             for (Item item : BeyonderUtil.getAbilities(player)) {
                 if (item != ItemInit.DISCERN.get()) {
-                    player.getCooldowns().removeCooldown(item);
+                    pPlayer.getCooldowns().removeCooldown(item);
                 }
             }
         }
@@ -60,5 +61,21 @@ public class Discern extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        int priority = 0;
+        for (Item item : BeyonderUtil.getAbilities(livingEntity)) {
+            int cooldown = BeyonderUtil.getCooldownsForAbility(livingEntity, item);
+            if (cooldown != 0) {
+                priority +=  cooldown / 20;
+            }
+            if (priority >= 100) {
+                priority = 100;
+                break;
+            }
+        }
+        return priority;
     }
 }

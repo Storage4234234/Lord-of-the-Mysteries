@@ -10,11 +10,11 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.swimmingtuna.lotm.beyonder.SailorClass;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.init.SoundInit;
@@ -34,7 +34,7 @@ public class SirenSongHarm extends SimpleAbilityItem {
 
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -44,7 +44,7 @@ public class SirenSongHarm extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private static void sirenSongHarm(Player player, Level level) {
+    private static void sirenSongHarm(LivingEntity player, Level level) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             if (tag.getInt("sirenSongHarm") == 0) {
@@ -82,7 +82,7 @@ public class SirenSongHarm extends SimpleAbilityItem {
         }
         if (sirenSongHarm % 20 == 0 && sirenSongHarm != 0) {
             for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(BeyonderUtil.getDamage(livingEntity).get(ItemInit.SIREN_SONG_HARM.get())))) {
-                if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
+                if (entity != livingEntity && !BeyonderUtil.areAllies(livingEntity, entity)) {
                     BeyonderUtil.applyMentalDamage(livingEntity, entity, (float) ((double) 6 - (0.5 * sequence)));
                 }
             }
@@ -120,7 +120,7 @@ public class SirenSongHarm extends SimpleAbilityItem {
 
         if (sirenSongWeaken % 20 == 0 && sirenSongWeaken != 0) { //make it for 380,360,430 etc.
             for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(BeyonderUtil.getDamage(livingEntity).get(ItemInit.SIREN_SONG_WEAKEN.get())))) {
-                if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
+                if (entity != livingEntity && !BeyonderUtil.areAllies(livingEntity, entity)) {
 
                     entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 21, 2, false, false));
                     entity.addEffect(new MobEffectInstance(ModEffects.ABILITY_WEAKNESS.get(), 21, 1, false, false));
@@ -161,7 +161,7 @@ public class SirenSongHarm extends SimpleAbilityItem {
 
         if (sirenSongStun % 20 == 0 && sirenSongStun != 0) {
             for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(BeyonderUtil.getDamage(livingEntity).get(ItemInit.SIREN_SONG_STUN.get())))) {
-                if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
+                if (entity != livingEntity && !BeyonderUtil.areAllies(livingEntity, entity)) {
                     entity.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), 19 - (sequence * 2), 2, false, false));
                 }
             }
@@ -199,16 +199,16 @@ public class SirenSongHarm extends SimpleAbilityItem {
         }
         if (sirenSongStrengthen % 20 == 0 && sirenSongStrengthen != 0) {
             for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(BeyonderUtil.getDamage(livingEntity).get(ItemInit.SIREN_SONG_STUN.get())))) {
-                if (entity == livingEntity || BeyonderUtil.isAllyOf(livingEntity, entity)) {
+                if (entity == livingEntity || BeyonderUtil.areAllies(livingEntity, entity)) {
                     if (entity.hasEffect(MobEffects.DAMAGE_BOOST)) {
                         int strengthAmp = entity.getEffect(MobEffects.DAMAGE_BOOST).getAmplifier();
-                        entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, (int) (float) BeyonderUtil.getDamage(entity).get(ItemInit.SIREN_SONG_STRENGTHEN.get()), strengthAmp + 2));
+                        entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, (int) (float) BeyonderUtil.getDamage(entity).get(ItemInit.SIREN_SONG_STRENGTHEN.get()), Math.max(4, SailorClass.strength + 2)));
                     } else if (!entity.hasEffect(MobEffects.DAMAGE_BOOST)) {
                         entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, (int) (float) BeyonderUtil.getDamage(entity).get(ItemInit.SIREN_SONG_STRENGTHEN.get()), 2));
                     }
                     if (entity.hasEffect(MobEffects.REGENERATION)) {
                         int regenAmp = entity.getEffect(MobEffects.REGENERATION).getAmplifier();
-                        entity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, (int) (float) BeyonderUtil.getDamage(entity).get(ItemInit.SIREN_SONG_STRENGTHEN.get()), regenAmp + 2));
+                        entity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, (int) (float) BeyonderUtil.getDamage(entity).get(ItemInit.SIREN_SONG_STRENGTHEN.get()), Math.max(4, SailorClass.regeneration + 4)));
                     } else if (!entity.hasEffect(MobEffects.REGENERATION)) {
                         entity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, (int) (float) BeyonderUtil.getDamage(entity).get(ItemInit.SIREN_SONG_STRENGTHEN.get()), 2));
                     }

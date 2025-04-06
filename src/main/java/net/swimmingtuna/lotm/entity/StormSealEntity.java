@@ -104,7 +104,7 @@ public class StormSealEntity extends AbstractHurtingProjectile {
         float radius = 3 * scaleData.getScale();
         if (!this.level().isClientSide()) {
             for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius * 0.75))) {
-                if (livingEntity != null && livingEntity.getMaxHealth() >= 50 && livingEntity != this.getOwner() && (this.getOwner() instanceof LivingEntity living && !BeyonderUtil.isAllyOf(living, livingEntity))) {
+                if (livingEntity != null && livingEntity.getMaxHealth() >= 50 && livingEntity != this.getOwner() && (this.getOwner() instanceof LivingEntity living && !BeyonderUtil.areAllies(living, livingEntity))) {
                     livingEntity.getPersistentData().putInt("inStormSeal", 3600);
                     livingEntity.getPersistentData().putInt("stormSealX", (int) livingEntity.getX());
                     livingEntity.getPersistentData().putInt("stormSealY", (int) livingEntity.getY());

@@ -276,7 +276,7 @@ public class DeathKnell extends Item {
             livingEntity.removeEffect(MobEffects.MOVEMENT_SPEED);
         }
         if (livingEntity.hasEffect(MobEffects.DAMAGE_BOOST)) {
-            livingEntity.removeEffect(MobEffects.MOVEMENT_SPEED);
+            livingEntity.removeEffect(MobEffects.DAMAGE_BOOST);
         }
         livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 2, false, false));
         livingEntity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 2, false, false));

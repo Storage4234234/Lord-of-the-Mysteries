@@ -39,17 +39,17 @@ public class ExtremeColdness extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        extremeColdness(player);
+        extremeColdnessAbility(player);
         addCooldown(player);
         useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
 
-    public void extremeColdness(Player player) {
+    public void extremeColdnessAbility(LivingEntity player) {
         if (!player.level().isClientSide()) {
             player.getPersistentData().putInt("sailorExtremeColdness", 1);
         }
@@ -77,55 +77,52 @@ public class ExtremeColdness extends SimpleAbilityItem {
         CompoundTag tag = livingEntity.getPersistentData();
         //EXTREME COLDNESS
         int extremeColdness = tag.getInt("sailorExtremeColdness");
-        if (extremeColdness >= BeyonderUtil.getDamage(livingEntity).get(ItemInit.EXTREME_COLDNESS.get())) {
-            tag.putInt("sailorExtremeColdness", 0);
-            extremeColdness = 0;
-        }
-        if (extremeColdness < 1) {
-            return;
-        }
-        tag.putInt("sailorExtremeColdness", extremeColdness + 1);
-
-        AABB areaOfEffect = livingEntity.getBoundingBox().inflate(extremeColdness);
-        List<LivingEntity> entities = livingEntity.level().getEntitiesOfClass(LivingEntity.class, areaOfEffect);
-        for (LivingEntity entity : entities) {
-            if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
-                int affectedBySailorExtremeColdness = entity.getPersistentData().getInt("affectedBySailorExtremeColdness");
-                entity.getPersistentData().putInt("affectedBySailorExtremeColdness", affectedBySailorExtremeColdness + 1);
-                entity.setTicksFrozen(1);
+        if (extremeColdness >= 1) {
+            if (extremeColdness >= BeyonderUtil.getDamage(livingEntity).get(ItemInit.EXTREME_COLDNESS.get())) {
+                tag.putInt("sailorExtremeColdness", 0);
+                extremeColdness = 0;
             }
-        }
-        List<Entity> entities1 = livingEntity.level().getEntitiesOfClass(Entity.class, areaOfEffect); //test thsi
-        for (Entity entity : entities1) {
-            if (!(entity instanceof LivingEntity)) {
-                int affectedBySailorColdness = entity.getPersistentData().getInt("affectedBySailorColdness");
-                entity.getPersistentData().putInt("affectedBySailorColdness", affectedBySailorColdness + 1);
-                if (affectedBySailorColdness == 10) {
-                    entity.setDeltaMovement(entity.getDeltaMovement().x() / 5, entity.getDeltaMovement().y() / 5, entity.getDeltaMovement().z() / 5);
-                    entity.hurtMarked = true;
-                    entity.getPersistentData().putInt("affectedBySailorColdness", 0);
+            tag.putInt("sailorExtremeColdness", extremeColdness + 1);
+            AABB areaOfEffect = livingEntity.getBoundingBox().inflate(extremeColdness);
+            List<LivingEntity> entities = livingEntity.level().getEntitiesOfClass(LivingEntity.class, areaOfEffect);
+            for (LivingEntity entity : entities) {
+                if (entity != livingEntity && !BeyonderUtil.areAllies(livingEntity, entity) && entity.getPersistentData().getInt("affectedBySailorExtremeColdness") == 0) {
+                    entity.getPersistentData().putInt("affectedBySailorExtremeColdness", 20);
+                    entity.setTicksFrozen(1);
                 }
             }
-        }
-        BlockPos playerPos = livingEntity.blockPosition();
-        int radius = extremeColdness;
-        int blocksToProcessPerTick = 2000;
-        int processedBlocks = 0;
-        Map<BlockPos, Integer> heightMapCache = new HashMap<>();
-        for (int dx = -radius; dx <= radius && processedBlocks < blocksToProcessPerTick; dx++) {
-            for (int dz = -radius; dz <= radius && processedBlocks < blocksToProcessPerTick; dz++) {
-                BlockPos surfacePos = playerPos.offset(dx, 0, dz);
-                Integer surfaceY = heightMapCache.get(surfacePos);
-                if (surfaceY == null) {
-                    surfaceY = livingEntity.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, surfacePos).getY();
-                    heightMapCache.put(surfacePos, surfaceY);
+            List<Entity> entities1 = livingEntity.level().getEntitiesOfClass(Entity.class, areaOfEffect); //test thsi
+            for (Entity entity : entities1) {
+                if (!(entity instanceof LivingEntity)) {
+                    int affectedBySailorColdness = entity.getPersistentData().getInt("affectedBySailorColdness");
+                    entity.getPersistentData().putInt("affectedBySailorColdness", affectedBySailorColdness + 1);
+                    if (affectedBySailorColdness >= 1 && entity.tickCount % 10 == 0 ) {
+                        entity.setDeltaMovement(entity.getDeltaMovement().x() / 5, entity.getDeltaMovement().y() / 5, entity.getDeltaMovement().z() / 5);
+                        entity.hurtMarked = true;
+                        entity.getPersistentData().putInt("affectedBySailorColdness", 0);
+                    }
                 }
+            }
+            BlockPos playerPos = livingEntity.blockPosition();
+            int radius = extremeColdness;
+            int blocksToProcessPerTick = 2000;
+            int processedBlocks = 0;
+            Map<BlockPos, Integer> heightMapCache = new HashMap<>();
+            for (int dx = -radius; dx <= radius && processedBlocks < blocksToProcessPerTick; dx++) {
+                for (int dz = -radius; dz <= radius && processedBlocks < blocksToProcessPerTick; dz++) {
+                    BlockPos surfacePos = playerPos.offset(dx, 0, dz);
+                    Integer surfaceY = heightMapCache.get(surfacePos);
+                    if (surfaceY == null) {
+                        surfaceY = livingEntity.level().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, surfacePos).getY();
+                        heightMapCache.put(surfacePos, surfaceY);
+                    }
 
-                for (int dy = 0; dy < 3; dy++) {
-                    BlockPos targetPos = new BlockPos(surfacePos.getX(), surfaceY - dy, surfacePos.getZ());
-                    if (ExtremeColdness.canFreezeBlock(livingEntity, targetPos)) {
-                        livingEntity.level().setBlockAndUpdate(targetPos, Blocks.ICE.defaultBlockState());
-                        processedBlocks++;
+                    for (int dy = 0; dy < 3; dy++) {
+                        BlockPos targetPos = new BlockPos(surfacePos.getX(), surfaceY - dy, surfacePos.getZ());
+                        if (ExtremeColdness.canFreezeBlock(livingEntity, targetPos)) {
+                            livingEntity.level().setBlockAndUpdate(targetPos, Blocks.ICE.defaultBlockState());
+                            processedBlocks++;
+                        }
                     }
                 }
             }
@@ -137,7 +134,8 @@ public class ExtremeColdness extends SimpleAbilityItem {
         CompoundTag tag = entity.getPersistentData();
         if (!entity.level().isClientSide()) {
             int affectedBySailorExtremeColdness = tag.getInt("affectedBySailorExtremeColdness");
-            if (!entity.level().isClientSide()) {
+            if (!entity.level().isClientSide() && affectedBySailorExtremeColdness >= 1) {
+                tag.putInt("affectedBySailorExtremeColdness", affectedBySailorExtremeColdness - 1);
                 if (entity instanceof Player player) {
                     player.setTicksFrozen(3);
                 }
@@ -153,7 +151,6 @@ public class ExtremeColdness extends SimpleAbilityItem {
                 if (affectedBySailorExtremeColdness >= 20) {
                     entity.addEffect(new MobEffectInstance(ModEffects.AWE.get(), 100, 1, false, false));
                     tag.putInt("affectedBySailorExtremeColdness", 0);
-                    affectedBySailorExtremeColdness = 0;
                     entity.hurt(entity.damageSources().freeze(), 30);
                 }
             }

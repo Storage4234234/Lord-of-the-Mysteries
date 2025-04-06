@@ -8,7 +8,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -27,11 +26,11 @@ import java.util.List;
 public class AcidicRain extends SimpleAbilityItem {
 
     public AcidicRain(Properties properties) {
-        super(properties, BeyonderClassInit.SAILOR, 3, 175, 500);
+        super(properties, BeyonderClassInit.SAILOR, 5, 175, 500);
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -41,7 +40,7 @@ public class AcidicRain extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void acidicRain(Player player) {
+    private void acidicRain(LivingEntity player) {
         if (!player.level().isClientSide()) {
             player.getPersistentData().putInt("sailorAcidicRain", 1);
         }
@@ -70,7 +69,7 @@ public class AcidicRain extends SimpleAbilityItem {
 
 
         for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(radius1))) {
-            if (entity == livingEntity || BeyonderUtil.isAllyOf(livingEntity, entity)) {
+            if (entity == livingEntity || BeyonderUtil.areAllies(livingEntity, entity)) {
                 continue;
             }
             if (entity.hasEffect(MobEffects.POISON)) {

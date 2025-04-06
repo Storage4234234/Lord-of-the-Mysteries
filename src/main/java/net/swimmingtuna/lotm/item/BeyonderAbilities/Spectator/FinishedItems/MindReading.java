@@ -30,16 +30,17 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 public class MindReading extends SimpleAbilityItem {
 
 
     public MindReading(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 8, 20, 60,12,12);
+        super(properties, BeyonderClassInit.SPECTATOR, 8, 20, 60, 12, 12);
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -68,12 +69,12 @@ public class MindReading extends SimpleAbilityItem {
         return attributeBuilder.build();
     }
 
-    public static boolean usedHand(Player player) {
+    public static boolean usedHand(LivingEntity player) {
         ItemStack mainHandStack = player.getMainHandItem();
         return mainHandStack.getItem() instanceof MindReading;
     }
 
-    public static void mindRead(Player player, LivingEntity interactionTarget, ItemStack stack) {
+    public static void mindRead(LivingEntity player, LivingEntity interactionTarget, ItemStack stack) {
         if (!player.level().isClientSide()) {
             if (interactionTarget instanceof Player playerInteractionTarget) {
                 AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
@@ -115,9 +116,22 @@ public class MindReading extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        double dreamIntoReality = 1;
+        if (livingEntity instanceof Player) {
+            dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
+        }
+        if (target != null && dreamIntoReality >= 1) {
+            return 15;
+        }
+        return 0;
     }
 }
 

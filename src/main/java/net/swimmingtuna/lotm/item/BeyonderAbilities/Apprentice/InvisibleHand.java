@@ -41,14 +41,14 @@ public class InvisibleHand extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        if (player.getPersistentData().getUUID("invisibleHandEntity").equals(new UUID(0, 0))) {
+    public InteractionResult useAbility(Level level, LivingEntity livingEntity, InteractionHand hand) {
+        if (livingEntity.getPersistentData().getUUID("invisibleHandEntity").equals(new UUID(0, 0))) {
             return InteractionResult.FAIL;
         }
-        if (!checkAll(player)) {
+        if (!checkAll(livingEntity)) {
             return InteractionResult.FAIL;
         }
-        releaseEntity(player);
+        releaseEntity(livingEntity);
         return InteractionResult.SUCCESS;
     }
 
@@ -72,12 +72,12 @@ public class InvisibleHand extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
-        if (!player.level().isClientSide && !interactionTarget.level().isClientSide) {
-            if (!checkAll(player)) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity livingEntity, LivingEntity interactionTarget, InteractionHand hand) {
+        if (!livingEntity.level().isClientSide && !interactionTarget.level().isClientSide) {
+            if (!checkAll(livingEntity)) {
                 return InteractionResult.FAIL;
             }
-            grabEntity(player, interactionTarget);
+            grabEntity(livingEntity, interactionTarget);
         }
         return InteractionResult.SUCCESS;
     }
@@ -142,7 +142,7 @@ public class InvisibleHand extends SimpleAbilityItem {
                         double y = blockHit.getLocation().y();
                         double z = blockHit.getLocation().z();
                         target.teleportTo(x, y, z);
-                        if (BeyonderUtil.isAllyOf(livingEntity, target)) {
+                        if (BeyonderUtil.areAllies(livingEntity, target)) {
                             target.fallDistance = 0;
                         } else {
                             target.fallDistance = (float) (target.getY() - target.level().getHeight(Heightmap.Types.WORLD_SURFACE, (int) x, (int) y));

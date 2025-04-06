@@ -34,18 +34,20 @@ public class TsunamiSeal extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        player.getCooldowns().addCooldown(ItemInit.TSUNAMI.get(), 2400);
+        if (player instanceof Player pPlayer) {
+            pPlayer.getCooldowns().addCooldown(ItemInit.TSUNAMI.get(), 2400);
+        }
         addCooldown(player);
         useSpirituality(player);
         startTsunami(player);
         return InteractionResult.SUCCESS;
     }
 
-    public static void startTsunami(Player player) {
+    public static void startTsunami(LivingEntity player) {
         if (!player.level().isClientSide()) {
             player.getPersistentData().putInt("sailorTsunamiSeal", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.TSUNAMI_SEAL.get()));
             float yaw = player.getYRot();
@@ -214,7 +216,7 @@ public class TsunamiSeal extends SimpleAbilityItem {
         );
         player.level().getEntitiesOfClass(LivingEntity.class, tsunamiAABB).forEach(livingEntity -> {
             if (livingEntity != player) {
-                if (livingEntity.getMaxHealth() >= 100 || livingEntity instanceof Player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
+                if (livingEntity.getMaxHealth() >= 100 || livingEntity instanceof Player && !BeyonderUtil.areAllies(player, livingEntity)) {
                     player.getPersistentData().putInt("sailorTsunamiSeal", 0);
                     livingEntity.getPersistentData().putInt("sailorSeal", 1200);
                     livingEntity.getPersistentData().putInt("sailorSealX", (int) livingEntity.getX());

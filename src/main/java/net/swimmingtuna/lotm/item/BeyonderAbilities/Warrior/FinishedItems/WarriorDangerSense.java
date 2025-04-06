@@ -28,7 +28,7 @@ public class WarriorDangerSense extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -52,14 +52,13 @@ public class WarriorDangerSense extends SimpleAbilityItem {
         }
         double radius = 200 - (BeyonderUtil.getSequence(livingEntity) * 20);
         for (Player otherPlayer : livingEntity.level().getEntitiesOfClass(Player.class, livingEntity.getBoundingBox().inflate(radius))) {
-            if (otherPlayer == livingEntity || BeyonderUtil.isAllyOf(livingEntity, otherPlayer)) {
+            if (otherPlayer == livingEntity || BeyonderUtil.areAllies(livingEntity, otherPlayer)) {
                 continue;
             }
             if (otherPlayer.getMainHandItem().getItem() instanceof SimpleAbilityItem || otherPlayer.getMainHandItem().getItem() instanceof ProjectileWeaponItem || otherPlayer.getMainHandItem().getItem() instanceof SwordItem || otherPlayer.getMainHandItem().getItem() instanceof AxeItem) { //also add for sealed artifacts
                 Vec3 directionToPlayer = otherPlayer.position().subtract(livingEntity.position()).normalize();
                 Vec3 lookAngle = livingEntity.getLookAngle();
                 double horizontalAngle = Math.atan2(directionToPlayer.x, directionToPlayer.z) - Math.atan2(lookAngle.x, lookAngle.z);
-
                 String horizontalDirection;
                 if (Math.abs(horizontalAngle) < Math.PI / 4) {
                     horizontalDirection = "in front of";

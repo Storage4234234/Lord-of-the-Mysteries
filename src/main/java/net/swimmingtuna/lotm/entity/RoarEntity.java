@@ -123,7 +123,7 @@ public class RoarEntity extends AbstractHurtingProjectile {
                     float blockStrength = block.defaultDestroyTime();
                     float obsidianStrength = Blocks.OBSIDIAN.defaultDestroyTime();
 
-                    if (blockStrength <= obsidianStrength) {
+                    if (blockStrength <= obsidianStrength && block != Blocks.BEDROCK) {
                         this.level().setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
                     }
                 }

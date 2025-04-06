@@ -7,7 +7,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -32,11 +31,11 @@ public class MatterAccelerationEntities extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        matterAccelerationEntities(player);
+        matterAccelerationEntitiesAbility(player);
         addCooldown(player);
         useSpirituality(player);
         return InteractionResult.SUCCESS;
@@ -53,11 +52,11 @@ public class MatterAccelerationEntities extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public void matterAccelerationEntities(Player player) {
+    public void matterAccelerationEntitiesAbility(LivingEntity player) {
         if (!player.level().isClientSide()) {
             AABB searchBox = player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.MATTER_ACCELERATION_ENTITIES.get()));
             for (Entity entity : player.level().getEntitiesOfClass(Entity.class, searchBox)) {
-                if (entity != player && (entity instanceof LivingEntity || entity instanceof Projectile) && (entity instanceof LivingEntity living && !BeyonderUtil.isAllyOf(player, living))) {
+                if (entity != player && (entity instanceof LivingEntity || entity instanceof Projectile) && (entity instanceof LivingEntity living && !BeyonderUtil.areAllies(player, living))) {
                     Vec3 currentMovement = entity.getDeltaMovement();
                     double speed = currentMovement.length();
                     Vec3 normalizedMovement = currentMovement.normalize();

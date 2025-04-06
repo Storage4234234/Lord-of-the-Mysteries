@@ -9,6 +9,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.*;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -146,80 +147,73 @@ public class WarriorClass implements BeyonderClass {
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 1, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 0, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 0, false, false);
                     speed = 1;
                     strength = 1;
                     resistance = 0;
-                    regen = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 6) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 0, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 0, false, false);
                     speed = 1;
                     strength = 2;
                     resistance = 0;
-                    regen = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 5) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 0, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 1, false, false);
                     speed = 1;
                     strength = 2;
-                    resistance = 1;
-                    regen = 1;
+                    resistance = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 4) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
-                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 2, false, false);
                     speed = 2;
                     strength = 3;
-                    resistance = 1;
-                    regen = 2;
+                    resistance = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 3) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
-                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 2, false, false);
                     speed = 2;
                     strength = 3;
-                    resistance = 1;
-                    regen = 2;
+                    resistance = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 2) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
-                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 2, false, false);
                     speed = 2;
                     strength = 3;
-                    resistance = 2;
-                    regen = 2;
+                    resistance = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 1) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
-                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 2, false, false);
                     speed = 2;
                     strength = 3;
-                    resistance = 2;
-                    regen = 2;
+                    resistance = 0;
+                    regen = -1;
                 } else if (sequenceLevel == 0) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
                     applyMobEffect(player, MobEffects.JUMP, 300, 2, false, false);
-                    applyMobEffect(player, MobEffects.REGENERATION, 300, 2, false, false);
+                    applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
                     speed = 2;
                     strength = 3;
-                    resistance = 2;
-                    regen = 2;
+                    resistance = 0;
+                    regen = -1;
                 }
             }
         }
@@ -249,6 +243,8 @@ public class WarriorClass implements BeyonderClass {
         items.put(1, ItemInit.DIVINEHANDLEFT.get());
         items.put(1, ItemInit.DIVINEHANDRIGHT.get());
         items.put(1, ItemInit.TWILIGHTMANIFESTATION.get());
+        items.remove(0, ItemInit.AURAOFGLORY.get());
+        items.remove(0, ItemInit.BEAMOFGLORY.get());
         items.put(0, ItemInit.AURAOFTWILIGHT.get());
         items.put(0, ItemInit.TWILIGHTFREEZE.get());
         items.put(0, ItemInit.TWILIGHTACCELERATE.get());
@@ -263,165 +259,12 @@ public class WarriorClass implements BeyonderClass {
         return ChatFormatting.DARK_RED;
     }
 
-    public static void warriorDamageNegation(LivingHurtEvent event) {
-        LivingEntity livingEntity = event.getEntity();
-        DamageSource source = event.getSource();
-        Entity entitySource = source.getEntity();
-        if (!livingEntity.level().isClientSide()) {
-            // boolean isWearingDawnArmor =
-            //boolean isWearingSilverArmor =
-            boolean isGiant = livingEntity.getPersistentData().getBoolean("warriorGiant");
-            boolean isHoGGiant = livingEntity.getPersistentData().getBoolean("handOfGodGiant");
-            boolean isTwilightGiant = livingEntity.getPersistentData().getBoolean("twilightGiant");
-            boolean isPhysical = BeyonderUtil.isPhysicalDamage(source);
-            boolean isSupernatural = BeyonderUtil.isSupernaturalDamage(source);
-            float amount = event.getAmount();
-            int sequence = -1;
 
-
-            if (livingEntity instanceof Player player) {
-                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                sequence = holder.getSequence();
-            } else if (livingEntity instanceof PlayerMobEntity player) {
-                sequence = player.getCurrentSequence();
-            }
-            //if wearing silver armor, if damage is under 25 HP, it's damage is reduced by 80%
-            boolean isWarrior = BeyonderUtil.currentPathwayMatchesNoException(livingEntity, BeyonderClassInit.WARRIOR.get());
-            if (hasFullSilverArmor(livingEntity) || hasFullDawnArmor(livingEntity)) {
-                if (hasFullSilverArmor(livingEntity)) {
-                    if (event.getAmount() <= 25) {
-                        event.setAmount(0);
-                    } else {
-                        event.setAmount(amount * 0.33f);
-                    }
-                } else if (hasFullDawnArmor(livingEntity)) {
-                    if (livingEntity.tickCount % 2 == 0) {
-                        BeyonderUtil.useSpirituality(livingEntity, 2);
-                    }
-                    if (event.getAmount() <= 10) {
-                        event.setAmount(0);
-                    } else if (isSupernatural) {
-                        event.setAmount(amount / 2);
-                    }
-                }
-            }
-            if (isWarrior) {
-                if (sequence == 8) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.75));
-                    }
-                } else if (sequence == 7) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.75));
-                    } else if (isPhysical) {
-                        event.setAmount((float) (amount * 0.7));
-                    }
-                } else if (sequence == 6) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.7));
-                    } else if (isPhysical) {
-                        if (!isGiant) {
-                            event.setAmount((float) (amount * 0.6));
-                        } else {
-                            if (event.getAmount() <= 5) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.45));
-                            }
-                        }
-                    }
-                } else if (sequence == 5) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.7));
-                    } else if (isPhysical) {
-                        if (!isGiant) {
-                            event.setAmount((float) (amount * 0.5));
-                        } else {
-                            if (event.getAmount() <= 7) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.35));
-                            }
-                        }
-                    }
-                } else if (sequence == 4) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.6));
-                    } else if (isPhysical) {
-                        if (!isGiant) {
-                            event.setAmount((float) (amount * 0.45));
-                        } else {
-                            if (event.getAmount() <= 10) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.35));
-                            }
-                        }
-                    }
-                } else if (sequence == 3 || sequence == 2) {
-                    if (isSupernatural) {
-                        event.setAmount((float) (amount * 0.6));
-                    } else if (isPhysical) {
-                        if (!isGiant) {
-                            event.setAmount((float) (amount * 0.4));
-                        } else {
-                            if (amount <= 15) {
-                                event.setCanceled(true);
-                            } else {
-                                event.setAmount((float) (amount * 0.35));
-                            }
-                        }
-                    }
-                } else if (sequence == 1) {
-                    if (isSupernatural) {
-                        if (isHoGGiant) {
-                            if (event.getAmount() <= 20) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.3));
-                            }
-                        }
-                    } else if (isPhysical) {
-                        if (isHoGGiant) {
-                            if (event.getAmount() <= 20) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.275));
-                            }
-                        } else {
-                            event.setAmount((float) (amount * 0.35));
-                        }
-                    }
-                } else if (sequence == 0) {
-                    if (isSupernatural) {
-                        if (isTwilightGiant) {
-                            if (event.getAmount() <= 25) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.2));
-                            }
-                        } else {
-                            event.setAmount((float) (amount * 0.5));
-                        }
-                    } else if (isPhysical) {
-                        if (isHoGGiant) {
-                            if (event.getAmount() <= 25) {
-                                event.setAmount(0);
-                            } else {
-                                event.setAmount((float) (amount * 0.2));
-                            }
-                        } else {
-                            event.setAmount((float) (amount * 0.35));
-                        }
-                    }
-                }
-            }
-        }
-    }
     public static void newWarriorDamageNegation(LivingHurtEvent event) {
         LivingEntity livingEntity = event.getEntity();
         DamageSource source = event.getSource();
         Entity entitySource = source.getEntity();
+        boolean isBeyonder = entitySource instanceof LivingEntity living && BeyonderUtil.isBeyonder(living);
         if (!livingEntity.level().isClientSide()) {
             boolean isGiant = livingEntity.getPersistentData().getBoolean("warriorGiant");
             boolean isHoGGiant = livingEntity.getPersistentData().getBoolean("handOfGodGiant");
@@ -452,9 +295,10 @@ public class WarriorClass implements BeyonderClass {
                 if (livingEntity.tickCount % 2 == 0) {
                     BeyonderUtil.useSpirituality(livingEntity, 2);
                 }
-                if (originalAmount <= 10) {
-                    event.setAmount(0);
-                    return;
+                float maxDamageAmount = isBeyonder ? 10 - (sequence) : 5 - ((float) sequence / 2);
+                if (originalAmount <= maxDamageAmount) {
+                    physicalReduction += 0.75f;
+                    supernaturalReduction += 0.75f;
                 }
             }
             if (isWarrior && isPhysical) {
@@ -491,7 +335,7 @@ public class WarriorClass implements BeyonderClass {
                 physicalReduction += 0.5f;
                 supernaturalReduction += 0.2f;
             } else if (hasFullDawnArmor(livingEntity) && isSupernatural) {
-                supernaturalReduction += 0.4f;
+                supernaturalReduction += (0.4f) - (sequence * 0.05f);
             }
             if (isWarrior) {
                 if (sequence == 8) {
@@ -548,6 +392,8 @@ public class WarriorClass implements BeyonderClass {
                     if (isSupernatural) {
                         if (isHoGGiant) {
                             supernaturalReduction += 0.63f;
+                        } else {
+                            supernaturalReduction += 0.42f;
                         }
                     } else if (isPhysical) {
                         if (isHoGGiant) {
@@ -567,16 +413,21 @@ public class WarriorClass implements BeyonderClass {
                         if (isTwilightGiant) {
                             physicalReduction += 0.6f;
                         } else {
-                            physicalReduction += 0.49f;
+                            physicalReduction += 0.5f;
                         }
                     }
                 }
             }
+            if (!isBeyonder && (!(entitySource instanceof Projectile projectile && projectile.getOwner() != null && projectile.getOwner() instanceof Player))) {
+                physicalReduction *= 0.5f;
+                supernaturalReduction *= 0.5f;
+            }
+            float maxReduction = Math.max(0.3f, Math.min(0.7f, (10 - sequence) * 0.075f));
             if (isPhysical) {
-                float finalReduction = Math.min(physicalReduction, 0.7f);
+                float finalReduction = Math.min(physicalReduction, maxReduction);
                 event.setAmount(amount * (1.0f - finalReduction));
             } else if (isSupernatural) {
-                float finalReduction = Math.min(supernaturalReduction, 0.7f);
+                float finalReduction = Math.min(supernaturalReduction, maxReduction);
                 event.setAmount(amount * (1.0f - finalReduction));
             }
         }

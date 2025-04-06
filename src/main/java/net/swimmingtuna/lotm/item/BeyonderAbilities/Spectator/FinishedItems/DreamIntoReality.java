@@ -38,7 +38,7 @@ public class DreamIntoReality extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -46,12 +46,13 @@ public class DreamIntoReality extends SimpleAbilityItem {
             addCooldown(player);
         } else {
             useSpirituality(player);
+            addCooldown(player, this, 20);
         }
         toggleFlying(player);
         return InteractionResult.SUCCESS;
     }
 
-    private void toggleFlying(Player player) {
+    private void toggleFlying(LivingEntity player) {
         if (!player.level().isClientSide()) {
             boolean canFly = player.getPersistentData().getBoolean(CAN_FLY);
             if (canFly) {
@@ -62,14 +63,14 @@ public class DreamIntoReality extends SimpleAbilityItem {
         }
     }
 
-    private void startFlying(Player player) {
-        if (!player.level().isClientSide()) {
+    private void startFlying(LivingEntity player) { //marked
+        if (!player.level().isClientSide() && player instanceof Player pPlayer) {
             AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
             if (dreamIntoReality.getValue() != 3) {
                 player.getPersistentData().putBoolean(CAN_FLY, true);
-                Abilities playerAbilities = player.getAbilities();
+                Abilities playerAbilities = pPlayer.getAbilities();
                 dreamIntoReality.setBaseValue(4);
-                if (!player.isCreative()) {
+                if (!pPlayer.isCreative()) {
                     playerAbilities.mayfly = true;
                     playerAbilities.flying = true;
                     playerAbilities.setFlyingSpeed(0.1F);
@@ -77,7 +78,7 @@ public class DreamIntoReality extends SimpleAbilityItem {
                 ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
                 scaleData.setTargetScale(scaleData.getBaseScale() * 12);
                 scaleData.markForSync(true);
-                player.onUpdateAbilities();
+                pPlayer.onUpdateAbilities();
                 if (player instanceof ServerPlayer serverPlayer) {
                     serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
                 }
@@ -121,7 +122,7 @@ public class DreamIntoReality extends SimpleAbilityItem {
                 BeyonderUtil.useSpirituality(livingEntity, 10);
             }
         }
-        if (BeyonderUtil.getSpirituality(livingEntity) >= 15) {
+        if (BeyonderUtil.getSpirituality(livingEntity) <= 15) {
             DreamIntoReality.stopFlying(livingEntity);
         }
         if (BeyonderUtil.getSequence(livingEntity) == 2) {
@@ -152,5 +153,16 @@ public class DreamIntoReality extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && ((float) BeyonderUtil.getMaxSpirituality(livingEntity) / BeyonderUtil.getSpirituality(livingEntity) >= 0.5f) && BeyonderUtil.getSequence(livingEntity) <= 4 && BeyonderUtil.getSequence(livingEntity) != -1) {
+            return  55;
+        } else if (livingEntity.getPersistentData().getBoolean("CanFly") && BeyonderUtil.getSpirituality(livingEntity) <= 1000) {
+            return  100;
+        } else {
+            return 0;
+        }
     }
 }

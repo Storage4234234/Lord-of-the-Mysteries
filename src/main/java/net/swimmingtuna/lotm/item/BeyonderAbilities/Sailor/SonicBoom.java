@@ -37,7 +37,7 @@ public class SonicBoom extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -47,12 +47,11 @@ public class SonicBoom extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void sonicBoom(Player player) {
+    public static void sonicBoom(LivingEntity player) {
         if (!(player.level() instanceof ServerLevel serverLevel)) {
             return;
         }
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int sequence = holder.getSequence();
+        int sequence = BeyonderUtil.getSequence(player);
         Vec3 lookVec = player.getLookAngle().scale(100);
         player.hurtMarked = true;
         player.setDeltaMovement(lookVec.x(), lookVec.y(), lookVec.z());
@@ -68,10 +67,8 @@ public class SonicBoom extends SimpleAbilityItem {
                 entity.addEffect(new MobEffectInstance(ModEffects.AWE.get(), duration, 1, false, false));
                 entity.hurt(entity.damageSources().generic(), damage);
             } else {
-
-                int sequence2 = holder.getSequence();
-                int duration2 = duration - (50 - (sequence2 * 5));
-                int damage2 = (int) (damage - (8 - (sequence2 * 0.5)));
+                int duration2 = duration - (50 - (sequence * 5));
+                int damage2 = (int) (damage - (8 - (sequence * 0.5)));
                 entity.addEffect(new MobEffectInstance(ModEffects.AWE.get(), duration2, 1, false, false));
                 entity.hurt(entity.damageSources().generic(), damage2);
             }

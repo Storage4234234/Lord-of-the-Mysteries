@@ -27,11 +27,11 @@ public class RainEyes extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        rainEyes(player);
+        rainEyesAbility(player);
         addCooldown(player);
         useSpirituality(player);
         return InteractionResult.SUCCESS;
@@ -61,20 +61,24 @@ public class RainEyes extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public static void rainEyes(Player player) {
+    public static void rainEyesAbility(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean torrentialDownpour = tag.getBoolean("torrentialDownpour");
             if (torrentialDownpour) {
                 tag.putBoolean("torrentialDownpour", false);
-                player.displayClientMessage(Component.literal("Rain eyes disabled").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
+                if (player instanceof Player pPlayer) {
+                    pPlayer.displayClientMessage(Component.literal("Rain eyes disabled").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
+                }
             } else {
                 tag.putBoolean("torrentialDownpour", true);
-                player.displayClientMessage(Component.literal("Rain eyes enabled").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
-
+                if (player instanceof Player pPlayer) {
+                    pPlayer.displayClientMessage(Component.literal("Rain eyes enabled").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE), true);
+                }
             }
         }
     }
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);

@@ -134,7 +134,7 @@ public class DivineHandRightEntity extends AbstractHurtingProjectile implements 
             float scale = scaleData.getScale();
             if (this.getOwner() != null && this.getOwner() instanceof LivingEntity owner) {
                 for (LivingEntity livingEntity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(scale * 0.8f))) {
-                    if (livingEntity != owner && BeyonderUtil.isAllyOf(owner, livingEntity)) {
+                    if (livingEntity != owner && BeyonderUtil.areAllies(owner, livingEntity)) {
                         livingEntity.getPersistentData().putDouble("luck", livingEntity.getPersistentData().getDouble("luck") + 25);
                         livingEntity.getPersistentData().putUUID("divineHandUUID", owner.getUUID());
                         livingEntity.getPersistentData().putInt("divineHandGuarding", 1200);
@@ -143,7 +143,7 @@ public class DivineHandRightEntity extends AbstractHurtingProjectile implements 
                         }
                         owner.sendSystemMessage(Component.literal("Guarding Entity:" + livingEntity.getScoreboardName()).withStyle(ChatFormatting.YELLOW));
                     }
-                    if (livingEntity == owner || BeyonderUtil.isAllyOf(owner ,livingEntity) && livingEntity.getPersistentData().getInt("divineHandLuckCooldown") == 0) {
+                    if (livingEntity == owner || BeyonderUtil.areAllies(owner ,livingEntity) && livingEntity.getPersistentData().getInt("divineHandLuckCooldown") == 0) {
                         livingEntity.getPersistentData().putDouble("corruption", livingEntity.getPersistentData().getDouble("corruption") - 25);
                         for (MobEffectInstance mobEffect : livingEntity.getActiveEffects()) {
                             MobEffect type = mobEffect.getEffect();

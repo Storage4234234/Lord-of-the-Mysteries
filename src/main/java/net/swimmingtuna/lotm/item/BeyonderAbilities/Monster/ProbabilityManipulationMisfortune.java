@@ -18,8 +18,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -69,7 +67,7 @@ public class ProbabilityManipulationMisfortune extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
         if (!checkAll(player, BeyonderClassInit.MONSTER.get(), 0,1000, true)) {
             return InteractionResult.FAIL;
         }
@@ -80,11 +78,10 @@ public class ProbabilityManipulationMisfortune extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack pStack, Player player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
+    public InteractionResult useAbilityOnEntity(ItemStack pStack, LivingEntity player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
         probabilityWipeEntity(pInteractionTarget);
         addCooldown(player);
         useSpirituality(player);
@@ -97,13 +94,13 @@ public class ProbabilityManipulationMisfortune extends SimpleAbilityItem {
         }
     }
 
-    public static void probabilityWipeWorld(Player player) {
+    public static void probabilityWipeWorld(LivingEntity player) {
         Level level = player.level();
         if (!level.isClientSide()) {
             for (Player pPlayer : level.players()) {
                 for (LivingEntity livingEntity : pPlayer.level().getEntitiesOfClass(LivingEntity.class, pPlayer.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.PROBABILITYMISFORTUNE.get())))) {
                     if (player.isShiftKeyDown()) {
-                        if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
+                        if (livingEntity != player && !BeyonderUtil.areAllies(player, livingEntity)) {
                             giveMisfortuneEvents(livingEntity);
                         }
                     } else {

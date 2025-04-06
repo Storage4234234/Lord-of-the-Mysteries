@@ -14,7 +14,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -44,7 +43,7 @@ public class GlobeOfTwilight extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -55,7 +54,7 @@ public class GlobeOfTwilight extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -68,7 +67,7 @@ public class GlobeOfTwilight extends SimpleAbilityItem {
     public static void globeOfTwilight(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(100))) {
-                if (living != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, living)) {
+                if (living != livingEntity && !BeyonderUtil.areAllies(livingEntity, living)) {
                     living.getPersistentData().putInt("globeOfTwilightX", (int) living.getX());
                     living.getPersistentData().putInt("globeOfTwilightY", (int) living.getY());
                     living.getPersistentData().putInt("globeOfTwilightZ", (int) living.getZ());
@@ -107,7 +106,6 @@ public class GlobeOfTwilight extends SimpleAbilityItem {
                         double startX, startY, startZ, endX, endY, endZ;
 
                         if (i < 4) {
-                            // Bottom face edges
                             startX = x + (i == 0 || i == 3 ? -halfSize : halfSize);
                             startZ = z + (i == 0 || i == 1 ? -halfSize : halfSize);
                             startY = y - halfSize;
@@ -115,7 +113,6 @@ public class GlobeOfTwilight extends SimpleAbilityItem {
                             endZ = z + (i == 2 || i == 3 ? halfSize : -halfSize);
                             endY = y - halfSize;
                         } else if (i < 8) {
-                            // Top face edges
                             startX = x + (i == 4 || i == 7 ? -halfSize : halfSize);
                             startZ = z + (i == 4 || i == 5 ? -halfSize : halfSize);
                             startY = y + halfSize;
@@ -123,7 +120,6 @@ public class GlobeOfTwilight extends SimpleAbilityItem {
                             endZ = z + (i == 6 || i == 7 ? halfSize : -halfSize);
                             endY = y + halfSize;
                         } else {
-                            // Vertical edges connecting top and bottom faces
                             int j = i - 8;
                             startX = x + (j == 0 || j == 2 ? -halfSize : halfSize);
                             startZ = z + (j == 0 || j == 1 ? -halfSize : halfSize);

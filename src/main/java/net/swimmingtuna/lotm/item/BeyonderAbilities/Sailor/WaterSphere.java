@@ -33,7 +33,7 @@ public class WaterSphere extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -43,7 +43,7 @@ public class WaterSphere extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private static void waterSphere(Player player) {
+    private static void waterSphere(LivingEntity player) {
         if (!player.level().isClientSide()) {
             player.getPersistentData().putInt("sailorSphere", (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.WATER_SPHERE.get()));
         }

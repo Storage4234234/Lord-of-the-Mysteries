@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -34,7 +35,7 @@ public class DomainOfProvidence extends SimpleAbilityItem {
         super(properties, BeyonderClassInit.MONSTER, 4, 400, 600);
     }
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -54,7 +55,7 @@ public class DomainOfProvidence extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void makeDomainOfProvidence(Player player) {
+    private void makeDomainOfProvidence(LivingEntity player) {
         if (!player.level().isClientSide()) {
             Vec3 eyePosition = player.getEyePosition();
             Vec3 lookVector = player.getLookAngle();

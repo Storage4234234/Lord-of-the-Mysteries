@@ -28,7 +28,7 @@ public class WindPushArea extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -39,7 +39,7 @@ public class WindPushArea extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if(!player.level().isClientSide && !interactionTarget.level().isClientSide){
             if (!checkAll(player)) {
                 return InteractionResult.FAIL;
@@ -51,7 +51,7 @@ public class WindPushArea extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void push(Player player, Level level){
+    public static void push(LivingEntity player, Level level){
         for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(BeyonderUtil.getDamage(player).get(ItemInit.TRICKWINDPUSH.get())))){
             Vec3 playerPos = player.position();
             Vec3 entityPos = entity.position();
@@ -61,7 +61,7 @@ public class WindPushArea extends SimpleAbilityItem {
         }
     }
 
-    public static void pushTarget(Player player, LivingEntity entity) {
+    public static void pushTarget(LivingEntity player, LivingEntity entity) {
         Vec3 playerPos = player.position();
         Vec3 entityPos = entity.position();
         Vec3 direction = playerPos.subtract(entityPos).normalize();

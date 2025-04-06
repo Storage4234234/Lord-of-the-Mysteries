@@ -12,7 +12,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -40,24 +39,24 @@ public class Freeze extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand){
-        if(!player.level().isClientSide && !interactionTarget.level().isClientSide){
-            if (!checkAll(player)) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity livingEntity, LivingEntity interactionTarget, InteractionHand hand){
+        if(!livingEntity.level().isClientSide && !interactionTarget.level().isClientSide){
+            if (!checkAll(livingEntity)) {
                 return InteractionResult.FAIL;
             }
-            addCooldown(player);
-            useSpirituality(player);
-            freezeEntity(player, interactionTarget);
+            addCooldown(livingEntity);
+            useSpirituality(livingEntity);
+            freezeEntity(livingEntity, interactionTarget);
         }
         return InteractionResult.SUCCESS;
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        if (!checkAll(player)) {
+    public InteractionResult useAbility(Level level, LivingEntity livingEntity, InteractionHand hand) {
+        if (!checkAll(livingEntity)) {
             return InteractionResult.FAIL;
         }
-        freezeAura(player);
+        freezeAura(livingEntity);
         return InteractionResult.SUCCESS;
     }
 
@@ -68,7 +67,7 @@ public class Freeze extends SimpleAbilityItem {
     public static void freezeAura(LivingEntity livingEntity) {
         int damage =(int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TRICKFREEZE.get());
         for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(damage))) {
-            if (living != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, living)) {
+            if (living != livingEntity && !BeyonderUtil.areAllies(livingEntity, living)) {
                 living.addEffect(new MobEffectInstance(ModEffects.PARALYSIS.get(), (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TRICKFREEZE.get()) / 3, 2, false, false));
             }
         }

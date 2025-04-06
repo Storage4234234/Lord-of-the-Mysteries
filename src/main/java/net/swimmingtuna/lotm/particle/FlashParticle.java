@@ -14,7 +14,7 @@ public class FlashParticle extends TextureSheetParticle {
         this.yd = yd;
         this.zd = zd;
         this.quadSize *= 40;
-        this.lifetime = 10;
+        this.lifetime = 40;
         this.setSpriteFromAge(spriteSet);
 
         this.rCol = 1f;

@@ -5,10 +5,15 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -19,11 +24,13 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 import static net.swimmingtuna.lotm.util.BeyonderUtil.removePathway;
@@ -36,7 +43,7 @@ public class FateReincarnation extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -46,18 +53,58 @@ public class FateReincarnation extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void fateReincarnation(Player player) { //add functionality for being able to control a player mob
+    private void fateReincarnation(LivingEntity player) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             int x = (int) (player.getX() + (Math.random() * 5000) - 2500);
             int z = (int) (player.getZ() + (Math.random() * 5000) - 2500);
             int surfaceY = getNonAirSurfaceBlock(player.level(),x,z);
             player.teleportTo(x, surfaceY + 4, z);
             player.getPersistentData().putInt("monsterReincarnationCounter", 7200);
-            if (holder.getSequence() == 0) {
+            if (BeyonderUtil.getSequence(player) == 0) {
                 player.getPersistentData().putBoolean("monsterReincarnation", true);
             } else {
                 player.getPersistentData().putBoolean("monsterReincarnation", false);
+            }
+        }
+    }
+
+    private static void restoreDataReboot(LivingEntity player, CompoundTag tag) {
+        for (MobEffectInstance activeEffect : new ArrayList<>(player.getActiveEffects())) {
+            player.removeEffect(activeEffect.getEffect());
+        }
+        int age = tag.getInt("monsterRebootAge");
+        int sanity = tag.getInt("monsterRebootSanity");
+        int luck = tag.getInt("monsterRebootLuck");
+        int misfortune = tag.getInt("monsterRebootMisfortune");
+        int corruption = tag.getInt("monsterRebootCorruption");
+        int health = tag.getInt("monsterRebootHealth");
+        int spirituality = tag.getInt("monsterRebootSpirituality");
+        int effectCount = tag.getInt("monsterRebootPotionEffectsCount");
+        int ageDecay = tag.getInt("monsterRebootAgeDecay");
+        for (int i = 0; i < effectCount; i++) {
+            CompoundTag effectTag = tag.getCompound("monsterRebootPotionEffect_" + i);
+            MobEffectInstance effect = MobEffectInstance.load(effectTag);
+            if (effect != null) {
+                player.addEffect(effect);
+            }
+        }
+        tag.putInt("ageDecay", ageDecay);
+        tag.putInt("age", age);
+        tag.putDouble("sanity", sanity);
+        tag.putDouble("corruption", corruption);
+        tag.putDouble("luck", luck);
+        tag.putDouble("misfortune", misfortune);
+        BeyonderUtil.setSpirituality(player, spirituality);
+        player.setHealth(Math.max(1, health));
+        List<Item> beyonderAbilities = BeyonderUtil.getAbilities(player);
+        for (Item item : beyonderAbilities) {
+            if (player instanceof Player pPlayer) {
+                if (item instanceof SimpleAbilityItem simpleAbilityItem) {
+                    String itemCooldowns = item.getDescription().toString();
+                    float savedCooldownPercent = tag.getFloat("monsterRebootCooldown" + itemCooldowns);
+                    int remainingCooldownTicks = (int) (simpleAbilityItem.getCooldown() * savedCooldownPercent);
+                    pPlayer.getCooldowns().addCooldown(item, remainingCooldownTicks);
+                }
             }
         }
     }
@@ -85,7 +132,7 @@ public class FateReincarnation extends SimpleAbilityItem {
                 }
                 if (x >= 7100) {
                     scaleData.setScale(0.2f);
-                    removePathway(livingEntity);
+                    removePathwayForMonster(livingEntity);
                 } else if (x >= 6900) {
                     scaleData.setScale(0.25f);
                     setPathwayAndSequence(livingEntity,BeyonderClassInit.MONSTER.get(), 9);
@@ -119,7 +166,7 @@ public class FateReincarnation extends SimpleAbilityItem {
                 }
                 if (x >= 7140) {
                     scaleData.setScale(0.2f);
-                    removePathway(livingEntity);
+                    removePathwayForMonster(livingEntity);
                 }
                 if (x >= 7010 && x <= 7139) {
                     scaleData.setScale(0.25f);
@@ -176,5 +223,22 @@ public class FateReincarnation extends SimpleAbilityItem {
             y--;
         }
         return y;
+    }
+
+    public static void removePathwayForMonster(LivingEntity living) {
+        if (living instanceof Player player) {
+            BeyonderHolderAttacher.getHolderUnwrap(player).removePathway();
+        } else {
+            setPathwayAndSequence(living, null, -1);
+        }
+        if (living instanceof Player player) {
+            Abilities playerAbilities = player.getAbilities();
+            playerAbilities.setFlyingSpeed(0.05F);
+            playerAbilities.setWalkingSpeed(0.1F);
+            player.onUpdateAbilities();
+            if (player instanceof ServerPlayer serverPlayer) {
+                serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
+            }
+        }
     }
 }

@@ -38,7 +38,7 @@ public class DomainOfDecay extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -61,13 +61,14 @@ public class DomainOfDecay extends SimpleAbilityItem {
     public static void monsterDomainIntHandler(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             CompoundTag tag = livingEntity.getPersistentData();
-            int maxRadius = (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.DECAYDOMAIN.get());
             int radius = tag.getInt("monsterDomainRadius");
-            if (livingEntity.tickCount % 500 == 0) {
+            if (livingEntity.tickCount % 10000 == 0) {
+                int maxRadius = (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.DECAYDOMAIN.get());
                 tag.putInt("monsterDomainMaxRadius", maxRadius);
             }
             if (livingEntity.isShiftKeyDown() && (livingEntity.getMainHandItem().getItem() instanceof DomainOfDecay || livingEntity.getMainHandItem().getItem() instanceof DomainOfProvidence)) {
                 tag.putInt("monsterDomainRadius", radius + 5);
+                int maxRadius = (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.DECAYDOMAIN.get());
                 if (livingEntity instanceof Player player) {
                     player.displayClientMessage(Component.literal("Current Domain Radius is " + radius).withStyle(BeyonderUtil.getStyle(player)), true);
                 }
@@ -82,7 +83,7 @@ public class DomainOfDecay extends SimpleAbilityItem {
     }
 
 
-    private void makeDomainOfProvidence(Player player) {
+    private void makeDomainOfProvidence(LivingEntity player) {
         if (!player.level().isClientSide()) {
             Vec3 eyePosition = player.getEyePosition();
             Vec3 lookVector = player.getLookAngle();

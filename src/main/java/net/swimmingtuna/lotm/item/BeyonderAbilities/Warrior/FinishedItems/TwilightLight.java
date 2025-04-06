@@ -35,7 +35,7 @@ public class TwilightLight extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -78,11 +78,11 @@ public class TwilightLight extends SimpleAbilityItem {
                 tag.putInt("twilightLightArea", 0);
             }
             for (LivingEntity living : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate(y))) {
-                if (living != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, living)) {
+                if (living != livingEntity && !BeyonderUtil.areAllies(livingEntity, living)) {
                     living.getPersistentData().putInt("age", living.getPersistentData().getInt("age") + 4);
                     if (living instanceof Player player) {
                         if (player.tickCount % 10 == 0) {
-                            player.displayClientMessage(Component.literal("You are being rapidly aged").withStyle(ChatFormatting.RED), true);
+                            player.displayClientMessage(Component.literal("You are being rapidly aged").withStyle(BeyonderUtil.ageStyle(living)).withStyle(ChatFormatting.BOLD), true);
                         }
                     }
                 }

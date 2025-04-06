@@ -40,7 +40,7 @@ public class TwilightAccelerate extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -54,7 +54,7 @@ public class TwilightAccelerate extends SimpleAbilityItem {
 
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -79,7 +79,7 @@ public class TwilightAccelerate extends SimpleAbilityItem {
     public static void saveDataReboot(LivingEntity livingEntity,LivingEntity target) {
         if (!livingEntity.level().isClientSide() && !target.level().isClientSide()) {
             CompoundTag tag = target.getPersistentData();
-            if (livingEntity == target || BeyonderUtil.isAllyOf(livingEntity, target)) {
+            if (livingEntity == target || BeyonderUtil.areAllies(livingEntity, target)) {
                 tag.putInt("twilightAgeAccelerate", (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TWILIGHTACCELERATE.get()));
             } else {
                 tag.putInt("twilightAgeAccelerateEnemy", (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.TWILIGHTACCELERATE.get()) / 2);
@@ -137,6 +137,9 @@ public class TwilightAccelerate extends SimpleAbilityItem {
                 }
                 if (Math.random() > 0.95) {
                     tag.putInt("age", tag.getInt("age") + 20);
+                    if (livingEntity instanceof Player player) {
+                        player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD),true);
+                    }
                 }
                 for (MobEffectInstance mobEffect : livingEntity.getActiveEffects()) {
                     int currentDuration = mobEffect.getDuration();

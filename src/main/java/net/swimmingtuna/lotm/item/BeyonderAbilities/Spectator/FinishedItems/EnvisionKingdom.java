@@ -40,8 +40,7 @@ public class EnvisionKingdom extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 6000 / dreamIntoReality, true)) {
             return InteractionResult.FAIL;
@@ -133,7 +132,7 @@ public class EnvisionKingdom extends SimpleAbilityItem {
         }
     }
 
-    private void generateCathedral(Player player) {
+    private void generateCathedral(LivingEntity player) {
         if (!player.level().isClientSide) {
             int x = (int) player.getX();
             int y = (int) player.getY();
@@ -149,5 +148,14 @@ public class EnvisionKingdom extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getPersistentData().getInt("mindscapeAbilities") == 0 && target != null) {
+            return 100;
+        } else {
+            return 0;
+        }
     }
 }

@@ -1,21 +1,25 @@
 package net.swimmingtuna.lotm.util.ClientData;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class ClientShouldntRenderInvisibilityData {
-    private static boolean shouldntRender;
-    private static UUID livingUUID;  // Add this to store player ID
+    private static final Map<UUID, Boolean> invisibilityStates = new HashMap<>();
 
     public static void setShouldntRender(boolean value, UUID uuid) {
-        shouldntRender = value;
-        livingUUID = uuid;
+        if (value) {
+            invisibilityStates.put(uuid, true);
+        } else {
+            invisibilityStates.remove(uuid);
+        }
     }
 
-    public static boolean getShouldntRender() {
-        return shouldntRender;
+    public static boolean getShouldntRender(UUID uuid) {
+        return invisibilityStates.getOrDefault(uuid, false);
     }
 
-    public static UUID getLivingUUID() {
-        return livingUUID;
+    public static void clearAll() {
+        invisibilityStates.clear();
     }
 }

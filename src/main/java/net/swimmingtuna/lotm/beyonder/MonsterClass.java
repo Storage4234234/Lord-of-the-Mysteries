@@ -28,6 +28,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
@@ -266,10 +267,10 @@ public class MonsterClass implements BeyonderClass {
     @Override
     public Multimap<Integer, Item> getItems() {
         HashMultimap<Integer, Item> items = HashMultimap.create();
-        items.put(9, ItemInit.SPIRITVISION.get());
-        items.put(9, ItemInit.MONSTERDANGERSENSE.get());
         items.put(9, ItemInit.BEYONDER_ABILITY_USER.get());
         items.put(9, ItemInit.ALLY_MAKER.get());
+        items.put(9, ItemInit.SPIRITVISION.get());
+        items.put(9, ItemInit.MONSTERDANGERSENSE.get());
 
         items.put(8, ItemInit.MONSTERPROJECTILECONTROL.get());
 
@@ -1093,5 +1094,4 @@ public class MonsterClass implements BeyonderClass {
             }
         }
     }
-
 }

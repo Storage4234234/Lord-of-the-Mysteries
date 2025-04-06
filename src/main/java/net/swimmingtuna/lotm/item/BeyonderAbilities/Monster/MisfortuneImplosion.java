@@ -36,7 +36,7 @@ public class MisfortuneImplosion extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -46,10 +46,8 @@ public class MisfortuneImplosion extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void misfortuneImplosion(Player player) {
+    public static void misfortuneImplosion(LivingEntity player) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getSequence();
             Level level = player.level();
             int enhancement = 1;
             if (level instanceof ServerLevel serverLevel) {
@@ -57,7 +55,7 @@ public class MisfortuneImplosion extends SimpleAbilityItem {
             }
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.MISFORTUNEIMPLOSION.get());
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius))) {
-                if (entity != player && !BeyonderUtil.isAllyOf(player, entity)) {
+                if (entity != player && !BeyonderUtil.areAllies(player, entity)) {
                     CompoundTag tag = entity.getPersistentData();
                     double misfortune = tag.getDouble("misfortune");
                     Random random = new Random();

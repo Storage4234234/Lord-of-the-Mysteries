@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
@@ -20,6 +21,7 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ModArmorMaterials;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +36,7 @@ public class DawnWeaponry extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -44,43 +46,54 @@ public class DawnWeaponry extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void dawnWeaponry(Player player) {
-        if (!player.level().isClientSide()) {
-            CompoundTag tag = player.getPersistentData();
-            int selectedSlot = findClosestEmptySlot(player);
-            int x = tag.getInt("dawnWeaponry");
-            if (selectedSlot != -1) {
-                Inventory inventory = player.getInventory();
-                switch (x) {
-                    case 1 -> {
-                        ItemStack sword = createSword(ItemInit.SWORDOFDAWN.get().getDefaultInstance());
-                        inventory.setItem(selectedSlot, sword);
+    public static void dawnWeaponry(LivingEntity livingEntity) {
+        if (!livingEntity.level().isClientSide()) {
+            CompoundTag tag = livingEntity.getPersistentData();
+            ItemStack sword = createSword(ItemInit.SWORDOFDAWN.get().getDefaultInstance());
+            ItemStack axe = createPickaxe(ItemInit.PICKAXEOFDAWN.get().getDefaultInstance());
+            ItemStack spear = createSpear(ItemInit.SPEAROFDAWN.get().getDefaultInstance());
+            if (livingEntity instanceof Player pPlayer) {
+                int selectedSlot = findClosestEmptySlot(pPlayer);
+                int x = tag.getInt("dawnWeaponry");
+                if (selectedSlot != -1) {
+                    Inventory inventory = pPlayer.getInventory();
+                    switch (x) {
+                        case 1 -> {
+                            inventory.setItem(selectedSlot, sword);
+                        }
+                        case 2 -> {
+                            inventory.setItem(selectedSlot, axe);
+                        }
+                        case 3 -> {
+                            inventory.setItem(selectedSlot, spear);
+                        }
                     }
-                    case 2 -> {
-                        ItemStack axe = createPickaxe(ItemInit.PICKAXEOFDAWN.get().getDefaultInstance());
-                        inventory.setItem(selectedSlot, axe);
-                    }
-                    case 3 -> {
-                        ItemStack trident = createSpear(ItemInit.SPEAROFDAWN.get().getDefaultInstance());
-                        inventory.setItem(selectedSlot, trident);
-                    }
+                }
+            } else if (livingEntity instanceof Mob mob && mob.getTarget() != null) {
+                if (mob.getTarget().distanceTo(mob) >= 20) {
+                    mob.setItemInHand(InteractionHand.MAIN_HAND, spear);
+                } else {
+                    mob.setItemInHand(InteractionHand.MAIN_HAND, sword);
                 }
             }
         }
     }
+
     private static ItemStack createSword(ItemStack armor) {
         armor.enchant(Enchantments.SHARPNESS, 5);
         armor.enchant(Enchantments.KNOCKBACK, 2);
         armor.enchant(Enchantments.UNBREAKING, 3);
-        armor.enchant(Enchantments.FIRE_ASPECT,2);
+        armor.enchant(Enchantments.FIRE_ASPECT, 2);
         return armor;
     }
+
     private static ItemStack createSpear(ItemStack armor) {
         armor.enchant(Enchantments.SHARPNESS, 3);
         armor.enchant(Enchantments.UNBREAKING, 3);
         armor.enchant(Enchantments.LOYALTY, 1);
         return armor;
     }
+
     private static ItemStack createPickaxe(ItemStack armor) {
         armor.enchant(Enchantments.BLOCK_EFFICIENCY, 5);
         armor.enchant(Enchantments.BLOCK_FORTUNE, 2);
@@ -123,7 +136,7 @@ public class DawnWeaponry extends SimpleAbilityItem {
         super.inventoryTick(stack, level, entity, itemSlot, isSelected);
     }
 
-    public static String dawnWeaponryString (Player pPlayer) {
+    public static String dawnWeaponryString(Player pPlayer) {
         CompoundTag tag = pPlayer.getPersistentData();
         int dawnWeaponry = tag.getInt("dawnWeaponry");
         if (dawnWeaponry == 1) {
@@ -147,6 +160,18 @@ public class DawnWeaponry extends SimpleAbilityItem {
             }
         }
         return true;
+    }
+
+    public static void removeDawnArmor(LivingEntity livingEntity) {
+        if (BeyonderUtil.currentPathwayAndSequenceMatches(livingEntity, BeyonderClassInit.WARRIOR.get(), 6)) return;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+                ItemStack itemStack = livingEntity.getItemBySlot(slot);
+                if (itemStack.getItem() instanceof ArmorItem armor && armor.getMaterial() == ModArmorMaterials.DAWN) {
+                    livingEntity.setItemSlot(slot, ItemStack.EMPTY);
+                }
+            }
+        }
     }
 
     public static boolean hasFullSilverArmor(LivingEntity entity) {

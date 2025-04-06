@@ -26,21 +26,21 @@ import java.util.List;
 public class Hurricane extends SimpleAbilityItem {
 
     public Hurricane(Properties properties) {
-        super(properties, BeyonderClassInit.SAILOR, 4, 1250, 1800);
+        super(properties, BeyonderClassInit.SAILOR, 4, 1000, 1800);
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        hurricane(player);
+        hurricaneAbility(player);
         addCooldown(player);
         useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
 
-    private void hurricane(Player pPlayer) {
+    private void hurricaneAbility(LivingEntity pPlayer) {
         if (!pPlayer.level().isClientSide()) {
             pPlayer.getPersistentData().putInt("sailorHurricane", (int) (float) BeyonderUtil.getDamage(pPlayer).get(ItemInit.HURRICANE.get()));
         }
@@ -84,7 +84,7 @@ public class Hurricane extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use, summon a hurricane which will rain down lightning and summon tornado's in a large area around you for 30 seconds"));
-        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1250").withStyle(ChatFormatting.YELLOW)));
+        tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1.5 Minutes").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));

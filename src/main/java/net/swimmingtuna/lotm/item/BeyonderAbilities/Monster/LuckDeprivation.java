@@ -34,7 +34,7 @@ public class LuckDeprivation extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!player.level().isClientSide()) {
             if (!checkAll(player)) {
                 return InteractionResult.FAIL;
@@ -74,7 +74,7 @@ public class LuckDeprivation extends SimpleAbilityItem {
     }
 
 
-    private static void giftLuck(LivingEntity interactionTarget, Player player) {
+    private static void giftLuck(LivingEntity interactionTarget, LivingEntity player) {
         if (!player.level().isClientSide() && !interactionTarget.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             CompoundTag pTag = interactionTarget.getPersistentData();

@@ -47,7 +47,7 @@ public class ChaosWalkerDisableEnable extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -57,12 +57,14 @@ public class ChaosWalkerDisableEnable extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void enableOrDisableDangerSense(Player player) {
+    public static void enableOrDisableDangerSense(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean chaosWalkerCombat = tag.getBoolean("monsterChaosWalkerCombat");
             tag.putBoolean("monsterChaosWalkerCombat", !chaosWalkerCombat);
-            player.displayClientMessage(Component.literal("Chaos Walker Combat is: " + (chaosWalkerCombat ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
+            if (player instanceof Player pPlayer) {
+                pPlayer.displayClientMessage(Component.literal("Chaos Walker Combat is: " + (chaosWalkerCombat ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
+            }
         }
     }
 

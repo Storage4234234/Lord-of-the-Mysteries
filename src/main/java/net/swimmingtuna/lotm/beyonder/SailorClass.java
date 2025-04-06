@@ -34,12 +34,12 @@ import net.swimmingtuna.lotm.util.BeyonderUtil;
 import java.util.List;
 
 public class SailorClass implements BeyonderClass {
-    private int dolhpinsGrace;
-    private int speed;
-    private int strength;
-    private int haste;
-    private int resistance;
-    private int regeneration;
+    public static int dolhpinsGrace;
+    public static int speed;
+    public static int strength;
+    public static int haste;
+    public static int resistance;
+    public static int regeneration;
 
     @Override
     public List<String> sequenceNames() {
@@ -91,13 +91,26 @@ public class SailorClass implements BeyonderClass {
             if (player instanceof ServerPlayer serverPlayer) {
                 serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(serverPlayer.getAbilities()));
             }
-
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, dolhpinsGrace + 2, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, speed + 1, false, false);
-            applyMobEffect(player,MobEffects.DIG_SPEED, 300, haste + 1, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, resistance + 1, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, strength + 2, false, false);
-            applyMobEffect(player,MobEffects.REGENERATION, 300, regeneration + 2, false, false);
+            if (sequenceLevel <= 4) {
+                applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, dolhpinsGrace + 2, false, false);
+                applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, speed + 1, false, false);
+                applyMobEffect(player, MobEffects.DIG_SPEED, 300, haste + 1, false, false);
+                applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, resistance + 1, false, false);
+                applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, strength + 2, false, false);
+                applyMobEffect(player, MobEffects.REGENERATION, 300, regeneration + 2, false, false);
+            } else if (sequenceLevel <= 6) {
+                applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, dolhpinsGrace + 1, false, false);
+                applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, speed + 1, false, false);
+                applyMobEffect(player, MobEffects.DIG_SPEED, 300, haste + 1, false, false);
+                applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, resistance + 1, false, false);
+                applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, strength + 1, false, false);
+                applyMobEffect(player, MobEffects.REGENERATION, 300, regeneration + 1, false, false);
+            } else {
+                applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, dolhpinsGrace + 1, false, false);
+                applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, speed + 1, false, false);
+                applyMobEffect(player, MobEffects.DIG_SPEED, 300, haste + 1, false, false);
+                applyMobEffect(player, MobEffects.REGENERATION, 300, regeneration + 1, false, false);
+            }
         }
         if (!player.level().isRaining() && !sailorFlight1) {
             playerAbilites.setFlyingSpeed(0.05F);
@@ -123,6 +136,7 @@ public class SailorClass implements BeyonderClass {
             applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 0, false, false);
             applyMobEffect(player,MobEffects.DIG_SPEED, 300, 0, false, false);
             applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 0, false, false);
+            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
             applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
             dolhpinsGrace = 0;
             regeneration = -1;

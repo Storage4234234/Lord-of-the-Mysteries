@@ -22,8 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -76,7 +74,7 @@ public class Frenzy extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack stack, Player player, LivingEntity interactionTarget, InteractionHand hand) {
+    public InteractionResult useAbilityOnEntity(ItemStack stack, LivingEntity player, LivingEntity interactionTarget, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -87,16 +85,15 @@ public class Frenzy extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void frenzy(Player player, Level level, BlockPos targetPos, int dreamIntoRealityValue) {
+    private void frenzy(LivingEntity player, Level level, BlockPos targetPos, int dreamIntoRealityValue) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            int sequence = holder.getSequence();
+            int sequence = BeyonderUtil.getSequence(player);
             double radius = BeyonderUtil.getDamage(player).get(ItemInit.FRENZY.get());
             float damage = (float) (17 - (sequence * 0.75));
             int duration = 250 - (sequence * 12) * dreamIntoRealityValue;
             AABB boundingBox = new AABB(targetPos).inflate(radius);
             level.getEntitiesOfClass(LivingEntity.class, boundingBox, LivingEntity::isAlive).forEach(livingEntity -> {
-                if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
+                if (livingEntity != player && !BeyonderUtil.areAllies(player, livingEntity)) {
                     livingEntity.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), duration, 1, false, false));
                     BeyonderUtil.applyMentalDamage(player, livingEntity, damage);
                 }
@@ -116,5 +113,14 @@ public class Frenzy extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return 40;
+        } else {
+            return 0;
+        }
     }
 }

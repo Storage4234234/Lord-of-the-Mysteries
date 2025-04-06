@@ -10,8 +10,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -31,15 +29,17 @@ public class ManipulateEmotion extends SimpleAbilityItem {
 
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
+        int dreamIntoReality = 1;
+        if (player instanceof Player pPlayer) {
+            dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
+        }
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player, this, 1200 / dreamIntoReality);
         useSpirituality(player, 500);
-        manipulateEmotion(player, holder.getSequence());
+        manipulateEmotion(player);
         return InteractionResult.SUCCESS;
     }
 
@@ -54,11 +54,11 @@ public class ManipulateEmotion extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    private static void manipulateEmotion(Player player, int sequence) {
+    private static void manipulateEmotion(LivingEntity player) {
         if (!player.level().isClientSide()) {
             float damage = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MANIPULATE_EMOTION.get());
             for (LivingEntity entity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(250))) {
-                if (entity != player && entity.hasEffect(ModEffects.MANIPULATION.get()) && !BeyonderUtil.isAllyOf(player, entity)) {
+                if (entity != player && entity.hasEffect(ModEffects.MANIPULATION.get()) && !BeyonderUtil.areAllies(player, entity)) {
                     if (!BeyonderUtil.isBeyonderCapable(entity)) {
                         BeyonderUtil.applyMentalDamage(player, entity, damage * 2);
                     } else {
@@ -72,5 +72,13 @@ public class ManipulateEmotion extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && target.hasEffect(ModEffects.MANIPULATION.get())) {
+            return 75;
+        }
+        return 0;
     }
 }

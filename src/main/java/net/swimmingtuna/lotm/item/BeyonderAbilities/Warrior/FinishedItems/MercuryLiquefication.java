@@ -28,6 +28,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.PsychologicalInvisibility;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.MercuryLiqueficationC2S;
 import net.swimmingtuna.lotm.networking.packet.SendDustParticleS2C;
@@ -51,7 +52,7 @@ public class MercuryLiquefication extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -75,7 +76,6 @@ public class MercuryLiquefication extends SimpleAbilityItem {
         }
     }
 
-    public static final Map<UUID, Boolean> lastSentStates = new HashMap<>();
 
     public static void mercuryLiqueficationTick(LivingEvent.LivingTickEvent event) {
         LivingEntity livingEntity = event.getEntity();
@@ -89,10 +89,10 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                 BeyonderUtil.useSpirituality(livingEntity, 10);
             }
             UUID playerId = livingEntity.getUUID();
-            Boolean lastState = lastSentStates.get(playerId);
+            Boolean lastState = PsychologicalInvisibility.lastSentInvisibilityStates.get(playerId);
             if (lastState == null || lastState != currentState) {
                 LOTMNetworkHandler.sendToAllPlayers(new SyncShouldntRenderInvisibilityPacketS2C(currentState, playerId));
-                lastSentStates.put(playerId, currentState);
+                PsychologicalInvisibility.lastSentInvisibilityStates.put(playerId, currentState);
             }
             Vec3 lookVec = livingEntity.getLookAngle();
             Random random = new Random();
@@ -186,14 +186,14 @@ public class MercuryLiquefication extends SimpleAbilityItem {
     public static void equipSilverArmor(LivingEntity user, LivingEntity targetEntity) {
         if (targetEntity.level().isClientSide()) return;
         if (user.getPersistentData().getBoolean("mercuryLiquefication")) {
-            if (BeyonderUtil.isAllyOf(user, targetEntity)) {
+            if (BeyonderUtil.areAllies(user, targetEntity)) {
                 if (user != targetEntity) {
                     long currentTime = System.currentTimeMillis();
                     if (currentTime - lastActivationTime >= COOLDOWN_MS) {
                         CompoundTag tag = targetEntity.getPersistentData();
                         user.getPersistentData().putUUID("mercuryArmor", targetEntity.getUUID());
                         user.getPersistentData().putInt("mercuryArmorForm", 10);
-                        user.sendSystemMessage(Component.literal("armor put on " + targetEntity.getName()));
+                        user.sendSystemMessage(Component.literal("Armor put on " + targetEntity.getName()));
                         targetEntity.getPersistentData().putInt("mercuryArmorEquipped", 10);
                         CompoundTag armorData = new CompoundTag();
                         ListTag armorItems = new ListTag();
@@ -266,7 +266,6 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                                 EquipmentSlot slot = EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, slotIndex);
                                 if (slot != null) {
                                     livingEntity.setItemSlot(slot, armorStack);
-                                    System.out.println("set as original armor");
                                 }
                             }
                             tag.remove("mercuryArmorStorage");
@@ -276,7 +275,6 @@ public class MercuryLiquefication extends SimpleAbilityItem {
                         living.getPersistentData().putInt("mercuryArmorForm", 0);
                     } else {
                         tag.putInt("mercuryArmorEquipped", 10);
-                        System.out.println("put as 10");
                     }
                 }
             }

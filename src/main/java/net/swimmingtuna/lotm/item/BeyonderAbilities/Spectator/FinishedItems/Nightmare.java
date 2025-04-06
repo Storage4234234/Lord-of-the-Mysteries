@@ -24,8 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
-import net.swimmingtuna.lotm.caps.BeyonderHolder;
-import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -40,7 +38,7 @@ import java.util.List;
 public class Nightmare extends SimpleAbilityItem {
 
     public Nightmare(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 5, 100, 110,35,35 );
+        super(properties, BeyonderClassInit.SPECTATOR, 5, 100, 110, 35, 35);
     }
 
     @Override
@@ -52,18 +50,18 @@ public class Nightmare extends SimpleAbilityItem {
         }
         addCooldown(player);
         useSpirituality(player);
-        nightmare(player, pContext.getLevel(), pContext.getClickedPos());
+        nightmareNew(player, pContext.getClickedPos());
         return InteractionResult.SUCCESS;
     }
 
     @Override
-    public InteractionResult useAbilityOnEntity(ItemStack pStack, Player player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
+    public InteractionResult useAbilityOnEntity(ItemStack pStack, LivingEntity player, LivingEntity pInteractionTarget, InteractionHand pUsedHand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player);
         useSpirituality(player);
-        nightmare(player, player.level(), pInteractionTarget.getOnPos());
+        nightmareNew(player, pInteractionTarget.getOnPos());
         return InteractionResult.SUCCESS;
     }
 
@@ -87,50 +85,38 @@ public class Nightmare extends SimpleAbilityItem {
         return attributeBuilder.build();
     }
 
-
-    private void nightmare(Player player, Level level, BlockPos targetPos) {
-        if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-            int sequence = holder.getSequence();
-            int dir = (int) dreamIntoReality.getValue();
-            double radius = BeyonderUtil.getDamage(player).get(ItemInit.NIGHTMARE.get());
-            float damagePlayer = ((float) (40.0 * dir) - (sequence * 2));
-            float damageMob = ((float) (20.0 * dir) - (sequence));
-            int duration = 300 - (sequence * 20);
-            AABB boundingBox = new AABB(targetPos).inflate(radius);
-            level.getEntitiesOfClass(LivingEntity.class, boundingBox, entity -> entity.isAlive()).forEach(livingEntity -> {
-                AttributeInstance nightmareAttribute = livingEntity.getAttribute(ModAttributes.NIGHTMARE.get());
-                String playerName = livingEntity.getDisplayName().getString();
-                if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity)) {
-                    livingEntity.addEffect(new MobEffectInstance(MobEffects.DARKNESS, duration, 1, false, false));
-                    if (livingEntity instanceof Player) {
-                        if (nightmareAttribute.getValue() < 3) {
-                            if (sequence <= 2) {
-                                nightmareAttribute.setBaseValue(nightmareAttribute.getValue() + 2);
-                            } else {
-                                nightmareAttribute.setBaseValue(nightmareAttribute.getValue() + 1);
-                            }
-                        }
-                        if (nightmareAttribute.getValue() >= 3) {
-                            BeyonderUtil.applyMentalDamage(player, livingEntity, damagePlayer);
-                            nightmareAttribute.setBaseValue(0);
-                        }
-                        player.sendSystemMessage(Component.literal(playerName + "'s nightmare value is:" + (int) nightmareAttribute.getValue()).withStyle(BeyonderUtil.getStyle(player)));
-
-                    } else {
-                        BeyonderUtil.applyMentalDamage(player, livingEntity, damageMob);
-                    }
-                }
-            });
-        }
+    public static void nightmareNew(LivingEntity livingEntity, BlockPos targetPos) {
+        AttributeInstance dreamIntoReality = livingEntity.getAttribute(ModAttributes.DIR.get());
+        int sequence = BeyonderUtil.getSequence(livingEntity);
+        Level level = livingEntity.level();
+        int dir = (int) dreamIntoReality.getValue();
+        double radius = BeyonderUtil.getDamage(livingEntity).get(ItemInit.NIGHTMARE.get());
+        float damagePlayer = ((float) (65.0 * dir) - (sequence * 2));
+        int duration = 300 - (sequence * 20);
+        AABB boundingBox = new AABB(targetPos).inflate(radius);
+        level.getEntitiesOfClass(LivingEntity.class, boundingBox, LivingEntity::isAlive).forEach(living -> {
+           String name = living.getDisplayName().getString();
+           CompoundTag tag = living.getPersistentData();
+           if (living != livingEntity && !BeyonderUtil.areAllies(livingEntity, living)) {
+               living.addEffect(new MobEffectInstance(MobEffects.DARKNESS, duration, 1, false, false));
+               if (tag.getInt("NightmareTimer") < 300) {
+                   int addToAmount = sequence < 3 ? 200 : 100;
+                   tag.putInt("NightmareTimer", addToAmount);
+                   livingEntity.sendSystemMessage(Component.literal(name + "'s nightmare value is " + tag.getInt("NightmareTimer") + " / 300"));
+               } else {
+                   tag.putInt("NightmareTimer", 0);
+                   BeyonderUtil.applyMentalDamage(livingEntity, living, damagePlayer);
+               }
+           }
+        });
     }
+
 
     public static void nightmareTick(LivingEntity livingEntity) {
         if (livingEntity instanceof Player player) {
             AttributeInstance nightmareAttribute = player.getAttribute(ModAttributes.NIGHTMARE.get());
-            CompoundTag playerPersistentData = player.getPersistentData();
-            int nightmareTimer = playerPersistentData.getInt("NightmareTimer");
+            CompoundTag tag = player.getPersistentData();
+            int nightmareTimer = tag.getInt("NightmareTimer");
             int matterAccelerationBlockTimer = player.getPersistentData().getInt("matterAccelerationBlockTimer");
             if (matterAccelerationBlockTimer >= 1) {
                 player.getPersistentData().putInt("matterAccelerationBlockTimer", matterAccelerationBlockTimer - 1);
@@ -144,7 +130,7 @@ public class Nightmare extends SimpleAbilityItem {
             } else {
                 nightmareTimer = 0;
             }
-            playerPersistentData.putInt("NightmareTimer", nightmareTimer);
+            tag.putInt("NightmareTimer", nightmareTimer);
         }
     }
 
@@ -157,8 +143,17 @@ public class Nightmare extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return target.getPersistentData().getInt("NightmareTimer") / 3;
+        }
+        return 0;
     }
 }

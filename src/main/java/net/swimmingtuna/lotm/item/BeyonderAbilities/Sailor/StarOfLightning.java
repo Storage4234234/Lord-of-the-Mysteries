@@ -40,20 +40,19 @@ public class StarOfLightning extends SimpleAbilityItem {
 
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player);
         useSpirituality(player);
-        starOfLightning(player);
+        starOfLightningAbility(player);
         return InteractionResult.SUCCESS;
     }
 
-    private static void starOfLightning(Player player) {
+    private static void starOfLightningAbility(LivingEntity player) {
         if (!player.level().isClientSide()) {
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            if (holder.getSequence() == 0) {
+            if (BeyonderUtil.getSequence(player) == 0) {
                 player.getPersistentData().putInt("sailorLightningStar", 50);
             } else {
                 player.getPersistentData().putInt("sailorLightningStar", 80);
@@ -97,11 +96,7 @@ public class StarOfLightning extends SimpleAbilityItem {
                 double offsetY = (Math.random() * 5) - 2.5;
                 double offsetZ = (Math.random() * 5) - 2.5;
                 if (Math.sqrt(offsetX * offsetX + offsetY * offsetY + offsetZ * offsetZ) <= 2.5) {
-                    serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
-                            player.getX() + offsetX,
-                            player.getY() + offsetY,
-                            player.getZ() + offsetZ,0,
-                            0.0, 0.0, 0.0,0);
+                    serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX() + offsetX, player.getY() + offsetY, player.getZ() + offsetZ,0, 0.0, 0.0, 0.0,0);
                 }
             }
         }

@@ -5,6 +5,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -27,7 +28,7 @@ public class MeteorNoLevelShower extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -38,7 +39,7 @@ public class MeteorNoLevelShower extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void meteorNoLevelShower(Player player) {
+    public static void meteorNoLevelShower(LivingEntity player) {
         if (!player.level().isClientSide()) {
             for (int i = 0; i < BeyonderUtil.getDamage(player).get(ItemInit.METEOR_NO_LEVEL_SHOWER.get()); i++) {
                 MeteorNoLevelEntity.summonMultipleMeteors(player);
@@ -60,5 +61,10 @@ public class MeteorNoLevelShower extends SimpleAbilityItem {
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return 80;
     }
 }

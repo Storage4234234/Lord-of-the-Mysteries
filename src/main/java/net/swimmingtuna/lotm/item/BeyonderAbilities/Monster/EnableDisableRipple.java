@@ -53,7 +53,7 @@ public class EnableDisableRipple extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -63,12 +63,14 @@ public class EnableDisableRipple extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static void enableOrDisableDangerSense(Player player) {
+    public static void enableOrDisableDangerSense(LivingEntity player) {
         if (!player.level().isClientSide()) {
             CompoundTag tag = player.getPersistentData();
             boolean ripple = tag.getBoolean("monsterRipple");
             tag.putBoolean("monsterRipple", !ripple);
-            player.displayClientMessage(Component.literal("Ripple of Chaos " + (ripple ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
+            if (player instanceof Player pPlayer) {
+                pPlayer.displayClientMessage(Component.literal("Ripple of Chaos " + (ripple ? "Off" : "On")).withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY), true);
+            }
         }
     }
 
@@ -104,7 +106,7 @@ public class EnableDisableRipple extends SimpleAbilityItem {
             }
             for (LivingEntity livingEntity : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENABLEDISABLERIPPLE.get())))) {
                 Random random = new Random();
-                if (livingEntity != player && !BeyonderUtil.isAllyOf(player, livingEntity) && livingEntity.getMaxHealth() >= 15) {
+                if (livingEntity != player && !BeyonderUtil.areAllies(player, livingEntity) && livingEntity.getMaxHealth() >= 15) {
                     int randomInt = random.nextInt(14);
                     if (randomInt == 0) {
                         livingEntity.hurt(livingEntity.damageSources().generic(), livingEntity.getMaxHealth() / (10 - enhancement));

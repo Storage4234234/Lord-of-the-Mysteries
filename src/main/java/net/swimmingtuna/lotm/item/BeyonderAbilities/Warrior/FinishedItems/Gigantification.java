@@ -37,7 +37,7 @@ public class Gigantification extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
@@ -108,9 +108,9 @@ public class Gigantification extends SimpleAbilityItem {
             if (destroyBlocks && (isGiant || isHoGGiant || isTwilightGiant)) {
                 int radius = (int) (scale + 2);
                 if (isHoGGiant) {
-                    radius *= 2;
+                    radius = (int) ((scale + 2) * 0.8);
                 } else if (isTwilightGiant) {
-                    radius *= 4;
+                    radius = (int) ((scale + 2) * 0.6);
                 }
                 BlockPos playerPos = entity.blockPosition();
                 Level level = entity.level();

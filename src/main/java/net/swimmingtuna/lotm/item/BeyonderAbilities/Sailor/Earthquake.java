@@ -9,7 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
@@ -36,17 +35,17 @@ public class Earthquake extends SimpleAbilityItem {
     }
 
     @Override
-    public InteractionResult useAbility(Level level, Player player, InteractionHand hand) {
+    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        earthquake(player);
+        earthquakeAbility(player);
         addCooldown(player);
         useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
 
-    public void earthquake(Player player) {
+    public void earthquakeAbility(LivingEntity player) {
         if (!player.level().isClientSide()) {
             player.getPersistentData().putInt("sailorEarthquake", 200);
         }
@@ -59,7 +58,7 @@ public class Earthquake extends SimpleAbilityItem {
             int radius = (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.EARTHQUAKE.get());
             if (sailorEarthquake % 20 == 0) {
                 for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate((radius)))) {
-                    if (entity != livingEntity && !BeyonderUtil.isAllyOf(livingEntity, entity)) {
+                    if (entity != livingEntity && !BeyonderUtil.areAllies(livingEntity, entity)) {
                         if (entity.onGround()) {
                             entity.hurt(livingEntity.damageSources().fall(), 35 - (sequence * 5));
                         }
