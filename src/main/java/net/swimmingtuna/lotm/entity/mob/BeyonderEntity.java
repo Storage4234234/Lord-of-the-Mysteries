@@ -16,8 +16,11 @@ import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
+import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.misc.Idle;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetPlayerLookTarget;
@@ -35,6 +38,7 @@ public class BeyonderEntity extends Monster implements SmartBrainOwner<BeyonderE
     public BeyonderEntity(Level pLevel, BeyonderClass beyonderClass) {
         super(MobInit.MONSTER_BEYONDER_ENTITY.get(), pLevel);
         BeyonderUtil.setPathway(this, beyonderClass);
+        BeyonderUtil.setSequence(this, 9);
     }
 
 
@@ -96,6 +100,7 @@ public class BeyonderEntity extends Monster implements SmartBrainOwner<BeyonderE
         return BrainActivityGroup.coreTasks(
                 new GroupBeyondersBehaviour<>(),
                 new MoveToWalkTarget<>()
+
         );
     }
 
@@ -105,7 +110,9 @@ public class BeyonderEntity extends Monster implements SmartBrainOwner<BeyonderE
                 new FirstApplicableBehaviour<>(
                         new TargetOrRetaliate<>(),
                         new SetPlayerLookTarget<>(),
-                        new SetRandomLookTarget<>())
+                        new SetRandomLookTarget<>(),
+                        new SetRandomWalkTarget<>().dontAvoidWater().setRadius(8)
+                )
         );
     }
 

@@ -1,7 +1,6 @@
 package net.swimmingtuna.lotm.entity.mob.behaviour;
 
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -58,21 +57,18 @@ public class GroupBeyondersBehaviour<E extends LivingEntity> extends ExtendedBeh
     protected void start(E entity) {
         List<LivingEntity> nearbyEntities = BrainUtils.getMemory(entity, MemoryModuleType.NEAREST_LIVING_ENTITIES);
         List<LivingEntity> groupTarget = nearbyEntities.stream().filter(
-                target -> this.canGroup.test((E) target)
+                target ->
+                        this.canGroup.test((E) target)
+                   //     && entity.distanceTo(target) > 15
                         && BeyonderUtil.getSequence(target) != -1
                         && BeyonderUtil.getPathway(target) == BeyonderUtil.getPathway(entity)
-                        && entity.distanceTo(target) > 5
         ).toList();
 
-        addAllies(groupTarget, entity);
-        if (groupTarget.isEmpty()) {
-            BrainUtils.clearMemory(entity, MemoryModuleType.NEAREST_LIVING_ENTITIES);
-        }
-        else {
-            BrainUtils.setMemory(entity, MemoryModuleType.NEAREST_LIVING_ENTITIES, groupTarget);
-            BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(groupTarget.stream().findFirst().get(), 1, 5));
+        if (!groupTarget.isEmpty()) {
+            addAllies(groupTarget, entity);
+            BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(groupTarget.stream().sorted((o1, o2) -> (int) o2.distanceTo(o1)).findFirst().get().position(), 1, 10));
             BrainUtils.clearMemory(entity, MemoryModuleType.CANT_REACH_WALK_TARGET_SINCE);
-
+            BrainUtils.setMemory(entity, MemoryModuleType.NEAREST_LIVING_ENTITIES, nearbyEntities.stream().filter(livingEntity -> !groupTarget.contains(livingEntity)).toList());
         }
     }
 }

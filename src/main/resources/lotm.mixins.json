@@ -5,7 +5,6 @@
   "refmap": "lotm.refmap.json",
   "mixins": [
     "ClientUpdateStructureBlockUnlimit",
-    "EntityCollisionMixin",
     "EntityTickMixin",
     "ExplosionNoKnockback",
     "MixinBrewingStandMenu",
