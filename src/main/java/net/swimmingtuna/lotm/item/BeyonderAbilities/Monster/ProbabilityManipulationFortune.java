@@ -130,4 +130,10 @@ public class ProbabilityManipulationFortune extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) { //marked make it work on self
+        return 0;
+    }
+
 }

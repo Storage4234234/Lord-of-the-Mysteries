@@ -354,4 +354,14 @@ public class FalseProphecy extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        livingEntity.getPersistentData().putInt("falseProphecyItem", 4);
+        if (target != null) {
+            return 60;
+        }
+        return 0;
+    }
+
 }

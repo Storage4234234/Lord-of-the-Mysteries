@@ -46,34 +46,34 @@ public class DawnArmory extends SimpleAbilityItem {
     }
 
     public static void storeAndPutArmor(LivingEntity livingEntity) {
-        if (!livingEntity.level().isClientSide() && livingEntity instanceof Player player) {
-            CompoundTag persistentData = player.getPersistentData();
+        if (!livingEntity.level().isClientSide()) {
+            CompoundTag persistentData = livingEntity.getPersistentData();
             boolean isDawnArmorOn = persistentData.getBoolean("dawnArmorOn");
             if (!isDawnArmorOn) {
                 CompoundTag armorData = new CompoundTag();
                 ListTag armorItems = new ListTag();
                 for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
-                    ItemStack armorStack = player.getItemBySlot(slot);
+                    ItemStack armorStack = livingEntity.getItemBySlot(slot);
                     if (!armorStack.isEmpty()) {
                         CompoundTag slotTag = new CompoundTag();
                         slotTag.putInt("dawnArmorSlot", slot.getIndex());
                         armorStack.save(slotTag);
                         armorItems.add(slotTag);
-                        player.setItemSlot(slot, ItemStack.EMPTY);
+                        livingEntity.setItemSlot(slot, ItemStack.EMPTY);
                     }
                 }
-                player.setItemSlot(EquipmentSlot.HEAD, createEnchantedArmor(ItemInit.DAWN_HELMET.get().getDefaultInstance()));
-                player.setItemSlot(EquipmentSlot.CHEST, createEnchantedArmor(ItemInit.DAWN_CHESTPLATE.get().getDefaultInstance()));
-                player.setItemSlot(EquipmentSlot.LEGS,  createEnchantedArmor(ItemInit.DAWN_LEGGINGS.get().getDefaultInstance()));
-                player.setItemSlot(EquipmentSlot.FEET, createEnchantedArmor(ItemInit.DAWN_BOOTS.get().getDefaultInstance()));
+                livingEntity.setItemSlot(EquipmentSlot.HEAD, createEnchantedArmor(ItemInit.DAWN_HELMET.get().getDefaultInstance()));
+                livingEntity.setItemSlot(EquipmentSlot.CHEST, createEnchantedArmor(ItemInit.DAWN_CHESTPLATE.get().getDefaultInstance()));
+                livingEntity.setItemSlot(EquipmentSlot.LEGS,  createEnchantedArmor(ItemInit.DAWN_LEGGINGS.get().getDefaultInstance()));
+                livingEntity.setItemSlot(EquipmentSlot.FEET, createEnchantedArmor(ItemInit.DAWN_BOOTS.get().getDefaultInstance()));
                 armorData.put("dawnArmorItems", armorItems);
                 persistentData.put("dawnStoredArmorData", armorData);
                 persistentData.putBoolean("dawnArmorOn", true);
             } else {
                 for (EquipmentSlot slot : new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET}) {
-                    ItemStack currentArmor = player.getItemBySlot(slot);
+                    ItemStack currentArmor = livingEntity.getItemBySlot(slot);
                     if (!currentArmor.isEmpty() && (currentArmor.is(ItemInit.DAWN_HELMET.get()) || currentArmor.is(ItemInit.DAWN_CHESTPLATE.get()) || currentArmor.is(ItemInit.DAWN_LEGGINGS.get()) || currentArmor.is(ItemInit.DAWN_BOOTS.get()))) {
-                        player.setItemSlot(slot, ItemStack.EMPTY);
+                        livingEntity.setItemSlot(slot, ItemStack.EMPTY);
                     }
                 }
                 if (persistentData.contains("dawnStoredArmorData")) {
@@ -85,7 +85,7 @@ public class DawnArmory extends SimpleAbilityItem {
                         ItemStack armorStack = ItemStack.of(slotTag);
                         EquipmentSlot slot = EquipmentSlot.byTypeAndIndex(EquipmentSlot.Type.ARMOR, slotIndex);
                         if (slot != null) {
-                            player.setItemSlot(slot, armorStack);
+                            livingEntity.setItemSlot(slot, armorStack);
                         }
                     }
                     persistentData.remove("dawnStoredArmorData");
@@ -138,6 +138,16 @@ public class DawnArmory extends SimpleAbilityItem {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getPersistentData().getBoolean("dawnArmorOn") && BeyonderUtil.getSpirituality(livingEntity) <= 200) {
+            return 90;
+        }
+        else if (!livingEntity.getPersistentData().getBoolean("dawnArmorOn") && target != null) {
+            return 100;
+        }
+        return 0;
+    }
 }
 
 

@@ -94,4 +94,17 @@ public class ProbabilityManipulationWorldFortune extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        livingEntity.getPersistentData().putInt("probabilityManipulationWorldFortuneValue", 3);
+        if (!livingEntity.level().isClientSide() && livingEntity.level() instanceof ServerLevel serverLevel) {
+            WorldFortuneValue data = WorldFortuneValue.getInstance(serverLevel);
+            if (data.getWorldFortune() != 3) {
+                return 75;
+            }
+        }
+        return 0;
+    }
+
 }

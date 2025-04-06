@@ -118,4 +118,13 @@ public class LuckDenial extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && BeyonderUtil.getPathway(livingEntity) == BeyonderClassInit.MONSTER.get()) {
+            return 80;
+        }
+        return 0;
+    }
+
 }

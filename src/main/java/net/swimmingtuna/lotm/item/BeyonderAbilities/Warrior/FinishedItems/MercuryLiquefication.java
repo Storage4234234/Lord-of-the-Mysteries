@@ -365,5 +365,15 @@ public class MercuryLiquefication extends SimpleAbilityItem {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        boolean x = livingEntity.getPersistentData().getBoolean("mercuryLiquefication");
+        if (x && BeyonderUtil.getSpirituality(livingEntity) < 1200) {
+            return 80;
+        } else if (target != null && !x) {
+            return 65;
+        }
+        return 0;
+    }
 }
 

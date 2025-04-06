@@ -76,4 +76,14 @@ public class Tornado extends SimpleAbilityItem {
             player.level().addFreshEntity(tornado);
         }
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return 75;
+        }
+        else {
+            return 10;
+        }
+    }
 }

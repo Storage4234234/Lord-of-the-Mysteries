@@ -72,4 +72,16 @@ public class ChaosAmplification extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (!livingEntity.level().isClientSide() && livingEntity.level() instanceof ServerLevel serverLevel) {
+            CalamityEnhancementData data = CalamityEnhancementData.getInstance(serverLevel);
+            if (data.getCalamityEnhancement() < 2) {
+                livingEntity.getPersistentData().putInt("calamityEnhancementItemValue", 2);
+                return 50;
+            }
+        }
+        return 0;
+    }
 }

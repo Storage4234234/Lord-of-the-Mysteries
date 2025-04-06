@@ -69,5 +69,12 @@ public class BeamOfTwilight extends SimpleAbilityItem {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return 90;
+        }
+        return 0;
+    }
 }
 

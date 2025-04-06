@@ -127,6 +127,11 @@ public class AcidicRain extends SimpleAbilityItem {
     }
 
     @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return 55;
+    }
+
+    @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }

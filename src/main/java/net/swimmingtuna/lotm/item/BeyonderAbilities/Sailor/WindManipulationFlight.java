@@ -37,7 +37,7 @@ public class WindManipulationFlight extends SimpleAbilityItem {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        if (BeyonderUtil.getSequence(player) <= 4) {
+        if (BeyonderUtil.getSequence(player) <= 4 && player instanceof Player) {
             toggleFlying(player);
         } else {
             useSpirituality(player,40);
@@ -159,4 +159,13 @@ public class WindManipulationFlight extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && target.distanceTo(livingEntity) >= 10) {
+            return 50;
+        }
+        return 0;
+    }
+
 }

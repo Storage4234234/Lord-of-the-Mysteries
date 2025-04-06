@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -56,10 +57,14 @@ public class AquaticLifeManipulation extends SimpleAbilityItem {
             if (nearestPlayer == null) {
                 return;
             }
-            if (sequence >= 2) {
-                player.sendSystemMessage(Component.literal("Nearest Player is " + nearestPlayer.getName().getString() + ". Pathway is " + BeyonderUtil.getPathway(nearestPlayer)).withStyle(BeyonderUtil.getStyle(player)));
-            } else {
-                player.sendSystemMessage(Component.literal("Nearest Player is " + nearestPlayer.getName().getString() + ". Pathway is " + BeyonderUtil.getPathway(nearestPlayer) + ". Sequence is" + BeyonderUtil.getSequence(nearestPlayer)).withStyle(BeyonderUtil.getStyle(player)));
+            if (player instanceof Player) {
+                if (sequence >= 2) {
+                    player.sendSystemMessage(Component.literal("Nearest Player is " + nearestPlayer.getName().getString() + ". Pathway is " + BeyonderUtil.getPathway(nearestPlayer)).withStyle(BeyonderUtil.getStyle(player)));
+                } else {
+                    player.sendSystemMessage(Component.literal("Nearest Player is " + nearestPlayer.getName().getString() + ". Pathway is " + BeyonderUtil.getPathway(nearestPlayer) + ". Sequence is" + BeyonderUtil.getSequence(nearestPlayer)).withStyle(BeyonderUtil.getStyle(player)));
+                }
+            } else if (player instanceof Mob mob && !BeyonderUtil.areAllies(nearestPlayer, mob)) {
+                mob.setTarget(nearestPlayer);
             }
         }
     }
@@ -76,5 +81,13 @@ public class AquaticLifeManipulation extends SimpleAbilityItem {
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target == null && livingEntity.getHealth() >= 30) {
+            return 20;
+        }
+        return 0;
     }
 }

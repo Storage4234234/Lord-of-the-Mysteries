@@ -14,6 +14,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -64,5 +65,14 @@ public class AuraOfTwilight extends SimpleAbilityItem {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getPersistentData().getBoolean("auraOfTwilight") && BeyonderUtil.getSequence(livingEntity) <= 900) {
+            return 100;
+        } else if (!livingEntity.getPersistentData().getBoolean("auraOfTwilight") && target != null) {
+            return 80;
+        }
+        return 0;
+    }
 }
 

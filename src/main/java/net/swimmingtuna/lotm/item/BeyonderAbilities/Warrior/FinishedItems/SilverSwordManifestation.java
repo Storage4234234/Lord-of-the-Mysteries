@@ -102,7 +102,9 @@ public class SilverSwordManifestation extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
-
-
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return 0;
+    }
 }
 

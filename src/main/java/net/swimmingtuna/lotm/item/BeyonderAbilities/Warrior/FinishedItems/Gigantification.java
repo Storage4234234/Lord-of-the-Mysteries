@@ -210,5 +210,21 @@ public class Gigantification extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        CompoundTag tag = livingEntity.getPersistentData();
+        boolean isGiant = tag.getBoolean("warriorGiant");
+        boolean isHoGGiant = tag.getBoolean("handOfGodGiant");
+        boolean isTwilightGiant = tag.getBoolean("twilightGiant");
+        if (isGiant || isHoGGiant || isTwilightGiant) {
+            if ((float) BeyonderUtil.getMaxSpirituality(livingEntity) / BeyonderUtil.getSpirituality(livingEntity) < 0.2f || livingEntity.getMaxHealth() / livingEntity.getHealth() > 0.9  || target == null) {
+                return 100;
+            } else if (target != null) {
+                return 85;
+            }
+        }
+        return 0;
+    }
 }
 

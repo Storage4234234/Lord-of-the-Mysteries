@@ -129,5 +129,12 @@ public class LightOfDawn extends SimpleAbilityItem {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getMaxHealth() / livingEntity.getHealth() < 0.7) {
+            return 80;
+        }
+        return 0;
+    }
 }
 

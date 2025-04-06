@@ -81,5 +81,9 @@ public class EnableOrDisableProtection extends SimpleAbilityItem {
         }
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return 0;
+    }
 
 }

@@ -89,5 +89,12 @@ public class MercuryCage extends SimpleAbilityItem {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && target.distanceTo(livingEntity) < 30) {
+            return 80;
+        }
+        return 0;
+    }
 }
 

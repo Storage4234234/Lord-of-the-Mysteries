@@ -70,4 +70,16 @@ public class LightningBallAbsorb extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            if (livingEntity.getPersistentData().getInt("sailorLightningStorm") >= 1) {
+                return 100;
+            } else {
+                return 60;
+            }
+        }
+        return 0;
+    }
 }

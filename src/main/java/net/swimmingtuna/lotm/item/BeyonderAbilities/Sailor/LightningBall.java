@@ -69,4 +69,12 @@ public class LightningBall extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && BeyonderUtil.getSequence(livingEntity) > 1) {
+            return 30;
+        }
+        return 0;
+    }
 }

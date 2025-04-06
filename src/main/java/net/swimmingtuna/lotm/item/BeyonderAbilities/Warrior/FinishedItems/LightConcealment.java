@@ -85,7 +85,7 @@ public class LightConcealment extends SimpleAbilityItem {
                         sendToPlayer(packet, (ServerPlayer) player);
                     } else {
                         SendParticleS2C packet = new SendParticleS2C(
-                                ParticleInit.FLASH_PARTICLE.get(),
+                                ParticleInit.LONG_FLASH_PARTICLE.get(),
                                 x, y, z,
                                 velocityX, velocityY, velocityZ
                         );
@@ -111,5 +111,12 @@ public class LightConcealment extends SimpleAbilityItem {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getMaxHealth() / livingEntity.getHealth() < 0.5) {
+            return 80;
+        }
+        return 0;
+    }
 }
 

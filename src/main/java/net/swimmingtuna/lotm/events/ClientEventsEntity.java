@@ -115,6 +115,7 @@ public class ClientEventsEntity {
         event.registerSpriteSet(ParticleInit.WARDEN_PARTICLE.get(), WardenParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.WIND_MOVE_PROJECTILES_PARTICLES.get(), WindProjectilesParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.FLASH_PARTICLE.get(), FlashParticle.Provider::new);
+        event.registerSpriteSet(ParticleInit.LONG_FLASH_PARTICLE.get(), LongFlashParticle.Provider::new);
         event.registerSpriteSet(ParticleInit.WIND_UNEQUIP_ARMOR_PARTICLE.get(), WindArmorParticle.Provider::new);
     }
 

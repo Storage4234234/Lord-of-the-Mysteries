@@ -151,4 +151,17 @@ public class RebootSelf extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        CompoundTag tag = livingEntity.getPersistentData();
+        if (tag.getInt("monsterRebootHealth") == 0) {
+            if (livingEntity.getHealth() >= livingEntity.getMaxHealth() - 1) {
+                return 100;
+            }
+        } else if (livingEntity.getMaxHealth() / livingEntity.getHealth() < 0.3) {
+            return 100;
+        }
+        return 0;
+    }
 }

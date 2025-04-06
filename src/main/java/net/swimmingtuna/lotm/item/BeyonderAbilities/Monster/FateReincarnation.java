@@ -241,4 +241,13 @@ public class FateReincarnation extends SimpleAbilityItem {
             }
         }
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getHealth() < 8) {
+            return 10;
+        }
+        return 0;
+    }
+
 }

@@ -6,12 +6,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.entity.EndStoneEntity;
 import net.swimmingtuna.lotm.entity.NetherrackEntity;
 import net.swimmingtuna.lotm.entity.StoneEntity;
@@ -54,9 +56,69 @@ public class MatterAccelerationBlocks extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
+    public static void matterAccelerationBlocksMobTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity living = event.getEntity();
+        if (!living.level().isClientSide() && living instanceof Mob mob) {
+            int x = mob.getPersistentData().getInt("matterAccelerationMobShootTimer");
+            if (x >= 1) {
+                mob.getPersistentData().putInt("matterAccelerationMobShootTimer", x - 1);
+                if (x % 10 == 0) {
+                    Vec3 lookDirection = mob.getLookAngle().normalize().scale(20);
+                    if (mob.level().dimension() == Level.OVERWORLD) {
+                        StoneEntity stoneEntity = mob.level().getEntitiesOfClass(StoneEntity.class, mob.getBoundingBox().inflate(10))
+                                .stream()
+                                .min(Comparator.comparingDouble(zombie -> zombie.distanceTo(mob)))
+                                .orElse(null);
+                        if (stoneEntity != null) {
+                            stoneEntity.setDeltaMovement(lookDirection);
+                            stoneEntity.setSent(true);
+                            stoneEntity.setShouldntDamage(false);
+                            stoneEntity.setTickCount(440);
+                        }
+                        if (stoneEntity == null) {
+                            mob.getPersistentData().putInt("matterAccelerationBlockTimer", 0);
+                        }
+                    }
+                    if (mob.level().dimension() == Level.NETHER) {
+                        NetherrackEntity netherrackEntity = mob.level().getEntitiesOfClass(NetherrackEntity.class, mob.getBoundingBox().inflate(10))
+                                .stream()
+                                .min(Comparator.comparingDouble(zombie -> zombie.distanceTo(mob)))
+                                .orElse(null);
+                        if (netherrackEntity != null) {
+                            netherrackEntity.setDeltaMovement(lookDirection);
+                            netherrackEntity.setSent(true);
+                            netherrackEntity.setShouldDamage(true);
+                            netherrackEntity.setTickCount(440);
+                        }
+                        if (netherrackEntity == null) {
+                            mob.getPersistentData().putInt("matterAccelerationBlockTimer", 0);
+                        }
+                    }
+                    if (mob.level().dimension() == Level.END) {
+                        EndStoneEntity endStoneEntity = mob.level().getEntitiesOfClass(EndStoneEntity.class, mob.getBoundingBox().inflate(10))
+                                .stream()
+                                .min(Comparator.comparingDouble(zombie -> zombie.distanceTo(mob)))
+                                .orElse(null);
+                        if (endStoneEntity != null) {
+                            endStoneEntity.setDeltaMovement(lookDirection);
+                            endStoneEntity.setSent(true);
+                            endStoneEntity.setShouldntDamage(false);
+                            endStoneEntity.setTickCount(440);
+                        }
+                        if (endStoneEntity == null) {
+                            mob.getPersistentData().putInt("matterAccelerationBlockTimer", 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static void matterAccelerationBlocks(LivingEntity player) {
         if (!player.level().isClientSide()) {
-
+            if (player instanceof Mob mob) {
+                mob.getPersistentData().putInt("matterAccelerationMobShootTimer", (int) (float) BeyonderUtil.getDamage(mob).get(ItemInit.MATTER_ACCELERATION_BLOCKS.get()) / 10);
+            }
             player.getPersistentData().putInt("matterAccelerationBlockTimer", 480);
             Level level = player.level();
             BlockPos playerPos = player.blockPosition();
@@ -176,6 +238,7 @@ public class MatterAccelerationBlocks extends SimpleAbilityItem {
     private static boolean isOnSurface(Level level, BlockPos pos) {
         return level.canSeeSky(pos.above()) || !level.getBlockState(pos.above()).isSolid();
     }
+
     public static void leftClick(Player player) {
         int x = player.getPersistentData().getInt("matterAccelerationBlockTimer");
         if (x >= 1) {
@@ -234,8 +297,14 @@ public class MatterAccelerationBlocks extends SimpleAbilityItem {
             }
         }
     }
+
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return super.getPriority(livingEntity, target);
     }
 }

@@ -66,4 +66,12 @@ public class Tyranny extends SimpleAbilityItem {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return 100;
+        }
+        return 0;
+    }
+
 }

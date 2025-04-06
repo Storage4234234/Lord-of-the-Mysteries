@@ -202,6 +202,13 @@ public class DawnWeaponry extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
-
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        livingEntity.getPersistentData().putInt("dawnWeaponry", 1);
+        if (target != null) {
+            return 90;
+        }
+        return 0;
+    }
 }
 

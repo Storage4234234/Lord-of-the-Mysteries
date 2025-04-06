@@ -80,9 +80,9 @@ public class ExtremeColdness extends SimpleAbilityItem {
         if (extremeColdness >= 1) {
             if (extremeColdness >= BeyonderUtil.getDamage(livingEntity).get(ItemInit.EXTREME_COLDNESS.get())) {
                 tag.putInt("sailorExtremeColdness", 0);
-                extremeColdness = 0;
+            } else {
+                tag.putInt("sailorExtremeColdness", extremeColdness + 1);
             }
-            tag.putInt("sailorExtremeColdness", extremeColdness + 1);
             AABB areaOfEffect = livingEntity.getBoundingBox().inflate(extremeColdness);
             List<LivingEntity> entities = livingEntity.level().getEntitiesOfClass(LivingEntity.class, areaOfEffect);
             for (LivingEntity entity : entities) {
@@ -91,7 +91,7 @@ public class ExtremeColdness extends SimpleAbilityItem {
                     entity.setTicksFrozen(1);
                 }
             }
-            List<Entity> entities1 = livingEntity.level().getEntitiesOfClass(Entity.class, areaOfEffect); //test thsi
+            List<Entity> entities1 = livingEntity.level().getEntitiesOfClass(Entity.class, areaOfEffect);
             for (Entity entity : entities1) {
                 if (!(entity instanceof LivingEntity)) {
                     int affectedBySailorColdness = entity.getPersistentData().getInt("affectedBySailorColdness");
@@ -159,5 +159,13 @@ public class ExtremeColdness extends SimpleAbilityItem {
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return (int) (100 - target.distanceTo(livingEntity));
+        }
+        return 0;
     }
 }

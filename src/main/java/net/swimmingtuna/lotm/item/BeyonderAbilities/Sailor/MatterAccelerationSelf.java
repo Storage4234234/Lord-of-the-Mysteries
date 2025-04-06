@@ -181,4 +181,13 @@ public class MatterAccelerationSelf extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            livingEntity.getPersistentData().putInt("tyrantSelfAcceleration", (int) (livingEntity.distanceTo(target) + 10));
+            return 70;
+        }
+        return 0;
+    }
 }

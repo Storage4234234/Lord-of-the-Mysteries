@@ -109,5 +109,8 @@ public class MonsterDangerSense extends SimpleAbilityItem {
             }
         }
     }
-
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return 0;
+    }
 }

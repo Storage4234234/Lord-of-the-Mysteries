@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DomainOfDecay extends SimpleAbilityItem {
     public static final BooleanProperty LIT = BooleanProperty.create("lit");
@@ -48,18 +49,9 @@ public class DomainOfDecay extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    @Override
-    public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
-        Player player = pContext.getPlayer();
-        if (!checkAll(player)) {
-            return InteractionResult.FAIL;
-        }
-        removeDomainOfProvidence(pContext);
-        return InteractionResult.SUCCESS;
-    }
-
     public static void monsterDomainIntHandler(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
+            float domainBlocks = 0;
             CompoundTag tag = livingEntity.getPersistentData();
             int radius = tag.getInt("monsterDomainRadius");
             if (livingEntity.tickCount % 10000 == 0) {
@@ -85,39 +77,44 @@ public class DomainOfDecay extends SimpleAbilityItem {
 
     private void makeDomainOfProvidence(LivingEntity player) {
         if (!player.level().isClientSide()) {
-            Vec3 eyePosition = player.getEyePosition();
-            Vec3 lookVector = player.getLookAngle();
-            Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
-            ClipContext clipContext = new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player);
-            BlockHitResult blockHit = player.level().clip(clipContext);
-            if (blockHit.getType() != HitResult.Type.BLOCK) {
-                Level level = player.level();
-                BlockPos pos = player.getOnPos();
-                level.setBlock(pos, BlockInit.MONSTER_DOMAIN_BLOCK.get().defaultBlockState().setValue(LIT, false), 3);
+            Level level = player.level();
+            BlockPos playerPos = player.getOnPos();
+            AtomicBoolean foundOwnedDomain = new AtomicBoolean(false);
+
+            BlockPos.betweenClosedStream(playerPos.offset(-5, -5, -5), playerPos.offset(5, 5, 5)).forEach(pos -> {
                 if (level.getBlockEntity(pos) instanceof MonsterDomainBlockEntity domainEntity) {
-                    domainEntity.setOwner(player);
-                    int radius = player.getPersistentData().getInt("monsterDomainRadius");
-                    domainEntity.setRadius(radius);
-                    domainEntity.setBad(true);
-                    domainEntity.setChanged();
+                    if (domainEntity.getOwner() != null && domainEntity.getOwner() == player) {
+                        level.removeBlock(pos, false);
+                        foundOwnedDomain.set(true);
+                        player.sendSystemMessage(Component.literal("Removed your domain at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ()) );
+                    }
+                }
+            });
+
+            if (!foundOwnedDomain.get()) {
+                Vec3 eyePosition = player.getEyePosition();
+                Vec3 lookVector = player.getLookAngle();
+                Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
+                ClipContext clipContext = new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player);
+                BlockHitResult blockHit = level.clip(clipContext);
+                if (blockHit.getType() != HitResult.Type.BLOCK) {
+                    level.setBlock(playerPos, BlockInit.MONSTER_DOMAIN_BLOCK.get().defaultBlockState().setValue(LIT, false), 3);
+                    if (level.getBlockEntity(playerPos) instanceof MonsterDomainBlockEntity domainEntity) {
+                        domainEntity.setOwner(player);
+                        int radius = player.getPersistentData().getInt("monsterDomainRadius");
+                        domainEntity.setRadius(radius);
+                        domainEntity.setBad(true);
+                        domainEntity.setChanged();
+                    }
                 }
             }
         }
     }
 
-    private void removeDomainOfProvidence(UseOnContext pContext) {
-        Level level = pContext.getLevel();
-        BlockPos pos = pContext.getClickedPos();
-        if (!level.isClientSide()) {
-            if (level.getBlockState(pos).is(BlockInit.MONSTER_DOMAIN_BLOCK.get())) {
-                level.removeBlock(pos, false);
-            }
-        }
-    }
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, put down a domain of decay, which will cause everything in the radius of it to encounter severe negative effects, the strength of them being stronger the smaller area. Examples include entities getting withered, ores turning to stone, crops dying, tools getting damaged, and more"));
+        tooltipComponents.add(Component.literal("Upon use, put down a domain of decay, which will cause everything in the radius of it to encounter severe negative effects, the strength of them being stronger the smaller area. Examples include entities getting withered, ores turning to stone, crops dying, tools getting damaged, and more. Use near a domain in order to remove it"));
         tooltipComponents.add(Component.literal("Left Click to increase radius"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("400").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("30 Seconds").withStyle(ChatFormatting.YELLOW)));
@@ -129,5 +126,10 @@ public class DomainOfDecay extends SimpleAbilityItem {
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return 0;
     }
 }

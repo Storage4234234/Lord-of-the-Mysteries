@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DomainOfProvidence extends SimpleAbilityItem {
     public static final BooleanProperty LIT = BooleanProperty.create("lit");
@@ -57,21 +58,35 @@ public class DomainOfProvidence extends SimpleAbilityItem {
 
     private void makeDomainOfProvidence(LivingEntity player) {
         if (!player.level().isClientSide()) {
-            Vec3 eyePosition = player.getEyePosition();
-            Vec3 lookVector = player.getLookAngle();
-            Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
-            ClipContext clipContext = new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player);
-            BlockHitResult blockHit = player.level().clip(clipContext);
-            if (blockHit.getType() != HitResult.Type.BLOCK) {
-                Level level = player.level();
-                BlockPos pos = player.getOnPos();
-                level.setBlock(pos, BlockInit.MONSTER_DOMAIN_BLOCK.get().defaultBlockState().setValue(LIT, true), 3);
+            Level level = player.level();
+            BlockPos playerPos = player.getOnPos();
+            AtomicBoolean foundOwnedDomain = new AtomicBoolean(false);
+
+            BlockPos.betweenClosedStream(playerPos.offset(-5, -5, -5), playerPos.offset(5, 5, 5)).forEach(pos -> {
                 if (level.getBlockEntity(pos) instanceof MonsterDomainBlockEntity domainEntity) {
-                    domainEntity.setOwner(player);
-                    int radius = player.getPersistentData().getInt("monsterDomainRadius");
-                    domainEntity.setRadius(radius);
-                    domainEntity.setBad(false);
-                    domainEntity.setChanged();
+                    if (domainEntity.getOwner() != null && domainEntity.getOwner() == player) {
+                        level.removeBlock(pos, false);
+                        foundOwnedDomain.set(true);
+                        player.sendSystemMessage(Component.literal("Removed your domain at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ()) );
+                    }
+                }
+            });
+
+            if (!foundOwnedDomain.get()) {
+                Vec3 eyePosition = player.getEyePosition();
+                Vec3 lookVector = player.getLookAngle();
+                Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
+                ClipContext clipContext = new ClipContext(eyePosition, reachVector, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player);
+                BlockHitResult blockHit = level.clip(clipContext);
+                if (blockHit.getType() != HitResult.Type.BLOCK) {
+                    level.setBlock(playerPos, BlockInit.MONSTER_DOMAIN_BLOCK.get().defaultBlockState().setValue(LIT, false), 3);
+                    if (level.getBlockEntity(playerPos) instanceof MonsterDomainBlockEntity domainEntity) {
+                        domainEntity.setOwner(player);
+                        int radius = player.getPersistentData().getInt("monsterDomainRadius");
+                        domainEntity.setRadius(radius);
+                        domainEntity.setBad(false);
+                        domainEntity.setChanged();
+                    }
                 }
             }
         }
@@ -111,5 +126,10 @@ public class DomainOfProvidence extends SimpleAbilityItem {
     @Override
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return 0;
     }
 }

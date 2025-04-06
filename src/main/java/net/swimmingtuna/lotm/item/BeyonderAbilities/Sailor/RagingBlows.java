@@ -179,4 +179,12 @@ public class RagingBlows extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && target.distanceTo(livingEntity) <= (27 - (BeyonderUtil.getSequence(livingEntity) * 3)) + 5) {
+            return 80;
+        }
+        return 0;
+    }
 }

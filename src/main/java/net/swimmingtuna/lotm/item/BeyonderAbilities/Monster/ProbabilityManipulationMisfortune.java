@@ -197,4 +197,9 @@ public class ProbabilityManipulationMisfortune extends SimpleAbilityItem {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {  //marked make it work on self
+        return 0;
+    }
+
 }

@@ -68,6 +68,12 @@ public class BeamOfGlory extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
-
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return 90;
+        }
+        return 0;
+    }
 }
 

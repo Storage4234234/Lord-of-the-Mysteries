@@ -94,4 +94,12 @@ public class Hurricane extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target == null && BeyonderUtil.getSpirituality(livingEntity) == BeyonderUtil.getMaxSpirituality(livingEntity)) {
+            return 2;
+        }
+        return 0;
+    }
 }

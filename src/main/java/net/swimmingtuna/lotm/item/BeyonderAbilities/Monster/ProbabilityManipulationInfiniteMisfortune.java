@@ -80,17 +80,6 @@ public class ProbabilityManipulationInfiniteMisfortune extends SimpleAbilityItem
         return InteractionResult.SUCCESS;
     }
 
-    @Override
-    public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) { //add if cursor is on a projectile, lightning goes to projectile and pwoers it
-        if (!checkAll(player)) {
-            return InteractionResult.FAIL;
-        }
-        giveInfiniteMisfortune(player);
-        addCooldown(player);
-        useSpirituality(player);
-        return InteractionResult.SUCCESS;
-    }
-
     public static void giveInfiniteMisfortune(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
             livingEntity.getPersistentData().putInt("probabilityManipulationInfiniteMisfortune", (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.PROBABILITYINFINITEMISFORTUNE.get()));
@@ -168,4 +157,13 @@ public class ProbabilityManipulationInfiniteMisfortune extends SimpleAbilityItem
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return 100;
+        }
+        return 0;
+    }
+
 }

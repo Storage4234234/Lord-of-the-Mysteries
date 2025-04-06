@@ -128,4 +128,9 @@ public class WaterSphere extends SimpleAbilityItem {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return (int) Math.max(0, 60 - livingEntity.getHealth());
+    }
+
 }

@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.world.worlddata.WorldFortuneValue;
+import net.swimmingtuna.lotm.world.worlddata.WorldMisfortuneData;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -71,4 +72,17 @@ public class ProbabilityManipulationWorldMisfortune extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        livingEntity.getPersistentData().putInt("probabilityManipulationWorldMisfortuneValue", 3);
+        if (!livingEntity.level().isClientSide() && livingEntity.level() instanceof ServerLevel serverLevel) {
+            WorldMisfortuneData data = WorldMisfortuneData.getInstance(serverLevel);
+            if (data.getWorldMisfortune() != 3) {
+                return 75;
+            }
+        }
+        return 0;
+    }
+
 }

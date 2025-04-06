@@ -72,5 +72,12 @@ public class DivineHandLeft extends SimpleAbilityItem {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return 70;
+        }
+        return 0;
+    }
 }
 

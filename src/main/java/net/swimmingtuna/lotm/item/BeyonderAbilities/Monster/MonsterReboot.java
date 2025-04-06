@@ -86,4 +86,10 @@ public class MonsterReboot extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return super.getPriority(livingEntity, target);
+    }
+
 }

@@ -88,4 +88,13 @@ public class LuckDeprivation extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return (int) target.getPersistentData().getDouble("luck");
+        }
+        return 0;
+    }
+
 }

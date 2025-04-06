@@ -60,4 +60,12 @@ public class CalamityIncarnationTornado extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && livingEntity.getPersistentData().getInt("calamityIncarnationTsunami") == 0) {
+            return (int) (80 - livingEntity.getHealth());
+        }
+        return 0;
+    }
 }

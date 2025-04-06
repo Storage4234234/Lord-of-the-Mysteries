@@ -91,4 +91,9 @@ public class VolcanicEruption extends SimpleAbilityItem {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        return 2;
+    }
+
 }

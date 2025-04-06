@@ -146,4 +146,24 @@ public class LuckManipulation extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        float priority = 0;
+        CompoundTag tag = livingEntity.getPersistentData();
+
+        if (livingEntity.getMaxHealth() / livingEntity.getHealth() < 0.4) {
+            priority = 100;
+            tag.putInt("luckManipulationItem", 1);
+        } else {
+            priority = 40;
+            int luckItem;
+            do {
+                luckItem = livingEntity.getRandom().nextInt(7) + 1;
+            } while (luckItem == 2);
+            tag.putInt("luckManipulationItem", luckItem);
+        }
+        return (int) priority;
+    }
+
 }

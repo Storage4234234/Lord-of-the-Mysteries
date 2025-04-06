@@ -113,4 +113,15 @@ public class LightningRedirection extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        int maxLightningCount = 0;
+        if (target != null) {
+            for (LightningEntity lightning : livingEntity.level().getEntitiesOfClass(LightningEntity.class, livingEntity.getBoundingBox().inflate(BeyonderUtil.getDamage(livingEntity).get(ItemInit.LIGHTNING_REDIRECTION.get())))) {
+                maxLightningCount++;
+            }
+        }
+        return Math.min(100, maxLightningCount);
+    }
 }

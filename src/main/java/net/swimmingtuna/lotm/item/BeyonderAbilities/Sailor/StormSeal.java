@@ -114,4 +114,19 @@ public class StormSeal extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            float healthPercent = livingEntity.getMaxHealth() / livingEntity.getHealth();
+            float targetHealthPercent = target.getMaxHealth() / target.getHealth();
+            if (healthPercent <= targetHealthPercent) {
+                return 80;
+            }
+            else {
+                return 45;
+            }
+        }
+        return 0;
+    }
 }

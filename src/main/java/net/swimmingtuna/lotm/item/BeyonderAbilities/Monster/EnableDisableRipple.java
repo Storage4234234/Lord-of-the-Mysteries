@@ -398,5 +398,13 @@ public class EnableDisableRipple extends SimpleAbilityItem {
             }
         }
     }
-
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && BeyonderUtil.getSpirituality(livingEntity) > 900 && !livingEntity.getPersistentData().getBoolean("monsterRipple")) {
+            return 95;
+        } else if (BeyonderUtil.getSpirituality(livingEntity) < 900 && livingEntity.getPersistentData().getBoolean("monsterRipple")) {
+            return 100;
+        }
+        return 0;
+    }
 }

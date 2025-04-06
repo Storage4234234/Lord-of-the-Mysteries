@@ -205,4 +205,8 @@ public class TwilightFreeze extends SimpleAbilityItem {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) { //marked ... make it so you can choose which somehow
+        return 0;
+    }
 }

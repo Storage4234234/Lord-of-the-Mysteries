@@ -177,5 +177,15 @@ public class AuraOfGlory extends SimpleAbilityItem {
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("WARRIOR_ABILITY", ChatFormatting.YELLOW);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getPersistentData().getBoolean("auraOfGlory") && BeyonderUtil.getSequence(livingEntity) <= 600) {
+            return 100;
+        } else if (!livingEntity.getPersistentData().getBoolean("auraOfGlory") && target != null) {
+            return 80;
+        }
+        return 0;
+    }
 }
 

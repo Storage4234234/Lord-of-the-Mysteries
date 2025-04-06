@@ -234,7 +234,7 @@ public class ChaosWalkerDisableEnable extends SimpleAbilityItem {
     private static void spawnParticleCylinderServerSide(ServerPlayer player, int centerX, int centerZ, int height,
                                                         int radius) {
         for (int y = 0; y <= height; y++) {
-            for (double angle = 0; angle < 360; angle += 10) { // Adjust the step size for density
+            for (double angle = 0; angle < 360; angle += 10) {
                 double radians = Math.toRadians(angle);
                 double x = centerX + radius * Math.cos(radians);
                 double z = centerZ + radius * Math.sin(radians);
@@ -243,5 +243,15 @@ public class ChaosWalkerDisableEnable extends SimpleAbilityItem {
                 }
             }
         }
+    }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null && !livingEntity.getPersistentData().getBoolean("monsterChaosWalkerCombat")) {
+            return 85;
+        } else if (livingEntity.getPersistentData().getBoolean("monsterChaosWalkerCombat") && target == null) {
+            return 20;
+        }
+        return 0;
     }
 }

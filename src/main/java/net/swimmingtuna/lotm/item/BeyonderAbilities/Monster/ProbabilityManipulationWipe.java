@@ -153,4 +153,12 @@ public class ProbabilityManipulationWipe extends SimpleAbilityItem {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
 
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            return (int) Math.min(100, target.getPersistentData().getDouble("luck") * 2);
+        }
+        return 0;
+    }
+
 }

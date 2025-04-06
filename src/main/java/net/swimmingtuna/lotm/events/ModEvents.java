@@ -61,10 +61,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.Burn;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.InvisibleHand;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.AqueousLightDrown;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.ExtremeColdness;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.StormSeal;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.TsunamiSeal;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.BattleHypnotism;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.DreamWalking;
@@ -341,6 +338,10 @@ public class ModEvents {
             envisionKingdom(livingEntity, level);
             SwordOfTwilight.twilightSwordTick(event);
             if (tag.getInt("inTwilight") == 0) {
+                //mob ticks
+                MatterAccelerationBlocks.matterAccelerationBlocksMobTick(event);
+
+                //regular ticks
                 battleHypnotismTickCheck(event);
                 dreamIntoReality(livingEntity);
                 acidicRainTick(livingEntity);

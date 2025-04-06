@@ -150,4 +150,15 @@ public class LightningStorm extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SAILOR_ABILITY", ChatFormatting.BLUE);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (target != null) {
+            CompoundTag tag = livingEntity.getPersistentData();
+            tag.putInt("sailorLightningStormDistance", 30);
+            tag.putInt("sailorStormVec", (int) livingEntity.distanceTo(target));
+            return 60;
+        }
+        return 0;
+    }
 }

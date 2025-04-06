@@ -173,4 +173,14 @@ public class AuraOfChaos extends SimpleAbilityItem {
     public Rarity getRarity(ItemStack pStack) {
         return Rarity.create("MONSTER_ABILITY", ChatFormatting.GRAY);
     }
+
+    @Override
+    public int getPriority(LivingEntity livingEntity, LivingEntity target) {
+        if (livingEntity.getPersistentData().getBoolean("monsterAuraOfChaos") && BeyonderUtil.getSpirituality(livingEntity) < 800) {
+            return 100;
+        } else if (!livingEntity.getPersistentData().getBoolean("monsterAuraOfChaos") && BeyonderUtil.getSpirituality(livingEntity) > 1500) {
+            return 90;
+        }
+        return 0;
+    }
 }
