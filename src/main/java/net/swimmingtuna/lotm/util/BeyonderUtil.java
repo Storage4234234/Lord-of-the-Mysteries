@@ -357,9 +357,7 @@ public class BeyonderUtil {
                 abilityNames.add(ItemInit.DREAM_INTO_REALITY.get());
             }
             if (sequence <= 1) {
-                abilityNames.add(ItemInit.PROPHESIZE_DEMISE.get());
-                abilityNames.add(ItemInit.PROPHESIZE_TELEPORT_PLAYER.get());
-                abilityNames.add(ItemInit.PROPHESIZE_TELEPORT_BLOCK.get());
+                abilityNames.add(ItemInit.PROPHECY.get());
                 abilityNames.add(ItemInit.METEOR_SHOWER.get());
                 abilityNames.add(ItemInit.METEOR_NO_LEVEL_SHOWER.get());
             }
@@ -982,14 +980,8 @@ public class BeyonderUtil {
             } else if (heldItem.getItem() instanceof MeteorNoLevelShower) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.METEOR_SHOWER.get())));
 
-            } else if (heldItem.getItem() instanceof ProphesizeDemise) {
-                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROPHESIZE_TELEPORT_BLOCK.get())));
-
-            } else if (heldItem.getItem() instanceof ProphesizeTeleportBlock) {
-                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROPHESIZE_TELEPORT_PLAYER.get())));
-
-            } else if (heldItem.getItem() instanceof ProphesizeTeleportPlayer) {
-                LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.PROPHESIZE_DEMISE.get())));
+            } else if (heldItem.getItem() instanceof Prophecy) {
+                LOTMNetworkHandler.sendToServer(new ProphesizeLeftClickC2S());
             } else if (heldItem.getItem() instanceof SirenSongHarm) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.SIREN_SONG_STRENGTHEN.get())));
 
@@ -1141,15 +1133,8 @@ public class BeyonderUtil {
             } else if (heldItem.getItem() instanceof MeteorNoLevelShower) {
                 pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.METEOR_SHOWER.get())));
                 heldItem.shrink(1);
-            } else if (heldItem.getItem() instanceof ProphesizeDemise) {
-                pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.PROPHESIZE_TELEPORT_BLOCK.get())));
-                heldItem.shrink(1);
-            } else if (heldItem.getItem() instanceof ProphesizeTeleportBlock) {
-                pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.PROPHESIZE_TELEPORT_PLAYER.get())));
-                heldItem.shrink(1);
-            } else if (heldItem.getItem() instanceof ProphesizeTeleportPlayer) {
-                pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.PROPHESIZE_DEMISE.get())));
-                heldItem.shrink(1);
+            } else if (heldItem.getItem() instanceof Prophecy) {
+                LOTMNetworkHandler.sendToServer(new ProphesizeLeftClickC2S());
             } else if (heldItem.getItem() instanceof LuckManipulation) {
                 LOTMNetworkHandler.sendToServer(new LuckManipulationLeftClickC2S());
             } else if (heldItem.getItem() instanceof Gigantification) {
@@ -1411,9 +1396,7 @@ public class BeyonderUtil {
         damageMap.put(ItemInit.NIGHTMARE.get(), applyAbilityStrengthened((40.0f - (sequence * 2)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.PLACATE.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
         damageMap.put(ItemInit.PLAGUE_STORM.get(), applyAbilityStrengthened((float) ((12.0f * dreamIntoReality) - (sequence * 1.5)) / abilityWeakness, abilityStrengthened));
-        damageMap.put(ItemInit.PROPHESIZE_DEMISE.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
-        damageMap.put(ItemInit.PROPHESIZE_TELEPORT_BLOCK.get(), applyAbilityStrengthened((float) ((500.0f * dreamIntoReality) - (sequence * 100)) / abilityWeakness, abilityStrengthened));
-        damageMap.put(ItemInit.PROPHESIZE_TELEPORT_PLAYER.get(), applyAbilityStrengthened((float) ((500.0f * dreamIntoReality) - (sequence * 100)) / abilityWeakness, abilityStrengthened));
+        damageMap.put(ItemInit.PROPHECY.get(), applyAbilityStrengthened((float) (8.0f + (dreamIntoReality * 2) - (sequence * 4)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.PSYCHOLOGICAL_INVISIBILITY.get(), applyAbilityStrengthened((0.0f), abilityStrengthened));
 
         // MONSTER

@@ -191,9 +191,7 @@ public class LOTM {
             event.accept(ItemInit.DISCERN);
             event.accept(ItemInit.TSUNAMI);
             event.accept(ItemInit.DREAM_INTO_REALITY);
-            event.accept(ItemInit.PROPHESIZE_TELEPORT_BLOCK);
-            event.accept(ItemInit.PROPHESIZE_TELEPORT_PLAYER);
-            event.accept(ItemInit.PROPHESIZE_DEMISE);
+            event.accept(ItemInit.PROPHECY);
             event.accept(ItemInit.ENVISION_LIFE);
             event.accept(ItemInit.METEOR_SHOWER);
             event.accept(ItemInit.METEOR_NO_LEVEL_SHOWER);

@@ -1,19 +1,23 @@
 package net.swimmingtuna.lotm.events;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.swimmingtuna.lotm.LOTM;
+import net.swimmingtuna.lotm.beyonder.SpectatorClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
@@ -22,13 +26,16 @@ import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoor;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ConsciousnessStroll;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLife;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocation;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionWeather;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
+import net.swimmingtuna.lotm.item.OtherItems.TestItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.regex.Matcher;
+
+import static net.swimmingtuna.lotm.beyonder.SpectatorClass.EVENT_TO_TAG;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Apprentice.TravelDoor.coordsTravel;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLife.spawnMob;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.EnvisionLocation.isThreeIntegers;
@@ -76,7 +83,7 @@ public class ServerEvents {
         if (!player.level().isClientSide()) {
             String message = event.getMessage().getString().toLowerCase();
             for (Player otherPlayer : level.players()) {
-                if (message.contains(otherPlayer.getName().getString().toLowerCase())) {
+                if (message.contains(otherPlayer.getName().getString().toLowerCase()) && !event.isCanceled()) {
                     BeyonderHolder otherHolder = BeyonderHolderAttacher.getHolderUnwrap(otherPlayer);
                     if (otherHolder.currentClassMatches(BeyonderClassInit.SPECTATOR) && otherHolder.getSequence() <= 1 && !otherPlayer.level().isClientSide()) {
                         otherPlayer.sendSystemMessage(Component.literal(player.getName().getString() + " mentioned you in chat. Their coordinates are: " + (int) player.getX() + " ," + (int) player.getY() + " ," + (int) player.getZ()).withStyle(style));
@@ -276,6 +283,50 @@ public class ServerEvents {
                 }
             } else {
                 event.getPlayer().displayClientMessage(Component.literal("Invalid coordinates or player name: " + message).withStyle(BeyonderUtil.getStyle(player)), true);
+            }
+            event.setCanceled(true);
+        }
+        ItemStack heldItem = player.getMainHandItem();
+        if (!heldItem.isEmpty() && heldItem.getItem() instanceof Prophecy) {
+            Matcher matcher = SpectatorClass.PROPHECY_PATTERN.matcher(message);
+            if (matcher.matches()) {
+                String targetPlayerName = matcher.group(1);
+                String eventDescription = matcher.group(2);
+                int timeValue = Integer.parseInt(matcher.group(3));
+                String timeUnit = matcher.group(4).toLowerCase();
+                int ticksPerSecond = 20;
+                int ticks;
+                if (timeUnit.startsWith("second")) {
+                    ticks = timeValue * ticksPerSecond;
+                } else {
+                    ticks = timeValue * 60 * ticksPerSecond;
+                }
+                String tagKey = null;
+                for (Map.Entry<String, String> entry : EVENT_TO_TAG.entrySet()) {
+                    if (eventDescription.equals(entry.getKey())) {
+                        tagKey = entry.getValue();
+                        break;
+                    }
+                }
+
+                if (tagKey != null) {
+                    Optional<ServerPlayer> targetPlayer = level.getServer().getPlayerList().getPlayers().stream().filter(p -> p.getName().getString().equals(targetPlayerName)).findFirst();
+                    if (targetPlayer.isPresent()) {
+                        CompoundTag tag = targetPlayer.get().getPersistentData();
+                        tag.putInt(tagKey, ticks);
+                        player.sendSystemMessage(Component.literal("Prophecy has been set for " + targetPlayerName));
+                    } else {
+                        player.sendSystemMessage(Component.literal("Could not find player: " + targetPlayerName));
+                    }
+                } else {
+                    for (String description : EVENT_TO_TAG.keySet()) {
+                        player.sendSystemMessage(Component.literal("• " + description).withStyle(ChatFormatting.YELLOW));
+                    }
+                    player.sendSystemMessage(Component.literal("Unknown prophecy. Known prophecy types are above").withStyle(ChatFormatting.RED));
+
+                }
+            } else {
+                player.sendSystemMessage(Component.literal("Prophecy written incorrectly. Should be put in the format of (Player) will (event) in (number) (minutes/seconds).").withStyle(ChatFormatting.RED));
             }
             event.setCanceled(true);
         }

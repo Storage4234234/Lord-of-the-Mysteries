@@ -52,9 +52,9 @@ public class Earthquake extends SimpleAbilityItem {
     }
 
     public static void earthquake(LivingEntity livingEntity) {
-        int sequence = BeyonderUtil.getSequence(livingEntity);
         int sailorEarthquake = livingEntity.getPersistentData().getInt("sailorEarthquake");
         if (sailorEarthquake >= 1) {
+            int sequence = BeyonderUtil.getSequence(livingEntity);
             int radius = (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.EARTHQUAKE.get());
             if (sailorEarthquake % 20 == 0) {
                 for (LivingEntity entity : livingEntity.level().getEntitiesOfClass(LivingEntity.class, livingEntity.getBoundingBox().inflate((radius)))) {

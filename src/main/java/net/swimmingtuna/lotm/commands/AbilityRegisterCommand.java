@@ -241,9 +241,7 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput RLLLL lotm:plaguestorm");
                     excecuteAbilityCommand(context, "/abilityput RRLRR lotm:dreamintoreality");
                     excecuteAbilityCommand(context, "/abilityput LLLLR lotm:discern");
-                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:prophesizeblock");
-                    excecuteAbilityCommand(context, "/abilityput LLRLR lotm:prophesizeplayer");
-                    excecuteAbilityCommand(context, "/abilityput LLRLL lotm:prophesizedemise");
+                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:prophecy");
                     excecuteAbilityCommand(context, "/abilityput RRLLL lotm:meteorshower");
                     excecuteAbilityCommand(context, "/abilityput RLRLR lotm:dreamweaving");
                 } else if (sequence == 0) {
@@ -256,12 +254,10 @@ public class AbilityRegisterCommand {
                     excecuteAbilityCommand(context, "/abilityput RLLLL lotm:plaguestorm");
                     excecuteAbilityCommand(context, "/abilityput RRLRR lotm:dreamintoreality");
                     excecuteAbilityCommand(context, "/abilityput LLLLR lotm:discern");
-                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:prophesizeblock");
-                    excecuteAbilityCommand(context, "/abilityput LLRLR lotm:prophesizeplayer");
-                    excecuteAbilityCommand(context, "/abilityput LLRLL lotm:prophesizedemise");
+                    excecuteAbilityCommand(context, "/abilityput LLRRR lotm:prophecy");
                     excecuteAbilityCommand(context, "/abilityput RRLLL lotm:meteorshower");
                     excecuteAbilityCommand(context, "/abilityput RLRRR lotm:envisionhealth");
-                    excecuteAbilityCommand(context, "/abilityput LLRRL lotm:envisionlocation");
+                    excecuteAbilityCommand(context, "/abilityput LLRLL lotm:envisionlocation");
                     excecuteAbilityCommand(context, "/abilityput RLLRR lotm:envisionbarrier");
                     excecuteAbilityCommand(context, "/abilityput RLRLR lotm:dreamweaving");
                 }

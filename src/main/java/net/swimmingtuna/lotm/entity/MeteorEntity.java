@@ -140,7 +140,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
         if (!player.level().isClientSide()) {
             double scatterRadius = 100.0;
             double randomX, randomY, randomZ;
-            Vec3 lookVec = player.getLookAngle().normalize().scale(100);
+            Vec3 lookVec = player.getLookAngle().normalize().scale(200);
             Vec3 targetPos = player.getEyePosition().add(lookVec);
             randomX = Math.random() * scatterRadius * 2 - scatterRadius;
             randomY = Math.random() * scatterRadius * 2 - scatterRadius;
@@ -173,6 +173,7 @@ public class MeteorEntity extends AbstractHurtingProjectile {
             player.level().addFreshEntity(meteorEntity);
         }
     }
+
 
     public static void summonMeteorAtPosition(LivingEntity player, int x, int y, int z) {
         if (!player.level().isClientSide()) {

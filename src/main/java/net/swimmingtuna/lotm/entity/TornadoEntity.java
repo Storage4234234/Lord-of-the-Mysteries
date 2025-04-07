@@ -309,11 +309,9 @@ public class TornadoEntity extends AbstractHurtingProjectile {
                     if (this.tickCount % 5 == 0) {
                         FallingBlockEntity fallingBlock = FallingBlockEntity.fall(this.level(), blockPosition, state);
                     fallingBlock.time = 1;
-
-                    // Set random motion for the falling block
-                    double randomDirectionX = (random.nextDouble() - 0.5) * 2.0; // random between -1 and 1
-                    double randomDirectionY = random.nextDouble() * 2.0; // random upward motion
-                    double randomDirectionZ = (random.nextDouble() - 0.5) * 2.0; // random between -1 and 1
+                    double randomDirectionX = (random.nextDouble() - 0.5) * 2.0;
+                    double randomDirectionY = random.nextDouble() * 2.0;
+                    double randomDirectionZ = (random.nextDouble() - 0.5) * 2.0;
                     fallingBlock.setDeltaMovement(randomDirectionX, randomDirectionY, randomDirectionZ);
 
                     // Remove the block from the world and add the falling block entity

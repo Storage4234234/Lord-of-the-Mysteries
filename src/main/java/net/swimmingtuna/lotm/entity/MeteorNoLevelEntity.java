@@ -149,7 +149,7 @@ public class MeteorNoLevelEntity extends AbstractHurtingProjectile {
         if (!player.level().isClientSide()) {
             double scatterRadius = 100.0;
             double randomX, randomY, randomZ;
-            Vec3 lookVec = player.getLookAngle().normalize().scale(100);
+            Vec3 lookVec = player.getLookAngle().normalize().scale(200);
             Vec3 targetPos = player.getEyePosition().add(lookVec);
             randomX = Math.random() * scatterRadius * 2 - scatterRadius;
             randomY = Math.random() * scatterRadius * 2 - scatterRadius;

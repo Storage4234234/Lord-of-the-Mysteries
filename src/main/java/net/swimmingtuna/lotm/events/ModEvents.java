@@ -46,6 +46,7 @@ import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.beyonder.ApprenticeClass;
 import net.swimmingtuna.lotm.beyonder.MonsterClass;
 import net.swimmingtuna.lotm.beyonder.SailorClass;
+import net.swimmingtuna.lotm.beyonder.SpectatorClass;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
@@ -63,10 +64,7 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.BeyonderAbilityUser;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.BattleHypnotism;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.DreamWalking;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeDemise;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.PsychologicalInvisibility;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderCharacteristic;
 import net.swimmingtuna.lotm.item.OtherItems.SwordOfTwilight;
@@ -133,7 +131,6 @@ import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedIte
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ManipulateMovement.manipulateMovement;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.MentalPlague.mentalPlague;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.Nightmare.nightmareTick;
-import static net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.ProphesizeTeleportPlayer.prophesizeTeleportation;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.Gigantification.warriorGiant;
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.WarriorDangerSense.warriorDangerSense;
 import static net.swimmingtuna.lotm.util.effect.BattleHypnotismEffect.battleHypnotismTickCheck;
@@ -342,6 +339,8 @@ public class ModEvents {
                 MatterAccelerationBlocks.matterAccelerationBlocksMobTick(event);
 
                 //regular ticks
+                Prophecy.prophecyTick(event);
+                SpectatorClass.prophecyTickEvent(event);
                 battleHypnotismTickCheck(event);
                 dreamIntoReality(livingEntity);
                 acidicRainTick(livingEntity);
@@ -365,7 +364,6 @@ public class ModEvents {
                 envisionBarrier(livingEntity);
                 consciousnessStroll(livingEntity);
                 BeyonderUtil.projectileEvent(livingEntity);
-                prophesizeTeleportation(livingEntity);
                 calamityIncarnationTornado(livingEntity);
                 windManipulationGuide(livingEntity);
                 windManipulationSense(livingEntity);

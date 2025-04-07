@@ -41,9 +41,7 @@ public class CreativeTabInit {
                         event.accept(ItemInit.DREAM_WEAVING.get());
                         event.accept(ItemInit.DISCERN.get());
                         event.accept(ItemInit.DREAM_INTO_REALITY.get());
-                        event.accept(ItemInit.PROPHESIZE_DEMISE.get());
-                        event.accept(ItemInit.PROPHESIZE_TELEPORT_BLOCK.get());
-                        event.accept(ItemInit.PROPHESIZE_TELEPORT_PLAYER.get());
+                        event.accept(ItemInit.PROPHECY.get());
                         event.accept(ItemInit.METEOR_SHOWER.get());
                         event.accept(ItemInit.METEOR_NO_LEVEL_SHOWER.get());
                         event.accept(ItemInit.ENVISION_BARRIER.get());

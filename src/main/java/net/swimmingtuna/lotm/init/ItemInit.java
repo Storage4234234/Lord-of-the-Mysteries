@@ -247,12 +247,8 @@ public class ItemInit {
             () -> new Discern(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> DREAM_INTO_REALITY = ITEMS.register("dreamintoreality",
             () -> new DreamIntoReality(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> PROPHESIZE_TELEPORT_BLOCK = ITEMS.register("prophesizeblock",
-            () -> new ProphesizeTeleportBlock(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> PROPHESIZE_TELEPORT_PLAYER = ITEMS.register("prophesizeplayer",
-            () -> new ProphesizeTeleportPlayer(new Item.Properties().stacksTo(1)));
-    public static final RegistryObject<Item> PROPHESIZE_DEMISE = ITEMS.register("prophesizedemise",
-            () -> new ProphesizeDemise(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> PROPHECY = ITEMS.register("prophecy",
+            () -> new Prophecy(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ENVISION_LIFE = ITEMS.register("envisionlife",
             () -> new EnvisionLife(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> METEOR_SHOWER = ITEMS.register("meteorshower",
