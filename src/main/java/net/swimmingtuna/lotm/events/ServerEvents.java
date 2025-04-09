@@ -314,9 +314,9 @@ public class ServerEvents {
                     if (targetPlayer.isPresent()) {
                         CompoundTag tag = targetPlayer.get().getPersistentData();
                         tag.putInt(tagKey, ticks);
-                        player.sendSystemMessage(Component.literal("Prophecy has been set for " + targetPlayerName));
+                        player.sendSystemMessage(Component.literal("Prophecy has been set for " + targetPlayerName).withStyle(ChatFormatting.GREEN));
                     } else {
-                        player.sendSystemMessage(Component.literal("Could not find player: " + targetPlayerName));
+                        player.sendSystemMessage(Component.literal("Could not find player: " + targetPlayerName).withStyle(ChatFormatting.RED));
                     }
                 } else {
                     for (String description : EVENT_TO_TAG.keySet()) {

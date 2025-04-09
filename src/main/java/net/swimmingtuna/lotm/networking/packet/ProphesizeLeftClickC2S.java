@@ -27,7 +27,7 @@ public class ProphesizeLeftClickC2S {
             if (player == null) return;
             CompoundTag tag = player.getPersistentData();
             int x = tag.getInt("spectatorProphecyItem");
-            if (x <= 7) {
+            if (x <= 6) {
                 tag.putInt("spectatorProphecyItem", x + 1);
             } else {
                 tag.putInt("spectatorProphecyItem", 1);

@@ -7,6 +7,8 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
@@ -79,14 +81,14 @@ public class Prophecy extends SimpleAbilityItem {
                 for (int i = 0; i < BeyonderUtil.getDamage(livingEntity).get(ItemInit.PROPHECY.get()); i++) {
                     MeteorEntity.summonMultipleMeteors(livingEntity);
                     if (livingEntity instanceof Player player) {
-                        player.displayClientMessage(Component.literal("You prophesized meteors into the world").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                        player.sendSystemMessage(Component.literal("You prophesized meteors into the world").withStyle(BeyonderUtil.getStyle(livingEntity)));
                     }
                 }
             } else if (prophecy == 2) {
                 for (int i = 0; i < BeyonderUtil.getDamage(livingEntity).get(ItemInit.PROPHECY.get()); i++) {
                     MeteorNoLevelEntity.summonMultipleMeteors(livingEntity);
                     if (livingEntity instanceof Player player) {
-                        player.displayClientMessage(Component.literal("You prophesized meteors that don't destroy blocks into the world").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                        player.sendSystemMessage(Component.literal("You prophesized meteors that don't destroy blocks into the world").withStyle(BeyonderUtil.getStyle(livingEntity)));
                     }
                 }
             } else if (prophecy == 3) {
@@ -103,17 +105,17 @@ public class Prophecy extends SimpleAbilityItem {
                 tornado.setTornadoMov(livingEntity.getLookAngle().scale(0.5f).toVector3f());
                 livingEntity.level().addFreshEntity(tornado);
                 if (livingEntity instanceof Player player) {
-                    player.displayClientMessage(Component.literal("You prophesized a tornado into the world").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                    player.sendSystemMessage(Component.literal("You prophesized a tornado into the world").withStyle(BeyonderUtil.getStyle(livingEntity)));
                 }
             } else if (prophecy == 4) {
                 tag.putInt("prophecyEarthquake", (int) (BeyonderUtil.getDamage(livingEntity).get(ItemInit.PROPHECY.get()) * 15));
                 if (livingEntity instanceof Player player) {
-                    player.displayClientMessage(Component.literal("You prophesized an eartuquake into the world").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                    player.sendSystemMessage(Component.literal("You prophesized an eartuquake into the world").withStyle(BeyonderUtil.getStyle(livingEntity)));
                 }
             } else if (prophecy == 5) {
                 tag.putInt("prophecyPlague",  (int) (BeyonderUtil.getDamage(livingEntity).get(ItemInit.PROPHECY.get()) * 10));
                 if (livingEntity instanceof Player player) {
-                    player.displayClientMessage(Component.literal("You prophesized a plague around you into the world").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                    player.sendSystemMessage(Component.literal("You prophesized a plague around you into the world").withStyle(BeyonderUtil.getStyle(livingEntity)));
                 }
             } else if (prophecy == 6) {
                 tag.putInt("prophecySinkhole", 80);
@@ -123,16 +125,14 @@ public class Prophecy extends SimpleAbilityItem {
                 int sinkholeRadius = (int) (BeyonderUtil.getDamage(livingEntity).get(ItemInit.PROPHECY.get()) * 3);
                 sinkholeRadius = Math.max(5, sinkholeRadius);
                 if (livingEntity instanceof Player player) {
-                    player.displayClientMessage(Component.literal("You prophesized a sinkhole into the world").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                    player.sendSystemMessage(Component.literal("You prophesized a sinkhole into the world").withStyle(BeyonderUtil.getStyle(livingEntity)));
                 }
                 tag.putInt("sinkholeProphecyRadius", sinkholeRadius);
             } else if (prophecy == 7) {
                 if (livingEntity instanceof Player player) {
-                    player.displayClientMessage(Component.literal("You prophesized fortune onto yourself").withStyle(BeyonderUtil.getStyle(livingEntity)), true);
+                    player.sendSystemMessage(Component.literal("You prophesized fortune onto yourself").withStyle(BeyonderUtil.getStyle(livingEntity)));
                 }
                 tag.putDouble("luck", tag.getInt("luck") + BeyonderUtil.getDamage(livingEntity).get(ItemInit.PROPHECY.get()) * 8);
-            } else if (prophecy == 8) {
-                livingEntity.sendSystemMessage(Component.literal("You can't prophesize misfortune on yourself.").withStyle(ChatFormatting.RED));
             }
         }
     }
@@ -294,9 +294,9 @@ public class Prophecy extends SimpleAbilityItem {
         CompoundTag tag = pPlayer.getPersistentData();
         int luckManipulation = tag.getInt("spectatorProphecyItem");
         if (luckManipulation == 1) {
-            return "Meteor";
+            return "Meteor Shower";
         } else if (luckManipulation == 2) {
-            return "Meteor (No Destruction)";
+            return "Meteor Shower (No Destruction)";
         } else if (luckManipulation == 3) {
             return "Tornado";
         } else if (luckManipulation == 4) {
@@ -307,16 +307,29 @@ public class Prophecy extends SimpleAbilityItem {
             return "Sinkhole";
         } else if (luckManipulation == 7) {
             return "Luck";
-        } else if (luckManipulation == 8) {
-            return "Misfortune";
         }
         return "None";
     }
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, prophesize that all entities nearby will teleport to the player, making it occur to all affected entities within a minute"));
-        tooltipComponents.add(Component.literal("Left Click for Prophesize Demise"));
+        tooltipComponents.add(Component.literal("You can use Prophecy in two ways. Firstly, it can be used to instantly manifest a prophecy of your choice. It can also be used by holding it in your hand and typing in this way, (Player Name) will (Prophecy Event) in (Number) (Seconds/Minutes)"));
+        tooltipComponents.add(Component.literal("Left Click to Cycle Between Prophecies"));
+        tooltipComponents.add(Component.literal("Prophecy Events are ")
+                .append(Component.literal("encounter a meteor ").withStyle(ChatFormatting.RED))
+                .append(Component.literal("encounter a tornado ").withStyle(ChatFormatting.GRAY))
+                .append(Component.literal("encounter an earthquake ").withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0x8B4513))))
+                .append(Component.literal("encounter a plague ").withStyle(ChatFormatting.DARK_GREEN))
+                .append(Component.literal("encounter a sinhkole ").withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0x8B4513))))
+                .append(Component.literal("encounter weakness ").withStyle(ChatFormatting.YELLOW))
+                .append(Component.literal("(abilities included) "))
+                .append(Component.literal("be healed ").withStyle(ChatFormatting.GREEN))
+                .append(Component.literal("be lucky ").withStyle(ChatFormatting.AQUA))
+                .append(Component.literal("be unlucky ").withStyle(ChatFormatting.RED))
+                .append(Component.literal("have potion success ").withStyle(ChatFormatting.GREEN))
+        );
+
+
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("750").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("2 Minutes").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
@@ -332,6 +345,12 @@ public class Prophecy extends SimpleAbilityItem {
 
     @Override
     public int getPriority(LivingEntity livingEntity, LivingEntity target) {
-        return (int) Math.min(100, livingEntity.getHealth() * 2);
+        if (target == null && livingEntity.getMaxHealth() == livingEntity.getHealth() && livingEntity.getPersistentData().getDouble("luck") <= 200) {
+            livingEntity.getPersistentData().putInt("spectatorProphecyItem", 7);
+        } else if (target != null) {
+            Random random = new Random();
+            livingEntity.getPersistentData().putInt("spectatorProphecyItem", random.nextInt(8));
+        }
+        return 0;
     }
 }

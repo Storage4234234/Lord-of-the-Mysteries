@@ -30,18 +30,11 @@ public interface BeyonderClass {
     ChatFormatting getColorFormatting();
 
     default SimpleContainer getAbilityItemsContainer(int sequenceLevel) {
-        // Create a container with 45 slots (5 rows of 9)
         SimpleContainer container = new SimpleContainer(45);
-
-        // Create a map to store items by sequence level in their insertion order
         Map<Integer, List<ItemStack>> orderedItems = new LinkedHashMap<>();
-
-        // Initialize the map for each relevant sequence level
         for (int i = 9; i >= sequenceLevel; i--) {
             orderedItems.put(i, new ArrayList<>());
         }
-
-        // Fill the map with items from getItems() while preserving insertion order
         Multimap<Integer, Item> items = getItems();
         for (Map.Entry<Integer, Item> entry : items.entries()) {
             int level = entry.getKey();
@@ -49,8 +42,6 @@ public interface BeyonderClass {
                 orderedItems.get(level).add(entry.getValue().getDefaultInstance());
             }
         }
-
-        // Add items to container in order from highest to lowest sequence
         int slotIndex = 0;
         for (int i = 9; i >= sequenceLevel; i--) {
             List<ItemStack> levelItems = orderedItems.get(i);
@@ -58,7 +49,6 @@ public interface BeyonderClass {
                 container.setItem(slotIndex++, stack);
             }
         }
-
         return container;
     }
 }

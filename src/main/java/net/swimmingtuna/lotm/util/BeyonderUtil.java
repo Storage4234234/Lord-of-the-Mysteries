@@ -1225,16 +1225,16 @@ public class BeyonderUtil {
         }
     }
 
-    public static boolean isBeyonderCapable(LivingEntity living) {
+    public static boolean isBeyonderCapable(LivingEntity living) { //marked
         return living instanceof Player || living instanceof PlayerMobEntity;
     }
 
-    public static @Nullable BeyonderClass getPathway(LivingEntity living) {
+    public static @Nullable BeyonderClass getPathway(LivingEntity living) { //marked
         if (living instanceof Player player) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             return holder.getCurrentClass();
         } else if (living instanceof PlayerMobEntity playerMobEntity) {
-            return (BeyonderClass) playerMobEntity.getCurrentPathway();
+            return playerMobEntity.getCurrentPathway();
         }
         return null;
     }
@@ -1248,7 +1248,7 @@ public class BeyonderUtil {
         }
     }
 
-    public static int getSequence(LivingEntity living) {
+    public static int getSequence(LivingEntity living) { //marked
         if (living instanceof Player player) {
             BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             return holder.getSequence();
@@ -1990,7 +1990,7 @@ public class BeyonderUtil {
     }
 
 
-    public static int getMentalStrength(LivingEntity livingEntity) {
+    public static int getMentalStrength(LivingEntity livingEntity) { //marked
         int mentalStrength = 10; // Default value
         if (!livingEntity.level().isClientSide()) {
             if (livingEntity instanceof Player player) {
@@ -2040,7 +2040,7 @@ public class BeyonderUtil {
         }
     }
 
-    public static void useSpirituality(LivingEntity living, int spirituality) {
+    public static void useSpirituality(LivingEntity living, int spirituality) { //marked
         if (!living.level().isClientSide()) {
             if (living instanceof Player player) {
                 BeyonderHolderAttacher.getHolderUnwrap(player).useSpirituality(spirituality);
@@ -2051,7 +2051,7 @@ public class BeyonderUtil {
     }
 
 
-    public static void addSpirituality(LivingEntity living, int spirituality) {
+    public static void addSpirituality(LivingEntity living, int spirituality) { //marked
         if (!living.level().isClientSide()) {
             if (living instanceof Player player) {
                 BeyonderHolderAttacher.getHolderUnwrap(player).setSpirituality(getSpirituality(living) + spirituality);
@@ -2061,7 +2061,7 @@ public class BeyonderUtil {
         }
     }
 
-    public static int getSpirituality(LivingEntity living) {
+    public static int getSpirituality(LivingEntity living) { //marked
         if (!living.level().isClientSide()) {
             if (living instanceof Player player) {
                 return (int) BeyonderHolderAttacher.getHolderUnwrap(player).getSpirituality();
@@ -2074,7 +2074,7 @@ public class BeyonderUtil {
         return 0;
     }
 
-    public static int getMaxSpirituality(LivingEntity living) {
+    public static int getMaxSpirituality(LivingEntity living) { //marked
         if (!living.level().isClientSide()) {
             if (living instanceof Player player) {
                 return (int) BeyonderHolderAttacher.getHolderUnwrap(player).getMaxSpirituality();
