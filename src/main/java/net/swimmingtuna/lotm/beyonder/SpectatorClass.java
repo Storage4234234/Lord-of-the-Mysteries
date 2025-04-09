@@ -7,14 +7,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -74,11 +72,12 @@ public class SpectatorClass implements BeyonderClass {
     }
 
     @Override
-    public void tick(Player player, int sequenceLevel) {
+    public void tick(LivingEntity player, int sequenceLevel) {
         if (!player.level().isClientSide() && player.isCrouching()) {
             player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 5, -1, false, false));
         }
-        if (player.level().getGameTime() % 80 == 0) {
+        if (player.tickCount % 80 == 0) {
+            System.out.println("Ticked for " + player.getName());
             if (sequenceLevel >= 0) {
                 player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 30 * 20, -1, false, false));
             }
@@ -163,7 +162,7 @@ public class SpectatorClass implements BeyonderClass {
     }
 
 
-    public void applyMobEffect(Player pPlayer, MobEffect mobEffect, int duration, int amplifier, boolean ambient, boolean visible) {
+    public void applyMobEffect(LivingEntity pPlayer, MobEffect mobEffect, int duration, int amplifier, boolean ambient, boolean visible) {
         MobEffectInstance currentEffect = pPlayer.getEffect(mobEffect);
         MobEffectInstance newEffect = new MobEffectInstance(mobEffect, duration, amplifier, ambient, visible);
         if (currentEffect == null) {

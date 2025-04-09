@@ -78,18 +78,21 @@ public class SailorClass implements BeyonderClass {
     }
 
     @Override
-    public void tick(Player player, int sequenceLevel) {
-        if (player.level().getGameTime() % 50 != 0) {
+    public void tick(LivingEntity player, int sequenceLevel) {
+        if (player.tickCount % 60 != 0) {
             return;
         }
         CompoundTag tag = player.getPersistentData();
-        Abilities playerAbilites = player.getAbilities();
+
         boolean sailorFlight1 = tag.getBoolean("sailorFlight1");
         if (player.isInWaterOrRain()) {
-            playerAbilites.setFlyingSpeed(0.1F);
-            player.onUpdateAbilities();
-            if (player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(serverPlayer.getAbilities()));
+            if (player instanceof Player pPlayer) {
+                Abilities playerAbilites = pPlayer.getAbilities();
+                playerAbilites.setFlyingSpeed(0.1F);
+                pPlayer.onUpdateAbilities();
+                if (player instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(serverPlayer.getAbilities()));
+                }
             }
             if (sequenceLevel <= 4) {
                 applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, dolhpinsGrace + 2, false, false);
@@ -112,122 +115,117 @@ public class SailorClass implements BeyonderClass {
                 applyMobEffect(player, MobEffects.REGENERATION, 300, regeneration + 1, false, false);
             }
         }
-        if (!player.level().isRaining() && !sailorFlight1) {
+        if (!player.level().isRaining() && !sailorFlight1 && player instanceof Player pPlayer) {
+            Abilities playerAbilites = pPlayer.getAbilities();
             playerAbilites.setFlyingSpeed(0.05F);
-            player.onUpdateAbilities();
+            pPlayer.onUpdateAbilities();
             if (player instanceof ServerPlayer serverPlayer) {
                 serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(serverPlayer.getAbilities()));
             }
         }
+
         if (sequenceLevel == 9) {
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.NIGHT_VISION, 300, 0, false, false);
             dolhpinsGrace = 0;
             regeneration = -1;
             speed = 0;
             strength = -1;
             resistance = 0;
             haste = -1;
-        }
-        else if (sequenceLevel == 8) {
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.DIG_SPEED, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
+        } else if (sequenceLevel == 8) {
+            applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DIG_SPEED, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.NIGHT_VISION, 300, 0, false, false);
             dolhpinsGrace = 0;
             regeneration = -1;
             speed = 0;
             strength = 0;
             resistance = 0;
             haste = 0;
-        }
-        else if (sequenceLevel == 7) {
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, 1, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 1, false, false);
-            applyMobEffect(player,MobEffects.DIG_SPEED, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.WATER_BREATHING, 300, 0, false, false);
+        } else if (sequenceLevel == 7) {
+            applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, 1, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 1, false, false);
+            applyMobEffect(player, MobEffects.DIG_SPEED, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.NIGHT_VISION, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.WATER_BREATHING, 300, 0, false, false);
             dolhpinsGrace = 1;
             regeneration = -1;
             speed = 1;
             strength = 1;
             resistance = 0;
             haste = 0;
-        }
-        else if (sequenceLevel == 6) {
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, 1, false, false);
-            applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 1, false, false);
-            applyMobEffect(player,MobEffects.DIG_SPEED, 300, 1, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.WATER_BREATHING, 300, 0, false, false);
+        } else if (sequenceLevel == 6) {
+            applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, 1, false, false);
+            applyMobEffect(player, MobEffects.NIGHT_VISION, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 1, false, false);
+            applyMobEffect(player, MobEffects.DIG_SPEED, 300, 1, false, false);
+            applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.WATER_BREATHING, 300, 0, false, false);
             dolhpinsGrace = 1;
             regeneration = -1;
             speed = 1;
             strength = 1;
             resistance = 0;
             haste = 1;
-        }
-        else if (sequenceLevel == 5) {
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, 1, false, false);
-            applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.DIG_SPEED, 300, 1, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
-            applyMobEffect(player,MobEffects.WATER_BREATHING, 300, 1, false, false);
+        } else if (sequenceLevel == 5) {
+            applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, 1, false, false);
+            applyMobEffect(player, MobEffects.NIGHT_VISION, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DIG_SPEED, 300, 1, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 1, false, false);
+            applyMobEffect(player, MobEffects.WATER_BREATHING, 300, 1, false, false);
             dolhpinsGrace = 1;
             regeneration = -1;
             speed = 1;
             strength = 2;
             resistance = 1;
             haste = 1;
-        }
-        else if (sequenceLevel == 4) {
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.DIG_SPEED, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 3, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.WATER_BREATHING, 300, 2, false, false);
+        } else if (sequenceLevel == 4) {
+            applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.NIGHT_VISION, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DIG_SPEED, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
+            applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.WATER_BREATHING, 300, 2, false, false);
             dolhpinsGrace = 2;
             regeneration = -1;
             speed = 2;
             strength = 3;
             resistance = 2;
             haste = 2;
-        }
-        else if (sequenceLevel == 3) {
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.DIG_SPEED, 300, 3, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 3, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.WATER_BREATHING, 300, 2, false, false);
+        } else if (sequenceLevel == 3) {
+            applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.NIGHT_VISION, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DIG_SPEED, 300, 3, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 3, false, false);
+            applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.WATER_BREATHING, 300, 2, false, false);
             dolhpinsGrace = 2;
             regeneration = -1;
             speed = 2;
             strength = 3;
             resistance = 2;
             haste = 3;
-        }
-        else if (sequenceLevel == 2) {
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.DIG_SPEED, 300, 3, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 4, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 3, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.WATER_BREATHING, 300, 3, false, false);
+        } else if (sequenceLevel == 2) {
+            applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.NIGHT_VISION, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DIG_SPEED, 300, 3, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 4, false, false);
+            applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 3, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.WATER_BREATHING, 300, 3, false, false);
             dolhpinsGrace = 2;
             regeneration = -1;
             speed = 3;
@@ -235,30 +233,28 @@ public class SailorClass implements BeyonderClass {
             resistance = 2;
             haste = 3;
 
-        }
-        else if (sequenceLevel == 1) {
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 4, false, false);
-            applyMobEffect(player,MobEffects.DIG_SPEED, 300, 4, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 3, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.WATER_BREATHING, 300, 4, false, false);
+        } else if (sequenceLevel == 1) {
+            applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.NIGHT_VISION, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 4, false, false);
+            applyMobEffect(player, MobEffects.DIG_SPEED, 300, 4, false, false);
+            applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 3, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.WATER_BREATHING, 300, 4, false, false);
             dolhpinsGrace = 2;
             regeneration = -1;
             speed = 3;
             strength = 4;
             resistance = 2;
             haste = 4;
-        }
-        else if (sequenceLevel == 0) {
-            applyMobEffect(player,MobEffects.DOLPHINS_GRACE, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.NIGHT_VISION, 300, 0, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_BOOST, 300, 5, false, false);
-            applyMobEffect(player,MobEffects.DIG_SPEED, 300, 4, false, false);
-            applyMobEffect(player,MobEffects.MOVEMENT_SPEED, 300, 3, false, false);
-            applyMobEffect(player,MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
-            applyMobEffect(player,MobEffects.WATER_BREATHING, 300, 4, false, false);
+        } else if (sequenceLevel == 0) {
+            applyMobEffect(player, MobEffects.DOLPHINS_GRACE, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.NIGHT_VISION, 300, 0, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 5, false, false);
+            applyMobEffect(player, MobEffects.DIG_SPEED, 300, 4, false, false);
+            applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 3, false, false);
+            applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 300, 2, false, false);
+            applyMobEffect(player, MobEffects.WATER_BREATHING, 300, 4, false, false);
             dolhpinsGrace = 2;
             regeneration = -1;
             speed = 3;
@@ -334,7 +330,7 @@ public class SailorClass implements BeyonderClass {
     }
 
 
-    public void applyMobEffect(Player pPlayer, MobEffect mobEffect, int duration, int amplifier, boolean ambient, boolean visible) {
+    public void applyMobEffect(LivingEntity pPlayer, MobEffect mobEffect, int duration, int amplifier, boolean ambient, boolean visible) {
         MobEffectInstance currentEffect = pPlayer.getEffect(mobEffect);
         MobEffectInstance newEffect = new MobEffectInstance(mobEffect, duration, amplifier, ambient, visible);
         if (currentEffect == null) {
@@ -362,6 +358,7 @@ public class SailorClass implements BeyonderClass {
             }
         }
     }
+
     public static void sailorProjectileLightning(ProjectileImpactEvent event) {
         Projectile projectile = event.getProjectile();
         if (!projectile.level().isClientSide()) {

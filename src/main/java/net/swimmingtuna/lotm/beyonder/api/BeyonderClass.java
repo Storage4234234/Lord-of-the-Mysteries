@@ -3,6 +3,7 @@ package net.swimmingtuna.lotm.beyonder.api;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +22,7 @@ public interface BeyonderClass {
 
     List<Double> maxHealth();
 
-    void tick(Player player, int sequence);
+    void tick(LivingEntity player, int sequence);
 
     Multimap<Integer, Item> getItems();
 

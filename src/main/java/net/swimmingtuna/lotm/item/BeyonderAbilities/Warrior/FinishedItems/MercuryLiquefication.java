@@ -40,7 +40,9 @@ import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.SilverArmory.createEnchantedArmor;
 

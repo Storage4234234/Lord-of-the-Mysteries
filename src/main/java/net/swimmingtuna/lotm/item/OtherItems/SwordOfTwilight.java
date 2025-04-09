@@ -38,7 +38,10 @@ import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.SilverSwordManifestation.findClosestEmptySlot;

@@ -72,14 +72,14 @@ public class WarriorClass implements BeyonderClass {
     }
 
     @Override
-    public void tick(Player player, int sequenceLevel) {
+    public void tick(LivingEntity player, int sequenceLevel) {
         if (!player.level().isClientSide()) {
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
             boolean isGiant = player.getPersistentData().getBoolean("warriorGiant");
             boolean isHoGGiant = player.getPersistentData().getBoolean("handOfGodGiant");
             boolean isTwilightGiant = player.getPersistentData().getBoolean("twilightGiant");
             boolean x = !isGiant && !isHoGGiant && !isTwilightGiant;
-            if (player.level().getGameTime() % 10 == 0) {
+            if (player.tickCount % 10 == 0) {
                 if (sequenceLevel == 8) {
                     if (player.getMainHandItem().getItem() instanceof ShieldItem || player.getOffhandItem().getItem() instanceof ShieldItem) {
                         applyMobEffect(player, MobEffects.DAMAGE_RESISTANCE, 20, resistance + 1, true, true);
@@ -124,7 +124,7 @@ public class WarriorClass implements BeyonderClass {
                     }
                 }
             }
-            if (player.level().getGameTime() % 50 == 0) {
+            if (player.tickCount % 60 == 0) {
                 if (sequenceLevel == 9) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 1, false, false);
                     applyMobEffect(player, MobEffects.DAMAGE_BOOST, 300, 0, false, false);

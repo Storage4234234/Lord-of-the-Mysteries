@@ -17,7 +17,6 @@ import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Sailor.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.*;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.*;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Warrior.FinishedItems.TwilightSword;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderCharacteristic;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderPotion;
 import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderResetPotion;

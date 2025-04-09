@@ -28,7 +28,6 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
@@ -90,9 +89,9 @@ public class MonsterClass implements BeyonderClass {
     }
 
     @Override
-    public void tick(Player player, int sequenceLevel) {
+    public void tick(LivingEntity player, int sequenceLevel) {
         CompoundTag tag = player.getPersistentData();
-        if (player.level().getGameTime() % 20 == 0) {
+        if (player.tickCount % 20 == 0) {
             if (sequenceLevel == 8 || sequenceLevel == 7) {
                 if (player.getMainHandItem().getItem() instanceof SwordItem) {
                     applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 60, speed + 1, true, true);
@@ -148,7 +147,7 @@ public class MonsterClass implements BeyonderClass {
                 }
             }
         }
-        if (player.level().getGameTime() % 50 == 0) {
+        if (player.tickCount % 60 == 0) {
             if (sequenceLevel == 9) {
                 applyMobEffect(player, MobEffects.MOVEMENT_SPEED, 300, 0, false, false);
                 applyMobEffect(player, MobEffects.JUMP, 300, 0, false, false);
@@ -327,7 +326,7 @@ public class MonsterClass implements BeyonderClass {
         return ChatFormatting.GRAY;
     }
 
-    public void applyMobEffect(Player pPlayer, MobEffect mobEffect, int duration, int amplifier, boolean ambient, boolean visible) {
+    public void applyMobEffect(LivingEntity pPlayer, MobEffect mobEffect, int duration, int amplifier, boolean ambient, boolean visible) {
         MobEffectInstance currentEffect = pPlayer.getEffect(mobEffect);
         MobEffectInstance newEffect = new MobEffectInstance(mobEffect, duration, amplifier, ambient, visible);
         if (currentEffect == null) {

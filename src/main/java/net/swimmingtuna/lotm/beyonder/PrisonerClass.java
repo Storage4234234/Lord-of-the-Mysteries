@@ -3,6 +3,7 @@ package net.swimmingtuna.lotm.beyonder;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
@@ -48,7 +49,7 @@ public class PrisonerClass implements BeyonderClass {
     }
 
     @Override
-    public void tick(Player player, int sequenceLevel) {
+    public void tick(LivingEntity player, int sequenceLevel) {
         if (player.level().getGameTime() % 50 == 0) {
             if (sequenceLevel == 9) {
             }

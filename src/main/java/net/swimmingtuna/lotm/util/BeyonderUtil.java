@@ -93,6 +93,7 @@ import net.swimmingtuna.lotm.util.AllyInformation.PlayerAllyData;
 import net.swimmingtuna.lotm.util.ClientData.ClientLeftclickCooldownData;
 import net.swimmingtuna.lotm.util.ScribeRecording.CapabilityScribeAbilities;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
+import net.swimmingtuna.lotm.world.worlddata.BeyonderEntityData;
 import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
 import org.jetbrains.annotations.Nullable;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -1226,7 +1227,7 @@ public class BeyonderUtil {
     }
 
     public static boolean isBeyonderCapable(LivingEntity living) { //marked
-        return living instanceof Player || living instanceof PlayerMobEntity;
+        return getPathway(living) != null;
     }
 
     public static @Nullable BeyonderClass getPathway(LivingEntity living) { //marked
@@ -1235,6 +1236,21 @@ public class BeyonderUtil {
             return holder.getCurrentClass();
         } else if (living instanceof PlayerMobEntity playerMobEntity) {
             return playerMobEntity.getCurrentPathway();
+        } else {
+            if (living.level() instanceof ServerLevel serverLevel) {
+                BeyonderEntityData mappingData = BeyonderEntityData.getInstance(serverLevel);
+                String pathwayString = mappingData.getStringForEntity(living.getType());
+                if (pathwayString != null) {
+                    String lowerPathway = pathwayString.toLowerCase();
+                    for (BeyonderClass beyonderClass : BeyonderClassInit.getRegistry()) {
+                        for (String sequenceName : beyonderClass.sequenceNames()) {
+                            if (lowerPathway.contains(sequenceName.toLowerCase())) {
+                                return beyonderClass;
+                            }
+                        }
+                    }
+                }
+            }
         }
         return null;
     }
@@ -1255,6 +1271,22 @@ public class BeyonderUtil {
         } else if (living instanceof PlayerMobEntity playerMobEntity) {
             return playerMobEntity.getCurrentSequence();
         } else {
+            if (living.level() instanceof ServerLevel serverLevel) {
+                BeyonderEntityData mappingData = BeyonderEntityData.getInstance(serverLevel);
+                String pathwayString = mappingData.getStringForEntity(living.getType());
+                if (pathwayString != null) {
+                    String lowerPathway = pathwayString.toLowerCase();
+                    BeyonderClass beyonderClass = getPathway(living);
+                    if (beyonderClass != null) {
+                        List<String> sequenceNames = beyonderClass.sequenceNames();
+                        for (int i = 0; i < sequenceNames.size(); i++) {
+                            if (lowerPathway.contains(sequenceNames.get(i).toLowerCase())) {
+                                return i;
+                            }
+                        }
+                    }
+                }
+            }
             float maxHp = living.getMaxHealth();
             if (maxHp <= 20) {
                 return 9;
@@ -1989,20 +2021,16 @@ public class BeyonderUtil {
         return source.is(DamageTypes.MAGIC) || source.is(DamageTypes.ON_FIRE) || source.is(DamageTypes.LIGHTNING_BOLT) || source.is(DamageTypes.DRAGON_BREATH) || source.is(DamageTypes.WITHER) || source.is(MENTAL_DAMAGE);
     }
 
-
-    public static int getMentalStrength(LivingEntity livingEntity) { //marked
-        int mentalStrength = 10; // Default value
+    public static int getMentalStrength(LivingEntity livingEntity) {
+        int mentalStrength = 10;
         if (!livingEntity.level().isClientSide()) {
-            if (livingEntity instanceof Player player) {
-                BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-                mentalStrength = Math.max(1, holder.getMentalStrength());
-            } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
-                mentalStrength = Math.max(1, playerMobEntity.getMentalStrength());
-            } else {
-                mentalStrength = Math.max(1, (int) (livingEntity.getMaxHealth() / 2));
+            BeyonderClass pathway = getPathway(livingEntity);
+            if (pathway != null) {
+                int sequence = BeyonderUtil.getSequence(livingEntity);
+                mentalStrength = pathway.mentalStrength().get(sequence);
             }
         }
-        return mentalStrength;
+        return Math.max(1, mentalStrength);
     }
 
     public static boolean isPurifiable(LivingEntity livingEntity) {
@@ -2046,6 +2074,15 @@ public class BeyonderUtil {
                 BeyonderHolderAttacher.getHolderUnwrap(player).useSpirituality(spirituality);
             } else if (living instanceof PlayerMobEntity playerMobEntity) {
                 playerMobEntity.useSpirituality(spirituality);
+            } else {
+                if (living.level() instanceof ServerLevel serverLevel) {
+                    BeyonderEntityData mappingData = BeyonderEntityData.getInstance(serverLevel);
+                    String pathwayString = mappingData.getStringForEntity(living.getType());
+                    if (pathwayString != null) {
+                        int spiritualityLevel = living.getPersistentData().getInt("lotmSpirituality");
+                        living.getPersistentData().putInt("lotmSpirituality", Math.max(1, spiritualityLevel - spirituality));
+                    }
+                }
             }
         }
     }
@@ -2057,18 +2094,33 @@ public class BeyonderUtil {
                 BeyonderHolderAttacher.getHolderUnwrap(player).setSpirituality(getSpirituality(living) + spirituality);
             } else if (living instanceof PlayerMobEntity playerMobEntity) {
                 playerMobEntity.setSpirituality(getSpirituality(playerMobEntity) + spirituality);
+            } else {
+                if (living.level() instanceof ServerLevel serverLevel) {
+                    BeyonderEntityData mappingData = BeyonderEntityData.getInstance(serverLevel);
+                    String pathwayString = mappingData.getStringForEntity(living.getType());
+                    if (pathwayString != null) {
+                        int spiritualityLevel = living.getPersistentData().getInt("lotmSpirituality");
+                        living.getPersistentData().putInt("lotmSpirituality", Math.min(getMaxSpirituality(living), spiritualityLevel + spirituality));
+                    }
+                }
             }
         }
     }
 
-    public static int getSpirituality(LivingEntity living) { //marked
+    public static int getSpirituality(LivingEntity living) {
         if (!living.level().isClientSide()) {
             if (living instanceof Player player) {
                 return (int) BeyonderHolderAttacher.getHolderUnwrap(player).getSpirituality();
             } else if (living instanceof PlayerMobEntity playerMobEntity) {
                 return playerMobEntity.getSpirituality();
             } else {
-                return 0;
+                if (living.level() instanceof ServerLevel serverLevel) {
+                    BeyonderEntityData mappingData = BeyonderEntityData.getInstance(serverLevel);
+                    String pathwayString = mappingData.getStringForEntity(living.getType());
+                    if (pathwayString != null) {
+                        return living.getPersistentData().getInt("lotmSpirituality");
+                    }
+                }
             }
         }
         return 0;
@@ -2076,12 +2128,9 @@ public class BeyonderUtil {
 
     public static int getMaxSpirituality(LivingEntity living) { //marked
         if (!living.level().isClientSide()) {
-            if (living instanceof Player player) {
-                return (int) BeyonderHolderAttacher.getHolderUnwrap(player).getMaxSpirituality();
-            } else if (living instanceof PlayerMobEntity playerMobEntity) {
-                return playerMobEntity.getMaxSpirituality();
-            } else {
-                return 0;
+            BeyonderClass pathway = getPathway(living);
+            if (pathway != null) {
+                return pathway.spiritualityLevels().get(getSequence(living));
             }
         }
         return 0;
@@ -2598,6 +2647,14 @@ public class BeyonderUtil {
                 BeyonderHolderAttacher.getHolderUnwrap(player).setSpirituality(spirituality);
             } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
                 playerMobEntity.setSpirituality(spirituality);
+            } else {
+                if (livingEntity.level() instanceof ServerLevel serverLevel) {
+                    BeyonderEntityData mappingData = BeyonderEntityData.getInstance(serverLevel);
+                    String pathwayString = mappingData.getStringForEntity(livingEntity.getType());
+                    if (pathwayString != null) {
+                        livingEntity.getPersistentData().putInt("lotmSpirituality", spirituality);
+                    }
+                }
             }
         }
     }

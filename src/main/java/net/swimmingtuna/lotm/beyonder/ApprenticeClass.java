@@ -73,10 +73,9 @@ public class ApprenticeClass implements BeyonderClass {
     }
 
     @Override
-    public void tick(Player player, int sequenceLevel) {
+    public void tick(LivingEntity player, int sequenceLevel) {
         if (player.level().getGameTime() % 50 == 0) {
             CompoundTag tag = player.getPersistentData();
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
             if (sequenceLevel == 9) {
             }
             if (sequenceLevel == 8) {

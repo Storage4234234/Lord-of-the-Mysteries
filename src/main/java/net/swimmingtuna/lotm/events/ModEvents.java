@@ -81,6 +81,7 @@ import net.swimmingtuna.lotm.util.CorruptionAndLuckHandler;
 import net.swimmingtuna.lotm.util.SpiritWorldVisibilityTracker;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import net.swimmingtuna.lotm.util.effect.NoRegenerationEffect;
+import net.swimmingtuna.lotm.world.worlddata.BeyonderEntityData;
 import net.swimmingtuna.lotm.world.worlddata.CalamityEnhancementData;
 import net.swimmingtuna.lotm.world.worldgen.MirrorWorldChunkGenerator;
 
@@ -337,6 +338,7 @@ public class ModEvents {
             if (tag.getInt("inTwilight") == 0) {
                 //mob ticks
                 MatterAccelerationBlocks.matterAccelerationBlocksMobTick(event);
+                BeyonderEntityData.regenerateSpirituality(event);
 
                 //regular ticks
                 Prophecy.prophecyTick(event);

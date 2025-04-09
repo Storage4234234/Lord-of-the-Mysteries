@@ -31,7 +31,6 @@ import net.swimmingtuna.lotm.entity.StoneEntity;
 import net.swimmingtuna.lotm.entity.TornadoEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.init.ItemInit;
-import net.swimmingtuna.lotm.item.BeyonderAbilities.Monster.MisfortuneManipulation;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.effect.ModEffects;

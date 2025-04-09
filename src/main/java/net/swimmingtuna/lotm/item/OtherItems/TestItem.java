@@ -3,8 +3,10 @@ package net.swimmingtuna.lotm.item.OtherItems;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -17,11 +19,10 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
-import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.item.BeyonderPotions.BeyonderCharacteristic;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
+import net.swimmingtuna.lotm.world.worlddata.BeyonderEntityData;
 
 public class TestItem extends SimpleAbilityItem {
 
@@ -83,13 +84,9 @@ public class TestItem extends SimpleAbilityItem {
                 playerMobEntity.setMaxSpirituality(10000);
                 playerMobEntity.setSpiritualityRegen(50);
             }
-            ItemStack stack = new ItemStack(ItemInit.BEYONDER_CHARACTERISTIC.get());
-            if (player.isShiftKeyDown()) {
-                BeyonderCharacteristic.setData(stack, BeyonderClassInit.SPECTATOR.get(), 0, false, 1);
-            } else {
-                BeyonderCharacteristic.setData(stack, BeyonderClassInit.SPECTATOR.get(), 1, false, 1);
-            }
-            player.setItemInHand(InteractionHand.OFF_HAND, stack);
+            ServerLevel serverLevel = (ServerLevel) player.level();
+            BeyonderEntityData mappingData = BeyonderEntityData.getInstance(serverLevel);
+            mappingData.setEntityString(EntityType.BLAZE, "visionary");
         }
 
         return InteractionResult.SUCCESS;

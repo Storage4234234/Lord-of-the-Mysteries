@@ -3,7 +3,6 @@ package net.swimmingtuna.lotm.item.Model;
 import net.minecraft.resources.ResourceLocation;
 import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.item.OtherItems.SpearOfDawn;
-import net.swimmingtuna.lotm.item.OtherItems.SwordOfDawn;
 import software.bernie.geckolib.model.GeoModel;
 
 public class SpearOfDawnModel extends GeoModel<SpearOfDawn> {

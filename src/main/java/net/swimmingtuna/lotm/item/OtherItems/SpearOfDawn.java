@@ -27,7 +27,6 @@ import net.swimmingtuna.lotm.init.EntityInit;
 import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems.MindReading;
 import net.swimmingtuna.lotm.item.Renderer.SpearOfDawnRenderer;
-import net.swimmingtuna.lotm.item.Renderer.SwordOfDawnRenderer;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
