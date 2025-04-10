@@ -77,7 +77,6 @@ public class SpectatorClass implements BeyonderClass {
             player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 5, -1, false, false));
         }
         if (player.tickCount % 80 == 0) {
-            System.out.println("Ticked for " + player.getName());
             if (sequenceLevel >= 0) {
                 player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 30 * 20, -1, false, false));
             }

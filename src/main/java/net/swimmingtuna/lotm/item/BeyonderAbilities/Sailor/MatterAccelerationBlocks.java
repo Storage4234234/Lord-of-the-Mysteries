@@ -305,6 +305,9 @@ public class MatterAccelerationBlocks extends SimpleAbilityItem {
 
     @Override
     public int getPriority(LivingEntity livingEntity, LivingEntity target) {
-        return super.getPriority(livingEntity, target);
+        if (target != null) {
+            return 100;
+        }
+        return 0;
     }
 }

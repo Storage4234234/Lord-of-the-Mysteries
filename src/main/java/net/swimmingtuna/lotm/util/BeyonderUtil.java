@@ -2957,9 +2957,11 @@ public class BeyonderUtil {
                     } else {
                     }
                 } else if (!hasEntityInteraction && !hasBlockInteraction) {
+                    System.out.println("used" + itemName);
                     simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
                 } else if (successfulUse) {
                 } else {
+                    System.out.println("used" + itemName);
                     simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
                 }
             }

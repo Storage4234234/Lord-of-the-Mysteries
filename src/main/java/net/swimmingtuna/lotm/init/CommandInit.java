@@ -25,6 +25,7 @@ public class CommandInit {
         FatedConnectionCommand.register(event.getDispatcher(), event.getBuildContext());
         TransformCommand.register(event.getDispatcher());
         BeyonderRecipeCommand.register(event.getDispatcher(), event.getBuildContext());
+        BeyonderEntityCommand.register(event.getDispatcher(), event.getBuildContext());
         AllyCommand.register(event.getDispatcher());
     }
 }

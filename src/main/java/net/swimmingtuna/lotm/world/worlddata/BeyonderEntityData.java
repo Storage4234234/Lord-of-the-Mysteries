@@ -7,22 +7,26 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
+import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static net.swimmingtuna.lotm.util.BeyonderUtil.getAbilities;
+import static net.swimmingtuna.lotm.util.BeyonderUtil.useAvailableAbilityAsMob;
 
 public class BeyonderEntityData extends SavedData {
     private static final String DATA_NAME = "EntityStringMapping";
@@ -186,11 +190,82 @@ public class BeyonderEntityData extends SavedData {
                             int sequence = BeyonderUtil.getSequence(living);
                             BeyonderUtil.addSpirituality(living, pathway.spiritualityRegen().get(sequence) * 20);
                         }
+                        if (living instanceof Mob mob) {
+                            selectAndUseAbility(mob);
+                        }
                         int sequenceLevel = BeyonderUtil.getSequence(living);
                         pathway.tick(living, sequenceLevel);
                     }
                 }
             }
+        }
+    }
+
+    private static void selectAndUseAbility(Mob mob) {
+        List<Item> availableAbilities = getAbilities(mob);
+        if (availableAbilities.isEmpty()) {
+            return;
+        }
+
+        // Filter abilities by spirituality requirement
+        List<WeightedAbility> weightedAbilities = new ArrayList<>();
+        int currentSpirituality = BeyonderUtil.getSpirituality(mob);
+
+        for (Item item : availableAbilities) {
+            if (item instanceof SimpleAbilityItem abilityItem) {
+                // Check if the mob has enough spirituality to use this ability
+                if (currentSpirituality >= abilityItem.getRequiredSpirituality()) {
+                    // Determine priority and add to weighted list
+                    int priority = abilityItem.getPriority(mob, mob.getTarget());
+                    // Add priority + 1 to ensure even 0 priority abilities have a chance
+                    weightedAbilities.add(new WeightedAbility(abilityItem, priority + 1));
+                }
+            }
+        }
+
+        if (weightedAbilities.isEmpty()) {
+            return; // No abilities with sufficient spirituality
+        }
+
+        // Select ability based on weighted priority
+        SimpleAbilityItem selectedAbility = selectWeightedAbility(weightedAbilities);
+        if (selectedAbility != null) {
+            mob.setItemInHand(InteractionHand.MAIN_HAND, selectedAbility.getDefaultInstance());
+            useAvailableAbilityAsMob(mob);
+        }
+    }
+
+    private static SimpleAbilityItem selectWeightedAbility(List<WeightedAbility> weightedAbilities) {
+        int totalWeight = 0;
+        for (WeightedAbility ability : weightedAbilities) {
+            totalWeight += ability.weight;
+        }
+
+        if (totalWeight <= 0) {
+            return null;
+        }
+
+        // Select based on weight
+        Random random = new Random();
+        int randomValue = random.nextInt(totalWeight);
+        int currentWeight = 0;
+
+        for (WeightedAbility ability : weightedAbilities) {
+            currentWeight += ability.weight;
+            if (randomValue < currentWeight) {
+                return ability.abilityItem;
+            }
+        }
+        return weightedAbilities.get(0).abilityItem;
+    }
+
+    private static class WeightedAbility {
+        final SimpleAbilityItem abilityItem;
+        final int weight;
+
+        WeightedAbility(SimpleAbilityItem abilityItem, int weight) {
+            this.abilityItem = abilityItem;
+            this.weight = weight;
         }
     }
 }
