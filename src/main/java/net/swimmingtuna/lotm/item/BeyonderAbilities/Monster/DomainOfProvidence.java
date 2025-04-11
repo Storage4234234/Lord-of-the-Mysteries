@@ -46,15 +46,6 @@ public class DomainOfProvidence extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    @Override
-    public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
-        Player player = pContext.getPlayer();
-        if (!checkAll(player)) {
-            return InteractionResult.FAIL;
-        }
-        removeDomainOfProvidence(pContext);
-        return InteractionResult.SUCCESS;
-    }
 
     private void makeDomainOfProvidence(LivingEntity player) {
         if (!player.level().isClientSide()) {
@@ -103,15 +94,7 @@ public class DomainOfProvidence extends SimpleAbilityItem {
     }
 
 
-    private void removeDomainOfProvidence(UseOnContext pContext) {
-        Level level = pContext.getLevel();
-        BlockPos pos = pContext.getClickedPos();
-        if (!level.isClientSide()) {
-            if (level.getBlockState(pos).is(BlockInit.MONSTER_DOMAIN_BLOCK.get())) {
-                level.removeBlock(pos, false);
-            }
-        }
-    }
+
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {

@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -95,13 +96,26 @@ public class SailorLightning extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext context) {
-        Player player = context.getPlayer();
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 200, true)) {
-            return InteractionResult.FAIL;
+        if (context.getPlayer() == null) {
+            Entity entity = context.getItemInHand().getEntityRepresentation();
+            if (entity instanceof LivingEntity user) {
+                if (!checkAll(user, BeyonderClassInit.SAILOR.get(), 5, 200, true)) {
+                    return InteractionResult.FAIL;
+                }
+                lightningblock(user, user.level(), context.getClickLocation());
+                addCooldown(user, this, 10 + BeyonderUtil.getSequence(user) * 2);
+                return InteractionResult.SUCCESS;
+            }
+        } else {
+            Player player = context.getPlayer();
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+            if (!checkAll(player, BeyonderClassInit.SAILOR.get(), 5, 200, true)) {
+                return InteractionResult.FAIL;
+            }
+            lightningblock(player, player.level(), context.getClickLocation());
+            addCooldown(player, this, 10 + holder.getSequence() * 2);
+            return InteractionResult.SUCCESS;
         }
-        lightningblock(player, player.level(), context.getClickLocation());
-        addCooldown(player, this, 10 + holder.getSequence() * 2);
         return InteractionResult.SUCCESS;
     }
 
@@ -122,15 +136,14 @@ public class SailorLightning extends SimpleAbilityItem {
         }
     }
 
-    private static void lightningblock(Player player, Level level, Vec3 targetPos) {
+    private static void lightningblock(LivingEntity player, Level level, Vec3 targetPos) {
         if (!level.isClientSide()) {
             Vec3 lookVec = player.getLookAngle();
-            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-            holder.useSpirituality(200);
+            BeyonderUtil.useSpirituality(player, 200);
             float speed = 10.0f;
-            if (!player.isCreative()) {
+            if (player instanceof Player pPlayer) {
                 ItemStack itemStack = player.getUseItem();
-                player.getCooldowns().addCooldown(itemStack.getItem(), 10 + (holder.getSequence() * 2));
+                pPlayer.getCooldowns().addCooldown(itemStack.getItem(), 10 + (BeyonderUtil.getSequence(player) * 2));
             }
             LightningEntity lightningEntity = new LightningEntity(EntityInit.LIGHTNING_ENTITY.get(), level);
             lightningEntity.setSpeed(speed);

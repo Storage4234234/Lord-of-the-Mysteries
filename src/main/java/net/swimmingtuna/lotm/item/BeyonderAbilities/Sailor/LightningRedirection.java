@@ -57,13 +57,25 @@ public class LightningRedirection extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
-        Player player = pContext.getPlayer();
-        if (!checkAll(player)) {
-            return InteractionResult.FAIL;
+        if (pContext.getPlayer() == null) {
+            Entity entity = pContext.getItemInHand().getEntityRepresentation();
+            if (entity instanceof LivingEntity user) {
+                if (!checkAll(user)) {
+                    return InteractionResult.FAIL;
+                }
+                lightningRedirection(user, pContext.getClickedPos());
+                return InteractionResult.SUCCESS;
+            }
+        } else {
+            Player player = pContext.getPlayer();
+            if (!checkAll(player)) {
+                return InteractionResult.FAIL;
+            }
+            lightningRedirection(player, pContext.getClickedPos());
+            addCooldown(player);
+            useSpirituality(player);
+            return InteractionResult.SUCCESS;
         }
-        lightningRedirection(player, pContext.getClickedPos());
-        addCooldown(player);
-        useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
     @Override

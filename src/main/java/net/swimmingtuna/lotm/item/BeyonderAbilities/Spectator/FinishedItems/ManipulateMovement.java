@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -21,7 +22,7 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.util.Lazy;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import net.swimmingtuna.lotm.util.effect.ModEffects;
 import org.jetbrains.annotations.NotNull;
@@ -37,14 +38,25 @@ public class ManipulateMovement extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext context) {
-        Player player = context.getPlayer();
-        int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 4, 200 / dreamIntoReality, true)) {
-            return InteractionResult.FAIL;
+        if (context.getPlayer() == null) {
+            Entity entity = context.getItemInHand().getEntityRepresentation();
+            if (entity instanceof LivingEntity user) {
+                if (!checkAll(user, BeyonderClassInit.SPECTATOR.get(), 4, 200 / BeyonderUtil.getDreamIntoReality(user), true)) {
+                    return InteractionResult.FAIL;
+                }
+                manipulateMovement(user, context);
+                return InteractionResult.SUCCESS;
+            }
+        } else {
+            Player player = context.getPlayer();
+            if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 4, 200 / BeyonderUtil.getDreamIntoReality(player), true)) {
+                return InteractionResult.FAIL;
+            }
+            addCooldown(player);
+            useSpirituality(player, 200 / BeyonderUtil.getDreamIntoReality(player));
+            manipulateMovement(player, context);
+            return InteractionResult.SUCCESS;
         }
-        addCooldown(player);
-        useSpirituality(player, 200 / dreamIntoReality);
-        manipulateMovement(player, context);
         return InteractionResult.SUCCESS;
     }
 
@@ -59,7 +71,7 @@ public class ManipulateMovement extends SimpleAbilityItem {
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
 
-    public void manipulateMovement(Player player, UseOnContext context) {
+    public void manipulateMovement(LivingEntity player, UseOnContext context) {
         if (!player.level().isClientSide()) {
             boolean x = player.getPersistentData().getBoolean("manipulateMovementBoolean");
             if (!x) {
@@ -68,17 +80,19 @@ public class ManipulateMovement extends SimpleAbilityItem {
                 player.getPersistentData().putInt("manipulateMovementX", pos.getX());
                 player.getPersistentData().putInt("manipulateMovementY", pos.getY());
                 player.getPersistentData().putInt("manipulateMovementZ", pos.getZ());
-                player.displayClientMessage(Component.literal("Manipulate Movement Position is " + pos.getX() + " " + pos.getY() + " " + pos.getZ()).withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
-
+                if (player instanceof Player pPlayer) {
+                    pPlayer.displayClientMessage(Component.literal("Manipulate Movement Position is " + pos.getX() + " " + pos.getY() + " " + pos.getZ()).withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
+                }
             }
             if (x) {
                 player.getPersistentData().remove("manipulateMovementX");
                 player.getPersistentData().remove("manipulateMovementY");
                 player.getPersistentData().remove("manipulateMovementZ");
                 player.getPersistentData().putBoolean("manipulateMovementBoolean", false);
-                player.displayClientMessage(Component.literal("Manipulate Movement Position Reset").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
+                if (player instanceof Player pPlayer) {
+                    pPlayer.displayClientMessage(Component.literal("Manipulate Movement Position Reset").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
+                }
             }
-
         }
     }
 

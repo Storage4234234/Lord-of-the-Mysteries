@@ -725,7 +725,6 @@ public class BeyonderUtil {
         }
 
 
-
         // Check for block interaction
         if (!successfulUse && hasBlockInteraction) {
             Vec3 eyePosition = player.getEyePosition();
@@ -973,7 +972,7 @@ public class BeyonderUtil {
             } else if (heldItem.getItem() instanceof EnvisionLocation) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.ENVISION_KINGDOM.get())));
 
-            }  else if (heldItem.getItem() instanceof EnvisionKingdom) {
+            } else if (heldItem.getItem() instanceof EnvisionKingdom) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.ENVISION_BARRIER.get())));
             } else if (heldItem.getItem() instanceof MeteorShower) {
                 LOTMNetworkHandler.sendToServer(new UpdateItemInHandC2S(activeSlot, new ItemStack(ItemInit.METEOR_NO_LEVEL_SHOWER.get())));
@@ -1125,7 +1124,7 @@ public class BeyonderUtil {
             } else if (heldItem.getItem() instanceof EnvisionLocation) {
                 pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.ENVISION_KINGDOM.get())));
                 heldItem.shrink(1);
-            }  else if (heldItem.getItem() instanceof EnvisionKingdom) {
+            } else if (heldItem.getItem() instanceof EnvisionKingdom) {
                 pPlayer.getInventory().setItem(activeSlot, new ItemStack((ItemInit.ENVISION_BARRIER.get())));
                 heldItem.shrink(1);
             } else if (heldItem.getItem() instanceof MeteorShower) {
@@ -1334,26 +1333,17 @@ public class BeyonderUtil {
         if (level instanceof ServerLevel serverLevel) {
             enhancement = CalamityEnhancementData.getInstance(serverLevel).getCalamityEnhancement();
         }
-        double dreamIntoReality;
-        if (livingEntity instanceof Player) {
-            dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
-        } else {
-            dreamIntoReality = 1;
-        }
+        int dreamIntoReality = getDreamIntoReality(livingEntity);
         float abilityStrengthened = 1;
         if (livingEntity.getPersistentData().getInt("abilityStrengthened") >= 1) {
+            System.out.println("ability strengthened is 2");
             abilityStrengthened = 2;
         }
-        int sequence = 0;
         int abilityWeakness = 1;
         if (livingEntity.hasEffect(ModEffects.ABILITY_WEAKNESS.get())) {
             abilityWeakness = Math.max(1, (livingEntity.getEffect(ModEffects.ABILITY_WEAKNESS.get())).getAmplifier());
         }
-        if (livingEntity instanceof Player player) {
-            sequence = BeyonderHolderAttacher.getHolderUnwrap(player).getSequence();
-        } else if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
-            sequence = playerMobEntity.getCurrentSequence();
-        }
+        int sequence = BeyonderUtil.getSequence(livingEntity);
         //SAILOR
         damageMap.put(ItemInit.ACIDIC_RAIN.get(), applyAbilityStrengthened((50.0f - (sequence * 7)) / abilityWeakness, abilityStrengthened));
         damageMap.put(ItemInit.AQUATIC_LIFE_MANIPULATION.get(), applyAbilityStrengthened((50.0f - (sequence * 5)) / abilityWeakness, abilityStrengthened));
@@ -2306,7 +2296,6 @@ public class BeyonderUtil {
     }
 
 
-
     public static ChatFormatting corruptionStyle(LivingEntity livingEntity) {
         ChatFormatting style = ChatFormatting.YELLOW;
         if (!livingEntity.level().isClientSide()) {
@@ -2954,14 +2943,23 @@ public class BeyonderUtil {
                 String itemName = simpleAbilityItem.getDescription().getString();
                 if ((hasEntityInteraction || hasBlockInteraction) && !hasGeneralAbility) {
                     if (successfulUse) {
-                    } else {
+                        for (Player player : mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(100))) {
+                            player.sendSystemMessage(Component.literal(mob.getName().getString() + " used " + itemName));
+                        }
                     }
                 } else if (!hasEntityInteraction && !hasBlockInteraction) {
-                    System.out.println("used" + itemName);
+                    for (Player player : mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(100))) {
+                        player.sendSystemMessage(Component.literal(mob.getName().getString() + " used " + itemName));
+                    }
                     simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
                 } else if (successfulUse) {
+                    for (Player player : mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(100))) {
+                        player.sendSystemMessage(Component.literal(mob.getName().getString() + " used " + itemName));
+                    }
                 } else {
-                    System.out.println("used" + itemName);
+                    for (Player player : mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(100))) {
+                        player.sendSystemMessage(Component.literal(mob.getName().getString() + " used " + itemName));
+                    }
                     simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
                 }
             }
@@ -3082,6 +3080,15 @@ public class BeyonderUtil {
             tag.putInt("luckTornadoImmunity", 0);
             tag.putInt("calamityLOTMLightningImmunity", 0);
             tag.putInt("calamityLightningStormImmunity", 0);
+            tag.putInt("abilityStrengthened", 0);
         }
+    }
+
+    public static int getDreamIntoReality(LivingEntity living) {
+        int dir = 1;
+        if (living.getAttribute(ModAttributes.DIR.get()) != null) {
+            dir = (int) living.getAttribute(ModAttributes.DIR.get()).getBaseValue();
+        }
+        return dir;
     }
 }

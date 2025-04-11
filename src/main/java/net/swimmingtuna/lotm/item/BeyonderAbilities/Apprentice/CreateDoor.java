@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -30,20 +31,41 @@ public class CreateDoor extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext context) {
-        Player player = context.getPlayer();
-        Level level = context.getLevel();
-        BlockPos targetPos = context.getClickedPos();
-        BlockPos posRelativeTo = context.getClickedPos().relative(context.getClickedFace());
-        Direction direction = context.getClickedFace().getOpposite();
-        if (!checkAll(player)){
-            return InteractionResult.FAIL;
+        if (context.getPlayer() == null) {
+            Entity entity = context.getItemInHand().getEntityRepresentation();
+            if (entity instanceof LivingEntity user) {
+                Level level = context.getLevel();
+                BlockPos targetPos = context.getClickedPos();
+                BlockPos posRelativeTo = context.getClickedPos().relative(context.getClickedFace());
+                Direction direction = context.getClickedFace().getOpposite();
+
+                if (!checkAll(user)) {
+                    return InteractionResult.FAIL;
+                }
+                if (!canCreateDoor(user, targetPos, posRelativeTo)) {
+                    return InteractionResult.FAIL;
+                }
+                createDoor(user, level, targetPos, posRelativeTo, direction);
+                return InteractionResult.SUCCESS;
+            }
+        } else {
+            Player player = context.getPlayer();
+            Level level = context.getLevel();
+            BlockPos targetPos = context.getClickedPos();
+            BlockPos posRelativeTo = context.getClickedPos().relative(context.getClickedFace());
+            Direction direction = context.getClickedFace().getOpposite();
+
+            if (!checkAll(player)) {
+                return InteractionResult.FAIL;
+            }
+            if (!canCreateDoor(player, targetPos, posRelativeTo)) {
+                return InteractionResult.FAIL;
+            }
+            createDoor(player, level, targetPos, posRelativeTo, direction);
+            addCooldown(player);
+            useSpirituality(player);
+            return InteractionResult.SUCCESS;
         }
-        if(!canCreateDoor(player, targetPos, posRelativeTo)){
-            return InteractionResult.FAIL;
-        }
-        createDoor(player, level, targetPos, posRelativeTo, direction);
-        addCooldown(player);
-        useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
 
@@ -56,7 +78,7 @@ public class CreateDoor extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    public static boolean canCreateDoor(Player player, BlockPos pos, BlockPos posRelativeTo){
+    public static boolean canCreateDoor(LivingEntity player, BlockPos pos, BlockPos posRelativeTo){
         Level level = player.level();
         if(!level.isEmptyBlock(pos) && !level.isEmptyBlock(BlockPos.containing(pos.getX(), pos.getY() + 1, pos.getZ()))){
             if(level.isEmptyBlock(posRelativeTo) && level.isEmptyBlock(BlockPos.containing(posRelativeTo.getX(), posRelativeTo.getY() + 1, posRelativeTo.getZ()))){
@@ -75,7 +97,7 @@ public class CreateDoor extends SimpleAbilityItem {
         return false;
     }
 
-    public static void createDoor(Player player, Level level, BlockPos pos, BlockPos posRelativeTo, Direction direction){
+    public static void createDoor(LivingEntity player, Level level, BlockPos pos, BlockPos posRelativeTo, Direction direction){
         if(!player.level().isClientSide){
             int cordModifier;
             int x = pos.getX();

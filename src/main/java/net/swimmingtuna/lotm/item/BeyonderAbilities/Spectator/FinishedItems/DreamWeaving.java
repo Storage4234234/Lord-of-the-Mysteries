@@ -68,7 +68,7 @@ public class DreamWeaving extends SimpleAbilityItem {
             return InteractionResult.FAIL;
         }
         AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-        addCooldown(player, this, 500 / (int) dreamIntoReality.getValue());
+        addCooldown(player, this, 500 / BeyonderUtil.getDreamIntoReality(player));
         useSpirituality(player);
         dreamWeave(player, interactionTarget);
         return InteractionResult.SUCCESS;
@@ -138,14 +138,13 @@ public class DreamWeaving extends SimpleAbilityItem {
             double x = interactionTarget.getX();
             double y = interactionTarget.getY();
             double z = interactionTarget.getZ();
-            AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
             interactionTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 150, 1, false, false));
             RandomSource random = player.getRandom();
             int times = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.DREAM_WEAVING.get());
             for (int i = 0; i < times; i++) {
                 int randomNumber = random.nextInt(10);
                 EntityType<? extends Mob> entityType = MOB_TYPES.get(randomNumber);
-                spawnMobsAroundTarget(interactionTarget, entityType, interactionTarget, level, x, y, z, dreamIntoReality.getValue() == 2 ? 2 : 1);
+                spawnMobsAroundTarget(interactionTarget, entityType, interactionTarget, level, x, y, z, BeyonderUtil.getDreamIntoReality(player) == 2 ? 2 : 1);
             }
         }
     }

@@ -39,12 +39,11 @@ public class EnvisionKingdom extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
-        int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
-        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 6000 / dreamIntoReality, true)) {
+        if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, 6000 / BeyonderUtil.getDreamIntoReality(player), true)) {
             return InteractionResult.FAIL;
         }
         addCooldown(player);
-        useSpirituality(player, 6000 / dreamIntoReality);
+        useSpirituality(player, 6000 / BeyonderUtil.getDreamIntoReality(player));
         generateCathedral(player);
         return InteractionResult.SUCCESS;
     }
@@ -60,7 +59,7 @@ public class EnvisionKingdom extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
-    public static void envisionKingdom(LivingEntity livingEntity, Level level) {
+    public static void envisionKingdom(LivingEntity livingEntity, Level level) { //marked
         //ENVISION KINGDOM
         CompoundTag tag = livingEntity.getPersistentData();
         if (livingEntity instanceof Player player && level instanceof ServerLevel serverLevel) {

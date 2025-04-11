@@ -80,11 +80,10 @@ public class MindStorm extends SimpleAbilityItem {
 
     public void mindStorm(LivingEntity player, LivingEntity interactionTarget) {
         if (!player.level().isClientSide()) {
-            AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
             int sequence = BeyonderUtil.getSequence(player);
             int duration = 300 - (sequence * 25);
             int damage =  (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.MIND_STORM.get());
-            if (dreamIntoReality.getValue() == 2) {
+            if (BeyonderUtil.getDreamIntoReality(player) == 2) {
                 damage = (int) ((int) (float)1.5 * BeyonderUtil.getDamage(player).get(ItemInit.MIND_STORM.get()));
             }
             interactionTarget.addEffect(new MobEffectInstance(ModEffects.AWE.get(), (int) (duration * 0.5), 1, false, false));

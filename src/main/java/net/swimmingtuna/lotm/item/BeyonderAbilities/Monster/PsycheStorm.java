@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -60,13 +61,25 @@ public class PsycheStorm extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
-        Player player = pContext.getPlayer();
-        if (!checkAll(player)) {
-            return InteractionResult.FAIL;
+        if (pContext.getPlayer() == null) {
+            Entity entity = pContext.getItemInHand().getEntityRepresentation();
+            if (entity instanceof LivingEntity user) {
+                if (!checkAll(user)) {
+                    return InteractionResult.FAIL;
+                }
+                psycheStorm(user, pContext.getLevel(), pContext.getClickedPos());
+                return InteractionResult.SUCCESS;
+            }
+        } else {
+            Player player = pContext.getPlayer();
+            if (!checkAll(player)) {
+                return InteractionResult.FAIL;
+            }
+            addCooldown(player);
+            psycheStorm(player, pContext.getLevel(), pContext.getClickedPos());
+            useSpirituality(player);
+            return InteractionResult.SUCCESS;
         }
-        addCooldown(player);
-        psycheStorm(player, pContext.getLevel(), pContext.getClickedPos());
-        useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
 

@@ -22,6 +22,7 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.spirituality.ModAttributes;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -67,8 +68,7 @@ public class DreamWalking extends SimpleAbilityItem {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-        addCooldown(player, this, 40 / (int) dreamIntoReality.getValue());
+        addCooldown(player, this, 40 / BeyonderUtil.getDreamIntoReality(player));
         useSpirituality(player);
         dreamWalk(interactionTarget, player);
         return InteractionResult.SUCCESS;

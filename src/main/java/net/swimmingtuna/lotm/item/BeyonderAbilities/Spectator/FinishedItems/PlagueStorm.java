@@ -82,9 +82,8 @@ public class PlagueStorm extends SimpleAbilityItem {
 
     public void plagueStorm(LivingEntity player, LivingEntity interactionTarget) {
         if (!player.level().isClientSide()) {
-            AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
             interactionTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 80, 1, false, false));
-            for (LivingEntity entity : interactionTarget.level().getEntitiesOfClass(LivingEntity.class, interactionTarget.getBoundingBox().inflate(30 * dreamIntoReality.getValue()))) {
+            for (LivingEntity entity : interactionTarget.level().getEntitiesOfClass(LivingEntity.class, interactionTarget.getBoundingBox().inflate(30 * BeyonderUtil.getDreamIntoReality(player)))) {
                 if (entity == player || BeyonderUtil.areAllies(player, entity)) {
                     continue;
                 }

@@ -32,8 +32,7 @@ public class EnvisionDeath extends SimpleAbilityItem {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-        envisionDeath(player, (int) dreamIntoReality.getValue());
+        envisionDeath(player, BeyonderUtil.getDreamIntoReality(player));
         addCooldown(player);
         useSpirituality(player);
         return InteractionResult.SUCCESS;

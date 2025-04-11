@@ -799,6 +799,18 @@ public class ModEvents {
     public static void onLivingJoinWorld(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
         if (!entity.level().isClientSide()) {
+            if (!(entity instanceof Player && !(entity instanceof PlayerMobEntity)) && entity instanceof LivingEntity living) {
+                if (entity.level() instanceof ServerLevel serverLevel) {
+                    BeyonderEntityData mappingData = BeyonderEntityData.getInstance(serverLevel);
+                    String pathwayString = mappingData.getStringForEntity(entity.getType());
+                    if (pathwayString != null) {
+                        BeyonderClass pathway = BeyonderUtil.getPathway(living);
+                        if (pathway != null) {
+                            BeyonderHolder.updateMaxHealthModifier(living, pathway.maxHealth().get(BeyonderUtil.getSequence(living)));
+                        }
+                    }
+                }
+            }
             if (entity instanceof LivingEntity livingEntity) {
                 if (livingEntity instanceof PlayerMobEntity playerMobEntity) {
                     if (!playerMobEntity.level().getLevelData().getGameRules().getBoolean(GameRuleInit.NPC_SHOULD_SPAWN)) {

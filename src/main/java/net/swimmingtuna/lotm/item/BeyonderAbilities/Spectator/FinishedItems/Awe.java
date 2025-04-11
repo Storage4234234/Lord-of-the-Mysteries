@@ -45,9 +45,8 @@ public class Awe extends SimpleAbilityItem {
 
     public static void applyPotionEffectToEntities(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide()) {
-            AttributeInstance dreamIntoReality = livingEntity.getAttribute(ModAttributes.DIR.get());
             int sequence = BeyonderUtil.getSequence(livingEntity);
-            int dir = (int) dreamIntoReality.getValue();
+            int dir = BeyonderUtil.getDreamIntoReality(livingEntity);
             double radius = (18.0 - sequence) * dir;
             float damage = (float) (17.0 * (Math.max(1, dir * 0.5)) - (sequence * 1.2));
             int duration = (int) (float) BeyonderUtil.getDamage(livingEntity).get(ItemInit.AWE.get());
@@ -76,10 +75,7 @@ public class Awe extends SimpleAbilityItem {
 
     @Override
     public int getPriority(LivingEntity livingEntity, LivingEntity target) {
-        double dreamIntoReality = 1;
-        if (livingEntity instanceof Player) {
-            dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
-        }
+        int dreamIntoReality = BeyonderUtil.getDreamIntoReality(livingEntity);
         if (target != null && target.distanceTo(livingEntity) <= (18 - BeyonderUtil.getSequence(livingEntity)) * dreamIntoReality) {
             return (int) (100 - (target.distanceTo(livingEntity) * 2));
         } else {

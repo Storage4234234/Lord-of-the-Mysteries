@@ -77,10 +77,7 @@ public class ManipulateFondness extends SimpleAbilityItem {
         int mobTotalHP = 0;
         if (target != null && target.hasEffect(ModEffects.MANIPULATION.get())) {
             int sequence = BeyonderUtil.getSequence(livingEntity);
-            double dreamIntoReality = 1;
-            if (livingEntity instanceof Player) {
-                dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
-            }
+            double dreamIntoReality = BeyonderUtil.getDreamIntoReality(livingEntity);
             for (Mob mob : target.level().getEntitiesOfClass(Mob.class, target.getBoundingBox().inflate((20 - sequence) * dreamIntoReality))) {
                 mobTotalHP += (int) (mob.getMaxHealth() / 10);
                 if (mobTotalHP >= 100) {

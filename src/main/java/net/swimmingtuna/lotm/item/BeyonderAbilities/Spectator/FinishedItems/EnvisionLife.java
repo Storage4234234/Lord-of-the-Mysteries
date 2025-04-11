@@ -122,7 +122,7 @@ public class EnvisionLife extends SimpleAbilityItem {
     @Override
     public int getPriority(LivingEntity livingEntity, LivingEntity target) {
         int projectileSize = 0;
-        for (Projectile projectile : target.level().getEntitiesOfClass(Projectile.class, target.getBoundingBox().inflate(BeyonderUtil.getDamage(livingEntity).get(this)))) {
+        for (Projectile projectile : livingEntity.level().getEntitiesOfClass(Projectile.class, livingEntity.getBoundingBox().inflate(BeyonderUtil.getDamage(livingEntity).get(this)))) {
             projectileSize += (int) BeyonderUtil.getScale(projectile);
             if (projectileSize >= 100) {
                 projectileSize = 100;

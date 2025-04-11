@@ -33,12 +33,11 @@ public class EnvisionLocation extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbility(Level level, LivingEntity player, InteractionHand hand) {
-        int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
         int blinkDistance = player.getPersistentData().getInt("BlinkDistance");
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 0, blinkDistance * 4, true)) {
             return InteractionResult.FAIL;
         }
-        addCooldown(player, this, 20 / dreamIntoReality);
+        addCooldown(player, this, 20 / BeyonderUtil.getDreamIntoReality(player));
         useSpirituality(player, (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LOCATION.get()) * 2);
         envisionLocationBlink(player);
         return InteractionResult.SUCCESS;

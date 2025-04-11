@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -45,18 +46,30 @@ public class BattleHypnotism extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
-        Player player = pContext.getPlayer();
-        if (!checkAll(player)) {
-            return InteractionResult.FAIL;
+        if (pContext.getPlayer() == null) {
+            Entity entity = pContext.getItemInHand().getEntityRepresentation();
+            if (entity instanceof LivingEntity user) {
+                if (!checkAll(user)) {
+                    return InteractionResult.FAIL;
+                }
+                makesEntitiesAttackEachOther(user, user.level(), pContext.getClickedPos(), BeyonderUtil.getSequence(user), BeyonderUtil.getDreamIntoReality(user));
+                return InteractionResult.SUCCESS;
+            }
+        } else {
+            Player player = pContext.getPlayer();
+            if (!checkAll(player)) {
+                return InteractionResult.FAIL;
+            }
+            useSpirituality(player);
+            addCooldown(player);
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+            makesEntitiesAttackEachOther(player, player.level(), pContext.getClickedPos(), holder.getSequence(), BeyonderUtil.getDreamIntoReality(player));
+            return InteractionResult.SUCCESS;
         }
-        useSpirituality(player);
-        addCooldown(player);
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        makesEntitiesAttackEachOther(player, player.level(), pContext.getClickedPos(), holder.getSequence(), (int) player.getAttribute(ModAttributes.DIR.get()).getValue());
         return InteractionResult.SUCCESS;
     }
 
-    private void makesEntitiesAttackEachOther(Player player, Level level, BlockPos targetPos, int sequence, int dir) {
+    private void makesEntitiesAttackEachOther(LivingEntity player, Level level, BlockPos targetPos, int sequence, int dir) {
         if (!player.level().isClientSide()) {
             double radius = 20.0 - sequence * dir;
             int duration = (int) (float) BeyonderUtil.getDamage(player).get(ItemInit.BATTLE_HYPNOTISM.get());
@@ -126,11 +139,8 @@ public class BattleHypnotism extends SimpleAbilityItem {
         int mobTotalHP = 0;
         if (target != null) {
             int sequence = BeyonderUtil.getSequence(livingEntity);
-            double dreamIntoReality = 1;
-            if (livingEntity instanceof Player) {
-                dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
-            }
-            for (Mob mob : target.level().getEntitiesOfClass(Mob.class, target.getBoundingBox().inflate((20 - sequence) * dreamIntoReality))) {
+            BeyonderUtil.getDreamIntoReality(livingEntity);
+            for (Mob mob : target.level().getEntitiesOfClass(Mob.class, target.getBoundingBox().inflate((20 - sequence) * BeyonderUtil.getDreamIntoReality(livingEntity)))) {
                 mobTotalHP += (int) (mob.getMaxHealth() / 10);
                 if (mobTotalHP >= 100) {
                     mobTotalHP = 100;

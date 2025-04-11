@@ -52,7 +52,7 @@ public class Placate extends SimpleAbilityItem {
         if (!checkAll(player, BeyonderClassInit.SPECTATOR.get(), 7, 125, true)) {
             return InteractionResult.FAIL;
         }
-        if (BeyonderUtil.getSequence(player) <= 4 || player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {
+        if (BeyonderUtil.getSequence(player) <= 4 || BeyonderUtil.getDreamIntoReality(player) > 1) {
             removeHarmfulEffects(player);
             addCooldown(player);
             useSpirituality(player);

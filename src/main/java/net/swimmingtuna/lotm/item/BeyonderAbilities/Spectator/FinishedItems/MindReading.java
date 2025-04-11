@@ -77,7 +77,6 @@ public class MindReading extends SimpleAbilityItem {
     public static void mindRead(LivingEntity player, LivingEntity interactionTarget, ItemStack stack) {
         if (!player.level().isClientSide()) {
             if (interactionTarget instanceof Player playerInteractionTarget) {
-                AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
                 StringBuilder inventoryMessage = new StringBuilder();
                 boolean hasItems = false;
 
@@ -97,7 +96,7 @@ public class MindReading extends SimpleAbilityItem {
                     player.sendSystemMessage(Component.literal("The target player's inventory is empty.").withStyle(ChatFormatting.AQUA));
                 }
 
-                if (dreamIntoReality.getValue() >= 2) {
+                if (BeyonderUtil.getDreamIntoReality(player) >= 2) {
                     interactionTarget.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 1, false, false));
                 }
             } else {
@@ -124,10 +123,7 @@ public class MindReading extends SimpleAbilityItem {
 
     @Override
     public int getPriority(LivingEntity livingEntity, LivingEntity target) {
-        double dreamIntoReality = 1;
-        if (livingEntity instanceof Player) {
-            dreamIntoReality = Objects.requireNonNull(livingEntity.getAttribute(ModAttributes.DIR.get())).getBaseValue();
-        }
+        double dreamIntoReality = BeyonderUtil.getDreamIntoReality(livingEntity);
         if (target != null && dreamIntoReality >= 1) {
             return 15;
         }

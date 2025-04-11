@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -61,16 +62,32 @@ public class Frenzy extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
-        Player player = pContext.getPlayer();
-        Level level = player.level();
-        BlockPos targetPos = pContext.getClickedPos();
-        int dreamIntoReality = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
-        if (!checkAll(player)) {
-            return InteractionResult.FAIL;
+        if (pContext.getPlayer() == null) {
+            Entity entity = pContext.getItemInHand().getEntityRepresentation();
+            if (entity instanceof LivingEntity user) {
+                Level level = pContext.getLevel();
+                BlockPos targetPos = pContext.getClickedPos();
+
+                if (!checkAll(user)) {
+                    return InteractionResult.FAIL;
+                }
+                frenzy(user, level, targetPos, BeyonderUtil.getDreamIntoReality(user));
+                return InteractionResult.SUCCESS;
+            }
+        } else {
+            Player player = pContext.getPlayer();
+            Level level = player.level();
+            BlockPos targetPos = pContext.getClickedPos();
+
+            if (!checkAll(player)) {
+                return InteractionResult.FAIL;
+            }
+            frenzy(player, level, targetPos, BeyonderUtil.getDreamIntoReality(player));
+            addCooldown(player);
+            useSpirituality(player);
+
+            return InteractionResult.SUCCESS;
         }
-        frenzy(player,level,targetPos,dreamIntoReality);
-        addCooldown(player);
-        useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
     @Override
@@ -78,10 +95,9 @@ public class Frenzy extends SimpleAbilityItem {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
         addCooldown(player);
         useSpirituality(player);
-        frenzy(player, player.level(), BlockPos.containing(interactionTarget.position()), (int) dreamIntoReality.getValue());
+        frenzy(player, player.level(), BlockPos.containing(interactionTarget.position()), BeyonderUtil.getDreamIntoReality(player));
         return InteractionResult.SUCCESS;
     }
 

@@ -19,6 +19,7 @@ import net.minecraft.world.phys.Vec3;
 import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.EntityInit;
+import net.swimmingtuna.lotm.init.ItemInit;
 import net.swimmingtuna.lotm.init.ParticleInit;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
@@ -117,6 +118,7 @@ public class AqueousLightEntity extends AbstractHurtingProjectile {
             aqueousLightEntity.setDeltaMovement(initialVelocity);
             ScaleData scaleData = ScaleTypes.BASE.getScaleData(aqueousLightEntity);
             scaleData.setScale(scale);
+            System.out.println("scale is " + scale);
             Vec3 lightPosition = eyePosition.add(direction.scale(2.0));
             aqueousLightEntity.setPos(lightPosition);
             aqueousLightEntity.setOwner(player);

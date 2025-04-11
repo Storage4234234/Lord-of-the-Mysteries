@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -43,14 +44,25 @@ public class Nightmare extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
-        Player player = pContext.getPlayer();
-
-        if (!checkAll(player)) {
-            return InteractionResult.FAIL;
+        if (pContext.getPlayer() == null) {
+            Entity entity = pContext.getItemInHand().getEntityRepresentation();
+            if (entity instanceof LivingEntity user) {
+                if (!checkAll(user)) {
+                    return InteractionResult.FAIL;
+                }
+                nightmareNew(user, pContext.getClickedPos());
+                return InteractionResult.SUCCESS;
+            }
+        } else {
+            Player player = pContext.getPlayer();
+            if (!checkAll(player)) {
+                return InteractionResult.FAIL;
+            }
+            addCooldown(player);
+            useSpirituality(player);
+            nightmareNew(player, pContext.getClickedPos());
+            return InteractionResult.SUCCESS;
         }
-        addCooldown(player);
-        useSpirituality(player);
-        nightmareNew(player, pContext.getClickedPos());
         return InteractionResult.SUCCESS;
     }
 
@@ -86,10 +98,9 @@ public class Nightmare extends SimpleAbilityItem {
     }
 
     public static void nightmareNew(LivingEntity livingEntity, BlockPos targetPos) {
-        AttributeInstance dreamIntoReality = livingEntity.getAttribute(ModAttributes.DIR.get());
         int sequence = BeyonderUtil.getSequence(livingEntity);
         Level level = livingEntity.level();
-        int dir = (int) dreamIntoReality.getValue();
+        int dir = BeyonderUtil.getDreamIntoReality(livingEntity);
         double radius = BeyonderUtil.getDamage(livingEntity).get(ItemInit.NIGHTMARE.get());
         float damagePlayer = ((float) (65.0 * dir) - (sequence * 2));
         int duration = 300 - (sequence * 20);

@@ -48,7 +48,7 @@ public class AqueousLightDrown extends SimpleAbilityItem {
             Vec3 eyePosition = player.getEyePosition(1.0f);
             Vec3 direction = player.getViewVector(1.0f);
             Vec3 initialVelocity = direction.scale(2.0);
-
+            System.out.println("damage is " + BeyonderUtil.getDamage(player).get(ItemInit.AQUEOUS_LIGHT_DROWN.get()));
             AqueousLightEntity.summonEntityWithSpeed(direction, initialVelocity, eyePosition, player.getX(), player.getY(), player.getZ(), player, BeyonderUtil.getDamage(player).get(ItemInit.AQUEOUS_LIGHT_DROWN.get()));
         }
     }

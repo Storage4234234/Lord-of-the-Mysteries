@@ -53,7 +53,7 @@ public class ProphesizeDemise extends SimpleAbilityItem {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        int dir = (int) player.getAttribute(ModAttributes.DIR.get()).getValue();
+        int dir = BeyonderUtil.getDreamIntoReality(player);
         addCooldown(player, stack.getItem(), 3000 / dir);
         useSpirituality(player);
         prophesizeDemise(player,interactionTarget);
@@ -95,7 +95,7 @@ public class ProphesizeDemise extends SimpleAbilityItem {
     public void prophesizeDemise(LivingEntity player, LivingEntity interactionTarget) {
         if (!interactionTarget.level().isClientSide() && !player.level().isClientSide()) {
             if (BeyonderUtil.isBeyonderCapable(interactionTarget)) {
-                if (player.getAttribute(ModAttributes.DIR.get()).getBaseValue() > 1) {
+                if (BeyonderUtil.getDreamIntoReality(player) > 1) {
                     interactionTarget.addEffect(new MobEffectInstance(ModEffects.FRENZY.get(), 40, 1, false, false));
                 }
                 interactionTarget.addEffect(new MobEffectInstance(ModEffects.SPECTATORDEMISE.get(), 600, 1, false, false));

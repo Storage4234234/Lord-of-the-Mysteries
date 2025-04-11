@@ -18,7 +18,6 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
-import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 
@@ -190,11 +189,41 @@ public class BeyonderEntityData extends SavedData {
                             int sequence = BeyonderUtil.getSequence(living);
                             BeyonderUtil.addSpirituality(living, pathway.spiritualityRegen().get(sequence) * 20);
                         }
-                        if (living instanceof Mob mob) {
+                        CompoundTag persistentData = living.getPersistentData();
+                        List<String> keysToDecrement = new ArrayList<>();
+                        for (String key : persistentData.getAllKeys()) {
+                            if (key.startsWith("abilityCooldownFor")) {
+                                keysToDecrement.add(key);
+                            }
+                        }
+                        for (String key : keysToDecrement) {
+                            int currentCooldown = persistentData.getInt(key);
+                            if (currentCooldown > 0) {
+                                persistentData.putInt(key, Math.max(0, currentCooldown - 20));
+                            }
+                        }
+                        if (living instanceof Mob mob && mob.tickCount % 60 == 0) {
                             selectAndUseAbility(mob);
                         }
+
                         int sequenceLevel = BeyonderUtil.getSequence(living);
                         pathway.tick(living, sequenceLevel);
+                    }
+                }
+            }
+        }
+        if (!event.getEntity().level().isClientSide()) {
+            LivingEntity living = event.getEntity();
+            if (!(living instanceof PlayerMobEntity) && living instanceof Mob mob) {
+                ServerLevel level = (ServerLevel) living.level();
+                BeyonderEntityData mappingData = BeyonderEntityData.getInstance(level);
+                String pathwayString = mappingData.getStringForEntity(living.getType());
+                if (pathwayString != null) {
+                    BeyonderClass pathway = BeyonderUtil.getPathway(living);
+                    if (pathway != null) {
+                        if (mob.getTarget() == null && mob.getLastAttacker() != null) {
+                            mob.setTarget(mob.getLastAttacker());
+                        }
                     }
                 }
             }
@@ -207,27 +236,25 @@ public class BeyonderEntityData extends SavedData {
             return;
         }
 
-        // Filter abilities by spirituality requirement
         List<WeightedAbility> weightedAbilities = new ArrayList<>();
         int currentSpirituality = BeyonderUtil.getSpirituality(mob);
-
         for (Item item : availableAbilities) {
             if (item instanceof SimpleAbilityItem abilityItem) {
-                // Check if the mob has enough spirituality to use this ability
-                if (currentSpirituality >= abilityItem.getRequiredSpirituality()) {
-                    // Determine priority and add to weighted list
+                String cooldownKey = "abilityCooldownFor" + abilityItem.getDescription().getString();
+                int currentCooldown = mob.getPersistentData().getInt(cooldownKey);
+                if (currentCooldown <= 0 && currentSpirituality >= abilityItem.getRequiredSpirituality()) {
                     int priority = abilityItem.getPriority(mob, mob.getTarget());
-                    // Add priority + 1 to ensure even 0 priority abilities have a chance
-                    weightedAbilities.add(new WeightedAbility(abilityItem, priority + 1));
+                    if (priority > 0) {
+                        weightedAbilities.add(new WeightedAbility(abilityItem, priority + 1));
+                    }
                 }
             }
         }
 
         if (weightedAbilities.isEmpty()) {
-            return; // No abilities with sufficient spirituality
+            return;
         }
 
-        // Select ability based on weighted priority
         SimpleAbilityItem selectedAbility = selectWeightedAbility(weightedAbilities);
         if (selectedAbility != null) {
             mob.setItemInHand(InteractionHand.MAIN_HAND, selectedAbility.getDefaultInstance());
@@ -240,12 +267,9 @@ public class BeyonderEntityData extends SavedData {
         for (WeightedAbility ability : weightedAbilities) {
             totalWeight += ability.weight;
         }
-
         if (totalWeight <= 0) {
             return null;
         }
-
-        // Select based on weight
         Random random = new Random();
         int randomValue = random.nextInt(totalWeight);
         int currentWeight = 0;

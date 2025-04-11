@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -51,14 +52,28 @@ public class Tumble extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
-        Player player = pContext.getPlayer();
-        BlockPos targetPos = pContext.getClickedPos();
-        if (!checkAll(player)) {
-            return InteractionResult.FAIL;
+        if (pContext.getPlayer() == null) {
+            Entity entity = pContext.getItemInHand().getEntityRepresentation();
+            if (entity instanceof LivingEntity user) {
+                BlockPos targetPos = pContext.getClickedPos();
+                if (!checkAll(user)) {
+                    return InteractionResult.FAIL;
+                }
+                tumble(user, targetPos);
+                return InteractionResult.SUCCESS;
+            }
+        } else {
+            Player player = pContext.getPlayer();
+            BlockPos targetPos = pContext.getClickedPos();
+
+            if (!checkAll(player)) {
+                return InteractionResult.FAIL;
+            }
+            tumble(player, targetPos);
+            addCooldown(player);
+            useSpirituality(player);
+            return InteractionResult.SUCCESS;
         }
-        tumble(player, targetPos);
-        addCooldown(player);
-        useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
 

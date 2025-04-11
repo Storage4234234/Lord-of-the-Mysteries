@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -22,6 +23,7 @@ import net.swimmingtuna.lotm.caps.BeyonderHolder;
 import net.swimmingtuna.lotm.caps.BeyonderHolderAttacher;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
+import net.swimmingtuna.lotm.util.BeyonderUtil;
 import net.swimmingtuna.lotm.util.ReachChangeUUIDs;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,14 +58,26 @@ public class MonsterReboot extends SimpleAbilityItem {
 
     @Override
     public InteractionResult useAbilityOnBlock(UseOnContext pContext) {
-        Player player = pContext.getPlayer();
-        if (!checkAll(player)) {
-            return InteractionResult.FAIL;
+        if (pContext.getPlayer() == null) {
+            Entity entity = pContext.getItemInHand().getEntityRepresentation();
+            if (entity instanceof LivingEntity user) {
+                if (!checkAll(user)) {
+                    return InteractionResult.FAIL;
+                }
+                monsterReboot(user, pContext.getLevel(), pContext.getClickedPos(), BeyonderUtil.getSequence(user));
+                return InteractionResult.SUCCESS;
+            }
+        } else {
+            Player player = pContext.getPlayer();
+            if (!checkAll(player)) {
+                return InteractionResult.FAIL;
+            }
+            BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
+            monsterReboot(player, pContext.getLevel(), pContext.getClickedPos(), holder.getSequence());
+            addCooldown(player);
+            useSpirituality(player);
+            return InteractionResult.SUCCESS;
         }
-        BeyonderHolder holder = BeyonderHolderAttacher.getHolderUnwrap(player);
-        monsterReboot(player, pContext.getLevel(), pContext.getClickedPos(), holder.getSequence());
-        addCooldown(player);
-        useSpirituality(player);
         return InteractionResult.SUCCESS;
     }
 
