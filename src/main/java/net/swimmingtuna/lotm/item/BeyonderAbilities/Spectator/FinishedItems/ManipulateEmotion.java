@@ -74,7 +74,7 @@ public class ManipulateEmotion extends SimpleAbilityItem {
     @Override
     public int getPriority(LivingEntity livingEntity, LivingEntity target) {
         if (target != null && target.hasEffect(ModEffects.MANIPULATION.get())) {
-            return 75;
+            return 100;
         }
         return 0;
     }

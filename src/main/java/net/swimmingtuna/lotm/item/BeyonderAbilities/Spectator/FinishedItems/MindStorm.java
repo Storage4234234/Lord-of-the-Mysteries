@@ -101,6 +101,7 @@ public class MindStorm extends SimpleAbilityItem {
     public int getPriority(LivingEntity livingEntity, LivingEntity target) {
         if (target != null) {
             return 80;
-        } return 15;
+        }
+        return 0;
     }
 }

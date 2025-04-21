@@ -67,7 +67,6 @@ public class DreamWeaving extends SimpleAbilityItem {
         if (!checkAll(player)) {
             return InteractionResult.FAIL;
         }
-        AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
         addCooldown(player, this, 500 / BeyonderUtil.getDreamIntoReality(player));
         useSpirituality(player);
         dreamWeave(player, interactionTarget);
@@ -169,6 +168,9 @@ public class DreamWeaving extends SimpleAbilityItem {
 
     @Override
     public int getPriority(LivingEntity livingEntity, LivingEntity target) {
-        return 35;
+        if (target != null) {
+            return 50;
+        }
+        return 0;
     }
 }

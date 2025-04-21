@@ -667,10 +667,15 @@ public class ModEvents {
                 boolean dropCharacteristic = level.getLevelData().getGameRules().getBoolean(GameRuleInit.SHOULD_DROP_CHARACTERISTIC);
                 boolean resetSequence = level.getLevelData().getGameRules().getBoolean(GameRuleInit.RESET_SEQUENCE);
                 boolean safetyNet = level.getLevelData().getGameRules().getBoolean(GameRuleInit.PATHWAY_SAFETY_NET);
+                boolean fateReincarnation = livingEntity.getPersistentData().getInt("monsterReincarnationCounter") >= 1;
                 if (dropCharacteristic) {
                     if (!safetyNet) {
                         ItemStack stack = new ItemStack(ItemInit.BEYONDER_CHARACTERISTIC.get());
-                        BeyonderCharacteristic.setData(stack, pathway, sequence, false, 1);
+                        if (fateReincarnation) {
+                            BeyonderCharacteristic.setData(stack, BeyonderClassInit.MONSTER.get(), 1, false, 1);
+                        } else {
+                            BeyonderCharacteristic.setData(stack, pathway, sequence, false, 1);
+                        }
                         ItemEntity itemEntity = new ItemEntity(level, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), stack);
                         livingEntity.level().addFreshEntity(itemEntity);
                         if (!resetSequence) {
@@ -684,8 +689,11 @@ public class ModEvents {
                         }
                     } else if (sequence != 8 && sequence != 4) {
                         ItemStack stack = new ItemStack(ItemInit.BEYONDER_CHARACTERISTIC.get());
-                        BeyonderCharacteristic.setData(stack, pathway, sequence, false, 1);
-                        ItemEntity itemEntity = new ItemEntity(level, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), stack);
+                        if (fateReincarnation) {
+                            BeyonderCharacteristic.setData(stack, BeyonderClassInit.MONSTER.get(), 1, false, 1);
+                        } else {
+                            BeyonderCharacteristic.setData(stack, pathway, sequence, false, 1);
+                        }                        ItemEntity itemEntity = new ItemEntity(level, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), stack);
                         livingEntity.level().addFreshEntity(itemEntity);
                         if (!resetSequence) {
                             if (sequence == 9) {
@@ -830,7 +838,6 @@ public class ModEvents {
 
     @SubscribeEvent
     public static void addAttributes(EntityAttributeCreationEvent event) {
-        event.put(EntityInit.PLAYER_MOB_ENTITY.get(), AttributeSupplier.builder().add(ModAttributes.DIR.get()).build());
         event.put(EntityInit.PLAYER_MOB_ENTITY.get(), AttributeSupplier.builder().add(ModAttributes.NIGHTMARE.get()).build());
     }
 

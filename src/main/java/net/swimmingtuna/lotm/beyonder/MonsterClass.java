@@ -822,33 +822,23 @@ public class MonsterClass implements BeyonderClass {
         Vec3 projectilePos = projectile.position();
         Vec3 projectileDelta = projectile.getDeltaMovement();
         Level level = projectile.level();
-
         boolean isArrow = projectile instanceof AbstractArrow;
-
         trajectory.add(projectilePos);
-
-        int maxIterations = 1000; // Increased for a longer trajectory
-        double maxDistance = 100.0; // Maximum distance to calculate the trajectory
+        int maxIterations = 1000;
+        double maxDistance = 100.0;
 
         for (int i = 0; i < maxIterations; i++) {
             projectilePos = projectilePos.add(projectileDelta);
             trajectory.add(projectilePos);
-
-            // Check if the block at the projectile's position is not air
-            if (projectile instanceof Arrow arrow) {
-                if (arrow.tickCount >= 100) {
-                    break;
-                }
-            } else if (projectilePos.distanceTo(projectile.position()) > maxDistance) {
+            if (projectilePos.distanceTo(projectile.position()) > maxDistance) {
                 break;
             }
-
-            if (isArrow) {
+            if (isArrow && projectile instanceof AbstractArrow arrow && arrow.tickCount <= 100) {
                 projectileDelta = projectileDelta.scale(0.99F);
                 projectileDelta = projectileDelta.add(0, -0.05, 0);
             } else {
-                projectileDelta = projectileDelta.scale(0.99F); // Air resistance
-                projectileDelta = projectileDelta.add(0, -0.03, 0); // Gravity effect
+                projectileDelta = projectileDelta.scale(0.99F);
+                projectileDelta = projectileDelta.add(0, -0.03, 0);
             }
         }
 

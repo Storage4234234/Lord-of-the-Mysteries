@@ -11,7 +11,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -20,7 +19,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.swimmingtuna.lotm.init.BeyonderClassInit;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
-import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 import virtuoel.pehkui.api.ScaleData;
@@ -64,23 +62,25 @@ public class DreamIntoReality extends SimpleAbilityItem {
     }
 
     private void startFlying(LivingEntity player) { //marked
-        if (!player.level().isClientSide() && player instanceof Player pPlayer) {
-            AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-            if (dreamIntoReality.getValue() != 3) {
+        if (!player.level().isClientSide()) {
+            int dreamIntoReality = player.getPersistentData().getInt("dreamIntoReality");
+            if (dreamIntoReality != 3) {
                 player.getPersistentData().putBoolean(CAN_FLY, true);
-                Abilities playerAbilities = pPlayer.getAbilities();
-                dreamIntoReality.setBaseValue(4);
-                if (!pPlayer.isCreative()) {
-                    playerAbilities.mayfly = true;
-                    playerAbilities.flying = true;
-                    playerAbilities.setFlyingSpeed(0.1F);
-                }
+                player.getPersistentData().putInt("dreamIntoReality", 4);
                 ScaleData scaleData = ScaleTypes.BASE.getScaleData(player);
                 scaleData.setTargetScale(scaleData.getBaseScale() * 12);
                 scaleData.markForSync(true);
-                pPlayer.onUpdateAbilities();
-                if (player instanceof ServerPlayer serverPlayer) {
-                    serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
+                if (player instanceof Player pPlayer) {
+                    Abilities playerAbilities = pPlayer.getAbilities();
+                    if (!pPlayer.isCreative()) {
+                        playerAbilities.mayfly = true;
+                        playerAbilities.flying = true;
+                        playerAbilities.setFlyingSpeed(0.1F);
+                    }
+                    pPlayer.onUpdateAbilities();
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
+                    }
                 }
             }
         }
@@ -88,9 +88,12 @@ public class DreamIntoReality extends SimpleAbilityItem {
 
     public static void stopFlying(LivingEntity livingEntity) { //marked
         if (!livingEntity.level().isClientSide()) {
+            livingEntity.getPersistentData().putInt("dreamIntoReality", 1);
+            ScaleData scaleData = ScaleTypes.BASE.getScaleData(livingEntity);
+            scaleData.setTargetScale(1);
+            scaleData.markForSync(true);
+            livingEntity.getPersistentData().putBoolean(CAN_FLY, false);
             if (livingEntity instanceof Player player) {
-                AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
-                livingEntity.getPersistentData().putBoolean(CAN_FLY, false);
                 Abilities playerAbilities = player.getAbilities();
                 CompoundTag compoundTag = livingEntity.getPersistentData();
                 int mindscape = compoundTag.getInt("inMindscape");
@@ -98,12 +101,8 @@ public class DreamIntoReality extends SimpleAbilityItem {
                     playerAbilities.mayfly = false;
                     playerAbilities.flying = false;
                 }
-                dreamIntoReality.setBaseValue(1);
                 playerAbilities.setFlyingSpeed(0.05F);
                 player.onUpdateAbilities();
-                ScaleData scaleData = ScaleTypes.BASE.getScaleData(livingEntity);
-                scaleData.setTargetScale(1);
-                scaleData.markForSync(true);
                 if (livingEntity instanceof ServerPlayer serverPlayer) {
                     serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(playerAbilities));
                 }
@@ -133,7 +132,7 @@ public class DreamIntoReality extends SimpleAbilityItem {
             livingEntity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
             livingEntity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 3, false, false));
             livingEntity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 4, false, false));
-        }else if (BeyonderUtil.getSequence(livingEntity) == 0) {
+        } else if (BeyonderUtil.getSequence(livingEntity) == 0) {
             livingEntity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3, false, false));
             livingEntity.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 4, false, false));
             livingEntity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 100, 5, false, false));
@@ -150,6 +149,7 @@ public class DreamIntoReality extends SimpleAbilityItem {
         tooltipComponents.add(SimpleAbilityItem.getClassText(this.requiredSequence, this.requiredClass.get()));
         super.baseHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
@@ -157,10 +157,10 @@ public class DreamIntoReality extends SimpleAbilityItem {
 
     @Override
     public int getPriority(LivingEntity livingEntity, LivingEntity target) {
-        if (target != null && ((float) BeyonderUtil.getMaxSpirituality(livingEntity) / BeyonderUtil.getSpirituality(livingEntity) >= 0.5f) && BeyonderUtil.getSequence(livingEntity) <= 4 && BeyonderUtil.getSequence(livingEntity) != -1) {
-            return  55;
+        if (target != null && ((float) BeyonderUtil.getMaxSpirituality(livingEntity) / BeyonderUtil.getSpirituality(livingEntity) >= 0.5f) && BeyonderUtil.getSequence(target) <= 4 && BeyonderUtil.getSequence(livingEntity) != -1) {
+            return 55;
         } else if (livingEntity.getPersistentData().getBoolean("CanFly") && BeyonderUtil.getSpirituality(livingEntity) <= 1000) {
-            return  100;
+            return 100;
         } else {
             return 0;
         }

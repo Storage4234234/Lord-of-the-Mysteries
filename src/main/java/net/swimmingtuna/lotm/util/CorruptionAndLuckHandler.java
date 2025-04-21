@@ -68,6 +68,16 @@ public class CorruptionAndLuckHandler {
             if (corruption >= 1 && livingEntity.tickCount % 200 == 0) {
                 tag.putDouble("corruption", corruption - 1);
             }
+            if (BeyonderUtil.currentPathwayAndSequenceMatchesNoException(livingEntity, BeyonderClassInit.MONSTER.get(), 0)) {
+                for (LivingEntity living : BeyonderUtil.getAllies(livingEntity)) {
+                    if (living.getPersistentData().getDouble("misfortune") >= 0) {
+                        living.getPersistentData().putDouble("misfortune", 0);
+                    }
+                }
+                if (livingEntity.getPersistentData().getDouble("misfortune") >= 0) {
+                    livingEntity.getPersistentData().putDouble("misfortune", 0);
+                }
+            }
             if (corruption >= 1) {
                 if (livingEntity instanceof Player player && player.tickCount % 20 == 0) {
                     player.displayClientMessage(Component.literal("You're corrupted with a value of " + corruption + " / 100").withStyle(BeyonderUtil.corruptionStyle(livingEntity)), true);

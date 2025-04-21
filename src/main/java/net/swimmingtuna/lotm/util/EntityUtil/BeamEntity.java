@@ -12,6 +12,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.ClipContext;
@@ -210,14 +211,18 @@ public abstract class BeamEntity extends LOTMProjectile {
                     if (getIsTwilight() && entity instanceof LivingEntity livingEntity && this.getOwner() instanceof LivingEntity pOwner && !BeyonderUtil.areAllies(pOwner, livingEntity)) {
                         int age = livingEntity.getPersistentData().getInt("age");
                         livingEntity.hurt(BeyonderUtil.genericSource(owner), 10);
+                        int ageDivisibleAmount = 1;
+                        if (pOwner instanceof Mob mob) {
+                            ageDivisibleAmount = 3;
+                        }
                         if (this.tickCount % 3 == 0) {
                             if (livingEntity instanceof Player player) {
                                 player.displayClientMessage(Component.literal("You are getting rapidly aged").withStyle(BeyonderUtil.ageStyle(livingEntity)).withStyle(ChatFormatting.BOLD), true);
                             }
                             if (BeyonderUtil.getSequence(pOwner) != 0) {
-                                livingEntity.getPersistentData().putInt("age", (age + (30 - BeyonderUtil.getSequence(pOwner))) * 9);
+                                livingEntity.getPersistentData().putInt("age", ((age + (30 - BeyonderUtil.getSequence(pOwner))) * 9) / ageDivisibleAmount);
                             } else {
-                                livingEntity.getPersistentData().putInt("age", (age + (50)));
+                                livingEntity.getPersistentData().putInt("age", (age + (50)) / ageDivisibleAmount);
                             }
                         }
                     }
@@ -237,8 +242,6 @@ public abstract class BeamEntity extends LOTMProjectile {
                             this.collidePosX - radius, this.collidePosY - radius, this.collidePosZ - radius,
                             this.collidePosX + radius, this.collidePosY + radius, this.collidePosZ + radius
                     );
-
-                    // Block breaking and fire logic here...
                 }
             }
 

@@ -31,7 +31,7 @@ public class ApplyManipulation extends SimpleAbilityItem {
     private final Lazy<Multimap<Attribute, AttributeModifier>> lazyAttributeMap = Lazy.of(this::createAttributeMap);
 
     public ApplyManipulation(Properties properties) {
-        super(properties, BeyonderClassInit.SPECTATOR, 4, 50, 10,80,50);
+        super(properties, BeyonderClassInit.SPECTATOR, 4, 50, 10, 80, 50);
     }
 
     @Override
@@ -67,6 +67,7 @@ public class ApplyManipulation extends SimpleAbilityItem {
         attributeBuilder.put(ForgeMod.BLOCK_REACH.get(), new AttributeModifier(ReachChangeUUIDs.BEYONDER_BLOCK_REACH, "Reach modifier", 80, AttributeModifier.Operation.ADDITION)); //adds a 12 block reach for interacting with blocks, p much useless for this item
         return attributeBuilder.build();
     }
+
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Upon use on a living entity, gives you the ability to manipulate them for 30 seconds"));
@@ -87,6 +88,7 @@ public class ApplyManipulation extends SimpleAbilityItem {
             }
         }
     }
+
     @Override
     public @NotNull Rarity getRarity(ItemStack pStack) {
         return Rarity.create("SPECTATOR_ABILITY", ChatFormatting.AQUA);
@@ -96,8 +98,7 @@ public class ApplyManipulation extends SimpleAbilityItem {
     public int getPriority(LivingEntity user, LivingEntity target) {
         if (target != null && !target.hasEffect(ModEffects.MANIPULATION.get())) {
             return 35;
-        } else {
-            return 0;
         }
+        return 0;
     }
 }

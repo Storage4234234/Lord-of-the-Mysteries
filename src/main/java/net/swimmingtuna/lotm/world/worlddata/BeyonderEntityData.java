@@ -13,9 +13,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.swimmingtuna.lotm.LOTM;
 import net.swimmingtuna.lotm.beyonder.api.BeyonderClass;
 import net.swimmingtuna.lotm.entity.PlayerMobEntity;
 import net.swimmingtuna.lotm.item.BeyonderAbilities.SimpleAbilityItem;
@@ -178,37 +180,34 @@ public class BeyonderEntityData extends SavedData {
     public static void regenerateSpirituality(LivingEvent.LivingTickEvent event) {
         if (!event.getEntity().level().isClientSide() && event.getEntity().tickCount % 20 == 0) {
             LivingEntity living = event.getEntity();
-            if (!(living instanceof Player) && !(living instanceof PlayerMobEntity)) {
-                ServerLevel level = (ServerLevel) living.level();
-                BeyonderEntityData mappingData = BeyonderEntityData.getInstance(level);
-                String pathwayString = mappingData.getStringForEntity(living.getType());
-                if (pathwayString != null) {
-                    BeyonderClass pathway = BeyonderUtil.getPathway(living);
-                    if (pathway != null) {
-                        if (BeyonderUtil.getSpirituality(living) < BeyonderUtil.getMaxSpirituality(living)) {
-                            int sequence = BeyonderUtil.getSequence(living);
-                            BeyonderUtil.addSpirituality(living, pathway.spiritualityRegen().get(sequence) * 20);
-                        }
-                        CompoundTag persistentData = living.getPersistentData();
-                        List<String> keysToDecrement = new ArrayList<>();
-                        for (String key : persistentData.getAllKeys()) {
-                            if (key.startsWith("abilityCooldownFor")) {
-                                keysToDecrement.add(key);
-                            }
-                        }
-                        for (String key : keysToDecrement) {
-                            int currentCooldown = persistentData.getInt(key);
-                            if (currentCooldown > 0) {
-                                persistentData.putInt(key, Math.max(0, currentCooldown - 20));
-                            }
-                        }
-                        if (living instanceof Mob mob && mob.tickCount % 60 == 0) {
-                            selectAndUseAbility(mob);
-                        }
-
-                        int sequenceLevel = BeyonderUtil.getSequence(living);
-                        pathway.tick(living, sequenceLevel);
+            ServerLevel level = (ServerLevel) living.level();
+            BeyonderEntityData mappingData = BeyonderEntityData.getInstance(level);
+            String pathwayString = mappingData.getStringForEntity(living.getType());
+            if (pathwayString != null) {
+                BeyonderClass pathway = BeyonderUtil.getPathway(living);
+                if (pathway != null) {
+                    if (BeyonderUtil.getSpirituality(living) < BeyonderUtil.getMaxSpirituality(living)) {
+                        int sequence = BeyonderUtil.getSequence(living);
+                        BeyonderUtil.addSpirituality(living, pathway.spiritualityRegen().get(sequence) * 20);
                     }
+                    CompoundTag persistentData = living.getPersistentData();
+                    List<String> keysToDecrement = new ArrayList<>();
+                    for (String key : persistentData.getAllKeys()) {
+                        if (key.startsWith("abilityCooldownFor")) {
+                            keysToDecrement.add(key);
+                        }
+                    }
+                    for (String key : keysToDecrement) {
+                        int currentCooldown = persistentData.getInt(key);
+                        if (currentCooldown > 0) {
+                            persistentData.putInt(key, Math.max(0, currentCooldown - 20));
+                        }
+                    }
+                    if (living instanceof Mob mob && mob.tickCount % 60 == 0) {
+                        selectAndUseAbility(mob);
+                    }
+                    int sequenceLevel = BeyonderUtil.getSequence(living);
+                    pathway.tick(living, sequenceLevel);
                 }
             }
         }
@@ -229,7 +228,6 @@ public class BeyonderEntityData extends SavedData {
             }
         }
     }
-
     private static void selectAndUseAbility(Mob mob) {
         List<Item> availableAbilities = getAbilities(mob);
         if (availableAbilities.isEmpty()) {
@@ -242,10 +240,10 @@ public class BeyonderEntityData extends SavedData {
             if (item instanceof SimpleAbilityItem abilityItem) {
                 String cooldownKey = "abilityCooldownFor" + abilityItem.getDescription().getString();
                 int currentCooldown = mob.getPersistentData().getInt(cooldownKey);
-                if (currentCooldown <= 0 && currentSpirituality >= abilityItem.getRequiredSpirituality()) {
+                if (currentCooldown == 0 && currentSpirituality >= abilityItem.getRequiredSpirituality()) {
                     int priority = abilityItem.getPriority(mob, mob.getTarget());
                     if (priority > 0) {
-                        weightedAbilities.add(new WeightedAbility(abilityItem, priority + 1));
+                        weightedAbilities.add(new WeightedAbility(abilityItem, priority));
                     }
                 }
             }
@@ -257,6 +255,28 @@ public class BeyonderEntityData extends SavedData {
 
         SimpleAbilityItem selectedAbility = selectWeightedAbility(weightedAbilities);
         if (selectedAbility != null) {
+            int totalPriority = 0;
+            for (WeightedAbility ability : weightedAbilities) {
+                totalPriority += ability.weight;
+            }
+
+            // Debug log message
+            Level level = mob.level();
+            if (level instanceof ServerLevel) {
+                String entityName = mob.getName().getString();
+                String abilityName = selectedAbility.getDescription().getString();
+                int abilityPriority = 0;
+
+                for (WeightedAbility ability : weightedAbilities) {
+                    if (ability.abilityItem == selectedAbility) {
+                        abilityPriority = ability.weight;
+                        break;
+                    }
+                }
+                LOTM.LOGGER.info("{} chose ability {} with a {}/{} probability",
+                        entityName, abilityName, abilityPriority, totalPriority);
+            }
+
             mob.setItemInHand(InteractionHand.MAIN_HAND, selectedAbility.getDefaultInstance());
             useAvailableAbilityAsMob(mob);
         }
@@ -270,6 +290,7 @@ public class BeyonderEntityData extends SavedData {
         if (totalWeight <= 0) {
             return null;
         }
+
         Random random = new Random();
         int randomValue = random.nextInt(totalWeight);
         int currentWeight = 0;

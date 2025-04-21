@@ -2,6 +2,7 @@ package net.swimmingtuna.lotm.item.BeyonderAbilities.Spectator.FinishedItems;
 
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -20,6 +21,7 @@ import net.swimmingtuna.lotm.util.BeyonderUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Discern extends SimpleAbilityItem {
@@ -40,11 +42,24 @@ public class Discern extends SimpleAbilityItem {
         return InteractionResult.SUCCESS;
     }
 
-    private void discern(LivingEntity player) { //marked
+    private void discern(LivingEntity player) {
         if (!player.level().isClientSide() && player instanceof Player pPlayer) {
             for (Item item : BeyonderUtil.getAbilities(player)) {
                 if (item != ItemInit.DISCERN.get()) {
                     pPlayer.getCooldowns().removeCooldown(item);
+                }
+            }
+        } else {
+            CompoundTag persistentData = player.getPersistentData();
+            List<String> cooldownKeys = new ArrayList<>();
+            for (String key : persistentData.getAllKeys()) {
+                if (key.startsWith("abilityCooldownFor")) {
+                    cooldownKeys.add(key);
+                }
+            }
+            for (String key : cooldownKeys) {
+                if (!key.equals("abilityCooldownFor" + ItemInit.DISCERN.get().getDescription().getString())) {
+                    persistentData.putInt(key, 0);
                 }
             }
         }

@@ -88,7 +88,6 @@ import net.swimmingtuna.lotm.item.OtherItems.SwordOfTwilight;
 import net.swimmingtuna.lotm.item.SealedArtifacts.DeathKnell;
 import net.swimmingtuna.lotm.networking.LOTMNetworkHandler;
 import net.swimmingtuna.lotm.networking.packet.*;
-import net.swimmingtuna.lotm.spirituality.ModAttributes;
 import net.swimmingtuna.lotm.util.AllyInformation.PlayerAllyData;
 import net.swimmingtuna.lotm.util.ClientData.ClientLeftclickCooldownData;
 import net.swimmingtuna.lotm.util.ScribeRecording.CapabilityScribeAbilities;
@@ -140,7 +139,9 @@ public class BeyonderUtil {
         Projectile projectile = BeyonderUtil.getProjectiles(living);
         if (projectile == null) return;
 
-
+        if (living.level().isClientSide) {
+            return;
+        }
         //MATTER ACCELERATION ENTITIES
         if (projectile.getPersistentData().getInt("matterAccelerationEntities") >= 10) {
             double movementX = Math.abs(projectile.getDeltaMovement().x());
@@ -202,7 +203,7 @@ public class BeyonderUtil {
 
         //MONSTER CALCULATION PASSIVE
         if (target != null) {
-            if (BeyonderUtil.currentPathwayAndSequenceMatches(living, BeyonderClassInit.APPRENTICE.get(), 8) && living.getPersistentData().getBoolean("monsterProjectileControl")) {
+            if (BeyonderUtil.currentPathwayAndSequenceMatches(living, BeyonderClassInit.MONSTER.get(), 8) && living.getPersistentData().getBoolean("monsterProjectileControl")) {
                 double dx = target.getX() - projectile.getX();
                 double dy = target.getY() - projectile.getY();
                 double dz = target.getZ() - projectile.getZ();
@@ -1601,7 +1602,7 @@ public class BeyonderUtil {
         // Sailor Potions
         executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_9_potion ingredients 2 bossominium:rusted_trident mowziesmobs:sol_visage aquamirae:fin arphex:roach_nymph arphex:fly_appendage");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_8_potion ingredients 2 bossominium:mossy_stone_tablet alexsmobs:warped_muscle iceandfire:sea_serpent_fang minecraft:prismarine_shard mutantmonsters:endersoul_hand");
-        executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_7_potion ingredients 2 eeeabsmobs:heart_of_pagan mowziesmobs:ice_crystal aquamirae:abyssal_amethyst arphex:mantis_machete arphex:necrotic_fang");
+        executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_7_potion ingredients 2 eeeabsmobs:heart_of_ModEventspagan mowziesmobs:ice_crystal aquamirae:abyssal_amethyst arphex:mantis_machete arphex:necrotic_fang");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_6_potion ingredients 2 illageandspillage:spellbound_book cataclysm:monstrous_horn arphex:oversized_stinger minecraft:white_banner bosses_of_mass_destruction:void_thorn");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_5_potion ingredients 2 aquamirae:frozen_key soulsweapons:essence_of_eventide soulsweapons:darkin_blade alexscaves:immortal_embryo arphex:void_geode_shard");
         executeRecipeCommand(server, "/beyonderrecipe add lotm:sailor_4_potion ingredients 2 macabre:baal_heart alexscaves:tectonic_shard cataclysm:abyssal_egg terramity:belt_of_the_gnome_king iceandfire:dragon_skull_ice");
@@ -2872,96 +2873,93 @@ public class BeyonderUtil {
 
     public static void useAvailableAbilityAsMob(LivingEntity livingEntity) {
         if (!livingEntity.level().isClientSide() && getPathway(livingEntity) != null && livingEntity instanceof Mob mob) {
-            List<Item> abilities = getAbilities(livingEntity);
-            if (abilities.isEmpty()) {
+            ItemStack heldItem = livingEntity.getItemInHand(InteractionHand.MAIN_HAND);
+            if (!(heldItem.getItem() instanceof SimpleAbilityItem simpleAbilityItem)) {
                 return;
             }
+            if (livingEntity.hasEffect(ModEffects.STUN.get())) {
+                return;
+            }
+            if (!SimpleAbilityItem.checkAll(livingEntity, simpleAbilityItem.getRequiredPathway(),
+                    simpleAbilityItem.getRequiredSequence(), simpleAbilityItem.getRequiredSpirituality(), false)) {
+                return;
+            }
+            double entityReach = simpleAbilityItem.getEntityReach();
+            double blockReach = simpleAbilityItem.getBlockReach();
+            boolean successfulUse = false;
+            boolean hasEntityInteraction = false;
+            boolean hasBlockInteraction = false;
+            boolean hasGeneralAbility = false;
+
+            try {
+                Method entityMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbilityOnEntity", ItemStack.class, LivingEntity.class, LivingEntity.class, InteractionHand.class);
+                hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity", ItemStack.class, LivingEntity.class, LivingEntity.class, InteractionHand.class));
+            } catch (NoSuchMethodException ignored) {
+            }
+            try {
+                Method blockMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbilityOnBlock", UseOnContext.class);
+                hasBlockInteraction = !blockMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnBlock", UseOnContext.class));
+            } catch (NoSuchMethodException ignored) {
+            }
+
+            try {
+                Method generalMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbility", Level.class, LivingEntity.class, InteractionHand.class);
+                hasGeneralAbility = !generalMethod.equals(Ability.class.getDeclaredMethod("useAbility", Level.class, LivingEntity.class, InteractionHand.class));
+            } catch (NoSuchMethodException ignored) {
+            }
+
             LivingEntity target = mob.getTarget();
-            Random random = new Random();
-            Item randomItem = abilities.get(random.nextInt(abilities.size()));
-            if (randomItem instanceof SimpleAbilityItem simpleAbilityItem) {
-                if (livingEntity.hasEffect(ModEffects.STUN.get())) {
-                    return;
-                }
-                if (!SimpleAbilityItem.checkAll(livingEntity, simpleAbilityItem.getRequiredPathway(),
-                        simpleAbilityItem.getRequiredSequence(), simpleAbilityItem.getRequiredSpirituality(), false)) {
-                    mob.setItemInHand(InteractionHand.MAIN_HAND, simpleAbilityItem.getDefaultInstance());
-                }
-                double entityReach = simpleAbilityItem.getEntityReach();
-                double blockReach = simpleAbilityItem.getBlockReach();
-                boolean successfulUse = false;
-                boolean hasEntityInteraction = false;
-                boolean hasBlockInteraction = false;
-                boolean hasGeneralAbility = false;
-
-                try {
-                    Method entityMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbilityOnEntity", ItemStack.class, LivingEntity.class, LivingEntity.class, InteractionHand.class);
-                    hasEntityInteraction = !entityMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnEntity", ItemStack.class, LivingEntity.class, LivingEntity.class, InteractionHand.class));
-                } catch (NoSuchMethodException ignored) {
-                }
-                try {
-                    Method blockMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbilityOnBlock", UseOnContext.class);
-                    hasBlockInteraction = !blockMethod.equals(Ability.class.getDeclaredMethod("useAbilityOnBlock", UseOnContext.class));
-                } catch (NoSuchMethodException ignored) {
-                }
-
-                try {
-                    Method generalMethod = simpleAbilityItem.getClass().getDeclaredMethod("useAbility", Level.class, LivingEntity.class, InteractionHand.class);
-                    hasGeneralAbility = !generalMethod.equals(Ability.class.getDeclaredMethod("useAbility", Level.class, LivingEntity.class, InteractionHand.class));
-                } catch (NoSuchMethodException ignored) {
-                }
-                if (hasEntityInteraction) {
-                    if (target != null && target.distanceTo(mob) <= entityReach) {
-                        InteractionResult result = simpleAbilityItem.useAbilityOnEntity(livingEntity.getItemInHand(InteractionHand.MAIN_HAND), mob, target, InteractionHand.MAIN_HAND);
-                        if (result != InteractionResult.PASS) {
-                            successfulUse = true;
-                        }
+            if (hasEntityInteraction) {
+                if (target != null && target.distanceTo(mob) <= entityReach) {
+                    InteractionResult result = simpleAbilityItem.useAbilityOnEntity(heldItem, mob, target, InteractionHand.MAIN_HAND);
+                    if (result != InteractionResult.PASS) {
+                        successfulUse = true;
                     }
                 }
+            }
 
-                if (!successfulUse && hasBlockInteraction) {
-                    Vec3 eyePosition = livingEntity.getEyePosition();
-                    Vec3 lookVector = livingEntity.getLookAngle();
-                    Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
-                    BlockHitResult blockHit = livingEntity.level().clip(new ClipContext(eyePosition, reachVector,
-                            ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, livingEntity));
-                    if (blockHit.getType() != HitResult.Type.MISS) {
-                        UseOnContext context = new UseOnContext(
-                                livingEntity.level(),
-                                null,
-                                InteractionHand.MAIN_HAND,
-                                livingEntity.getItemInHand(InteractionHand.MAIN_HAND),
-                                blockHit
-                        );
-                        InteractionResult result = simpleAbilityItem.useOn(context);
-                        if (result != InteractionResult.PASS) {
-                            successfulUse = true;
-                        }
+            if (!successfulUse && hasBlockInteraction) {
+                Vec3 eyePosition = livingEntity.getEyePosition();
+                Vec3 lookVector = livingEntity.getLookAngle();
+                Vec3 reachVector = eyePosition.add(lookVector.x * blockReach, lookVector.y * blockReach, lookVector.z * blockReach);
+                BlockHitResult blockHit = livingEntity.level().clip(new ClipContext(eyePosition, reachVector,
+                        ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, livingEntity));
+                if (blockHit.getType() != HitResult.Type.MISS) {
+                    UseOnContext context = new UseOnContext(
+                            livingEntity.level(),
+                            null,
+                            InteractionHand.MAIN_HAND,
+                            heldItem,
+                            blockHit
+                    );
+                    InteractionResult result = simpleAbilityItem.useOn(context);
+                    if (result != InteractionResult.PASS) {
+                        successfulUse = true;
                     }
                 }
+            }
 
-                String itemName = simpleAbilityItem.getDescription().getString();
-                if ((hasEntityInteraction || hasBlockInteraction) && !hasGeneralAbility) {
-                    if (successfulUse) {
-                        for (Player player : mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(100))) {
-                            player.sendSystemMessage(Component.literal(mob.getName().getString() + " used " + itemName));
-                        }
-                    }
-                } else if (!hasEntityInteraction && !hasBlockInteraction) {
+            String itemName = simpleAbilityItem.getDescription().getString();
+            if ((hasEntityInteraction || hasBlockInteraction) && !hasGeneralAbility) {
+                if (successfulUse) {
                     for (Player player : mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(100))) {
                         player.sendSystemMessage(Component.literal(mob.getName().getString() + " used " + itemName));
                     }
-                    simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
-                } else if (successfulUse) {
-                    for (Player player : mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(100))) {
-                        player.sendSystemMessage(Component.literal(mob.getName().getString() + " used " + itemName));
-                    }
-                } else {
-                    for (Player player : mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(100))) {
-                        player.sendSystemMessage(Component.literal(mob.getName().getString() + " used " + itemName));
-                    }
-                    simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
                 }
+            } else if (!hasEntityInteraction && !hasBlockInteraction) {
+                for (Player player : mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(100))) {
+                    player.sendSystemMessage(Component.literal(mob.getName().getString() + " used " + itemName));
+                }
+                simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
+            } else if (successfulUse) {
+                for (Player player : mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(100))) {
+                    player.sendSystemMessage(Component.literal(mob.getName().getString() + " used " + itemName));
+                }
+            } else {
+                for (Player player : mob.level().getEntitiesOfClass(Player.class, mob.getBoundingBox().inflate(100))) {
+                    player.sendSystemMessage(Component.literal(mob.getName().getString() + " used " + itemName));
+                }
+                simpleAbilityItem.useAbility(mob.level(), mob, InteractionHand.MAIN_HAND);
             }
         }
     }
@@ -3085,10 +3083,6 @@ public class BeyonderUtil {
     }
 
     public static int getDreamIntoReality(LivingEntity living) {
-        int dir = 1;
-        if (living.getAttribute(ModAttributes.DIR.get()) != null) {
-            dir = (int) living.getAttribute(ModAttributes.DIR.get()).getBaseValue();
-        }
-        return dir;
+        return Math.max(1, living.getPersistentData().getInt("dreamIntoReality"));
     }
 }

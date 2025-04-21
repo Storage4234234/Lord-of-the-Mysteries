@@ -6,6 +6,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -140,7 +141,11 @@ public class DragonBreathEntity extends BeamEntity {
         DragonBreathEntity dragonBreath = new DragonBreathEntity(player, power);
         dragonBreath.setDestroyBlocks(true);
         dragonBreath.teleportTo(x,y+1,z);
-        dragonBreath.setDamage(power * 0.4f);
+        if (player instanceof Mob mob) {
+            dragonBreath.setDamage(power * 0.2f);
+        } else {
+            dragonBreath.setDamage(power * 0.4f);
+        }
         dragonBreath.setSize(Math.max(1, 3 - (BeyonderUtil.getSequence(player) * 2)));
         dragonBreath.setIsDragonbreath(true);
         dragonBreath.setFrenzyTime((int) (float) BeyonderUtil.getDamage(player).get(ItemInit.DRAGON_BREATH.get()));

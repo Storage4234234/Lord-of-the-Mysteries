@@ -301,7 +301,7 @@ public class TornadoEntity extends AbstractHurtingProjectile {
             if (pickup) {
                 for (BlockPos blockPosition : BlockPos.betweenClosed((int) minX, (int) minY, (int) minZ, (int) maxX, (int) maxY, (int) maxZ)) {
                     BlockState state = this.level().getBlockState(blockPosition);
-                    if (state.isAir() || state.is(BlockTags.TALL_FLOWERS) || random.nextInt(5000) != 1) {
+                    if (state.isAir() || state.is(BlockTags.TALL_FLOWERS) || random.nextInt(15000) != 1) {
                         continue;
                     }
                     if (this.tickCount % 5 == 0) {

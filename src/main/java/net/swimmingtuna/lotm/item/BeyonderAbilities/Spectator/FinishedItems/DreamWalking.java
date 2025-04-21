@@ -103,8 +103,7 @@ public class DreamWalking extends SimpleAbilityItem {
     public int getPriority(LivingEntity livingEntity, LivingEntity target) {
         if (target != null && target.getHealth() < livingEntity.getHealth()) {
             return 80;
-        } else {
-            return 20;
         }
+        return 0;
     }
 }

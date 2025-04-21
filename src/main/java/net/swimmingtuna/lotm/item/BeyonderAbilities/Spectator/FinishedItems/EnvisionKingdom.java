@@ -63,7 +63,6 @@ public class EnvisionKingdom extends SimpleAbilityItem {
         //ENVISION KINGDOM
         CompoundTag tag = livingEntity.getPersistentData();
         if (livingEntity instanceof Player player && level instanceof ServerLevel serverLevel) {
-            AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
             int mindScape = tag.getInt("inMindscape");
             if (mindScape < 1) return;
             Abilities playerAbilities = player.getAbilities();
@@ -75,9 +74,7 @@ public class EnvisionKingdom extends SimpleAbilityItem {
             if (mindscapeAbilities >= 1) {
                 BeyonderUtil.setSpirituality(livingEntity, BeyonderUtil.getMaxSpirituality(livingEntity));
                 if (!tag.getBoolean("CAN_FLY")) {
-                    if (dreamIntoReality != null) {
-                        dreamIntoReality.setBaseValue(3);
-                    }
+                    livingEntity.getPersistentData().putInt("dreamIntoReality", 3);
                     playerAbilities.setFlyingSpeed(0.1F);
                     playerAbilities.mayfly = true;
                     player.onUpdateAbilities();
@@ -88,9 +85,7 @@ public class EnvisionKingdom extends SimpleAbilityItem {
                 }
             }
             if (mindscapeAbilities == 1 && !tag.getBoolean("CAN_FLY")) {
-                if (dreamIntoReality != null) {
-                    dreamIntoReality.setBaseValue(1);
-                }
+                livingEntity.getPersistentData().putInt("dreamIntoReality", 1);
                 playerAbilities.setFlyingSpeed(0.05F);
                 playerAbilities.mayfly = false;
                 player.onUpdateAbilities();

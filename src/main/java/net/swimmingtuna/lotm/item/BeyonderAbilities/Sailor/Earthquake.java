@@ -83,9 +83,9 @@ public class Earthquake extends SimpleAbilityItem {
                                         0, 0.0, 0.0, 0, 0);
                             }
                         }
-                        if (random.nextInt(4000) == 1) { // 50% chance to destroy a block
+                        if (random.nextInt(6000) == 1) {
                             livingEntity.level().destroyBlock(blockPos, false);
-                        } else if (random.nextInt(10000) == 2) { // 10% chance to spawn a stone entity
+                        } else if (random.nextInt(18000) == 2) {
                             StoneEntity stoneEntity = new StoneEntity(livingEntity.level(), livingEntity);
                             ScaleData scaleData = ScaleTypes.BASE.getScaleData(stoneEntity);
                             stoneEntity.teleportTo(blockPos.getX(), blockPos.getY() + 3, blockPos.getZ());

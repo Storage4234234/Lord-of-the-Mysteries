@@ -84,9 +84,6 @@ public class TestItem extends SimpleAbilityItem {
                 playerMobEntity.setMaxSpirituality(10000);
                 playerMobEntity.setSpiritualityRegen(50);
             }
-            ServerLevel serverLevel = (ServerLevel) player.level();
-            BeyonderEntityData mappingData = BeyonderEntityData.getInstance(serverLevel);
-            mappingData.setEntityString(EntityType.BLAZE, "visionary");
         }
 
         return InteractionResult.SUCCESS;

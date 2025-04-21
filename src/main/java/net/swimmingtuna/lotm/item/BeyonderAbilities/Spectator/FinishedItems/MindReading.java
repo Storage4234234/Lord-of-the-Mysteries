@@ -123,10 +123,6 @@ public class MindReading extends SimpleAbilityItem {
 
     @Override
     public int getPriority(LivingEntity livingEntity, LivingEntity target) {
-        double dreamIntoReality = BeyonderUtil.getDreamIntoReality(livingEntity);
-        if (target != null && dreamIntoReality >= 1) {
-            return 15;
-        }
         return 0;
     }
 }

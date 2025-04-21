@@ -141,10 +141,12 @@ public class BattleHypnotism extends SimpleAbilityItem {
             int sequence = BeyonderUtil.getSequence(livingEntity);
             BeyonderUtil.getDreamIntoReality(livingEntity);
             for (Mob mob : target.level().getEntitiesOfClass(Mob.class, target.getBoundingBox().inflate((20 - sequence) * BeyonderUtil.getDreamIntoReality(livingEntity)))) {
-                mobTotalHP += (int) (mob.getMaxHealth() / 10);
-                if (mobTotalHP >= 100) {
-                    mobTotalHP = 100;
-                    break;
+                if (mob != target) {
+                    mobTotalHP += (int) (mob.getMaxHealth() / 10);
+                    if (mobTotalHP >= 100) {
+                        mobTotalHP = 100;
+                        break;
+                    }
                 }
             }
         }

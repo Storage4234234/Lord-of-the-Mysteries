@@ -47,7 +47,6 @@ public class ServerEvents {
     public static void onChatMessage(ServerChatEvent event) {
         Level level = event.getPlayer().serverLevel();
         ServerPlayer player = event.getPlayer();
-        AttributeInstance dreamIntoReality = player.getAttribute(ModAttributes.DIR.get());
         Style style = BeyonderUtil.getStyle(player);
         if (!player.level().isClientSide() && player.getMainHandItem().getItem() instanceof EnvisionWeather) {
             if (BeyonderUtil.currentPathwayMatches(player, BeyonderClassInit.SPECTATOR.get())) {
@@ -186,13 +185,13 @@ public class ServerEvents {
             }
 
             if (BeyonderUtil.getSpirituality(player) < 1500) {
-                player.displayClientMessage(Component.literal("You need " + (int) (1500 / dreamIntoReality.getValue()) + " spirituality in order to use this").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
+                player.displayClientMessage(Component.literal("You need " + (int) (1500 / BeyonderUtil.getDreamIntoReality(player)) + " spirituality in order to use this").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
             }
         }
         if (!player.level().isClientSide() && player.getMainHandItem().getItem() instanceof EnvisionLife && BeyonderUtil.currentPathwayAndSequenceMatches(player, BeyonderClassInit.SPECTATOR.get(), 0)) {
             String message = event.getMessage().getString().toLowerCase();
             spawnMob(player, message);
-            BeyonderUtil.useSpirituality(player, 1500 / (int) dreamIntoReality.getValue());
+            BeyonderUtil.useSpirituality(player, 1500 / BeyonderUtil.getDreamIntoReality(player));
             event.setCanceled(true);
         }
         String message = event.getMessage().getString();
@@ -203,7 +202,7 @@ public class ServerEvents {
                 return;
             }
             if (BeyonderUtil.getSpirituality(player) < BeyonderUtil.getDamage(player).get(ItemInit.ENVISION_LOCATION.get())) {
-                player.displayClientMessage(Component.literal("You need " + (int)(500 / dreamIntoReality.getValue()) + " spirituality in order to use this").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
+                player.displayClientMessage(Component.literal("You need " + (int)(BeyonderUtil.getDreamIntoReality(player)) + " spirituality in order to use this").withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA), true);
                 event.setCanceled(true);
                 return;
             }

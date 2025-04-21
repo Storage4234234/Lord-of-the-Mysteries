@@ -1,9 +1,11 @@
 package net.swimmingtuna.lotm.util;
 
 import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.LivingEntity;
+import org.jetbrains.annotations.NotNull;
 
 import static net.swimmingtuna.lotm.util.BeyonderUtil.getMentalStrength;
 
@@ -18,7 +20,10 @@ public class MentalDamageSource extends DamageSource {
     }
 
 
-
+    @Override
+    public @NotNull Component getLocalizedDeathMessage(@NotNull LivingEntity pLivingEntity) {
+        return Component.empty();
+    }
 
     public float calculateDamage(float baseAmount) {
         if (attacker == null || target == null) return baseAmount;
