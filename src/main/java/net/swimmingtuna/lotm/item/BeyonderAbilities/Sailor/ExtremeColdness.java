@@ -57,7 +57,7 @@ public class ExtremeColdness extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, let out freezing air which will freeze all surface blocks and entities around you, as wells as dealing damage"));
+        tooltipComponents.add(Component.literal("Upon use, release freezing air which will freeze all surface blocks and entities around you, as well as dealing damage."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1250").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Minute").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
