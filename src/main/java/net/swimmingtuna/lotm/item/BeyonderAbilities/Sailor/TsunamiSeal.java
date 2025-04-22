@@ -76,7 +76,7 @@ public class TsunamiSeal extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, summons a colossal wave in the direction you're looking that will seal any entity hit that is strong enough"));
+        tooltipComponents.add(Component.literal("Upon use, summon a colossal wave in the direction you're looking that will seal any powerful entities hit."));
         tooltipComponents.add(Component.literal("Left Click for Tsunami"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1100").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1.5 Minutes").withStyle(ChatFormatting.YELLOW)));
