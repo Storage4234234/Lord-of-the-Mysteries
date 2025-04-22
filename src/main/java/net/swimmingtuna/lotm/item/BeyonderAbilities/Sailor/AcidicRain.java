@@ -46,7 +46,7 @@ public class AcidicRain extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, summons an acidic rain around the player that persists for 15 seconds\n" +
+        tooltipComponents.add(Component.literal("Upon use, summons an acidic rain around the player that persists for 15 seconds.\n" +
                 "Spirituality Used: 175\n" +
                 "Cooldown: 25 seconds").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
