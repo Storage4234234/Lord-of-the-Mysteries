@@ -132,7 +132,7 @@ public class LuckManipulation extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, manipulate your luck as you wish"));
+        tooltipComponents.add(Component.literal("Upon use, manipulate your luck as you wish."));
         tooltipComponents.add(Component.literal("Left click to cycle between luck events"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("150").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("3 Seconds").withStyle(ChatFormatting.YELLOW)));
