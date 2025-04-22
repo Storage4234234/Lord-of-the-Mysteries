@@ -103,7 +103,7 @@ public class StormSeal extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, shoots out a compressed storm, which damages entities around and anything hit directly will be sealed for 3 minutes"));
+        tooltipComponents.add(Component.literal("Upon use, shoots out a compressed storm, which damages entities around it and seals anything hit directly for 3 minutes."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("5000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("2 Minutes").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
