@@ -65,7 +65,7 @@ public class AuraOfChaos extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal(
-                "Upon use, exude an aura of tyranny, not giving any entity permission to move, implanting fear strong enough to not allow them to use their abilities"
+                "Upon use, exude an aura of chaos, preventing entities from moving and crippling their use of abilities."
         ).withStyle(/*ChatFormatting.BOLD, ChatFormatting.BLUE*/));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
