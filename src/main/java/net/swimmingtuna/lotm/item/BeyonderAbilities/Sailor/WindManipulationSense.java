@@ -130,7 +130,7 @@ public class WindManipulationSense extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, summon constant winds around you. While active, you'll get the location of nearby entities"));
+        tooltipComponents.add(Component.literal("Upon use, summon constant winds around you. While active, you'll sense the locations of nearby entities."));
         tooltipComponents.add(Component.literal("Left Click for Wind Manipulation (Blade)"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("20 per second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));
