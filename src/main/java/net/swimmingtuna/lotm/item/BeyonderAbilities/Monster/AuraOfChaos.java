@@ -70,7 +70,7 @@ public class AuraOfChaos extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, enables or disables an aura of chaos around you. While enabled, it causes all entities around you to suffer a misfortunate event or calamity every two seconds. "));
+        tooltipComponents.add(Component.literal("Upon use, toggles an aura of chaos around you. While enabled, all entities around you will suffer a misfortunate event or calamity every two seconds."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("150 per second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("None").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
