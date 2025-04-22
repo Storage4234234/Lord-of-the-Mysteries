@@ -57,7 +57,7 @@ public class ProbabilityManipulationWipe extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, if clicked on an entity, causes all their fortunate/misfortunate events to disappear. If not, causes them to disappear to all entities around you"));
+        tooltipComponents.add(Component.literal("Upon use, if clicked on an entity, causes all their fortunate/misfortunate events to disappear. If not, causes them to disappear to all entities around you."));
         tooltipComponents.add(Component.literal("Left click for Probability Manipulation: Impulse"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("500").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("5 Seconds").withStyle(ChatFormatting.YELLOW)));
