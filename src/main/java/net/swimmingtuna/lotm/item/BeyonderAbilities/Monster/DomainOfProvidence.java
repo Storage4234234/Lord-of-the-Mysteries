@@ -98,7 +98,7 @@ public class DomainOfProvidence extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, put down a domain of providence, which will cause everything in the radius of it to encounter overwhelmingly positive effects, the strength of them being stronger the smaller area. Examples include entities getting regeneration, stone turning to ores, crops growing faster, repair tools, and more"));
+        tooltipComponents.add(Component.literal("Upon use, create a domain of providence in which crops grow faster, stone will turn into ores, and you and your allies will gain positive potion effects, lose all harmful effects, receive luck, saturation, have their items repaired, and lose misfortune. The strength of these effects increases with a smaller size. Use again within the domain to remove it."));
         tooltipComponents.add(Component.literal("Left Click to increase radius"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("400").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("30 Seconds").withStyle(ChatFormatting.YELLOW)));
