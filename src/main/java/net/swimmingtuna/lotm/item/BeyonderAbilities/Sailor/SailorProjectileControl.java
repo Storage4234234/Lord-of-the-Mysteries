@@ -47,7 +47,7 @@ public class SailorProjectileControl extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        tooltipComponents.add(Component.literal("Upon use, haves all of your projectiles curve towards the nearest living entity, use it again to turn it off"));
+        tooltipComponents.add(Component.literal("Upon use, toggles whether your projectiles will curve towards nearby entities."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("None").withStyle(ChatFormatting.YELLOW)));
         Component.literal("Cooldown: ").append(Component.literal("None").withStyle(ChatFormatting.YELLOW));
         tooltipComponents.add(getPathwayText(this.requiredClass.get()));
