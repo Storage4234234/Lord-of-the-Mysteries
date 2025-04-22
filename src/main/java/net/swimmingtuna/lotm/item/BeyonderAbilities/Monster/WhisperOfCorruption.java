@@ -45,7 +45,7 @@ public class WhisperOfCorruption extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, summons a sphere of corruption in the direction you're looking, hurting and corrupting all entities hit"));
+        tooltipComponents.add(Component.literal("Upon use, summons a sphere of corruption in the direction you're looking, which hurts and corrupts all entities hit."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("800").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("15 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
