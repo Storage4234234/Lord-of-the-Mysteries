@@ -60,7 +60,7 @@ public class ChaosAmplification extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, increases the strength of all calamities and unlucky events by the amount set"));
+        tooltipComponents.add(Component.literal("Upon use, increases the strength of all calamities and unlucky events by the set amount."));
         tooltipComponents.add(Component.literal("Left Click to increase amplification"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("2000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Minute").withStyle(ChatFormatting.YELLOW)));
