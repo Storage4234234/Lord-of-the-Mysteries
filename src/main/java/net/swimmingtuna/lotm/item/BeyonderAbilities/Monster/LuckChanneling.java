@@ -78,7 +78,7 @@ public class LuckChanneling extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, if you have an empty glass in your off hand, it will convert into a bottle of luck, filling it with all of your luck at the expense of half of it. At lower sequences, this will also absorb luck from entities around you. You can then throw the bottle to get the accumulated luck. A"));
+        tooltipComponents.add(Component.literal("Upon use, if you have an empty glass in your off hand, it will convert into a bottle of luck, absorbing all of your current luck. At lower sequences, this will also absorb luck from entities around you. You can then throw the bottle to get the accumulated luck."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("150").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("5 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
