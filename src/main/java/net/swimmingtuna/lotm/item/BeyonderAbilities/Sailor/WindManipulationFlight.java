@@ -145,7 +145,7 @@ public class WindManipulationFlight extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        tooltipComponents.add(Component.literal("Upon use, uses the wind to burst forward in the direction the player is looking three times or allow the user to fly, depending on the sequence"));
+        tooltipComponents.add(Component.literal("Upon use, uses the wind to burst forward in the direction you're looking three times or to fly after sequence 4."));
         tooltipComponents.add(Component.literal("Left Click for Wind Manipulation (Sense)"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("40 / 40 Per Second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("5 Seconds").withStyle(ChatFormatting.YELLOW)));
