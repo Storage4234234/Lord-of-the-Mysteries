@@ -66,7 +66,7 @@ public class LuckDenial extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, doesnt allow a target to gain any luck for a long period of time. If your sequence is less than two, then it will also not allow their misfortune value to go below that amount."));
+        tooltipComponents.add(Component.literal("Upon use, prevent a target from gaining luck for a long period of time. If your sequence is less than two, then it will also prevent their misfortune value from going below that amount."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("175").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("5 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
