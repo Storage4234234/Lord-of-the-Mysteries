@@ -45,7 +45,7 @@ public class AqueousLightPush extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, shoots a water bubble that upon hit, pushes the target away from the user\n" +
+        tooltipComponents.add(Component.literal("Upon use, shoots a water bubble that, upon hit, pushes the target away from the user.\n" +
                 "Spirituality Used: 50\n" +
                 "Cooldown: 3 seconds").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
