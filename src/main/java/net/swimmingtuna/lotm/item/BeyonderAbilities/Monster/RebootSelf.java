@@ -62,7 +62,7 @@ public class RebootSelf extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use if you're shifting, save your current state including health, spirituality, potion effects, luck, misfortune, sanity, and corruption. If not shifting, load your saved state"));
+        tooltipComponents.add(Component.literal("Upon use if you're shifting, save your current state including health, spirituality, potion effects, luck, misfortune, sanity, and corruption. If not shifting, revert to your saved state."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("2000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Minute").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
