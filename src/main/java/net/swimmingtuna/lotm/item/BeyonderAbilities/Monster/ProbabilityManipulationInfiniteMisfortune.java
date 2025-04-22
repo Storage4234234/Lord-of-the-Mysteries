@@ -57,7 +57,7 @@ public class ProbabilityManipulationInfiniteMisfortune extends SimpleAbilityItem
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, causes the targeted entity, or if nothing is targeted, yourself, to gain infinite misfortune for 3 minutes"));
+        tooltipComponents.add(Component.literal("Upon use, causes the targeted entity, or if nothing is targeted, yourself, to gain infinite misfortune for 3 minutes."));
         tooltipComponents.add(Component.literal("Left click for Probability Manipulation: World Fortune. Shift to increase amount"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("4000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("2 Minutes").withStyle(ChatFormatting.YELLOW)));
