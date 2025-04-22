@@ -62,7 +62,7 @@ public class SirenSongStun extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, sings out a song which stuns everyone around you every couple seconds"));
+        tooltipComponents.add(Component.literal("Upon use, sings out a song which stuns everyone around you every couple seconds."));
         tooltipComponents.add(Component.literal("Left Click for Siren Song Weaken"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("300").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("50 Seconds").withStyle(ChatFormatting.YELLOW)));
