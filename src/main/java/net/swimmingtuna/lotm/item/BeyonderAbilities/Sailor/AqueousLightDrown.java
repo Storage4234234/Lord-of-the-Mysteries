@@ -49,7 +49,7 @@ public class AqueousLightDrown extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, shoots a water bubble that upon hit, summons a water bubble around the target's head that causes them to drown\n" +
+        tooltipComponents.add(Component.literal("Upon use, shoots a water bubble that, upon hit, summons a water bubble around the target's head which causes them to drown.\n" +
                 "Spirituality Used: 75\n" +
                 "Cooldown: 15 seconds").withStyle(ChatFormatting.BOLD, ChatFormatting.BLUE));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
