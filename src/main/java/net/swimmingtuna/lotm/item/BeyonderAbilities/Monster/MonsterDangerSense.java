@@ -48,7 +48,7 @@ public class MonsterDangerSense extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, enable or disable your danger sense. If enabled, it will alert you of all players nearby holding weapons and of all projectory's trajectory"));
+        tooltipComponents.add(Component.literal("Upon use, toggle your danger sense. If enabled, it will alert you of all nearby players holding weapons and show all projectile trajectories."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("None").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Second").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
