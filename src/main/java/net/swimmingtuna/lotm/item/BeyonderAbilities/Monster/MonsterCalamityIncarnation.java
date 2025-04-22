@@ -134,7 +134,7 @@ public class MonsterCalamityIncarnation extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, turn into a calamity of your choice"));
+        tooltipComponents.add(Component.literal("Upon use, transform into a calamity of your choice."));
         tooltipComponents.add(Component.literal("Left click to cycle"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("700").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("45 Seconds").withStyle(ChatFormatting.YELLOW)));
