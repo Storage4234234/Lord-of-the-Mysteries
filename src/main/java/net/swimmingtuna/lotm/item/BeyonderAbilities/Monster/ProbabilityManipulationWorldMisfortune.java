@@ -60,7 +60,7 @@ public class ProbabilityManipulationWorldMisfortune extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, increases the chances of misfortunate events occuring to everything by the chosen amount"));
+        tooltipComponents.add(Component.literal("Upon use, increases the chances of misfortunate events occuring to everything by the chosen amount."));
         tooltipComponents.add(Component.literal("Left click for Probability Manipulation: Wipe"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1500").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("30 Seconds").withStyle(ChatFormatting.YELLOW)));
