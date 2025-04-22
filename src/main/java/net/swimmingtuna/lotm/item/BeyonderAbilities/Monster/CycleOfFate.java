@@ -75,7 +75,7 @@ public class CycleOfFate extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use on an entity traps a target in a cycle of fate. If you die near the target or 60 seconds pass, everything around them will be reset to how it was when you used the ability on them. Including cooldowns, position, potion effects, and, excluding you, spirituality. Each reset will cost you 1000 spirituality, and you can stop the cycle by clicking on the target again, or running out of spirituality"));
+        tooltipComponents.add(Component.literal("Upon use on an entity, traps it in a cycle of fate. If you die near the target or 60 seconds pass, everything around the target will be reset to how it was when you used the ability on them. This includes cooldowns, positions, potion effects, and spirituality (except yours). Each reset will cost you 1000 spirituality, and you can stop the cycle by either clicking on the target again or running out of spirituality."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("3 Minutes").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
