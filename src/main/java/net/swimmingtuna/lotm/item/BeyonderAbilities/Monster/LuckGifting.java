@@ -73,7 +73,7 @@ public class LuckGifting extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, takes away half the luck gifting amount to give the target the full luck gifting amount"));
+        tooltipComponents.add(Component.literal("Upon use, consume half the set amount of luck to give the target the full set amount."));
         tooltipComponents.add(Component.literal("Shift to increase luck gifting amount"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("100").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("8 Seconds").withStyle(ChatFormatting.YELLOW)));
