@@ -58,7 +58,7 @@ public class DomainOfProvidence extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal(
-                "Upon use, exude an aura of tyranny, not giving any entity permission to move, implanting fear strong enough to not allow them to use their abilities"
+                "Shift to increase radius at the cost of weaker effects. Upon use, create a domain of providence in which crops will grow faster, stone will turn into ores, you and your allies will gain positive potion effects, lose all harmful effects, receive luck, saturation, have their items repaired, and lose misfortune. Click again on the block with this item to remove it."
         ).withStyle(/*ChatFormatting.BOLD, ChatFormatting.BLUE*/));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
