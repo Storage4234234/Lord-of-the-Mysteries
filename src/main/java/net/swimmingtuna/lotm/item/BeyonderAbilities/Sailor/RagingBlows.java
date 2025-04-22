@@ -95,7 +95,7 @@ public class RagingBlows extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, unleash a fury of blows in the direction you're looking for a period of time"));
+        tooltipComponents.add(Component.literal("Upon use, unleash a fury of blows in the direction you're looking for a period of time."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("45").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("15 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(getPathwayText(this.requiredClass.get()));
