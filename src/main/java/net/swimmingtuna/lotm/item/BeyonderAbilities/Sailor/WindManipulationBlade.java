@@ -44,7 +44,7 @@ public class WindManipulationBlade extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, shoots out a blade of wind"));
+        tooltipComponents.add(Component.literal("Upon use, shoots out a blade of wind in the direction you're looking."));
         tooltipComponents.add(Component.literal("Left Click for Wind Manipulation (Cushion)"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("100").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1.5 Seconds").withStyle(ChatFormatting.YELLOW)));
