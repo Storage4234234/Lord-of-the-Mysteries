@@ -54,7 +54,7 @@ public class CalamityIncarnationTsunami extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, summon a ginormous bubble of water around you for 10 seconds"));
+        tooltipComponents.add(Component.literal("Upon use, summon a huge bubble of water around you for 10 seconds."));
         tooltipComponents.add(Component.literal("Left Click for Calamity Incarnation (Tornado)"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("50 Seconds").withStyle(ChatFormatting.YELLOW)));
