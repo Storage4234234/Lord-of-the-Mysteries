@@ -82,7 +82,7 @@ public class Hurricane extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, summon a hurricane which will rain down lightning and summon tornado's in a large area around you for 30 seconds"));
+        tooltipComponents.add(Component.literal("Upon use, summon a hurricane which will rain down lightning and summon tornadoes in a large area around you for 30 seconds."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1.5 Minutes").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
