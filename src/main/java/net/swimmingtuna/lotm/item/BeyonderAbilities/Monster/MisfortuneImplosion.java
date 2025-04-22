@@ -106,7 +106,7 @@ public class MisfortuneImplosion extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, causes all entities misfortune around you to implode, causing them to deal with either an explosion which scales off their misfortune, wither and the inability to regenerate for a time dependent on their misfortunem, or lightning to be attracted to them for a time dependent on their misfortune"));
+        tooltipComponents.add(Component.literal("Upon use, causes the misfortune of all surrounding entities to implode, inducing either an explosion which scales off their misfortune, wither and inability to regenerate for a time dependent on their misfortune, or lightning to be attracted to them for a time dependent on their misfortune."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("10 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
