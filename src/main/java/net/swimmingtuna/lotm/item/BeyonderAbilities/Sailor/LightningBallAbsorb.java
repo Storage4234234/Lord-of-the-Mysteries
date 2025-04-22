@@ -41,7 +41,7 @@ public class LightningBallAbsorb extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, briefly charge up a ball of condensed lightning which will absorb all nearby lightning, growing in size and destructive capability before being shot out"));
+        tooltipComponents.add(Component.literal("Upon use, briefly charge up a ball of condensed lightning which will absorb all nearby lightning, growing in size and destructive capability before being shot out."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1500").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("45 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
