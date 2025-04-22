@@ -263,7 +263,7 @@ public class SirenSongHarm extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, sings out a song which harms everyone around you if they're in it"));
+        tooltipComponents.add(Component.literal("Upon use, sings out a song which harms everyone around you."));
         tooltipComponents.add(Component.literal("Left Click for Siren Song Strengthen"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("300").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("50 Seconds").withStyle(ChatFormatting.YELLOW)));
