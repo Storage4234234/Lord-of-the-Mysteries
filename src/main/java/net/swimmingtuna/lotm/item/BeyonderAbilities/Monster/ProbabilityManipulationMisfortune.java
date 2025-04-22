@@ -57,7 +57,7 @@ public class ProbabilityManipulationMisfortune extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use on a target or typing a player's name in chat, gives them all misfortunate/cataclysmic events"));
+        tooltipComponents.add(Component.literal("Upon use on a target or typing a player's name in chat, gives them misfortunate/cataclysmic events."));
         tooltipComponents.add(Component.literal("Left click for Probability Manipulation: Infinite Fortune"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("1000 if on a single target, 3500 otherwise").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("25 Seconds").withStyle(ChatFormatting.YELLOW)));
