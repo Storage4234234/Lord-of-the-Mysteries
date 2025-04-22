@@ -43,7 +43,7 @@ public class EnableDisableRipple extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        tooltipComponents.add(Component.literal("Upon use, activates your danger sense, alerting you of players around you and where they are"));
+        tooltipComponents.add(Component.literal("Upon use, activate your danger sense, alerting you of surrounding players and their locations."));
         tooltipComponents.add(Component.literal("Activation Cost: ").append(Component.literal("None").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("40 per second").withStyle(ChatFormatting.YELLOW)));
         Component.literal("Cooldown: ").append(Component.literal("None").withStyle(ChatFormatting.YELLOW));
