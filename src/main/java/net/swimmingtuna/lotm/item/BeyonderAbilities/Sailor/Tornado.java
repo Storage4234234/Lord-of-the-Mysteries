@@ -45,7 +45,7 @@ public class Tornado extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, summons a tornado that moves in the direction you're looking. If used at the highest sequence, it deals mental damage instead of physical"));
+        tooltipComponents.add(Component.literal("Upon use, summons a tornado that moves in the direction you're looking. If used at the highest sequence, it deals mental damage instead of physical."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("500").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("10 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
