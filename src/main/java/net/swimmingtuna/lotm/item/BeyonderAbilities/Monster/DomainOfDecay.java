@@ -55,7 +55,7 @@ public class DomainOfDecay extends SimpleAbilityItem {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal(
-                "Upon use, exude an aura of tyranny, not giving any entity permission to move, implanting fear strong enough to not allow them to use their abilities"
+                "Shift to increase radius at the cost of weaker effects. Upon use, create a domain of decay in which crops will wither, ores turn to stone, and everything except you and your allies will be withered, have their armor and tools damaged, lose experience, receive hunger, wither, poison, lose all positive effects, increase misfortune, and lose luck. Click again on the block with this item to remove it."
         ).withStyle(/*ChatFormatting.BOLD, ChatFormatting.BLUE*/));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }
