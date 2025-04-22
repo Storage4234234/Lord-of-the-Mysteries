@@ -40,7 +40,7 @@ public class LightningBranch extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, summons a lightning that branches out as it goes on"));
+        tooltipComponents.add(Component.literal("Upon use, summons a lightning bolt that branches out as it travels."));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("450").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("8 Seconds").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(SimpleAbilityItem.getPathwayText(this.requiredClass.get()));
