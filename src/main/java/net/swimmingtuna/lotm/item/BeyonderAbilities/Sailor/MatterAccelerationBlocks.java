@@ -47,7 +47,7 @@ public class MatterAccelerationBlocks extends SimpleAbilityItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.literal("Upon use, accelerates ten blocks to your side. While they're on your side, left click to shoot them out, dealing massive damage to any "));
+        tooltipComponents.add(Component.literal("Upon use, accelerates ten blocks to your side. While they're at your side, left click to shoot them out, dealing massive damage."));
         tooltipComponents.add(Component.literal("Left Click for Matter Acceleration (Entities)"));
         tooltipComponents.add(Component.literal("Spirituality Used: ").append(Component.literal("2000").withStyle(ChatFormatting.YELLOW)));
         tooltipComponents.add(Component.literal("Cooldown: ").append(Component.literal("1 Minute").withStyle(ChatFormatting.YELLOW)));
